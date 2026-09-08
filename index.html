@@ -6,45 +6,247 @@
   <title>Thaipodee Worldwide Market Online v2026</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
-    .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; }
-    .video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; display: flex; align-items: center; justify-content: center; }
-    .video-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .video-placeholder h2 { font-size: 24px; margin-bottom: 10px; text-align: center; padding: 0 20px; }
-    .video-placeholder p { color: #aaa; text-align: center; padding: 0 20px; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; }
     
-    .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
-    .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .action-icon { font-size: 28px; margin-bottom: 4px; }
+    .app-container { 
+      position: relative; 
+      width: 100%; 
+      height: 100vh; 
+      max-width: 480px; 
+      margin: 0 auto;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      overflow: hidden;
+      padding-bottom: 110px;
+    }
+
+    .video-container { 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+
+    .video-placeholder { 
+      width: 100%; 
+      height: 100%; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      padding: 20px;
+      padding-bottom: 140px;
+    }
+
+    .video-placeholder h2 { 
+      font-size: 22px; 
+      font-weight: 700;
+      text-align: center; 
+      margin-bottom: 12px; 
+      line-height: 1.3;
+    }
+
+    .video-placeholder p { 
+      color: #cbd5e1; 
+      font-size: 15px; 
+      text-align: center; 
+    }
+
+    .video-info { 
+      position: absolute; 
+      bottom: 115px;
+      left: 16px; 
+      right: 90px;
+    }
+
+    .author-name { 
+      font-weight: 600; 
+      font-size: 15px; 
+      margin-bottom: 6px; 
+      display: flex; 
+      align-items: center; 
+      gap: 6px;
+    }
+
+    .desc { 
+      font-size: 13px; 
+      color: #eee; 
+      line-height: 1.4; 
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .music-line { 
+      display: flex; 
+      align-items: center; 
+      font-size: 12px; 
+      color: #ddd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-dot { 
+      width: 10px; 
+      height: 10px; 
+      border-radius: 50%; 
+      background: #f00; 
+      margin-right: 6px; 
+      flex-shrink: 0;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse { 
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+    }
+
+    .side-actions { 
+      position: absolute; 
+      right: 12px; 
+      bottom: 150px;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 24px;
+    }
+
+    .action-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .action-icon { font-size: 28px; }
     .action-count { font-size: 12px; color: #fff; }
-    .profile-icon { width: 48px; height: 48px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
-    .follow-btn { width: 24px; height: 24px; border-radius: 50%; background: #ff0050; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-top: -12px; border: 2px solid #000; }
-    
-    .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; height: 70px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); }
-    .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .nav-icon { font-size: 24px; margin-bottom: 2px; }
-    .nav-label { font-size: 10px; color: #aaa; }
-    .nav-item.active .nav-label { color: #fff; }
-    .nav-item.active .nav-icon { transform: scale(1.1); }
-    
-    .post-btn { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); width: 56px; height: 56px; background: #ff0050; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; }
+
+    .profile-icon { 
+      width: 44px; 
+      height: 44px; 
+      border-radius: 50%; 
+      background: #334155; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      position: relative;
+    }
+
+    .follow-btn { 
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 20px; 
+      height: 20px; 
+      border-radius: 50%; 
+      background: #f00; 
+      color: #fff; 
+      font-size: 14px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .post-btn { 
+      position: absolute; 
+      bottom: 95px;
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: 56px; 
+      height: 56px; 
+      background: #f00; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 100;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+
     .post-btn svg { width: 30px; height: 30px; }
-    
-    .video-info { position: absolute; bottom: 90px; left: 16px; right: 80px; }
-    .author-name { font-weight: bold; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .desc { font-size: 14px; color: #eee; line-height: 1.4; margin-bottom: 8px; }
-    .music-line { display: flex; align-items: center; font-size: 13px; color: #ddd; }
-    .music-dot { width: 12px; height: 12px; border-radius: 50%; background: #ff0050; margin-right: 6px; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-    
-    .upload-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; padding: 20px; overflow-y: auto; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-top: 10px; }
+
+    .bottom-nav { 
+      position: absolute; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 85px;
+      background: rgba(0,0,0,0.85); 
+      backdrop-filter: blur(10px);
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center; 
+      border-top: 1px solid #333;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .nav-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 11px; color: #aaa; }
+    .nav-item.active .nav-label { color: #fff; }
+
+    .upload-modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: #000; 
+      z-index: 999; 
+      padding: 20px; 
+      overflow-y: auto;
+    }
+
+    .modal-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 30px; 
+      padding-top: 10px;
+    }
+
     .modal-title { font-size: 20px; font-weight: bold; }
-    .close-btn { font-size: 28px; cursor: pointer; color: #fff; background: none; border: none; }
-    .upload-area { border: 2px dashed #555; border-radius: 12px; padding: 40px 20px; text-align: center; margin-bottom: 25px; }
-    .upload-area input { color: #fff; font-size: 16px; }
-    .upload-note { color: #aaa; margin-top: 15px; }
-    .post-submit { width: 100%; padding: 14px; background: #ff0050; color: #fff; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+    .close-btn { font-size: 28px; cursor: pointer; color: #fff; }
+
+    .upload-area { 
+      border: 2px dashed #444; 
+      border-radius: 12px; 
+      padding: 40px 20px; 
+      text-align: center; 
+      margin-bottom: 25px;
+    }
+
+    .upload-area input { color: #fff; font-size: 15px; }
+    .upload-note { color: #888; margin-top: 15px; font-size: 13px; }
+
+    .post-submit { 
+      width: 100%; 
+      padding: 14px; 
+      background: #f00; 
+      color: #fff; 
+      border: none; 
+      border-radius: 8px; 
+      font-size: 18px; 
+      cursor: pointer;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -64,24 +266,25 @@
 
     <div class="side-actions">
       <div class="action-item">
-        <div class="profile-icon">👤</div>
-        <div class="follow-btn">+</div>
+        <div class="profile-icon">👤
+          <div class="follow-btn">+</div>
+        </div>
       </div>
       <div class="action-item" id="likeBtn">
-        <div class="action-icon">❤️</div>
-        <div class="action-count" id="likeCount">1.2K</div>
+        <span class="action-icon">❤️</span>
+        <span class="action-count" id="likeCount">1.2K</span>
       </div>
-      <div class="action-item" id="commentBtn">
-        <div class="action-icon">💬</div>
-        <div class="action-count">345</div>
+      <div class="action-item">
+        <span class="action-icon">💬</span>
+        <span class="action-count">345</span>
       </div>
-      <div class="action-item" id="saveBtn">
-        <div class="action-icon">🔖</div>
-        <div class="action-count">210</div>
+      <div class="action-item">
+        <span class="action-icon">📦</span>
+        <span class="action-count">210</span>
       </div>
       <div class="action-item" id="shareBtn">
-        <div class="action-icon">↗️</div>
-        <div class="action-count">Share</div>
+        <span class="action-icon">↗️</span>
+        <span class="action-count">Share</span>
       </div>
     </div>
 
@@ -91,31 +294,31 @@
 
     <div class="bottom-nav">
       <div class="nav-item active">
-        <div class="nav-icon">🏠</div>
-        <div class="nav-label">Home</div>
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
       </div>
       <div class="nav-item">
-        <div class="nav-icon">🔍</div>
-        <div class="nav-label">Discover</div>
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Discover</span>
       </div>
       <div class="nav-item">
-        <div class="nav-icon">🛒</div>
-        <div class="nav-label">Shop</div>
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Shop</span>
       </div>
       <div class="nav-item">
-        <div class="nav-icon">💬</div>
-        <div class="nav-label">Inbox</div>
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">Inbox</span>
       </div>
       <div class="nav-item">
-        <div class="nav-icon">👤</div>
-        <div class="nav-label">Profile</div>
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
       </div>
     </div>
 
     <div class="upload-modal" id="uploadModal">
       <div class="modal-header">
         <h3 class="modal-title">Upload Video</h3>
-        <button class="close-btn" onclick="closeUploadModal()">✕</button>
+        <span class="close-btn" onclick="closeUploadModal()">✕</span>
       </div>
       <div class="upload-area">
         <input type="file" id="videoInput" accept="video/*">
@@ -127,34 +330,25 @@
 
   <script>
     let liked = false;
-    let likeCount = 1200;
+    let likeCountNum = 1200;
+    
     document.getElementById('likeBtn').addEventListener('click', () => {
       liked = !liked;
-      likeCount += liked ? 1 : -1;
-      document.getElementById('likeBtn').style.color = liked ? '#ff0050' : '#fff';
-      document.getElementById('likeCount').textContent = likeCount > 1000 ? (likeCount/1000).toFixed(1)+'K' : likeCount;
-    });
-
-    document.getElementById('commentBtn').addEventListener('click', () => {
-      alert('Comments feature coming soon!');
-    });
-
-    let saved = false;
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      saved = !saved;
-      document.getElementById('saveBtn').style.color = saved ? '#ffd700' : '#fff';
-      alert(saved ? 'Saved to favorites!' : 'Removed from favorites');
+      likeCountNum += liked ? 1 : -1;
+      document.getElementById('likeBtn').style.color = liked ? '#f00' : '#fff';
+      document.getElementById('likeCount').textContent = likeCountNum >= 1000 
+        ? (likeCountNum/1000).toFixed(1) + 'K' 
+        : likeCountNum;
     });
 
     document.getElementById('shareBtn').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
           title: 'Thaipodee Worldwide Market Online v2026',
-          text: 'Join Thaipodee Worldwide — Global Marketplace for Everyone!',
           url: window.location.href
         });
       } else {
-        alert('Link copied! Share with the world!');
+        alert('Link copied! Share it with friends!');
       }
     });
 
@@ -162,18 +356,19 @@
       document.getElementById('uploadModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
+
     function closeUploadModal() {
       document.getElementById('uploadModal').style.display = 'none';
       document.body.style.overflow = 'auto';
     }
+
     function uploadVideo() {
-      const fileInput = document.getElementById('videoInput');
-      if (!fileInput.files.length) {
-        alert('Please select a video file first');
+      const input = document.getElementById('videoInput');
+      if (!input.files || input.files.length === 0) {
+        alert('Please select a video file first!');
         return;
       }
-      const file = fileInput.files[0];
-      alert(`Uploading: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)\n\nUpload successful! Posted to the World!`);
+      alert('Video uploaded successfully! ✅\n(This is demo version)');
       closeUploadModal();
     }
   </script>
