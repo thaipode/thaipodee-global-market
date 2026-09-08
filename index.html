@@ -1,507 +1,320 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Thaipodee Market Online World Platform">
-    <meta name="apple-mobile-web-app-title" content="Thaipodee Market Online">
-    <meta name="application-name" content="Thaipodee Market Online">
-    <meta name="theme-color" content="#000000">
-    <title>Thaipodee Market Online World Platform</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        body { background: #000; color: #fff; min-height: 100vh; overflow-x: hidden; }
-        
-        /* ===== HEADER — ชื่อใหม่ทุกจุด ===== */
-        .header { position: fixed; top: 0; left: 0; right: 0; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
-        .header-center { font-size: 16px; font-weight: 600; }
-        .brand-name { font-size: 15px; font-weight: 700; color: #ff0050; }
-        .header-right { display: flex; gap: 16px; align-items: center; }
-        .icon-search, .icon-menu { font-size: 22px; cursor: pointer; }
-        
-        /* ===== VIDEO FEED — รูดขึ้น-ลง เปลี่ยนวิดีโอ ลื่นไหล ===== */
-        .video-container { position: fixed; top: 0; left: 0; right: 0; bottom: 60px; overflow: hidden; touch-action: pan-y; z-index: 10; }
-        .video-wrapper { height: 100%; transition: transform 0.3s ease-out; }
-        .video-slide { height: 100%; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 80px 16px 100px; }
-        .video-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); z-index: -1; }
-        .video-info { margin-bottom: 80px; }
-        .video-username { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-        .video-desc { font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
-        .video-music { font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        
-        /* ===== SIDE ICONS — ทุกปุ่มทำงาน กดได้ ===== */
-        .side-actions { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 50; }
-        .action-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; transition: transform 0.15s; }
-        .action-btn:active { transform: scale(0.9); }
-        .action-icon { font-size: 28px; line-height: 1; }
-        .action-count { font-size: 11px; color: #fff; margin-top: 2px; }
-        .avatar-side { width: 44px; height: 44px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; }
-        .avatar-side img { width: 100%; height: 100%; object-fit: cover; }
-        .follow-badge { width: 22px; height: 22px; border-radius: 50%; background: #ff0050; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-top: -8px; }
-        
-        /* ===== BOTTOM NAVIGATION — ครบ 5 ปุ่ม ทำงานทุกอัน ===== */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; font-size: 10px; color: #fff; opacity: 0.7; transition: opacity 0.2s; }
-        .nav-item.active { opacity: 1; }
-        .nav-icon { font-size: 22px; line-height: 1; }
-        .nav-create { width: 44px; height: 32px; background: linear-gradient(90deg, #00f2ff, #ff00c8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #000; font-weight: bold; }
-        
-        /* ===== UPLOAD PAGE — อัปโหลดวิดีโอได้จริง ===== */
-        .upload-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .upload-page.show { display: flex; }
-        .close-btn { position: absolute; top: 16px; left: 16px; font-size: 28px; cursor: pointer; color: #fff; }
-        .upload-icon { font-size: 64px; margin-bottom: 16px; }
-        .upload-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-        .upload-subtitle { color: #888; margin-bottom: 32px; }
-        .file-input-wrapper { width: 100%; max-width: 340px; }
-        .file-input-label { display: block; width: 100%; padding: 20px; background: #1a1a1a; border-radius: 12px; text-align: center; cursor: pointer; margin-bottom: 16px; border: 2px dashed #444; transition: all 0.3s; }
-        .file-input-label:hover { border-color: #ff0050; background: #222; }
-        #video-file { display: none; }
-        .video-preview { width: 100%; max-width: 340px; border-radius: 12px; margin-bottom: 16px; display: none; background: #000; }
-        .caption-input { width: 100%; max-width: 340px; padding: 14px; background: #1a1a1a; border: none; border-radius: 12px; color: #fff; font-size: 15px; margin-bottom: 12px; }
-        .hashtag-input { width: 100%; max-width: 340px; padding: 14px; background: #1a1a1a; border: none; border-radius: 12px; color: #fff; font-size: 15px; margin-bottom: 20px; }
-        .post-btn { width: 100%; max-width: 340px; padding: 14px; background: #ff0050; border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
-        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .progress-bar { width: 100%; max-width: 340px; height: 6px; background: #333; border-radius: 3px; margin-top: 16px; display: none; overflow: hidden; }
-        .progress-fill { height: 100%; background: #ff0050; width: 0%; transition: width 0.3s; }
-        
-        /* ===== PROFILE PAGE — ครบสถิติ + ตารางโพสต์ ===== */
-        .profile-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 150; display: none; overflow-y: auto; padding-bottom: 80px; }
-        .profile-page.show { display: block; }
-        .profile-header { padding: 40px 20px 20px; display: flex; flex-direction: column; align-items: center; }
-        .profile-avatar-large { width: 90px; height: 90px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 12px; overflow: hidden; }
-        .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-        .profile-username { color: #888; font-size: 14px; margin-bottom: 20px; }
-        .profile-stats { display: flex; gap: 30px; margin-bottom: 20px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 18px; font-weight: 600; }
-        .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
-        .profile-buttons { display: flex; gap: 10px; margin-bottom: 24px; }
-        .btn-follow { padding: 10px 30px; background: #ff0050; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; color: #fff; font-size: 14px; }
-        .btn-message { padding: 10px 24px; background: #222; border-radius: 6px; cursor: pointer; border: none; color: #fff; font-size: 14px; }
-        .btn-edit { padding: 10px 24px; background: #222; border-radius: 6px; cursor: pointer; border: none; color: #fff; font-size: 14px; }
-        .profile-desc { padding: 0 20px 20px; font-size: 14px; line-height: 1.5; color: #ccc; text-align: center; max-width: 320px; }
-        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px; }
-        .post-item { aspect-ratio: 9/16; background: #1a1a1a; border-radius: 2px; overflow: hidden; cursor: pointer; position: relative; }
-        .post-item img, .post-item video { width: 100%; height: 100%; object-fit: cover; }
-        .post-duration { position: absolute; bottom: 4px; right: 4px; font-size: 11px; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 2px; }
-        .back-btn-profile { position: absolute; top: 16px; left: 16px; font-size: 24px; cursor: pointer; color: #fff; text-decoration: none; }
-        
-        /* ===== SHOP / MARKET PAGE — ตลาดสินค้า ===== */
-        .shop-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 150; display: none; overflow-y: auto; padding-bottom: 80px; padding-top: 60px; }
-        .shop-page.show { display: block; }
-        .shop-header { padding: 20px; text-align: center; }
-        .shop-icon { font-size: 48px; margin-bottom: 12px; }
-        .shop-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-        .shop-subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 12px; }
-        .product-card { background: #1a1a1a; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-        .product-card:active { transform: scale(0.98); }
-        .product-img { width: 100%; aspect-ratio: 1; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        .product-info { padding: 10px; }
-        .product-name { font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
-        .product-price { font-size: 16px; font-weight: 700; color: #ff0050; }
-        .back-btn-shop { position: absolute; top: 16px; left: 16px; font-size: 24px; cursor: pointer; color: #fff; text-decoration: none; }
-        
-        /* ===== MESSAGES PAGE ===== */
-        .messages-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 150; display: none; overflow-y: auto; padding-bottom: 80px; padding-top: 60px; }
-        .messages-page.show { display: block; }
-        .msg-header { padding: 20px; text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; }
-        .msg-list { padding: 0; }
-        .msg-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #222; cursor: pointer; }
-        .msg-item:active { background: #111; }
-        .msg-avatar { width: 48px; height: 48px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .msg-content { flex: 1; }
-        .msg-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .msg-preview { font-size: 13px; color: #888; }
-        .msg-badge { background: #ff0050; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; }
-        .back-btn-msg { position: absolute; top: 16px; left: 16px; font-size: 24px; cursor: pointer; color: #fff; text-decoration: none; }
-        
-        /* ===== HIDE ALL PAGES EXCEPT FEED BY DEFAULT ===== */
-        .page { display: none; }
-        .page.active { display: block; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Thaipodee Market Online World Platform">
+  <meta name="apple-mobile-web-app-title" content="Thaipodee Market Online">
+  <meta name="application-name" content="Thaipodee Market Online">
+  <meta name="theme-color" content="#000000">
+  <title>Thaipodee Market Online World Platform</title>
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff2d55;
+}
+
+.header-center {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.icon-search, .icon-menu {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.video-slide {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-slide.active {
+  opacity: 1;
+}
+
+.video-bg {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.video-info {
+  position: absolute;
+  bottom: 120px;
+  left: 16px;
+  right: 90px;
+  z-index: 10;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.video-username {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.video-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+
+.video-music {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.side-actions {
+  position: absolute;
+  right: 12px;
+  bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  z-index: 10;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.action-icon {
+  font-size: 28px;
+}
+
+.action-count {
+  font-size: 11px;
+}
+
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: #000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  border-top: 1px solid #222;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.nav-icon {
+  font-size: 24px;
+}
+
+.nav-item.post-btn .nav-icon {
+  width: 44px;
+  height: 32px;
+  background: linear-gradient(45deg, #00f2ea, #ff2d55);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+@media (max-width: 480px) {
+  .video-info {
+    bottom: 110px;
+    left: 12px;
+    right: 80px;
+  }
+  .video-username { font-size: 15px; }
+  .video-desc { font-size: 13px; }
+  .side-actions { bottom: 130px; gap: 22px; }
+}
+
+@media (min-width: 768px) {
+  .video-info {
+    bottom: 130px;
+    left: 24px;
+    right: 120px;
+  }
+  .side-actions { right: 20px; bottom: 150px; gap: 28px; }
+  .video-username { font-size: 18px; }
+  .video-desc { font-size: 15px; }
+}
+  </style>
 </head>
 <body>
 
-<!-- ===== HEADER — ชื่อแพลตฟอร์มใหม่ทุกจุด ===== -->
-<header class="header">
-    <span class="brand-name">Thaipodee Market</span>
-    <span class="header-center">สำหรับคุณ</span>
-    <div class="header-right">
-        <span class="icon-search">🔍</span>
-        <span class="icon-menu">☰</span>
-    </div>
-</header>
+<div class="header">
+  <span class="brand-name">Thaipodee Market</span>
+  <span class="header-center">สำหรับคุณ</span>
+  <div class="header-right">
+    <span class="icon-search">🔍</span>
+    <span class="icon-menu">☰</span>
+  </div>
+</div>
 
-<!-- ===== VIDEO FEED — รูดขึ้น-ลง เปลี่ยนวิดีโอได้ ===== -->
 <div class="video-container" id="videoContainer">
-    <div class="video-wrapper" id="videoWrapper">
-        <!-- Video Slide 1 -->
-        <div class="video-slide">
-            <div class="video-bg"></div>
-            <div class="video-info">
-                <div class="video-username">จักรพงษ์ โพดีรจนกุล</div>
-                <div class="video-desc">ยินดีต้อนรับสู่ Thaipodee Market Online World Platform — แพลตฟอร์มระดับโลกสำหรับทุกคน 🇹🇭🌍</div>
-                <div class="video-music">🎵 เสียงต้นฉบับ — จักรพงษ์</div>
-            </div>
-            <!-- Side Icons -->
-            <div class="side-actions">
-                <div class="avatar-side">👤</div>
-                <div class="action-btn" id="likeBtn">
-                    <span class="action-icon">❤️</span>
-                    <span class="action-count">0</span>
-                </div>
-                <div class="action-btn" id="commentBtn">
-                    <span class="action-icon">💬</span>
-                    <span class="action-count">0</span>
-                </div>
-                <div class="action-btn" id="saveBtn">
-                    <span class="action-icon">⭐</span>
-                    <span class="action-count">0</span>
-                </div>
-                <div class="action-btn" id="shareBtn">
-                    <span class="action-icon">↗️</span>
-                    <span class="action-count">0</span>
-                </div>
-            </div>
-        </div>
-        <!-- Video Slide 2 -->
-        <div class="video-slide">
-            <div class="video-bg" style="background: linear-gradient(135deg, #2e1a2e 0%, #3e163e 50%, #600f60 100%);"></div>
-            <div class="video-info">
-                <div class="video-username">ร้านค้าตัวอย่าง</div>
-                <div class="video-desc">สินค้าแสนดี — ช้อปปิ้งทั่วโลก 🌐 เข้ามาเป็นส่วนหนึ่งของแพลตฟอร์มได้เลยครับ</div>
-                <div class="video-music">🎵 เพลงประกอบ — Thaipodee Market</div>
-            </div>
-            <div class="side-actions">
-                <div class="avatar-side">🏪</div>
-                <div class="action-btn">
-                    <span class="action-icon">❤️</span>
-                    <span class="action-count">128</span>
-                </div>
-                <div class="action-btn">
-                    <span class="action-icon">💬</span>
-                    <span class="action-count">24</span>
-                </div>
-                <div class="action-btn">
-                    <span class="action-icon">⭐</span>
-                    <span class="action-count">56</span>
-                </div>
-                <div class="action-btn">
-                    <span class="action-icon">↗️</span>
-                    <span class="action-count">12</span>
-                </div>
-            </div>
-        </div>
+  <div class="video-wrapper">
+    <div class="video-slide active">
+      <div class="video-bg"></div>
+      <div class="video-info">
+        <div class="video-username">ชื่อผู้ใช้</div>
+        <div class="video-desc">Thaipodee Market — แพลตฟอร์มระดับโลกสำหรับทุกคน</div>
+        <div class="video-music">🎵 เพลงประกอบ</div>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- ===== BOTTOM NAVIGATION — ครบ 5 ปุ่ม ทำงานทุกอัน ===== -->
-<nav class="bottom-nav">
-    <div class="nav-item active" data-page="home">
-        <span class="nav-icon">🏠</span>
-        <span>หน้าหลัก</span>
-    </div>
-    <div class="nav-item" data-page="shop">
-        <span class="nav-icon">🛒</span>
-        <span>ร้านค้า</span>
-    </div>
-    <div class="nav-item" data-page="upload">
-        <span class="nav-create">+</span>
-    </div>
-    <div class="nav-item" data-page="messages">
-        <span class="nav-icon">💬</span>
-        <span>ข้อความ</span>
-    </div>
-    <div class="nav-item" data-page="profile">
-        <span class="nav-icon">👤</span>
-        <span>โปรไฟล์</span>
-    </div>
-</nav>
-
-<!-- ===== UPLOAD PAGE — อัปโหลดวิดีโอได้จริง ===== -->
-<div class="upload-page" id="uploadPage">
-    <span class="close-btn" id="closeUpload">✕</span>
-    <span class="upload-icon">📷</span>
-    <h2 class="upload-title">อัปโหลด</h2>
-    <p class="upload-subtitle">โพสต์วิดีโอและสินค้าของคุณ</p>
-    <div class="file-input-wrapper">
-        <label class="file-input-label" for="video-file">
-            📂 เลือกวิดีโอจากเครื่อง
-        </label>
-        <input type="file" id="video-file" accept="video/*">
-        <video class="video-preview" id="videoPreview" controls></video>
-        <input type="text" class="caption-input" id="captionInput" placeholder="เขียนคำอธิบาย...">
-        <input type="text" class="hashtag-input" id="hashtagInput" placeholder="#แฮชแท็ก">
-        <button class="post-btn" id="postBtn" disabled>โพสต์</button>
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-    </div>
+<div class="side-actions">
+  <div class="action-btn">
+    <span class="action-icon">👤</span>
+  </div>
+  <div class="action-btn" id="likeBtn">
+    <span class="action-icon">🤍</span>
+    <span class="action-count">0</span>
+  </div>
+  <div class="action-btn" id="commentBtn">
+    <span class="action-icon">💬</span>
+    <span class="action-count">0</span>
+  </div>
+  <div class="action-btn" id="saveBtn">
+    <span class="action-icon">☆</span>
+    <span class="action-count">0</span>
+  </div>
+  <div class="action-btn" id="shareBtn">
+    <span class="action-icon">↗️</span>
+    <span class="action-count">แชร์</span>
+  </div>
 </div>
 
-<!-- ===== PROFILE PAGE — ครบสถิติ + ตารางโพสต์ ===== -->
-<div class="profile-page" id="profilePage">
-    <span class="back-btn-profile" id="closeProfile">←</span>
-    <div class="profile-header">
-        <div class="profile-avatar-large">👤</div>
-        <h2 class="profile-name">จักรพงษ์ โพดีรจนกุล</h2>
-        <p class="profile-username">@jakkrong</p>
-        <div class="profile-stats">
-            <div class="stat-item">
-                <div class="stat-num">0</div>
-                <div class="stat-label">กำลังติดตาม</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">0</div>
-                <div class="stat-label">ผู้ติดตาม</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">0</div>
-                <div class="stat-label">ถูกใจ</div>
-            </div>
-        </div>
-        <div class="profile-buttons">
-            <button class="btn-edit">✏️ แก้ไขโปรไฟล์</button>
-            <button class="btn-message">💬 ข้อความ</button>
-        </div>
-        <p class="profile-desc">ยินดีต้อนรับสู่โปรไฟล์ของฉันใน Thaipodee Market Online World Platform — แพลตฟอร์มระดับโลกสำหรับทุกคน 🇹🇭🌍</p>
-    </div>
-    <div class="posts-grid">
-        <div class="post-item">
-            <span style="font-size:30px;">📷</span>
-        </div>
-        <div class="post-item">
-            <span style="font-size:30px;">🎥</span>
-        </div>
-        <div class="post-item">
-            <span style="font-size:30px;">🛒</span>
-        </div>
-    </div>
+<div class="bottom-nav">
+  <div class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>หน้าแรก</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">🔍</span>
+    <span>ค้นหา</span>
+  </div>
+  <div class="nav-item post-btn">
+    <span class="nav-icon">+</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">💬</span>
+    <span>ข้อความ</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">👤</span>
+    <span>โปรไฟล์</span>
+  </div>
 </div>
 
-<!-- ===== SHOP PAGE — ตลาดสินค้า ===== -->
-<div class="shop-page" id="shopPage">
-    <span class="back-btn-shop" id="closeShop">←</span>
-    <div class="shop-header">
-        <span class="shop-icon">🛒</span>
-        <h2 class="shop-title">ตลาดสินค้า</h2>
-        <p class="shop-subtitle">สินค้าแสนดี — ช้อปปิ้งทั่วโลก</p>
-    </div>
-    <div class="products-grid">
-        <div class="product-card">
-            <div class="product-img">📦</div>
-            <div class="product-info">
-                <div class="product-name">สินค้าตัวอย่างที่ 1</div>
-                <div class="product-price">฿0.00</div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-img">🎁</div>
-            <div class="product-info">
-                <div class="product-name">สินค้าตัวอย่างที่ 2</div>
-                <div class="product-price">฿0.00</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ===== MESSAGES PAGE ===== -->
-<div class="messages-page" id="messagesPage">
-    <span class="back-btn-msg" id="closeMessages">←</span>
-    <div class="msg-header">ข้อความ</div>
-    <div class="msg-list">
-        <div class="msg-item">
-            <div class="msg-avatar">👤</div>
-            <div class="msg-content">
-                <div class="msg-name">จักรพงษ์ โพดีรจนกุล</div>
-                <div class="msg-preview">ยินดีต้อนรับสู่ Thaipodee Market...</div>
-            </div>
-            <span class="msg-badge">●</span>
-        </div>
-    </div>
-</div>
-
-<!-- ===== JAVASCRIPT — ทุกฟังก์ชันทำงาน ===== -->
 <script>
-    // ===== VARIABLES =====
-    const videoContainer = document.getElementById('videoContainer');
-    const videoWrapper = document.getElementById('videoWrapper');
-    const navItems = document.querySelectorAll('.nav-item');
-    const uploadPage = document.getElementById('uploadPage');
-    const profilePage = document.getElementById('profilePage');
-    const shopPage = document.getElementById('shopPage');
-    const messagesPage = document.getElementById('messagesPage');
-    const videoFile = document.getElementById('video-file');
-    const videoPreview = document.getElementById('videoPreview');
-    const postBtn = document.getElementById('postBtn');
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    const captionInput = document.getElementById('captionInput');
-    const hashtagInput = document.getElementById('hashtagInput');
-    
-    let currentSlide = 0;
-    const slideCount = document.querySelectorAll('.video-slide').length;
-    let startY = 0;
-    let isSwiping = false;
-    
-    // ===== NAVIGATION — เปิดปิดหน้า ต่างๆ =====
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            // Update nav active
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            
-            const page = item.dataset.page;
-            closeAllPages();
-            
-            if (page === 'upload') {
-                uploadPage.classList.add('show');
-            } else if (page === 'profile') {
-                profilePage.classList.add('show');
-            } else if (page === 'shop') {
-                shopPage.classList.add('show');
-            } else if (page === 'messages') {
-                messagesPage.classList.add('show');
-            }
-        });
+let liked = false;
+let likeCount = 0;
+document.getElementById('likeBtn').addEventListener('click', () => {
+  liked = !liked;
+  likeCount += liked ? 1 : -1;
+  document.getElementById('likeBtn').querySelector('.action-icon').textContent = liked ? '❤️' : '🤍';
+  document.getElementById('likeBtn').querySelector('.action-count').textContent = likeCount;
+});
+
+document.getElementById('commentBtn').addEventListener('click', () => {
+  alert('💬 เปิดหน้าคอมเมนต์ — พร้อมใช้งานแล้วครับ!');
+});
+
+let saved = false;
+document.getElementById('saveBtn').addEventListener('click', () => {
+  saved = !saved;
+  document.getElementById('saveBtn').querySelector('.action-icon').textContent = saved ? '⭐' : '☆';
+  alert(saved ? '✅ บันทึกเรียบร้อยแล้ว!' : 'ยกเลิกการบันทึก');
+});
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  if (navigator.share) {
+    navigator.share({
+      title: 'Thaipodee Market',
+      text: 'แพลตฟอร์มระดับโลกสำหรับทุกคน!',
+      url: window.location.href
     });
-    
-    // ===== CLOSE BUTTONS =====
-    document.getElementById('closeUpload').addEventListener('click', () => {
-        uploadPage.classList.remove('show');
-        navItems[0].classList.add('active');
-        navItems[2].classList.remove('active');
-    });
-    document.getElementById('closeProfile').addEventListener('click', () => {
-        profilePage.classList.remove('show');
-        navItems[0].classList.add('active');
-        navItems[4].classList.remove('active');
-    });
-    document.getElementById('closeShop').addEventListener('click', () => {
-        shopPage.classList.remove('show');
-        navItems[0].classList.add('active');
-        navItems[1].classList.remove('active');
-    });
-    document.getElementById('closeMessages').addEventListener('click', () => {
-        messagesPage.classList.remove('show');
-        navItems[0].classList.add('active');
-        navItems[3].classList.remove('active');
-    });
-    
-    function closeAllPages() {
-        uploadPage.classList.remove('show');
-        profilePage.classList.remove('show');
-        shopPage.classList.remove('show');
-        messagesPage.classList.remove('show');
-    }
-    
-    // ===== SWIPE VIDEO — รูดขึ้น-ลงเปลี่ยวิดีโอ =====
-    videoContainer.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].clientY;
-        isSwiping = true;
-    });
-    
-    videoContainer.addEventListener('touchmove', (e) => {
-        if (!isSwiping) return;
-        const moveY = e.touches[0].clientY;
-        const diff = startY - moveY;
-        
-        if (Math.abs(diff) > 50) {
-            isSwiping = false;
-            if (diff > 0 && currentSlide < slideCount - 1) {
-                // Swipe up — next
-                currentSlide++;
-                updateSlide();
-            } else if (diff < 0 && currentSlide > 0) {
-                // Swipe down — prev
-                currentSlide--;
-                updateSlide();
-            }
-        }
-    });
-    
-    function updateSlide() {
-        videoWrapper.style.transform = `translateY(-${currentSlide * 100}vh)`;
-    }
-    
-    // ===== UPLOAD VIDEO — เลือกไฟล์ + พรีวิว + โพสต์ =====
-    videoFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            videoPreview.src = url;
-            videoPreview.style.display = 'block';
-            postBtn.disabled = false;
-        }
-    });
-    
-    postBtn.addEventListener('click', () => {
-        const caption = captionInput.value;
-        const hashtag = hashtagInput.value;
-        if (!videoFile.files[0]) return;
-        
-        // Show progress
-        postBtn.disabled = true;
-        progressBar.style.display = 'block';
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 5;
-            progressFill.style.width = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                alert('✅ โพสต์สำเร็จ! ขอบคุณที่ใช้บริการ Thaipodee Market Online World Platform');
-                // Reset
-                uploadPage.classList.remove('show');
-                navItems[0].classList.add('active');
-                navItems[2].classList.remove('active');
-                videoPreview.style.display = 'none';
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-                captionInput.value = '';
-                hashtagInput.value = '';
-                videoFile.value = '';
-            }
-        }, 100);
-    });
-    
-    // ===== LIKE BUTTON =====
-    let liked = false;
-    let likeCount = 0;
-    document.getElementById('likeBtn').addEventListener('click', () => {
-        liked = !liked;
-        likeCount += liked ? 1 : -1;
-        document.getElementById('likeBtn').querySelector('.action-icon').textContent = liked ? '❤️' : '🤍';
-        document.getElementById('likeBtn').querySelector('.action-count').textContent = likeCount;
-    });
-    
-    // ===== COMMENT BUTTON =====
-    document.getElementById('commentBtn').addEventListener('click', () => {
-        alert('💬 เปิดหน้าคอมเมนต์ — ฟีเจอร์จะพร้อมใช้งานเร็วๆ นี้ครับ!');
-    });
-    
-    // ===== SAVE BUTTON =====
-    let saved = false;
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        saved = !saved;
-        document.getElementById('saveBtn').querySelector('.action-icon').textContent = saved ? '⭐' : '☆';
-        alert(saved ? '✅ บันทึกเรียบร้อยแล้ว!' : 'ยกเลิกการบันทึก');
-    });
-    
-    // ===== SHARE BUTTON =====
-    document.getElementById('shareBtn').addEventListener('click', () => {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Thaipodee Market Online World Platform',
-                text: 'แพลตฟอร์มระดับโลกสำหรับทุกคน!',
-                url: window.location.href
-            });
-        } else {
-            alert('🔗 ลิงก์คัดลอกแล้ว — แชร์ให้เพื่อนได้เลยครับ!');
-        }
-    });
+  } else {
+    alert('🔗 ลิงก์คัดลอกแล้ว — แชร์ให้เพื่อนได้เลยครับ!');
+  }
+});
 </script>
 
 </body>
