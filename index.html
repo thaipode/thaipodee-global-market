@@ -79,6 +79,14 @@
     .tabs { display: flex; border-bottom: 1px solid #222; }
     .tab { flex: 1; text-align: center; padding: 12px; font-size: 15px; color: #888; cursor: pointer; }
     .tab.active { color: #fff; border-bottom: 2px solid #fff; }
+    
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 15px; z-index: 9999; animation: fadeInOut 2.5s forwards; }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    }
   </style>
 </head>
 <body>
@@ -269,21 +277,27 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
 function submitPost() {
   const videoInput = document.getElementById('video-input');
   const desc = document.getElementById('post-desc').value.trim();
   
   if (!videoInput || !videoInput.files.length) {
-    alert('กรุณาเลือกวิดีโอก่อนครับ');
+    showToast('⚠️ กรุณาเลือกวิดีโอก่อน');
     return;
   }
   
   const fileName = videoInput.files[0].name;
   postCount++;
   
-  alert('✅ โพสต์สำเร็จ!\n\n📁 ไฟล์: ' + fileName + '\n📝 คำอธิบาย: ' + (desc || '-') + '\n📊 โพสต์ที่: ' + postCount + '\n\nกดตกลงเพื่อดูโพสต์ของคุณ!');
-  
-  // อัปเดตหน้าหลัก
+  // อัปเดตหน้าหลัก — ทำก่อนทุกอย่าง
   const infoArea = document.getElementById('video-info-area');
   if (infoArea) {
     infoArea.innerHTML = `
@@ -313,8 +327,11 @@ function submitPost() {
   if (videoName) videoName.style.display = 'none';
   document.getElementById('post-desc').value = '';
   
-  // กลับหน้าหลัก
-  goToPage('page-home');
+  // แจ้งเตือนแบบไม่บล็อก
+  showToast('✅ โพสต์สำเร็จ! ' + fileName);
+  
+  // กลับหน้าหลัก — ทันที
+  setTimeout(() => goToPage('page-home'), 300);
 }
 </script>
 
