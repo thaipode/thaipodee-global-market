@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-title" content="Thaipodee">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhcGlwb2RlIE1hcmtldCBPbmxpbmUgVjIwMjYiLCJzaG9ydF9uYW1lIjoiVGhhcGlwb2RlIiwiZGVzY3JpcHRpb24iOiLhgzXlhazlhazlhazljfHlwgZGVigZzlhnjku6Tlm5jnvZHnq5kiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiI2ZmMDA1MCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwczovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRTNDdGV4dCBmb250LXNpemU9JzgwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyB4LXBhZGRpbmc9JzUwJyB5LXBhZGRpbmc9JzUwJyBmaWxsPSd3aGl0ZScgZm9udC1mYW1pbHk9J2FyaWFsJyUzRSVUJTNDL3RleHQlM0Mvc3ZnJTNFIiwic2l6ZXMiOiIzMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
   <title>Thaipodee Market Online V2026</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -27,7 +26,6 @@
     .video-player { width: 100%; height: 100%; object-fit: contain; display: none; background: #000; }
     .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e, #16213e); }
     .video-placeholder-content { text-align: center; color: #888; padding: 20px; }
-    .video-placeholder-content .icon { font-size: 64px; margin-bottom: 15px; }
     .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 10; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
     .side-btn span { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
@@ -35,7 +33,6 @@
     .video-info { position: absolute; left: 16px; right: 80px; bottom: 100px; z-index: 10; display: none; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
     .video-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
     .video-desc { font-size: 14px; color: #ddd; }
-    .status-box { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 13px; z-index: 20; display: none; }
 
     .page-header { padding: 16px; text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
     .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
@@ -51,51 +48,86 @@
     .profile-page { padding: 20px; text-align: center; }
     .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #333; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; overflow: hidden; border: 2px solid #444; }
     .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; cursor: pointer; }
-    .profile-username { color: #888; font-size: 14px; margin-bottom: 20px; cursor: pointer; }
-    .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
-    .stat-item { text-align: center; cursor: pointer; }
-    .stat-num { font-size: 18px; font-weight: bold; }
-    .stat-label { font-size: 12px; color: #888; }
-    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 0 4px; }
-    .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .profile-name { font-size: 22px; font-weight: bold; margin-bottom: 4px; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: all 0.2s; display: inline-block; border: 1px solid transparent; }
+    .profile-name:hover, .profile-name:active { background: #2a2a2a; border-color: #444; }
+    .profile-username { color: #888; font-size: 15px; margin-bottom: 24px; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; display: inline-block; }
+    .profile-username:hover, .profile-username:active { background: #2a2a2a; }
+    .profile-stats { display: flex; justify-content: center; gap: 40px; margin-bottom: 24px; }
+    .stat-item { text-align: center; cursor: pointer; padding: 8px 14px; border-radius: 6px; transition: background 0.2s; }
+    .stat-item:hover, .stat-item:active { background: #2a2a2a; }
+    .stat-num { font-size: 20px; font-weight: bold; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
+    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 4px; }
+    .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; overflow: hidden; position: relative; }
+    .grid-item video { width: 100%; height: 100%; object-fit: cover; }
+    .grid-item .placeholder-icon { font-size: 32px; color: #555; }
     .empty-text { color: #666; text-align: center; margin-top: 60px; }
+    .tip-text { font-size: 13px; color: #888; margin-bottom: 16px; }
     
-    /* Modal แก้โปรไฟล์ */
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .modal.active { display: flex; }
-    .modal-content { background: #1a1a1a; border-radius: 12px; padding: 24px; width: 100%; max-width: 360px; border: 1px solid #333; }
-    .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
-    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-    .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-size: 16px; cursor: pointer; }
-    .btn-cancel { background: #333; color: #fff; }
-    .btn-save { background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; }
-    .edit-hint { font-size: 12px; color: #888; margin-top: 4px; }
-    .click-hint { font-size: 11px; color: #666; margin-top: 2px; }
+    /* Modal แก้โปรไฟล์ — ชัดเจน กดได้แน่นอน ทุกเครื่องแยกกัน */
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-bg.open { display: flex; }
+    .modal-card { background: #1e1e1e; border-radius: 16px; padding: 24px; width: 100%; max-width: 340px; border: 1px solid #333; }
+    .modal-head { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+    .modal-field { margin-bottom: 16px; text-align: left; }
+    .modal-label { font-size: 13px; color: #aaa; margin-bottom: 6px; display: block; }
+    .modal-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: #fff; font-size: 15px; outline: none; }
+    .modal-input:focus { border-color: #ff0050; }
+    .modal-row-btns { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-btn { flex: 1; padding: 13px; border-radius: 8px; border: none; font-size: 16px; cursor: pointer; font-weight: 600; }
+    .btn-no { background: #333; color: #fff; }
+    .btn-yes { background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; }
+    
+    /* ต้อนรับตั้งชื่อครั้งแรก */
+    .welcome-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .welcome-modal.show { display: flex; }
+    .welcome-card { background: #1e1e1e; border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 340px; border: 1px solid #444; text-align: center; }
+    .welcome-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+    .welcome-desc { font-size: 14px; color: #aaa; margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-<!-- Modal แก้โปรไฟล์ -->
-<div class="modal" id="edit-profile-modal">
-  <div class="modal-content">
-    <div class="modal-title">แก้ไขโปรไฟล์</div>
-    <div class="form-group" style="margin:0 0 12px 0;">
-      <input type="text" class="form-input" id="edit-name" placeholder="ชื่อของฉัน">
+<!-- ✅ หน้าต้อนรับ — ตั้งชื่อเองครั้งแรก ทุกคนไม่ซ้ำกัน -->
+<div class="welcome-modal" id="welcomeModal">
+  <div class="welcome-card">
+    <div class="welcome-title">👋 ยินดีต้อนรับ!</div>
+    <div class="welcome-desc">ตั้งชื่อของคุณเพื่อเริ่มใช้งาน</div>
+    <div class="modal-field">
+      <label class="modal-label">ชื่อที่แสดง</label>
+      <input type="text" class="modal-input" id="welcomeName" placeholder="ใส่ชื่อของคุณ">
     </div>
-    <div class="form-group" style="margin:0 0 12px 0;">
-      <input type="text" class="form-input" id="edit-username" placeholder="thaipodee_user">
+    <div class="modal-field">
+      <label class="modal-label">ชื่อผู้ใช้ (@)</label>
+      <input type="text" class="modal-input" id="welcomeUser" placeholder="ชื่อผู้ใช้">
     </div>
-    <div class="form-group" style="margin:0 0 12px 0;">
-      <input type="number" class="form-input" id="edit-following" placeholder="0">
+    <button class="modal-btn btn-yes" style="width:100%; margin-top:8px;" onclick="saveWelcome()">เริ่มใช้งาน</button>
+  </div>
+</div>
+
+<!-- ✅ Modal แก้โปรไฟล์ — กดได้แน่นอน ทุกเครื่องแยกกัน -->
+<div class="modal-bg" id="editModal">
+  <div class="modal-card">
+    <div class="modal-head">แก้ไขโปรไฟล์</div>
+    <div class="modal-field">
+      <label class="modal-label">ชื่อที่แสดง</label>
+      <input type="text" class="modal-input" id="fName" placeholder="ใส่ชื่อของคุณ">
     </div>
-    <div class="form-group" style="margin:0;">
-      <input type="number" class="form-input" id="edit-followers" placeholder="0">
+    <div class="modal-field">
+      <label class="modal-label">ชื่อผู้ใช้ (@)</label>
+      <input type="text" class="modal-input" id="fUser" placeholder="thaipodee_user">
     </div>
-    <div class="edit-hint">👆 กรอกข้อมูล แล้วกดบันทึก</div>
-    <div class="modal-buttons">
-      <button class="modal-btn btn-cancel" onclick="closeEditModal()">ยกเลิก</button>
-      <button class="modal-btn btn-save" onclick="saveProfile()">บันทึก</button>
+    <div class="modal-field">
+      <label class="modal-label">จำนวนกำลังติดตาม</label>
+      <input type="number" class="modal-input" id="fFollowing" placeholder="0">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">จำนวนผู้ติดตาม</label>
+      <input type="number" class="modal-input" id="fFollowers" placeholder="0">
+    </div>
+    <div class="modal-row-btns">
+      <button class="modal-btn btn-no" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn btn-yes" onclick="saveAll()">บันทึก</button>
     </div>
   </div>
 </div>
@@ -104,14 +136,12 @@
   <div class="video-container">
     <div class="video-placeholder" id="video-placeholder">
       <div class="video-placeholder-content">
-        <div class="icon">🎬</div>
+        <div style="font-size:64px; margin-bottom:15px;">🎬</div>
         <div>กด + เพื่อเลือกวิดีโอ</div>
-        <div style="font-size:13px; color:#666; margin-top:8px;">Thaipodee Market Online V2026 — แอปเต็มรูปแบบ</div>
+        <div style="font-size:13px; color:#666; margin-top:8px;">Thaipodee Market Online V2026</div>
       </div>
     </div>
     <video class="video-player" id="video-player" controls playsinline muted></video>
-    
-    <div class="status-box" id="status-saved">✅ บันทึกแล้ว — จดจำไว้แล้ว</div>
     
     <div class="side-actions">
       <div class="side-btn" onclick="goTo('page-profile')"><div class="side-icon">👤</div><span>ฉัน</span></div>
@@ -141,18 +171,15 @@
     <span class="back-btn" onclick="goBack()">←</span>
     เลือกวิดีโอ
   </div>
-  
   <label class="upload-area">
     <input type="file" id="video-input" accept="video/*">
     <div style="font-size:48px; margin-bottom:10px;">📷</div>
     <div>แตะเพื่อเลือกไฟล์วิดีโอ</div>
     <div class="file-name" id="video-name"></div>
   </label>
-  
   <div class="form-group">
     <textarea class="form-input" id="post-desc" placeholder="คำอธิบาย (ไม่จำเป็น)..."></textarea>
   </div>
-  
   <button class="publish-btn" onclick="saveAndShow()">บันทึกและแสดง</button>
 </div>
 
@@ -174,25 +201,31 @@
     <span id="avatar-icon">👤</span>
   </div>
   <input type="file" id="avatar-input" accept="image/*" style="display:none;">
-  <div class="profile-name" id="profile-name" onclick="openEditModal()">ชื่อของฉัน</div>
-  <div class="profile-username" id="profile-username" onclick="openEditModal()">@thaipodee_user</div>
+  
+  <!-- ✅ กดที่ชื่อได้เลย — เปิดหน้าแก้ไขทันที -->
+  <div class="profile-name" id="dispName" onclick="openEditModal()">ชื่อของฉัน</div>
+  <div class="profile-username" id="dispUser" onclick="openEditModal()">@thaipodee_user</div>
+  
   <div class="profile-stats">
     <div class="stat-item" onclick="openEditModal()">
-      <div class="stat-num" id="stat-following">0</div>
+      <div class="stat-num" id="dispFollowing">0</div>
       <div class="stat-label">กำลังติดตาม</div>
     </div>
     <div class="stat-item" onclick="openEditModal()">
-      <div class="stat-num" id="stat-followers">0</div>
+      <div class="stat-num" id="dispFollowers">0</div>
       <div class="stat-label">ผู้ติดตาม</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num" id="total-posts">0</div>
+      <div class="stat-num" id="dispPosts">0</div>
       <div class="stat-label">โพสต์</div>
     </div>
   </div>
-  <div class="click-hint">💡 แตะที่ชื่อ/รูป/ตัวเลข เพื่อแก้ไข</div>
-  <div class="video-grid" id="profile-grid"></div>
-  <div class="empty-text" id="profile-empty">ยังไม่มีวิดีโอ — กด + เพื่อสร้างโพสต์แรก</div>
+  <div class="tip-text">💡 แตะที่ชื่อ/ตัวเลข เพื่อแก้ไขโปรไฟล์</div>
+  
+  <div class="video-grid" id="video-grid">
+    <!-- วิดีโอจะแสดงตัวอย่างจริง ไม่ใช่แค่ไอคอน -->
+  </div>
+  <div class="empty-text" id="profile-empty">ยังไม่มีวิดีโอ — กด + เพื่ออัปโหลด</div>
 </div>
 
 <nav class="bottom-nav">
@@ -221,218 +254,244 @@
 <script>
 let currentPage = 'page-home';
 let history = [];
-let postCount = 0;
+let userVideos = [];
 
-// เปลี่ยนหน้า
-function goTo(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach((item, idx) => {
-    const map = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile'];
-    item.classList.toggle('active', map[idx] === id);
-  });
-  if (currentPage !== id) history.push(currentPage);
-  currentPage = id;
-  window.scrollTo(0, 0);
-}
+// ==== โหลดข้อมูลผู้ใช้ — แยกแต่ละคน ไม่ซ้ำกัน ====
+function loadUserData() {
+  const name = localStorage.getItem('userName');
+  const user = localStorage.getItem('userHandle');
+  const following = localStorage.getItem('userFollowing');
+  const followers = localStorage.getItem('userFollowers');
+  const avatar = localStorage.getItem('userAvatar');
+  const videos = localStorage.getItem('userVideos');
 
-function goBack() {
-  if (history.length > 0) goTo(history.pop());
-  else goTo('page-home');
-}
-
-// เปิด/ปิด Modal แก้โปรไฟล์
-function openEditModal() {
-  const modal = document.getElementById('edit-profile-modal');
-  modal.classList.add('active');
-  // โหลดค่าปัจจุบันลงช่องแก้ไข
-  document.getElementById('edit-name').value = document.getElementById('profile-name').textContent;
-  document.getElementById('edit-username').value = document.getElementById('profile-username').textContent.replace('@', '');
-  document.getElementById('edit-following').value = document.getElementById('stat-following').textContent;
-  document.getElementById('edit-followers').value = document.getElementById('stat-followers').textContent;
-}
-
-function closeEditModal() {
-  document.getElementById('edit-profile-modal').classList.remove('active');
-}
-
-// บันทึกโปรไฟล์ลง localStorage
-function saveProfile() {
-  const name = document.getElementById('edit-name').value.trim() || 'ชื่อของฉัน';
-  const username = document.getElementById('edit-username').value.trim() || 'thaipodee_user';
-  const following = document.getElementById('edit-following').value.trim() || '0';
-  const followers = document.getElementById('edit-followers').value.trim() || '0';
-
-  // อัปเดตหน้าจอ
-  document.getElementById('profile-name').textContent = name;
-  document.getElementById('profile-username').textContent = '@' + username;
-  document.getElementById('stat-following').textContent = following;
-  document.getElementById('stat-followers').textContent = followers;
-
-  // บันทึกถาวร
-  localStorage.setItem('profile_name', name);
-  localStorage.setItem('profile_username', username);
-  localStorage.setItem('profile_following', following);
-  localStorage.setItem('profile_followers', followers);
-
-  closeEditModal();
-  alert('✅ บันทึกโปรไฟล์เรียบร้อย!');
-}
-
-// รูปโปรไฟล์
-function openAvatarPicker() {
-  document.getElementById('avatar-input').click();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  // โหลดโปรไฟล์ที่บันทึกไว้
-  loadProfile();
-
-  // รูปโปรไฟล์
-  const avatarInput = document.getElementById('avatar-input');
-  if (avatarInput) {
-    avatarInput.addEventListener('change', function(e) {
-      if (e.target.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          const imgData = ev.target.result;
-          document.getElementById('avatar-img').src = imgData;
-          document.getElementById('avatar-img').style.display = 'block';
-          document.getElementById('avatar-icon').style.display = 'none';
-          localStorage.setItem('profile_avatar', imgData);
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-  }
-
-  // เลือกวิดีโอ
-  const input = document.getElementById('video-input');
-  const nameDisplay = document.getElementById('video-name');
-  if (input && nameDisplay) {
-    input.addEventListener('change', function(e) {
-      if (e.target.files.length > 0) {
-        nameDisplay.textContent = '✅ ' + e.target.files[0].name;
-        nameDisplay.style.display = 'block';
-      }
-    });
-  }
-
-  loadSavedVideo();
-});
-
-// โหลดโปรไฟล์จากที่บันทึกไว้
-function loadProfile() {
-  const savedName = localStorage.getItem('profile_name');
-  const savedUsername = localStorage.getItem('profile_username');
-  const savedFollowing = localStorage.getItem('profile_following');
-  const savedFollowers = localStorage.getItem('profile_followers');
-  const savedAvatar = localStorage.getItem('profile_avatar');
-
-  if (savedName) document.getElementById('profile-name').textContent = savedName;
-  if (savedUsername) document.getElementById('profile-username').textContent = '@' + savedUsername;
-  if (savedFollowing) document.getElementById('stat-following').textContent = savedFollowing;
-  if (savedFollowers) document.getElementById('stat-followers').textContent = savedFollowers;
-  if (savedAvatar) {
-    document.getElementById('avatar-img').src = savedAvatar;
+  if (name) document.getElementById('dispName').textContent = name;
+  if (user) document.getElementById('dispUser').textContent = '@' + user;
+  if (following) document.getElementById('dispFollowing').textContent = following;
+  if (followers) document.getElementById('dispFollowers').textContent = followers;
+  
+  if (avatar) {
+    document.getElementById('avatar-img').src = avatar;
     document.getElementById('avatar-img').style.display = 'block';
     document.getElementById('avatar-icon').style.display = 'none';
   }
 
-  // โหลดจำนวนโพสต์
-  const savedPosts = localStorage.getItem('post_count');
-  if (savedPosts) {
-    postCount = parseInt(savedPosts);
-    document.getElementById('total-posts').textContent = postCount;
+  if (videos) {
+    userVideos = JSON.parse(videos);
+    document.getElementById('dispPosts').textContent = userVideos.length;
+    renderVideoGrid();
+  }
+
+  // ==== ถ้ายังไม่เคยตั้งชื่อ — เปิดหน้าต้อนรับทันที ====
+  if (!name) {
+    setTimeout(() => {
+      document.getElementById('welcomeModal').classList.add('show');
+      document.getElementById('welcomeName').focus();
+    }, 300);
   }
 }
 
-// บันทึกวิดีโอ
-function saveAndShow() {
-  const input = document.getElementById('video-input');
-  const desc = document.getElementById('post-desc').value.trim();
+// ==== บันทึกชื่อตอนต้อนรับ ====
+function saveWelcome() {
+  const name = document.getElementById('welcomeName').value.trim() || 'ผู้ใช้งาน';
+  const user = document.getElementById('welcomeUser').value.trim() || 'user' + Date.now();
   
-  if (!input || !input.files.length) {
+  localStorage.setItem('userName', name);
+  localStorage.setItem('userHandle', user);
+  localStorage.setItem('userFollowing', '0');
+  localStorage.setItem('userFollowers', '0');
+  localStorage.setItem('userVideos', '[]');
+  
+  document.getElementById('dispName').textContent = name;
+  document.getElementById('dispUser').textContent = '@' + user;
+  document.getElementById('welcomeModal').classList.remove('show');
+}
+
+// ==== เปิด-ปิด แก้โปรไฟล์ ====
+function openEditModal() {
+  const currentName = document.getElementById('dispName').textContent;
+  const currentUser = document.getElementById('dispUser').textContent.replace('@', '');
+  const currentFollowing = document.getElementById('dispFollowing').textContent;
+  const currentFollowers = document.getElementById('dispFollowers').textContent;
+  
+  document.getElementById('fName').value = currentName;
+  document.getElementById('fUser').value = currentUser;
+  document.getElementById('fFollowing').value = currentFollowing;
+  document.getElementById('fFollowers').value = currentFollowers;
+  
+  document.getElementById('editModal').classList.add('open');
+  document.getElementById('fName').focus();
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+}
+
+// ==== บันทึกการเปลี่ยนชื่อ — ทุกคนแก้ได้เอง แยกกัน ====
+function saveAll() {
+  const name = document.getElementById('fName').value.trim() || 'ผู้ใช้งาน';
+  const user = document.getElementById('fUser').value.trim() || 'user' + Date.now();
+  const following = document.getElementById('fFollowing').value.trim() || '0';
+  const followers = document.getElementById('fFollowers').value.trim() || '0';
+  
+  // อัปเดตหน้าจอ
+  document.getElementById('dispName').textContent = name;
+  document.getElementById('dispUser').textContent = '@' + user;
+  document.getElementById('dispFollowing').textContent = following;
+  document.getElementById('dispFollowers').textContent = followers;
+  
+  // บันทึกลงเครื่อง — แต่ละคนเก็บของตัวเอง
+  localStorage.setItem('userName', name);
+  localStorage.setItem('userHandle', user);
+  localStorage.setItem('userFollowing', following);
+  localStorage.setItem('userFollowers', followers);
+  
+  closeModal();
+  alert('✅ บันทึกเรียบร้อยแล้ว!');
+}
+
+// ==== เปลี่ยนรูปโปรไฟล์ ====
+function openAvatarPicker() {
+  document.getElementById('avatar-input').click();
+}
+
+document.getElementById('avatar-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    document.getElementById('avatar-img').src = dataUrl;
+    document.getElementById('avatar-img').style.display = 'block';
+    document.getElementById('avatar-icon').style.display = 'none';
+    localStorage.setItem('userAvatar', dataUrl);
+  };
+  reader.readAsDataURL(file);
+});
+
+// ==== เปลี่ยนหน้า ====
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  
+  document.querySelectorAll('.nav-item').forEach((item, idx) => {
+    const pages = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile'];
+    item.classList.toggle('active', pages[idx] === pageId);
+  });
+  
+  if (currentPage !== pageId) history.push(currentPage);
+  currentPage = pageId;
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (history.length > 0) {
+    const prev = history.pop();
+    goTo(prev);
+  } else {
+    goTo('page-home');
+  }
+}
+
+// ==== อัปโหลดวิดีโอ — แสดงตัวอย่างจริง ไม่ใช่แค่ไอคอน ====
+let currentVideoFile = null;
+document.getElementById('video-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  currentVideoFile = file;
+  document.getElementById('video-name').textContent = '✅ ' + file.name;
+  document.getElementById('video-name').style.display = 'block';
+});
+
+function saveAndShow() {
+  if (!currentVideoFile) {
     alert('กรุณาเลือกไฟล์วิดีโอก่อนครับ');
     return;
   }
   
-  const file = input.files[0];
-  const fileName = file.name;
-  const fileDesc = desc || 'วิดีโอของฉัน';
+  const desc = document.getElementById('post-desc').value.trim() || 'วิดีโอของฉัน';
+  const url = URL.createObjectURL(currentVideoFile);
   
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64Data = e.target.result;
-    
-    try {
-      localStorage.setItem('savedVideoData', base64Data);
-      localStorage.setItem('savedVideoName', fileName);
-      localStorage.setItem('savedVideoDesc', fileDesc);
-    } catch (err) {
-      alert('⚠️ พื้นที่เก็บไม่พอ — ลองไฟล์สั้นๆ ครับ');
-      return;
-    }
-    
-    showVideo(base64Data, fileName, fileDesc);
-    
-    const status = document.getElementById('status-saved');
-    status.style.display = 'block';
-    setTimeout(() => { status.style.display = 'none'; }, 3000);
-    
-    // เพิ่มจำนวนโพสต์
-    postCount++;
-    localStorage.setItem('post_count', postCount);
-    const totalPosts = document.getElementById('total-posts');
-    if (totalPosts) totalPosts.textContent = postCount;
-    
-    // เพิ่มในตารางโปรไฟล์
-    const grid = document.getElementById('profile-grid');
-    const empty = document.getElementById('profile-empty');
-    if (grid && empty) {
-      empty.style.display = 'none';
-      const newItem = document.createElement('div');
-      newItem.className = 'grid-item';
-      newItem.innerHTML = '🎥';
-      grid.insertBefore(newItem, grid.firstChild);
-    }
-    
-    goTo('page-home');
-    
-    input.value = '';
-    document.getElementById('video-name').style.display = 'none';
-    document.getElementById('post-desc').value = '';
+  // แสดงวิดีโอบนหน้าหลัก
+  document.getElementById('video-placeholder').style.display = 'none';
+  document.getElementById('video-player').src = url;
+  document.getElementById('video-player').style.display = 'block';
+  document.getElementById('vid-name').textContent = currentVideoFile.name;
+  document.getElementById('vid-desc').textContent = desc;
+  document.getElementById('video-info').style.display = 'block';
+  
+  // บันทึกลงรายการโปรไฟล์
+  const videoData = {
+    name: currentVideoFile.name,
+    desc: desc,
+    url: url,
+    time: Date.now()
   };
-  reader.readAsDataURL(file);
+  userVideos.unshift(videoData);
+  localStorage.setItem('userVideos', JSON.stringify(userVideos));
+  document.getElementById('dispPosts').textContent = userVideos.length;
+  
+  // แสดงตัวอย่างวิดีโอในตาราง — เห็นภาพจริง ไม่ใช่แค่ไอคอน
+  renderVideoGrid();
+  
+  // กลับไปหน้าหลัก
+  goTo('page-home');
+  
+  // ล้างฟอร์ม
+  currentVideoFile = null;
+  document.getElementById('video-input').value = '';
+  document.getElementById('video-name').style.display = 'none';
+  document.getElementById('post-desc').value = '';
 }
 
-function showVideo(src, name, desc) {
-  const placeholder = document.getElementById('video-placeholder');
-  const player = document.getElementById('video-player');
-  const info = document.getElementById('video-info');
-  const vidName = document.getElementById('vid-name');
-  const vidDesc = document.getElementById('vid-desc');
+// ==== แสดงตารางวิดีโอ — เห็นภาพจริงทุกคน ====
+function renderVideoGrid() {
+  const grid = document.getElementById('video-grid');
+  const empty = document.getElementById('profile-empty');
   
-  if (placeholder) placeholder.style.display = 'none';
-  if (player) {
-    player.src = src;
-    player.style.display = 'block';
-    player.play().catch(() => {});
+  if (userVideos.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
   }
-  if (info) info.style.display = 'block';
-  if (vidName) vidName.textContent = name;
-  if (vidDesc) vidDesc.textContent = desc;
+  
+  empty.style.display = 'none';
+  grid.innerHTML = '';
+  
+  userVideos.forEach((vid, idx) => {
+    const item = document.createElement('div');
+    item.className = 'grid-item';
+    item.onclick = () => playVideo(idx);
+    
+    // แสดงตัวอย่างวิดีโอจริง
+    const videoEl = document.createElement('video');
+    videoEl.src = vid.url;
+    videoEl.muted = true;
+    videoEl.preload = 'metadata';
+    item.appendChild(videoEl);
+    
+    grid.appendChild(item);
+  });
 }
 
-function loadSavedVideo() {
-  const savedData = localStorage.getItem('savedVideoData');
-  const savedName = localStorage.getItem('savedVideoName');
-  const savedDesc = localStorage.getItem('savedVideoDesc');
-  
-  if (savedData && savedName) {
-    showVideo(savedData, savedName, savedDesc || 'วิดีโอของฉัน');
-  }
+// ==== กดวิดีโอในโปรไฟล์เพื่อเล่น ====
+function playVideo(index) {
+  const vid = userVideos[index];
+  document.getElementById('video-placeholder').style.display = 'none';
+  document.getElementById('video-player').src = vid.url;
+  document.getElementById('video-player').style.display = 'block';
+  document.getElementById('vid-name').textContent = vid.name;
+  document.getElementById('vid-desc').textContent = vid.desc;
+  document.getElementById('video-info').style.display = 'block';
+  goTo('page-home');
 }
+
+// ==== เริ่มทำงานเมื่อโหลดเสร็จ ====
+document.addEventListener('DOMContentLoaded', function() {
+  loadUserData();
+});
 </script>
 
 </body>
