@@ -2,59 +2,52 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THAIPODEE V2026</title>
     <link rel="icon" href="https://i.imgur.com/8ZxQrL9.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        html, body {
-            background: #000; color: #fff;
-            height: 100vh; height: 100dvh;
-            overflow: hidden; position: fixed; inset: 0;
-            -webkit-user-select: none; user-select: none;
-        }
+        body { background: #000; color: #fff; padding-bottom: 80px; }
 
         /* Header */
         .header {
-            position: absolute; top: 0; left: 0; right: 0; height: 50px;
+            position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: #000; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; padding-top: env(safe-area-inset-top, 0);
-            border-bottom: 1px solid #333; z-index: 100;
+            padding: 0 12px; border-bottom: 1px solid #333; z-index: 100;
         }
         .header-left { display: flex; align-items: center; gap: 8px; }
         .logo { width: 28px; height: 28px; border-radius: 4px; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
+        .menu-btn { font-size: 24px; cursor: pointer; padding: 10px; }
 
         /* Video Area */
         .video-area {
-            position: absolute; top: 50px; left: 0; right: 0; bottom: 160px;
+            margin-top: 50px; width: 100%; min-height: 60vh;
             background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             display: flex; align-items: flex-start; justify-content: center;
-            padding-top: 20px;
+            padding: 30px 20px;
         }
-        .video-text { color: #ccc; font-size: 14px; text-align: center; padding: 0 20px; }
+        .video-text { color: #ccc; font-size: 14px; text-align: center; }
 
         /* Right Buttons */
         .side-buttons {
-            position: absolute; right: 12px; bottom: 170px;
-            display: flex; flex-direction: column; gap: 24px; z-index: 60;
+            position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 30px; z-index: 50;
         }
         .side-btn {
             display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; padding: 8px;
-            -webkit-tap-highlight-color: transparent;
+            cursor: pointer; padding: 10px;
+            background: rgba(0,0,0,0.5); border-radius: 50%;
+            width: 50px; height: 50px; justify-content: center;
         }
-        .side-btn:active { transform: scale(0.92); opacity: 0.8; }
-        .side-icon { font-size: 28px; }
-        .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
+        .side-icon { font-size: 24px; }
+        .side-label { font-size: 10px; color: #aaa; margin-top: 4px; }
 
         /* Info Bar */
         .info-bar {
-            position: absolute; bottom: 80px; left: 0; right: 0;
             padding: 12px; display: flex; align-items: flex-start; gap: 10px;
-            border-top: 1px solid #222; background: #000;
+            border-bottom: 1px solid #222;
         }
         .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; flex-shrink: 0; }
         .info-text { flex: 1; }
@@ -63,47 +56,21 @@
 
         /* Bottom Nav */
         .bottom-nav {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            height: 70px; padding-bottom: env(safe-area-inset-bottom, 0);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
             background: #000; border-top: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center; z-index: 100;
         }
         .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            cursor: pointer; padding: 8px 4px;
-            -webkit-tap-highlight-color: transparent;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            cursor: pointer; padding: 8px;
         }
-        .nav-item:active { opacity: 0.7; }
+        .nav-icon { font-size: 20px; }
         .nav-label { font-size: 11px; color: #aaa; }
-        .nav-item.active .nav-label { color: #fff; }
         .plus-btn {
             width: 44px; height: 32px; background: #fff; border-radius: 6px;
             color: #000; font-size: 22px; font-weight: bold;
             display: flex; align-items: center; justify-content: center;
         }
-
-        /* Side Menu */
-        .side-menu {
-            position: fixed; top: 0; right: -280px; width: 280px; height: 100vh;
-            background: #111; z-index: 200; transition: right 0.3s ease;
-            border-left: 1px solid #333; overflow-y: auto;
-        }
-        .side-menu.open { right: 0; }
-        .menu-header {
-            padding: 20px 16px; border-bottom: 1px solid #333;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .close-btn { font-size: 28px; cursor: pointer; padding: 4px; }
-        .menu-item {
-            padding: 16px; border-bottom: 1px solid #222;
-            cursor: pointer; font-size: 15px;
-        }
-        .menu-item:active { background: #222; }
-        .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            z-index: 150; display: none;
-        }
-        .overlay.show { display: block; }
     </style>
 </head>
 <body>
@@ -115,26 +82,7 @@
         <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
-</div>
-
-<!-- Overlay -->
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<!-- Side Menu -->
-<div class="side-menu" id="sideMenu">
-    <div class="menu-header">
-        <h3>เมนูหลัก</h3>
-        <div class="close-btn" onclick="toggleMenu()">×</div>
-    </div>
-    <div class="menu-item" onclick="alert('เข้าโปรไฟล์')">👤 โปรไฟล์</div>
-    <div class="menu-item" onclick="alert('เข้าตะกร้า')">🛒 ตะกร้าสินค้า</div>
-    <div class="menu-item" onclick="alert('เข้าคำสั่งซื้อ')">📋 คำสั่งซื้อ</div>
-    <div class="menu-item" onclick="alert('เข้าคูปอง')">🎟️ คูปอง</div>
-    <div class="menu-item" onclick="alert('เข้าครีเอเตอร์')">🎬 ครีเอเตอร์</div>
-    <div class="menu-item" onclick="alert('เข้าข้อความ')">💬 ข้อความ</div>
-    <div class="menu-item" onclick="alert('เข้าโปรโมท')">📢 โปรโมท</div>
-    <div class="menu-item" onclick="alert('เข้าขยายธุรกิจ')">🚀 ขยายธุรกิจ</div>
+    <div class="menu-btn" onclick="testMenu()">☰</div>
 </div>
 
 <!-- Video Area -->
@@ -144,10 +92,18 @@
 
 <!-- Right Buttons -->
 <div class="side-buttons">
-    <div class="side-btn" onclick="event.stopPropagation(); like()"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
-    <div class="side-btn" onclick="event.stopPropagation(); comment()"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
-    <div class="side-btn" onclick="event.stopPropagation(); share()"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
-    <div class="side-btn" onclick="event.stopPropagation(); cart()"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
+    <div class="side-btn" onclick="testLike()">
+        <span class="side-icon">❤️</span>
+    </div>
+    <div class="side-btn" onclick="testComment()">
+        <span class="side-icon">💬</span>
+    </div>
+    <div class="side-btn" onclick="testShare()">
+        <span class="side-icon">↗️</span>
+    </div>
+    <div class="side-btn" onclick="testCart()">
+        <span class="side-icon">🛒</span>
+    </div>
 </div>
 
 <!-- Info Bar -->
@@ -161,46 +117,45 @@
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="event.stopPropagation(); goHome()">
-        <span class="nav-label">🏠 หน้าแรก</span>
+    <div class="nav-item" onclick="testHome()">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="event.stopPropagation(); goSearch()">
-        <span class="nav-label">🔍 ค้นหา</span>
+    <div class="nav-item" onclick="testSearch()">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-item" onclick="event.stopPropagation(); goCreate()">
+    <div class="nav-item" onclick="testCreate()">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="event.stopPropagation(); goMessages()">
-        <span class="nav-label">💬 ข้อความ</span>
+    <div class="nav-item" onclick="testMessage()">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="event.stopPropagation(); goProfile()">
-        <span class="nav-label">👤 โปรไฟล์</span>
+    <div class="nav-item" onclick="testProfile()">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('beforeinstallprompt', function(e) {
-        e.preventDefault();
-        return false;
-    });
+// ปิดป๊อปอัพติดตั้ง
+window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    return false;
 });
 
-function toggleMenu() {
-    document.getElementById('sideMenu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-}
-
-function like() { alert('❤️ กดถูกใจแล้ว!'); }
-function comment() { alert('💬 เปิดความคิดเห็น'); }
-function share() { alert('↗️ แชร์แล้ว!'); }
-function cart() { alert('🛒 เข้าตะกร้าสินค้า'); }
-
-function goHome() { alert('🏠 หน้าแรก'); }
-function goSearch() { alert('🔍 ค้นหา'); }
-function goCreate() { alert('+ สร้างโพสต์ / อัปโหลดวิดีโอ'); }
-function goMessages() { alert('💬 ข้อความ'); }
-function goProfile() { alert('👤 โปรไฟล์'); }
+// ทุกฟังก์ชัน — เรียบง่าย ชัดเจน
+function testMenu() { alert('☰ เปิดเมนูหลัก'); }
+function testLike() { alert('❤️ กดถูกใจแล้ว!'); }
+function testComment() { alert('💬 เปิดความคิดเห็น'); }
+function testShare() { alert('↗️ แชร์แล้ว!'); }
+function testCart() { alert('🛒 เข้าตะกร้าสินค้า'); }
+function testHome() { alert('🏠 ไปหน้าแรก'); }
+function testSearch() { alert('🔍 ค้นหา'); }
+function testCreate() { alert('+ สร้างโพสต์ / อัปโหลดวิดีโอ'); }
+function testMessage() { alert('💬 ข้อความ'); }
+function testProfile() { alert('👤 โปรไฟล์'); }
 </script>
 
 </body>
