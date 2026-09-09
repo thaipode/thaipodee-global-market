@@ -3,226 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>THAIPODEE V2026 — Thailand World Market Online Platform</title>
-    <link rel="icon" type="image/png" href="https://i.imgur.com/8ZxQrL9.png">
-    <meta name="description" content="THAIPODEE — แพลตฟอร์มตลาดออนไลน์ระดับโลก จากไทยสู่ทั่วโลก">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="THAIPODEE">
-    <link rel="apple-touch-icon" href="https://i.imgur.com/8ZxQrL9.png">
+    <title>THAIPODEE V2026</title>
+    <link rel="icon" href="https://i.imgur.com/8ZxQrL9.png">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        :root { --bg: #000; --text: #fff; --accent: #2563eb; --card: #1a1a1a; --border: #333; --safe-bottom: env(safe-area-inset-bottom, 0px); }
-        html, body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
-        
-        /* Header */
-        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top, 0px)); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-        .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo { width: 32px; height: 32px; border-radius: 6px; }
-        .brand-name { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        html, body { 
+            background: #000; color: #fff; 
+            height: 100vh; 
+            height: 100dvh; /* รองรับจอโค้ง มือถือทุกรุ่น */
+            overflow: hidden; /* ปิดการเลื่อนจอ */
+            position: fixed; inset: 0;
+        }
+
+        /* Header — คงที่ ด้านบน */
+        .header { 
+            position: absolute; top: 0; left: 0; right: 0; 
+            height: 50px; background: #000; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 12px; padding-top: env(safe-area-inset-top, 0px);
+            border-bottom: 1px solid #333; z-index: 100; 
+        }
+        .header-left { display: flex; align-items: center; gap: 8px; }
+        .logo { width: 28px; height: 28px; border-radius: 4px; }
+        .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .icon-btn { font-size: 22px; cursor: pointer; }
+        .menu-btn { font-size: 22px; cursor: pointer; }
 
-        /* Main Content */
-        .content { padding-top: 55px; }
-        .video-card { width: 100%; min-height: calc(100vh - 140px); display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 1px solid #222; position: relative; padding: 20px 16px 120px; }
-        .video-placeholder { width: 100%; aspect-ratio: 9/16; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; padding: 20px; margin-bottom: 16px; }
-        .video-placeholder h2 { font-size: 22px; margin-bottom: 8px; }
-        .video-placeholder p { font-size: 14px; color: #aaa; }
-        .video-info { width: 100%; padding: 0 4px; }
-        .creator-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .creator-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); flex-shrink: 0; }
-        .creator-name { font-weight: 600; font-size: 15px; }
-        .desc { font-size: 14px; line-height: 1.6; color: #ddd; }
-        
-        /* Action Buttons — ขวา */
-        .action-buttons { position: fixed; right: 14px; bottom: calc(130px + var(--safe-bottom)); display: flex; flex-direction: column; gap: 26px; align-items: center; z-index: 50; }
-        .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-        .action-icon { font-size: 26px; }
-        .action-label { font-size: 11px; color: #aaa; }
+        /* Video Area — กลางจอ พอดี */
+        .video-area { 
+            position: absolute; top: 50px; left: 0; right: 0; bottom: 160px;
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            display: flex; align-items: flex-start; justify-content: center; 
+            padding-top: 20px;
+        }
+        .video-text { color: #ccc; font-size: 14px; text-align: center; padding: 0 20px; }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding: 10px 0; padding-bottom: calc(10px + var(--safe-bottom)); z-index: 100; height: 75px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
-        .nav-icon { font-size: 24px; line-height: 1; }
-        .nav-label { font-size: 10px; color: #888; }
+        /* Right Buttons — อยู่ในพื้นที่ ไม่ทับ ไม่หาย */
+        .side-buttons { 
+            position: absolute; right: 12px; bottom: 170px; 
+            display: flex; flex-direction: column; gap: 24px; z-index: 50; 
+        }
+        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .side-icon { font-size: 24px; }
+        .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        /* Info Bar — ด้านล่างวิดีโอ เห็นชัดเจน */
+        .info-bar { 
+            position: absolute; bottom: 80px; left: 0; right: 0;
+            padding: 12px; display: flex; align-items: flex-start; gap: 10px; 
+            border-top: 1px solid #222; background: #000;
+        }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; flex-shrink: 0; }
+        .info-text { flex: 1; }
+        .username { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .desc { font-size: 13px; color: #ccc; line-height: 1.4; }
+
+        /* Bottom Nav — ล่างสุด ไม่ถูกบัง */
+        .bottom-nav { 
+            position: absolute; bottom: 0; left: 0; right: 0; 
+            height: 70px; padding-bottom: env(safe-area-inset-bottom, 0px);
+            background: #000; border-top: 1px solid #333; 
+            display: flex; justify-content: space-around; align-items: center; z-index: 100; 
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .nav-icon { font-size: 20px; }
+        .nav-label { font-size: 11px; color: #aaa; }
         .nav-item.active .nav-label { color: #fff; }
-        .create-btn { width: 46px; height: 32px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 22px; font-weight: 700; line-height: 1; }
-
-        /* Side Menu & Overlay */
-        .side-menu { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background: #111; z-index: 200; transition: right 0.3s ease; border-left: 1px solid #333; overflow-y: auto; }
-        .side-menu.open { right: 0; }
-        .menu-header { padding: 20px 16px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .close-btn { font-size: 24px; cursor: pointer; }
-        .menu-item { padding: 14px 16px; border-bottom: 1px solid #222; cursor: pointer; transition: background 0.2s; }
-        .menu-item:hover { background: #222; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 150; display: none; }
-        .overlay.show { display: block; }
-
-        /* Pages */
-        .page { display: none; padding-top: 55px; padding-bottom: 20px; min-height: 100vh; }
-        .page.active { display: block; }
-        .page-title { font-size: 22px; font-weight: 700; padding: 16px; border-bottom: 1px solid #222; }
-        .card { background: var(--card); border-radius: 12px; margin: 12px; padding: 16px; border: 1px solid var(--border); }
-        .stat-row { display: flex; justify-content: space-around; text-align: center; padding: 16px 0; }
-        .stat-num { font-size: 20px; font-weight: 700; }
-        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
-        .btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .btn:active { opacity: 0.8; }
+        .plus-btn { 
+            width: 40px; height: 28px; background: #fff; border-radius: 4px; 
+            color: #000; font-size: 20px; font-weight: bold; 
+            display: flex; align-items: center; justify-content: center; 
+        }
     </style>
 </head>
 <body>
 
 <!-- Header -->
 <div class="header">
-    <div class="logo-area">
-        <img src="https://i.imgur.com/8ZxQrL9.png" alt="THAIPODEE" class="logo">
-        <span class="brand-name">THAIPODEE</span>
+    <div class="header-left">
+        <img src="https://i.imgur.com/8ZxQrL9.png" alt="Logo" class="logo">
+        <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <span class="icon-btn" onclick="toggleMenu()">☰</span>
+    <span class="menu-btn">☰</span>
 </div>
 
-<!-- Overlay -->
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<!-- Side Menu -->
-<div class="side-menu" id="sideMenu">
-    <div class="menu-header">
-        <h3>เมนูหลัก</h3>
-        <span class="close-btn" onclick="toggleMenu()">×</span>
-    </div>
-    <div class="menu-item" onclick="showPage('profile'); toggleMenu()">👤 โปรไฟล์</div>
-    <div class="menu-item" onclick="showPage('cart'); toggleMenu()">🛒 ตะกร้าสินค้า</div>
-    <div class="menu-item" onclick="showPage('orders'); toggleMenu()">📋 คำสั่งซื้อ</div>
-    <div class="menu-item" onclick="showPage('coupons'); toggleMenu()">🎟️ คูปอง</div>
-    <div class="menu-item" onclick="showPage('creator'); toggleMenu()">🎬 ครีเอเตอร์</div>
-    <div class="menu-item" onclick="showPage('messages'); toggleMenu()">💬 ข้อความ</div>
-    <div class="menu-item" onclick="showPage('promote'); toggleMenu()">📢 โปรโมท</div>
-    <div class="menu-item" onclick="showPage('business'); toggleMenu()">🚀 ขยายธุรกิจ</div>
+<!-- Video Area -->
+<div class="video-area">
+    <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
-<!-- HOME PAGE -->
-<div class="page active" id="page-home">
-    <div class="content">
-        <div class="video-card">
-            <div class="video-placeholder">
-                <h2>วิดีโอ / เนื้อหา</h2>
-                <p>THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
-            </div>
-            <div class="video-info">
-                <div class="creator-row">
-                    <div class="creator-avatar"></div>
-                    <div>
-                        <div class="creator-name">@thaipodee_official</div>
-                    </div>
-                </div>
-                <p class="desc">THAIPODEE V2026 — แพลตฟอร์มออนไลน์ระดับโลก ซื้อ ขาย แชร์ ได้ทุกที่ทั่วโลก 🇹🇭🌍</p>
-            </div>
-        </div>
-    </div>
-    <div class="action-buttons">
-        <div class="action-btn"><span class="action-icon">❤️</span><span class="action-label">ถูกใจ</span></div>
-        <div class="action-btn"><span class="action-icon">💬</span><span class="action-label">ความคิด</span></div>
-        <div class="action-btn"><span class="action-icon">↗️</span><span class="action-label">แชร์</span></div>
-        <div class="action-btn"><span class="action-icon">🛒</span><span class="action-label">ตะกร้า</span></div>
+<!-- Right Buttons -->
+<div class="side-buttons">
+    <div class="side-btn"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
+    <div class="side-btn"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
+    <div class="side-btn"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
+    <div class="side-btn"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
+</div>
+
+<!-- Info Bar -->
+<div class="info-bar">
+    <div class="avatar"></div>
+    <div class="info-text">
+        <div class="username">@thaipodee_official</div>
+        <div class="desc">THAIPODEE V2026 — แพลตฟอร์มออนไลน์ระดับโลก ซื้อ ขาย แชร์ ได้ทุกที่ทั่วโลก 🌍 🇹🇭</div>
     </div>
 </div>
 
-<!-- PROFILE PAGE -->
-<div class="page" id="page-profile">
-    <h2 class="page-title">โปรไฟล์</h2>
-    <div class="card" style="text-align:center; padding:24px;">
-        <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, #2563eb, #7c3aed); margin:0 auto 12px;"></div>
-        <h2 style="font-size:20px;">THAIPODEE Official</h2>
-        <p style="color:#888; margin-bottom:16px;">@thaipodee_official</p>
-        <div class="stat-row">
-            <div><div class="stat-num">1,234</div><div class="stat-label">กำลังติดตาม</div></div>
-            <div><div class="stat-num">5,678</div><div class="stat-label">ผู้ติดตาม</div></div>
-            <div><div class="stat-num">99.9K</div><div class="stat-label">ถูกใจ</div></div>
-        </div>
-        <button class="btn" style="margin-top:12px;">แก้ไขโปรไฟล์</button>
-    </div>
-</div>
-
-<!-- CART PAGE -->
-<div class="page" id="page-cart">
-    <h2 class="page-title">ตะกร้าสินค้า</h2>
-    <div class="card"><h3>สินค้าในตะกร้า</h3><p style="color:#888; margin-top:8px;">ยังไม่มีสินค้า</p></div>
-    <div class="card"><h3>คูปองส่วนลด</h3><p style="color:#888; margin-top:8px;">ไม่มีคูปองที่ใช้งาน</p></div>
-</div>
-
-<!-- ORDERS PAGE -->
-<div class="page" id="page-orders">
-    <h2 class="page-title">คำสั่งซื้อ</h2>
-    <div class="card"><h3>📝 รอชำระเงิน</h3><p style="color:#888; margin-top:8px;">ไม่มีรายการ</p></div>
-    <div class="card"><h3>🚚 จัดส่ง</h3><p style="color:#888; margin-top:8px;">ไม่มีรายการ</p></div>
-    <div class="card"><h3>✅ รอรับสินค้า</h3><p style="color:#888; margin-top:8px;">ไม่มีรายการ</p></div>
-</div>
-
-<!-- COUPONS PAGE -->
-<div class="page" id="page-coupons">
-    <h2 class="page-title">คูปอง</h2>
-    <div class="card"><h3>คูปองของฉัน</h3><p style="color:#888; margin-top:8px;">ยังไม่มีคูปอง</p></div>
-</div>
-
-<!-- CREATOR PAGE -->
-<div class="page" id="page-creator">
-    <h2 class="page-title">ครีเอเตอร์</h2>
-    <div class="card"><h3>สมัครเป็นครีเอเตอร์</h3><p style="color:#888; margin:8px 0;">สร้างรายได้จากเนื้อหาของคุณ</p><button class="btn">สมัครเลย</button></div>
-</div>
-
-<!-- MESSAGES PAGE -->
-<div class="page" id="page-messages">
-    <h2 class="page-title">ข้อความ</h2>
-    <div class="card" style="text-align:center; color:#888;">ยังไม่มีข้อความ</div>
-</div>
-
-<!-- PROMOTE PAGE -->
-<div class="page" id="page-promote">
-    <h2 class="page-title">โปรโมท</h2>
-    <div class="card"><h3>โปรโมทสินค้า & เนื้อหา</h3><p style="color:#888; margin:8px 0;">เข้าถึงลูกค้าทั่วโลก</p><button class="btn">เริ่มโปรโมท</button></div>
-</div>
-
-<!-- BUSINESS PAGE -->
-<div class="page" id="page-business">
-    <h2 class="page-title">ขยายธุรกิจ</h2>
-    <div class="card"><h3>เปิดร้านค้า</h3><p style="color:#888; margin:8px 0;">ขายสินค้าทั่วโลก</p><button class="btn">เปิดร้านเลย</button></div>
-    <div class="card"><h3>ตลาดโลก</h3><p style="color:#888; margin:8px 0;">THAIPODEE V2026 — Thailand World Market Online Platform</p></div>
-</div>
-
-<!-- BOTTOM NAV -->
+<!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="showPage('home')"><span class="nav-icon">หน้าแรก</span><span class="nav-label">หน้าแรก</span></div>
-    <div class="nav-item" onclick="showPage('discover')"><span class="nav-icon">ค้นหา</span><span class="nav-label">ค้นหา</span></div>
-    <div class="nav-item" onclick="showCreate()"><span class="create-btn">+</span></div>
-    <div class="nav-item" onclick="showPage('messages')"><span class="nav-icon">ข้อความ</span><span class="nav-label">ข้อความ</span></div>
-    <div class="nav-item" onclick="showPage('profile')"><span class="nav-icon">โปรไฟล์</span><span class="nav-label">โปรไฟล์</span></div>
+    <div class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าแรก</span>
+    </div>
+    <div class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">ค้นหา</span>
+    </div>
+    <div class="nav-item">
+        <span class="plus-btn">+</span>
+    </div>
+    <div class="nav-item">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">ข้อความ</span>
+    </div>
+    <div class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
+    </div>
 </div>
-
-<script>
-function toggleMenu() {
-    document.getElementById('sideMenu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-}
-
-function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    if (name === 'home') {
-        document.getElementById('page-home').classList.add('active');
-        document.querySelector('.nav-item:first-child').classList.add('active');
-    } else {
-        const el = document.getElementById('page-' + name);
-        if (el) el.classList.add('active');
-    }
-    window.scrollTo(0,0);
-}
-
-function showCreate() {
-    alert('สร้างโพสต์ / อัปโหลดวิดีโอ\n\nTHAIPODEE V2026 — Thailand World Market Online Platform');
-}
-</script>
 
 </body>
 </html>
