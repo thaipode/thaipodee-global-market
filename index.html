@@ -61,9 +61,8 @@
     
     /* Upload Page */
     .upload-page { padding: 16px; }
-    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin-bottom: 20px; }
+    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin-bottom: 20px; cursor: pointer; }
     .upload-area input[type="file"] { display: none; }
-    .upload-label { cursor: pointer; display: block; }
     .upload-icon { font-size: 48px; margin-bottom: 10px; }
     .file-name { color: #4ade80; margin-top: 12px; display: none; font-size: 14px; }
     .form-group { margin-bottom: 20px; }
@@ -88,17 +87,25 @@
     .tabs { display: flex; border-bottom: 1px solid #222; }
     .tab { flex: 1; text-align: center; padding: 12px; font-size: 15px; color: #888; cursor: pointer; }
     .tab.active { color: #fff; border-bottom: 2px solid #fff; }
+    
+    /* New Post Preview */
+    .new-post { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #2e1a2e, #3e163e); display: flex; align-items: center; justify-content: center; z-index: 5; }
+    .new-post-content { text-align: center; padding: 20px; }
+    .new-post-icon { font-size: 64px; margin-bottom: 15px; }
+    .new-post-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+    .new-post-desc { font-size: 14px; color: #ddd; max-width: 300px; }
   </style>
 </head>
 <body>
 
 <!-- PAGE 1: HOME / VIDEO FEED -->
 <div class="page active" id="page-home">
-  <div class="video-container">
-    <div class="video-bg">
+  <div class="video-container" id="video-feed">
+    <!-- Dynamic posts will appear here -->
+    <div class="video-bg" id="default-post">
       <div class="video-placeholder">
         <div class="icon">🎬</div>
-        <div>วิดีโอจะแสดงที่นี่</div>
+        <div>กด + เพื่อโพสต์วิดีโอแรกของคุณ</div>
         <div style="font-size:13px; color:#666; margin-top:8px;">Thaipodee Market Online V2026</div>
       </div>
     </div>
@@ -110,7 +117,7 @@
       </div>
       <div class="side-btn">
         <div class="side-icon">❤️</div>
-        <span>0</span>
+        <span id="like-count">0</span>
       </div>
       <div class="side-btn">
         <div class="side-icon">💬</div>
@@ -127,15 +134,15 @@
     </div>
     
     <!-- Video Info -->
-    <div class="video-info">
-      <div style="font-weight:bold; margin-bottom:6px;">D D Y M Music</div>
-      <div style="font-size:14px; color:#ddd; margin-bottom:8px;">เพลงใหม่ — มาฟังกันนะ 🎵 #ดนตรี #เพลง</div>
+    <div class="video-info" id="video-info-area">
+      <div style="font-weight:bold; margin-bottom:6px;" id="post-username">Thaipodee Official</div>
+      <div style="font-size:14px; color:#ddd; margin-bottom:8px;" id="post-caption">ยินดีต้อนรับสู่ Thaipodee Market Online V2026! 🇹🇭🌏</div>
     </div>
     
     <!-- Music Bar -->
     <div class="music-bar">
       <div class="music-disc"></div>
-      <span>🎵 เสียงต้นฉบับ — D D Y M Music</span>
+      <span>🎵 เสียงต้นฉบับ — Thaipodee Market</span>
     </div>
   </div>
   
@@ -174,14 +181,12 @@
     สร้างโพสต์
   </div>
   
-  <div class="upload-area">
+  <label class="upload-area">
     <input type="file" id="video-input" accept="video/*">
-    <label for="video-input" class="upload-label">
-      <div class="upload-icon">📷</div>
-      <div>แตะเพื่อเลือกวิดีโอ<br>หรือถ่ายวิดีโอใหม่</div>
-    </label>
+    <div class="upload-icon">📷</div>
+    <div>แตะเพื่อเลือกวิดีโอ<br>หรือถ่ายวิดีโอใหม่</div>
     <div class="file-name" id="video-name">✅ เลือกไฟล์แล้ว</div>
-  </div>
+  </label>
   
   <div class="form-group">
     <label class="form-label">คำอธิบาย</label>
@@ -231,7 +236,7 @@
     <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ถูกใจ</div></div>
   </div>
   <button class="edit-profile-btn">แก้ไขโปรไฟล์</button>
-  <div class="video-grid">
+  <div class="video-grid" id="profile-grid">
     <div class="grid-item">📷</div>
     <div class="grid-item">📷</div>
     <div class="grid-item">📷</div>
@@ -273,6 +278,7 @@
 <script>
 let currentPage = 'page-home';
 let pageHistory = [];
+let postCount = 0;
 
 function goToPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -295,7 +301,7 @@ function goBack() {
   }
 }
 
-// UPLOAD FUNCTION — FIXED: กดตกลงแล้วกลับหน้าหลักเลย
+// Show selected filename
 document.addEventListener('DOMContentLoaded', function() {
   const videoInput = document.getElementById('video-input');
   const videoName = document.getElementById('video-name');
@@ -309,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Submit Post — WORKING: shows new post on homepage & profile
 function submitPost() {
   const videoInput = document.getElementById('video-input');
   const desc = document.getElementById('post-desc')?.value || '';
@@ -318,10 +325,42 @@ function submitPost() {
     return;
   }
   
-  // แจ้งเตือนก่อน แล้วค่อยกลับหน้าหลัก
-  alert('✅ อัปโหลดสำเร็จ!\n\nชื่อไฟล์: ' + videoInput.files[0].name + '\nคำอธิบาย: ' + desc + '\n\nกดตกลงเพื่อกลับหน้าหลัก');
+  const fileName = videoInput.files[0].name;
+  postCount++;
   
-  // กลับไปหน้าหลักทันทีเมื่อกดตกลง
+  // Show success message
+  alert('✅ โพสต์สำเร็จ!\n\n📁 ไฟล์: ' + fileName + '\n📝 คำอธิบาย: ' + (desc || '-') + '\n\nกดตกลงเพื่อดูโพสต์ของคุณ!');
+  
+  // Update homepage with new post
+  const infoArea = document.getElementById('video-info-area');
+  if (infoArea) {
+    infoArea.innerHTML = `
+      <div style="font-weight:bold; margin-bottom:6px;">คุณ — โพสต์ที่ ${postCount}</div>
+      <div style="font-size:14px; color:#ddd; margin-bottom:8px;">${desc || 'วิดีโอของฉัน 🎥'}</div>
+    `;
+  }
+  
+  // Update profile page grid
+  const grid = document.getElementById('profile-grid');
+  if (grid) {
+    const newItem = document.createElement('div');
+    newItem.className = 'grid-item';
+    newItem.innerHTML = '🎥';
+    grid.insertBefore(newItem, grid.firstChild);
+  }
+  
+  // Update like counter
+  const likeCount = document.getElementById('like-count');
+  if (likeCount) likeCount.textContent = '0';
+  
+  // Clear upload form
+  videoInput.value = '';
+  const videoName = document.getElementById('video-name');
+  if (videoName) videoName.style.display = 'none';
+  const descInput = document.getElementById('post-desc');
+  if (descInput) descInput.value = '';
+  
+  // Go back to home
   goToPage('page-home');
 }
 </script>
