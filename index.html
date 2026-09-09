@@ -6,57 +6,72 @@
     <title>THAIPODEE V2026</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: sans-serif; }
+        html, body {
+            background: #000; color: #fff; font-family: sans-serif;
+            height: 100%; overflow: hidden;
+        }
 
         /* Header */
         .header {
             position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: #000; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; border-bottom: 1px solid #333; z-index: 100;
+            padding: 0 12px; border-bottom: 1px solid #333; z-index: 1000;
         }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
         .menu-btn { font-size: 24px; padding: 8px; cursor: pointer; }
 
         /* Video Area */
-        .video-area {
-            margin-top: 50px; width: 100%; height: calc(100vh - 120px);
-            background: #000; display: flex; align-items: center; justify-content: center;
-            position: relative;
+        .video-container {
+            position: fixed; top: 50px; left: 0; right: 0; bottom: 70px;
+            background: #000; z-index: 1;
+            display: flex; align-items: center; justify-content: center;
         }
-        .video-player { width: 100%; height: 100%; object-fit: contain; display: block; }
-        .video-placeholder { color: #888; font-size: 16px; }
+        .video-placeholder {
+            color: #888; font-size: 16px; text-align: center; padding: 20px;
+        }
+        .video-wrapper {
+            width: 100%; height: 100%; position: relative; display: none; background: #000;
+        }
+        .close-video-btn {
+            position: absolute; top: 10px; right: 10px; width: 44px; height: 44px;
+            border-radius: 50%; background: rgba(0,0,0,0.7); color: #fff; font-size: 28px;
+            border: none; cursor: pointer; z-index: 20;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .close-video-btn:active { background: rgba(200,0,0,0.8); transform: scale(0.9); }
+        .video-player {
+            width: 100%; height: 100%; object-fit: contain; background: #000;
+            playsinline webkit-playsinline controlslist="nodownload nofullscreen noremoteplayback";
+        }
         .video-desc {
-            position: absolute; bottom: 80px; left: 15px; right: 90px;
-            font-size: 13px; line-height: 1.5;
-            text-shadow: 0 1px 3px #000;
+            position: absolute; bottom: 15px; left: 15px; right: 80px;
+            font-size: 13px; line-height: 1.5; text-shadow: 0 1px 3px #000;
+            z-index: 5; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px;
         }
 
-        /* ✅ ปุ่มด้านขวา — แก้ตรงนี้โดยเฉพาะ */
+        /* ปุ่มด้านขวา — กดได้แน่นอน ชั้นบนสุด */
         .side-buttons {
             position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 24px;
-            z-index: 9999; /* สูงสุดแน่นอน */
+            display: flex; flex-direction: column; gap: 28px;
+            z-index: 99999; pointer-events: none;
         }
         .side-btn {
             width: 56px; height: 56px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.5); border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
+            background: rgba(0,0,0,0.6); border-radius: 50%;
+            border: none; outline: none; cursor: pointer;
+            pointer-events: auto; -webkit-tap-highlight-color: transparent;
         }
-        .side-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
-        .side-icon { font-size: 24px; line-height: 1; }
+        .side-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+        .side-icon { font-size: 26px; line-height: 1; }
         .side-label { font-size: 10px; color: #fff; margin-top: 2px; }
 
         /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
             background: #000; border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 100;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
         .nav-icon { font-size: 20px; }
@@ -69,8 +84,8 @@
 
         /* Upload Modal */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 99999; display: none; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 999999; display: none; align-items: center; justify-content: center;
             padding: 20px;
         }
         .modal.show { display: flex; }
@@ -104,31 +119,34 @@
 <div class="header">
     <span class="title">THAIPODEE</span>
     <span class="version">V2026</span>
-    <div class="menu-btn" onclick="alert('เมนูทำงานแล้ว!')">☰</div>
+    <div class="menu-btn" id="menuBtn">☰</div>
 </div>
 
 <!-- Video Area -->
-<div class="video-area">
+<div class="video-container">
     <div class="video-placeholder" id="videoPlaceholder">กด + เพื่ออัปโหลดวิดีโอ</div>
-    <video class="video-player" id="videoPlayer" controls loop muted playsinline style="display:none;"></video>
-    <p class="video-desc" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก 🌍</p>
+    <div class="video-wrapper" id="videoWrapper">
+        <button class="close-video-btn" id="closeVideoBtn">×</button>
+        <video class="video-player" id="videoPlayer" controls loop muted playsinline></video>
+        <p class="video-desc" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก 🌍</p>
+    </div>
 </div>
 
-<!-- ✅ ปุ่มด้านขวา — กดได้แน่นอน -->
+<!-- ปุ่มด้านขวา -->
 <div class="side-buttons">
-    <button class="side-btn" onclick="alert('❤️ กดถูกใจแล้ว!')">
+    <button class="side-btn" id="btnLike">
         <span class="side-icon">❤️</span>
         <span class="side-label">ถูกใจ</span>
     </button>
-    <button class="side-btn" onclick="alert('💬 เปิดความคิดเห็น')">
+    <button class="side-btn" id="btnComment">
         <span class="side-icon">💬</span>
         <span class="side-label">ความคิด</span>
     </button>
-    <button class="side-btn" onclick="alert('↗️ แชร์แล้ว!')">
+    <button class="side-btn" id="btnShare">
         <span class="side-icon">↗️</span>
         <span class="side-label">แชร์</span>
     </button>
-    <button class="side-btn" onclick="alert('🛒 เข้าตะกร้าสินค้า')">
+    <button class="side-btn" id="btnCart">
         <span class="side-icon">🛒</span>
         <span class="side-label">ตะกร้า</span>
     </button>
@@ -136,22 +154,22 @@
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item" onclick="alert('🏠 หน้าแรก')">
+    <div class="nav-item" id="navHome">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="alert('🔍 ค้นหา')">
+    <div class="nav-item" id="navSearch">
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-item" onclick="openUpload()">
+    <div class="nav-item" id="navUpload">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="alert('💬 ข้อความ')">
+    <div class="nav-item" id="navMessage">
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="alert('👤 โปรไฟล์')">
+    <div class="nav-item" id="navProfile">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
@@ -163,12 +181,12 @@
         <h3 class="modal-title">อัปโหลดวิดีโอ</h3>
         <input type="text" class="input-field" id="descInput" placeholder="คำอธิบายวิดีโอ...">
         <div class="file-row">
-            <input type="file" accept="video/*" id="videoInput" style="display:none" onchange="pickFile(this)">
-            <button class="file-btn" onclick="document.getElementById('videoInput').click()">เลือกไฟล์</button>
+            <input type="file" accept="video/*" id="videoInput" style="display:none">
+            <button class="file-btn" id="selectFileBtn">เลือกไฟล์</button>
             <span class="file-name" id="fileName">ยังไม่ได้เลือก</span>
         </div>
-        <button class="btn btn-primary" onclick="uploadVideo()">📤 อัปโหลด</button>
-        <button class="btn btn-close" onclick="closeUpload()">ปิด</button>
+        <button class="btn btn-primary" id="uploadBtn">📤 อัปโหลด</button>
+        <button class="btn btn-close" id="closeModalBtn">ปิด</button>
     </div>
 </div>
 
@@ -176,8 +194,49 @@
 // ปิดป๊อปอัพ
 window.addEventListener('beforeinstallprompt', e => e.preventDefault());
 
-let selectedFile = null;
+let selectedFile = null, videoURL = null;
 
+// ผูกทุกปุ่มเมื่อหน้าโหลดเสร็จ
+document.addEventListener('DOMContentLoaded', function() {
+    // ปุ่มด้านขวา
+    document.getElementById('btnLike').addEventListener('click', () => alert('❤️ กดถูกใจแล้ว!'));
+    document.getElementById('btnComment').addEventListener('click', () => alert('💬 เปิดความคิดเห็น'));
+    document.getElementById('btnShare').addEventListener('click', () => alert('↗️ แชร์แล้ว!'));
+    document.getElementById('btnCart').addEventListener('click', () => alert('🛒 เข้าตะกร้าสินค้า'));
+    
+    // ปุ่มเมนู
+    document.getElementById('menuBtn').addEventListener('click', () => alert('☰ เมนู: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ'));
+    
+    // ปุ่มล่าง
+    document.getElementById('navHome').addEventListener('click', () => alert('🏠 หน้าแรก'));
+    document.getElementById('navSearch').addEventListener('click', () => alert('🔍 ค้นหา'));
+    document.getElementById('navUpload').addEventListener('click', openUpload);
+    document.getElementById('navMessage').addEventListener('click', () => alert('💬 ข้อความ'));
+    document.getElementById('navProfile').addEventListener('click', () => alert('👤 โปรไฟล์'));
+    
+    // ปิดวิดีโอ
+    document.getElementById('closeVideoBtn').addEventListener('click', closeVideo);
+    
+    // อัปโหลด
+    document.getElementById('selectFileBtn').addEventListener('click', () => {
+        document.getElementById('videoInput').click();
+    });
+    document.getElementById('videoInput').addEventListener('change', pickFile);
+    document.getElementById('uploadBtn').addEventListener('click', uploadVideo);
+    document.getElementById('closeModalBtn').addEventListener('click', closeUpload);
+});
+
+// วิดีโอ
+function closeVideo() {
+    const player = document.getElementById('videoPlayer');
+    player.pause();
+    player.src = '';
+    if (videoURL) URL.revokeObjectURL(videoURL);
+    document.getElementById('videoWrapper').style.display = 'none';
+    document.getElementById('videoPlaceholder').style.display = 'flex';
+}
+
+// อัปโหลด
 function openUpload() {
     document.getElementById('uploadModal').classList.add('show');
     selectedFile = null;
@@ -187,9 +246,9 @@ function openUpload() {
 function closeUpload() {
     document.getElementById('uploadModal').classList.remove('show');
 }
-function pickFile(input) {
-    if (input.files.length > 0) {
-        selectedFile = input.files[0];
+function pickFile(e) {
+    if (e.target.files.length > 0) {
+        selectedFile = e.target.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
     }
 }
@@ -197,14 +256,15 @@ function uploadVideo() {
     if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อนครับ'); return; }
     const desc = document.getElementById('descInput').value || 'ไม่มีคำอธิบาย';
     
-    const url = URL.createObjectURL(selectedFile);
+    // แสดงวิดีโอ ไม่บังคับเต็มจอ
+    videoURL = URL.createObjectURL(selectedFile);
     document.getElementById('videoPlaceholder').style.display = 'none';
-    const player = document.getElementById('videoPlayer');
-    player.src = url;
-    player.style.display = 'block';
+    const wrapper = document.getElementById('videoWrapper');
+    wrapper.style.display = 'block';
+    document.getElementById('videoPlayer').src = videoURL;
     document.getElementById('videoDesc').textContent = desc;
     
-    alert('✅ อัปโหลดสำเร็จ! วิดีโอแสดงแล้วครับ');
+    alert('✅ อัปโหลดสำเร็จ! กด × มุมขวาบนเพื่อปิดวิดีโอครับ');
     closeUpload();
 }
 </script>
