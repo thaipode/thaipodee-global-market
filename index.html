@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>THAIPODEE V2026</title>
     <link rel="icon" href="https://i.imgur.com/8ZxQrL9.png">
     <style>
@@ -19,30 +19,35 @@
         .logo { width: 28px; height: 28px; border-radius: 4px; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 24px; cursor: pointer; padding: 10px; }
+        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
 
         /* Video Area */
         .video-area {
             margin-top: 50px; width: 100%; min-height: 60vh;
             background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-            display: flex; align-items: flex-start; justify-content: center;
-            padding: 30px 20px;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; padding: 20px;
         }
-        .video-text { color: #ccc; font-size: 14px; text-align: center; }
+        .video-text { color: #ccc; font-size: 14px; text-align: center; margin-bottom: 20px; }
+        .video-placeholder {
+            width: 100%; max-width: 400px; aspect-ratio: 9/16;
+            background: rgba(0,0,0,0.3); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #888; font-size: 14px;
+            border: 2px dashed #555;
+        }
 
         /* Right Buttons */
         .side-buttons {
             position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 30px; z-index: 50;
+            display: flex; flex-direction: column; gap: 28px; z-index: 50;
         }
         .side-btn {
             display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; padding: 10px;
-            background: rgba(0,0,0,0.5); border-radius: 50%;
-            width: 50px; height: 50px; justify-content: center;
+            cursor: pointer; padding: 8px;
         }
-        .side-icon { font-size: 24px; }
-        .side-label { font-size: 10px; color: #aaa; margin-top: 4px; }
+        .side-icon { font-size: 26px; }
+        .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
 
         /* Info Bar */
         .info-bar {
@@ -71,6 +76,31 @@
             color: #000; font-size: 22px; font-weight: bold;
             display: flex; align-items: center; justify-content: center;
         }
+
+        /* Upload Modal */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 300; display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px;
+            border: 1px solid #333;
+        }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .input-field {
+            width: 100%; padding: 12px; margin-bottom: 12px;
+            background: #222; border: 1px solid #444; border-radius: 8px;
+            color: #fff; font-size: 14px;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-close { background: #333; color: #fff; }
     </style>
 </head>
 <body>
@@ -82,28 +112,21 @@
         <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <div class="menu-btn" onclick="testMenu()">☰</div>
+    <div class="menu-btn" onclick="alert('เมนูหลัก — โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ')">☰</div>
 </div>
 
 <!-- Video Area -->
 <div class="video-area">
+    <div class="video-placeholder">วิดีโอ / เนื้อหา</div>
     <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
 <!-- Right Buttons -->
 <div class="side-buttons">
-    <div class="side-btn" onclick="testLike()">
-        <span class="side-icon">❤️</span>
-    </div>
-    <div class="side-btn" onclick="testComment()">
-        <span class="side-icon">💬</span>
-    </div>
-    <div class="side-btn" onclick="testShare()">
-        <span class="side-icon">↗️</span>
-    </div>
-    <div class="side-btn" onclick="testCart()">
-        <span class="side-icon">🛒</span>
-    </div>
+    <div class="side-btn" onclick="alert('❤️ กดถูกใจแล้ว!')"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
+    <div class="side-btn" onclick="alert('💬 เปิดความคิดเห็น')"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
+    <div class="side-btn" onclick="alert('↗️ แชร์แล้ว!')"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
+    <div class="side-btn" onclick="alert('🛒 เข้าตะกร้าสินค้า')"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
 </div>
 
 <!-- Info Bar -->
@@ -117,45 +140,61 @@
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item" onclick="testHome()">
+    <div class="nav-item" onclick="alert('🏠 หน้าแรก')">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="testSearch()">
+    <div class="nav-item" onclick="alert('🔍 ค้นหา')">
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-item" onclick="testCreate()">
+    <div class="nav-item" onclick="openUpload()">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="testMessage()">
+    <div class="nav-item" onclick="alert('💬 ข้อความ')">
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="testProfile()">
+    <div class="nav-item" onclick="alert('👤 โปรไฟล์')">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
+<!-- Upload Modal -->
+<div class="modal" id="uploadModal">
+    <div class="modal-content">
+        <h3 class="modal-title">อัปโหลดวิดีโอ / สร้างโพสต์</h3>
+        <input type="text" class="input-field" placeholder="คำอธิบายวิดีโอ...">
+        <input type="file" class="input-field" accept="video/*" id="videoInput">
+        <button class="btn btn-primary" onclick="uploadVideo()">📤 อัปโหลด</button>
+        <button class="btn btn-close" onclick="closeUpload()">ปิด</button>
+    </div>
+</div>
+
 <script>
-// ปิดป๊อปอัพติดตั้ง
+// ปิดป๊อปอัพติดตั้งแอปถาวร
 window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     return false;
 });
 
-// ทุกฟังก์ชัน — เรียบง่าย ชัดเจน
-function testMenu() { alert('☰ เปิดเมนูหลัก'); }
-function testLike() { alert('❤️ กดถูกใจแล้ว!'); }
-function testComment() { alert('💬 เปิดความคิดเห็น'); }
-function testShare() { alert('↗️ แชร์แล้ว!'); }
-function testCart() { alert('🛒 เข้าตะกร้าสินค้า'); }
-function testHome() { alert('🏠 ไปหน้าแรก'); }
-function testSearch() { alert('🔍 ค้นหา'); }
-function testCreate() { alert('+ สร้างโพสต์ / อัปโหลดวิดีโอ'); }
-function testMessage() { alert('💬 ข้อความ'); }
-function testProfile() { alert('👤 โปรไฟล์'); }
+// อัปโหลดวิดีโอ
+function openUpload() {
+    document.getElementById('uploadModal').classList.add('show');
+}
+function closeUpload() {
+    document.getElementById('uploadModal').classList.remove('show');
+}
+function uploadVideo() {
+    const input = document.getElementById('videoInput');
+    if (input.files.length === 0) {
+        alert('กรุณาเลือกไฟล์วิดีโอก่อนครับ');
+        return;
+    }
+    alert('✅ กำลังอัปโหลด: ' + input.files[0].name + '\n\n(ต่อไปจะแสดงความคืบหน้า)');
+    closeUpload();
+}
 </script>
 
 </body>
