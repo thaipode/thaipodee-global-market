@@ -24,19 +24,18 @@
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
         .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
 
-        /* Video Area — แสดงวิดีโอจริง */
+        /* Video Area */
         .video-area {
             position: absolute; top: 50px; left: 0; right: 0; bottom: 70px;
-            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            background: #000;
             display: flex; align-items: center; justify-content: center;
-            flex-direction: column;
             overflow: hidden;
         }
         .video-placeholder {
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             color: #ddd; font-size: 16px;
-            text-align: center; padding: 20px;
+            text-align: center;
         }
         .video-player {
             width: 100%; height: 100%;
@@ -45,30 +44,42 @@
             background: #000;
         }
         .video-text {
-            position: absolute; bottom: 90px; left: 16px; right: 80px;
+            position: absolute; bottom: 90px; left: 16px; right: 100px;
             color: #fff; font-size: 13px; line-height: 1.5;
             text-shadow: 0 1px 4px rgba(0,0,0,0.8);
             z-index: 10;
         }
 
-        /* Right Buttons */
+        /* ✅ ปุ่มด้านขวา — แก้ให้กดง่าย ไม่ถูกบัง */
         .side-buttons {
             position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 28px; z-index: 60;
+            display: flex; flex-direction: column; gap: 32px;
+            z-index: 200; /* สูงสุด — ไม่มีอะไรบัง */
+            pointer-events: none; /* ให้คลิกทะลุกล่อง */
         }
         .side-btn {
             display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; padding: 8px;
+            cursor: pointer; 
+            padding: 12px; /* พื้นที่กดใหญ่ขึ้น */
+            min-width: 50px; min-height: 50px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            pointer-events: auto; /* เปิดคลิกเฉพาะปุ่ม */
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
-        .side-btn:active { transform: scale(0.9); opacity: 0.8; }
-        .side-icon { font-size: 28px; }
-        .side-label { font-size: 11px; color: #fff; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .side-btn:active { 
+            transform: scale(0.85); 
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+        }
+        .side-icon { font-size: 28px; line-height: 1; }
+        .side-label { font-size: 11px; color: #fff; margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
 
         /* Bottom Nav */
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
-            background: rgba(0,0,0,0.9); border-top: 1px solid #333;
+            background: rgba(0,0,0,0.95); border-top: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center; z-index: 100;
         }
         .nav-item {
@@ -145,42 +156,54 @@
         <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <div class="menu-btn" onclick="alert('เมนู: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ')">☰</div>
+    <div class="menu-btn" onclick="testMenu()">☰</div>
 </div>
 
-<!-- Video Area — มีพื้นที่แสดงวิดีโอจริง -->
+<!-- Video Area -->
 <div class="video-area">
     <div class="video-placeholder" id="videoPlaceholder">วิดีโอ / เนื้อหา<br>กด + เพื่ออัปโหลด</div>
     <video class="video-player" id="videoPlayer" controls loop muted playsinline></video>
     <p class="video-text" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
-<!-- Right Buttons -->
+<!-- ✅ ปุ่มด้านขวา — กดได้แน่นอน -->
 <div class="side-buttons">
-    <div class="side-btn" onclick="alert('❤️ กดถูกใจแล้ว!')"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
-    <div class="side-btn" onclick="alert('💬 เปิดความคิดเห็น')"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
-    <div class="side-btn" onclick="alert('↗️ แชร์แล้ว!')"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
-    <div class="side-btn" onclick="alert('🛒 เข้าตะกร้าสินค้า')"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
+    <div class="side-btn" onclick="testLike()">
+        <span class="side-icon">❤️</span>
+        <span class="side-label">ถูกใจ</span>
+    </div>
+    <div class="side-btn" onclick="testComment()">
+        <span class="side-icon">💬</span>
+        <span class="side-label">ความคิด</span>
+    </div>
+    <div class="side-btn" onclick="testShare()">
+        <span class="side-icon">↗️</span>
+        <span class="side-label">แชร์</span>
+    </div>
+    <div class="side-btn" onclick="testCart()">
+        <span class="side-icon">🛒</span>
+        <span class="side-label">ตะกร้า</span>
+    </div>
 </div>
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item" onclick="alert('🏠 หน้าแรก')">
+    <div class="nav-item" onclick="testHome()">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="alert('🔍 ค้นหา')">
+    <div class="nav-item" onclick="testSearch()">
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
     <div class="nav-item" onclick="openUpload()">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="alert('💬 ข้อความ')">
+    <div class="nav-item" onclick="testMessage()">
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="alert('👤 โปรไฟล์')">
+    <div class="nav-item" onclick="testProfile()">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
@@ -207,13 +230,23 @@
 
 <script>
 // ปิดป๊อปอัพติดตั้งแอป
-window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    return false;
-});
+window.addEventListener('beforeinstallprompt', e => e.preventDefault());
 
-let selectedFile = null;
-let videoBlobURL = null;
+// ✅ ปุ่มด้านขวา — เรียบง่าย ชัดเจน
+function testLike() { alert('❤️ กดถูกใจแล้ว!'); }
+function testComment() { alert('💬 เปิดความคิดเห็น'); }
+function testShare() { alert('↗️ แชร์แล้ว!'); }
+function testCart() { alert('🛒 เข้าตะกร้าสินค้า'); }
+function testMenu() { alert('☰ เมนูหลัก: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ'); }
+
+// ปุ่มล่าง
+function testHome() { alert('🏠 หน้าแรก'); }
+function testSearch() { alert('🔍 ค้นหา'); }
+function testMessage() { alert('💬 ข้อความ'); }
+function testProfile() { alert('👤 โปรไฟล์'); }
+
+// อัปโหลดวิดีโอ
+let selectedFile = null, videoBlobURL = null;
 
 function openUpload() {
     document.getElementById('uploadModal').classList.add('show');
@@ -235,16 +268,10 @@ function selectFile(input) {
     if (input.files.length > 0) {
         selectedFile = input.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
-    } else {
-        selectedFile = null;
-        document.getElementById('fileName').textContent = 'ยังไม่ได้เลือกไฟล์';
     }
 }
 function startUpload() {
-    if (!selectedFile) {
-        alert('กรุณาเลือกไฟล์วิดีโอก่อนครับ');
-        return;
-    }
+    if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อนครับ'); return; }
     const desc = document.getElementById('descInput').value || 'ไม่มีคำอธิบาย';
     
     document.getElementById('uploadBtn').disabled = true;
@@ -252,7 +279,6 @@ function startUpload() {
     document.getElementById('statusText').style.display = 'block';
     document.getElementById('statusText').textContent = 'กำลังประมวลผล...';
     
-    // จำลองความคืบหน้า
     let progress = 0;
     const bar = document.getElementById('progressBar');
     const timer = setInterval(() => {
@@ -260,32 +286,24 @@ function startUpload() {
         if (progress >= 100) {
             progress = 100;
             clearInterval(timer);
-            document.getElementById('statusText').textContent = '✅ กำลังแสดงวิดีโอ...';
             showVideo(desc);
         }
         bar.style.width = progress + '%';
     }, 150);
 }
-
-// ✅ แสดงวิดีโอทันทีหลังอัปโหลด
 function showVideo(desc) {
-    // สร้าง URL ชั่วคราวจากไฟล์ที่เลือก
-    if (videoBlobURL) URL.revokeObjectURL(videoBlobURL); // ลบเก่า
+    if (videoBlobURL) URL.revokeObjectURL(videoBlobURL);
     videoBlobURL = URL.createObjectURL(selectedFile);
     
-    // ซ่อนข้อความแจ้งเตือน + แสดงวิดีโอ
     document.getElementById('videoPlaceholder').style.display = 'none';
     const player = document.getElementById('videoPlayer');
     player.src = videoBlobURL;
     player.style.display = 'block';
-    
-    // อัปเดตคำอธิบาย
     document.getElementById('videoDesc').textContent = desc;
     
-    // ปิดหน้าต่างอัปโหลด
     setTimeout(() => {
         closeUpload();
-        alert('✅ อัปโหลดสำเร็จ!\nวิดีโอแสดงด้านบนแล้วครับ');
+        alert('✅ อัปโหลดสำเร็จ! วิดีโอแสดงแล้วครับ');
     }, 500);
 }
 </script>
