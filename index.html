@@ -12,7 +12,7 @@
             position: fixed; inset: 0;
         }
 
-        /* Header — ติดด้านบน */
+        /* Header */
         .header {
             position: absolute; top: 0; left: 0; right: 0; height: 50px;
             background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-between;
@@ -24,12 +24,13 @@
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
         .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
 
-        /* Video Area — เต็มจอ แสดงชัดเจน */
+        /* Video Area — แสดงวิดีโอจริง */
         .video-area {
             position: absolute; top: 50px; left: 0; right: 0; bottom: 70px;
             background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             display: flex; align-items: center; justify-content: center;
             flex-direction: column;
+            overflow: hidden;
         }
         .video-placeholder {
             width: 100%; height: 100%;
@@ -37,13 +38,20 @@
             color: #ddd; font-size: 16px;
             text-align: center; padding: 20px;
         }
+        .video-player {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            display: none;
+            background: #000;
+        }
         .video-text {
             position: absolute; bottom: 90px; left: 16px; right: 80px;
             color: #fff; font-size: 13px; line-height: 1.5;
             text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            z-index: 10;
         }
 
-        /* Right Buttons — ติดขวา กดได้ชัดเจน */
+        /* Right Buttons */
         .side-buttons {
             position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 28px; z-index: 60;
@@ -57,7 +65,7 @@
         .side-icon { font-size: 28px; }
         .side-label { font-size: 11px; color: #fff; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
-        /* Bottom Nav — ติดล่างสุด */
+        /* Bottom Nav */
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
             background: rgba(0,0,0,0.9); border-top: 1px solid #333;
@@ -140,10 +148,11 @@
     <div class="menu-btn" onclick="alert('เมนู: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ')">☰</div>
 </div>
 
-<!-- Video Area — เต็มพื้นที่ แสดงทันที -->
+<!-- Video Area — มีพื้นที่แสดงวิดีโอจริง -->
 <div class="video-area">
-    <div class="video-placeholder">วิดีโอ / เนื้อหา</div>
-    <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
+    <div class="video-placeholder" id="videoPlaceholder">วิดีโอ / เนื้อหา<br>กด + เพื่ออัปโหลด</div>
+    <video class="video-player" id="videoPlayer" controls loop muted playsinline></video>
+    <p class="video-text" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
 <!-- Right Buttons -->
@@ -203,8 +212,8 @@ window.addEventListener('beforeinstallprompt', function(e) {
     return false;
 });
 
-// อัปโหลด
 let selectedFile = null;
+let videoBlobURL = null;
 
 function openUpload() {
     document.getElementById('uploadModal').classList.add('show');
@@ -238,28 +247,46 @@ function startUpload() {
     }
     const desc = document.getElementById('descInput').value || 'ไม่มีคำอธิบาย';
     
-    // แสดงสถานะ + ความคืบหน้า
     document.getElementById('uploadBtn').disabled = true;
     document.getElementById('progressBox').style.display = 'block';
     document.getElementById('statusText').style.display = 'block';
-    document.getElementById('statusText').textContent = 'กำลังอัปโหลด...';
+    document.getElementById('statusText').textContent = 'กำลังประมวลผล...';
     
     // จำลองความคืบหน้า
     let progress = 0;
     const bar = document.getElementById('progressBar');
     const timer = setInterval(() => {
-        progress += Math.random() * 15;
+        progress += Math.random() * 12;
         if (progress >= 100) {
             progress = 100;
             clearInterval(timer);
-            document.getElementById('statusText').textContent = '✅ อัปโหลดสำเร็จ!';
-            setTimeout(() => {
-                alert('✅ อัปโหลดสำเร็จ!\n\nไฟล์: ' + selectedFile.name + '\nคำอธิบาย: ' + desc);
-                closeUpload();
-            }, 800);
+            document.getElementById('statusText').textContent = '✅ กำลังแสดงวิดีโอ...';
+            showVideo(desc);
         }
         bar.style.width = progress + '%';
-    }, 200);
+    }, 150);
+}
+
+// ✅ แสดงวิดีโอทันทีหลังอัปโหลด
+function showVideo(desc) {
+    // สร้าง URL ชั่วคราวจากไฟล์ที่เลือก
+    if (videoBlobURL) URL.revokeObjectURL(videoBlobURL); // ลบเก่า
+    videoBlobURL = URL.createObjectURL(selectedFile);
+    
+    // ซ่อนข้อความแจ้งเตือน + แสดงวิดีโอ
+    document.getElementById('videoPlaceholder').style.display = 'none';
+    const player = document.getElementById('videoPlayer');
+    player.src = videoBlobURL;
+    player.style.display = 'block';
+    
+    // อัปเดตคำอธิบาย
+    document.getElementById('videoDesc').textContent = desc;
+    
+    // ปิดหน้าต่างอัปโหลด
+    setTimeout(() => {
+        closeUpload();
+        alert('✅ อัปโหลดสำเร็จ!\nวิดีโอแสดงด้านบนแล้วครับ');
+    }, 500);
 }
 </script>
 
