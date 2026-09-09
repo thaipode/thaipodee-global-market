@@ -7,50 +7,52 @@
     <link rel="icon" href="https://i.imgur.com/8ZxQrL9.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        html, body { 
-            background: #000; color: #fff; 
-            height: 100vh; 
-            height: 100dvh; /* รองรับจอโค้ง มือถือทุกรุ่น */
-            overflow: hidden; /* ปิดการเลื่อนจอ */
-            position: fixed; inset: 0;
+        html, body {
+            background: #000; color: #fff;
+            height: 100vh; height: 100dvh;
+            overflow: hidden; position: fixed; inset: 0;
         }
 
-        /* Header — คงที่ ด้านบน */
-        .header { 
-            position: absolute; top: 0; left: 0; right: 0; 
-            height: 50px; background: #000; 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 12px; padding-top: env(safe-area-inset-top, 0px);
-            border-bottom: 1px solid #333; z-index: 100; 
+        /* Header */
+        .header {
+            position: absolute; top: 0; left: 0; right: 0; height: 50px;
+            background: #000; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 12px; padding-top: env(safe-area-inset-top, 0);
+            border-bottom: 1px solid #333; z-index: 100;
         }
         .header-left { display: flex; align-items: center; gap: 8px; }
         .logo { width: 28px; height: 28px; border-radius: 4px; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 22px; cursor: pointer; }
+        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; user-select: none; }
 
-        /* Video Area — กลางจอ พอดี */
-        .video-area { 
+        /* Video Area */
+        .video-area {
             position: absolute; top: 50px; left: 0; right: 0; bottom: 160px;
             background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-            display: flex; align-items: flex-start; justify-content: center; 
+            display: flex; align-items: flex-start; justify-content: center;
             padding-top: 20px;
         }
         .video-text { color: #ccc; font-size: 14px; text-align: center; padding: 0 20px; }
 
-        /* Right Buttons — อยู่ในพื้นที่ ไม่ทับ ไม่หาย */
-        .side-buttons { 
-            position: absolute; right: 12px; bottom: 170px; 
-            display: flex; flex-direction: column; gap: 24px; z-index: 50; 
+        /* Right Buttons — คลิกได้ชัดเจน */
+        .side-buttons {
+            position: absolute; right: 12px; bottom: 170px;
+            display: flex; flex-direction: column; gap: 24px; z-index: 60;
         }
-        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .side-icon { font-size: 24px; }
+        .side-btn {
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; padding: 6px; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .side-btn:active { transform: scale(0.95); }
+        .side-icon { font-size: 28px; }
         .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
 
-        /* Info Bar — ด้านล่างวิดีโอ เห็นชัดเจน */
-        .info-bar { 
+        /* Info Bar */
+        .info-bar {
             position: absolute; bottom: 80px; left: 0; right: 0;
-            padding: 12px; display: flex; align-items: flex-start; gap: 10px; 
+            padding: 12px; display: flex; align-items: flex-start; gap: 10px;
             border-top: 1px solid #222; background: #000;
         }
         .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; flex-shrink: 0; }
@@ -58,22 +60,49 @@
         .username { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
         .desc { font-size: 13px; color: #ccc; line-height: 1.4; }
 
-        /* Bottom Nav — ล่างสุด ไม่ถูกบัง */
-        .bottom-nav { 
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            height: 70px; padding-bottom: env(safe-area-inset-bottom, 0px);
-            background: #000; border-top: 1px solid #333; 
-            display: flex; justify-content: space-around; align-items: center; z-index: 100; 
+        /* Bottom Nav — ปุ่มกดทำงานแน่นอน */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 70px; padding-bottom: env(safe-area-inset-bottom, 0);
+            background: #000; border-top: 1px solid #333;
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
-        .nav-icon { font-size: 20px; }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; padding: 8px 4px; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item:active { opacity: 0.7; }
         .nav-label { font-size: 11px; color: #aaa; }
         .nav-item.active .nav-label { color: #fff; }
-        .plus-btn { 
-            width: 40px; height: 28px; background: #fff; border-radius: 4px; 
-            color: #000; font-size: 20px; font-weight: bold; 
-            display: flex; align-items: center; justify-content: center; 
+        .plus-btn {
+            width: 44px; height: 32px; background: #fff; border-radius: 6px;
+            color: #000; font-size: 22px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
         }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed; top: 0; right: -280px; width: 280px; height: 100vh;
+            background: #111; z-index: 200; transition: right 0.3s ease;
+            border-left: 1px solid #333; overflow-y: auto;
+        }
+        .side-menu.open { right: 0; }
+        .menu-header {
+            padding: 20px 16px; border-bottom: 1px solid #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .close-btn { font-size: 28px; cursor: pointer; padding: 4px; }
+        .menu-item {
+            padding: 16px; border-bottom: 1px solid #222;
+            cursor: pointer; font-size: 15px;
+        }
+        .menu-item:active { background: #222; }
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 150; display: none;
+        }
+        .overlay.show { display: block; }
     </style>
 </head>
 <body>
@@ -85,7 +114,26 @@
         <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <span class="menu-btn">☰</span>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- Side Menu -->
+<div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <h3>เมนูหลัก</h3>
+        <div class="close-btn" onclick="toggleMenu()">×</div>
+    </div>
+    <div class="menu-item" onclick="alert('เข้าโปรไฟล์')">👤 โปรไฟล์</div>
+    <div class="menu-item" onclick="alert('เข้าตะกร้า')">🛒 ตะกร้าสินค้า</div>
+    <div class="menu-item" onclick="alert('เข้าคำสั่งซื้อ')">📋 คำสั่งซื้อ</div>
+    <div class="menu-item" onclick="alert('เข้าคูปอง')">🎟️ คูปอง</div>
+    <div class="menu-item" onclick="alert('เข้าครีเอเตอร์')">🎬 ครีเอเตอร์</div>
+    <div class="menu-item" onclick="alert('เข้าข้อความ')">💬 ข้อความ</div>
+    <div class="menu-item" onclick="alert('เข้าโปรโมท')">📢 โปรโมท</div>
+    <div class="menu-item" onclick="alert('เข้าขยายธุรกิจ')">🚀 ขยายธุรกิจ</div>
 </div>
 
 <!-- Video Area -->
@@ -93,12 +141,12 @@
     <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
-<!-- Right Buttons -->
+<!-- Right Buttons — กดได้ทุกปุ่ม -->
 <div class="side-buttons">
-    <div class="side-btn"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
-    <div class="side-btn"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
-    <div class="side-btn"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
-    <div class="side-btn"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
+    <div class="side-btn" onclick="like()"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
+    <div class="side-btn" onclick="comment()"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
+    <div class="side-btn" onclick="share()"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
+    <div class="side-btn" onclick="cart()"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
 </div>
 
 <!-- Info Bar -->
@@ -110,28 +158,45 @@
     </div>
 </div>
 
-<!-- Bottom Nav -->
+<!-- Bottom Nav — กดได้ทุกปุ่ม -->
 <div class="bottom-nav">
-    <div class="nav-item active">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">หน้าแรก</span>
+    <div class="nav-item active" onclick="goHome()">
+        <span class="nav-label">🏠 หน้าแรก</span>
     </div>
-    <div class="nav-item">
-        <span class="nav-icon">🔍</span>
-        <span class="nav-label">ค้นหา</span>
+    <div class="nav-item" onclick="goSearch()">
+        <span class="nav-label">🔍 ค้นหา</span>
     </div>
-    <div class="nav-item">
-        <span class="plus-btn">+</span>
+    <div class="nav-item" onclick="goCreate()">
+        <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item">
-        <span class="nav-icon">💬</span>
-        <span class="nav-label">ข้อความ</span>
+    <div class="nav-item" onclick="goMessages()">
+        <span class="nav-label">💬 ข้อความ</span>
     </div>
-    <div class="nav-item">
-        <span class="nav-icon">👤</span>
-        <span class="nav-label">โปรไฟล์</span>
+    <div class="nav-item" onclick="goProfile()">
+        <span class="nav-label">👤 โปรไฟล์</span>
     </div>
 </div>
+
+<script>
+// ปุ่มเมนู
+function toggleMenu() {
+    document.getElementById('sideMenu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+}
+
+// ปุ่มด้านขวา
+function like() { alert('❤️ กดถูกใจแล้ว!'); }
+function comment() { alert('💬 เปิดความคิดเห็น'); }
+function share() { alert('↗️ แชร์แล้ว!'); }
+function cart() { alert('🛒 เข้าตะกร้าสินค้า'); }
+
+// ปุ่มล่าง
+function goHome() { alert('🏠 หน้าแรก'); }
+function goSearch() { alert('🔍 ค้นหา'); }
+function goCreate() { alert('+ สร้างโพสต์ / อัปโหลดวิดีโอ'); }
+function goMessages() { alert('💬 ข้อความ'); }
+function goProfile() { alert('👤 โปรไฟล์'); }
+</script>
 
 </body>
 </html>
