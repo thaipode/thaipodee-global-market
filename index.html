@@ -3,162 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>THAIPODEE — หน้าหลัก</title>
+    <title>Thaipodee Market Online V2026</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100%; overflow: hidden;
+            width: 100%; height: 100%; overflow: hidden;
+            background: #000; color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* === TOP BAR — ตรงรูปเป๊ะ === */
+        /* === STATUS BAR === */
+        .status-bar {
+            position: fixed; top: 0; left: 0; right: 0; height: 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; font-size: 12px; z-index: 200;
+        }
+        .status-right { display: flex; gap: 4px; }
+
+        /* === TOP BAR === */
         .top-bar {
-            position: fixed; top: 0; left: 0; right: 0; height: 48px;
+            position: fixed; top: 24px; left: 0; right: 0; height: 48px;
             display: flex; align-items: center; justify-content: center;
-            background: #000; z-index: 200;
-            border-bottom: 1px solid #222;
+            padding: 0 12px; z-index: 100;
         }
-        .back-btn { position: absolute; left: 12px; font-size: 20px; cursor: pointer; color: #fff; }
-        .live-label { position: absolute; left: 50px; font-size: 14px; font-weight: 500; }
-        .tab-toggle {
-            background: #333; border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; margin: 0 4px;
+        .top-left { position: absolute; left: 12px; font-size: 14px; color: #fff; }
+        .top-center { display: flex; gap: 24px; }
+        .top-tab {
+            font-size: 14px; color: rgba(255,255,255,0.6);
+            padding: 4px 0; cursor: pointer; position: relative;
         }
-        .tab-toggle.active { background: #fff; color: #000; font-weight: 500; }
-        .tab-text { font-size: 14px; color: #999; cursor: pointer; margin: 0 12px; }
-        .tab-text.active { color: #fff; font-weight: 500; position: relative; }
-        .tab-text.active::after {
-            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-            width: 24px; height: 2px; background: #fff; border-radius: 1px;
+        .top-tab.active { color: #fff; font-weight: 600; }
+        .top-tab.active::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%;
+            transform: translateX(-50%); width: 20px; height: 2px; background: #fff; border-radius: 1px;
         }
-        .top-right { position: absolute; right: 12px; display: flex; gap: 14px; font-size: 20px; }
-        .top-right span { cursor: pointer; }
+        .top-right { position: absolute; right: 12px; font-size: 20px; cursor: pointer; }
 
         /* === VIDEO AREA === */
         .video-area {
-            position: fixed; top: 48px; left: 0; right: 0; bottom: 75px;
-            display: flex; align-items: center; justify-content: center;
-            background: #000;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #000; display: flex; align-items: center; justify-content: center; z-index: 1;
         }
-        .placeholder-text { color: #666; font-size: 14px; text-align: center; }
+        .video-placeholder {
+            text-align: center; color: rgba(255,255,255,0.4);
+            font-size: 15px; line-height: 1.8;
+        }
 
-        /* === BOTTOM NAV — ตรงรูปเป๊ะ === */
+        /* === BOTTOM LEFT INFO === */
+        .bottom-info {
+            position: fixed; left: 16px; bottom: 95px; right: 80px; z-index: 50;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .author-name { font-size: 15px; font-weight: 700; color: #fff; }
+        .video-desc { font-size: 14px; color: #fff; line-height: 1.5; }
+        .music-info { font-size: 13px; color: #fff; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+
+        /* === RIGHT ICONS 6 ตัว ตรงรูป === */
+        .side-icons {
+            position: fixed; right: 12px; bottom: 95px; z-index: 50;
+            display: flex; flex-direction: column; gap: 24px; align-items: center;
+        }
+        .icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .icon-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #333; border: 2px solid #fff; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .icon-plus-badge {
+            position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background: #fe2c55; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; color: #fff; border: 2px solid #000;
+        }
+        .icon-emoji { font-size: 28px; color: #fff; }
+        .icon-num { font-size: 11px; color: #fff; font-weight: 500; }
+        .icon-disc {
+            width: 48px; height: 48px; border-radius: 50%; background: #222;
+            border: 2px solid #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; animation: spin 3s linear infinite;
+        }
+        @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+        /* === BOTTOM NAV 5 ปุ่ม — ปุ่ม+ พื้นขาวเต็มก้อน สีดำชัดเจน === */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-            background: #000; display: flex; justify-content: space-around; align-items: center;
-            padding: 0 8px; z-index: 200;
-            border-top: 1px solid #222;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 78px;
+            background: #000; display: flex; justify-content: space-around; align-items: flex-start;
+            padding: 10px 4px 20px 4px; z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; gap: 2px;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            cursor: pointer; width: 20%;
         }
-        .nav-icon { font-size: 22px; }
-        .nav-label { font-size: 10px; color: #aaa; }
-        .nav-item.active .nav-label { color: #fff; }
-        .center-btn {
-            width: 50px; height: 35px; background: #fff; border-radius: 8px;
-            position: relative; overflow: hidden; cursor: pointer;
+        .nav-icon { font-size: 24px; color: rgba(255,255,255,0.6); }
+        .nav-text { font-size: 10px; color: rgba(255,255,255,0.5); }
+        .nav-item.active .nav-icon, .nav-item.active .nav-text { color: #fff; }
+
+        /* === ปุ่มกลาง + — พื้นขาวเต็มก้อน ไม่มีครึ่งดำ เครื่องหมาย+ สีดำชัดเจน === */
+        .nav-center {
+            width: 48px; height: 32px; 
+            background: #fff; /* สีขาวเต็มก้อน ไม่มีครึ่งดำ */
+            border-radius: 8px;
+            position: relative; 
+            cursor: pointer; 
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .center-btn::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
-            background: #00f; border-radius: 8px 0 0 8px;
+        .nav-center span {
+            font-size: 26px; 
+            font-weight: 900; 
+            color: #000; /* สีดำชัดเจนบนพื้นขาว */
+            line-height: 1;
         }
-        .center-btn span {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            font-size: 24px; font-weight: bold; color: #000; z-index: 1;
+
+        .badge {
+            position: absolute; top: -4px; right: -10px; background: #fe2c55;
+            color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px;
+            min-width: 18px; text-align: center; font-weight: 600;
         }
-        .badge-wrap { position: relative; }
-        .badge-num {
-            position: absolute; top: -4px; right: -8px; background: #ff0050; color: #fff;
-            font-size: 9px; padding: 1px 4px; border-radius: 10px; min-width: 16px;
-            text-align: center; font-weight: 600;
-        }
-        .shop-icon { position: relative; }
-        .shop-dot {
-            position: absolute; top: 0; right: 0; width: 8px; height: 8px;
-            background: #ff0050; border-radius: 50%;
-        }
+        .nav-badge { position: relative; }
     </style>
 </head>
 <body>
 
-<!-- === TOP BAR === -->
+<!-- STATUS BAR -->
+<div class="status-bar">
+    <span>16:24</span>
+    <div class="status-right">
+        <span>📶</span>
+        <span>🔋77%</span>
+    </div>
+</div>
+
+<!-- TOP BAR -->
 <div class="top-bar">
-    <span class="back-btn" id="backBtn">←</span>
-    <span class="live-label">LIVE</span>
-    <span class="tab-toggle active">ตัวอย่าง</span>
-    <span class="tab-toggle">ฟีด</span>
-    <span class="tab-text">ใกล้เคียง</span>
-    <span class="tab-text">กำลังติดตาม</span>
-    <span class="tab-text active">สำหรับคุณ</span>
-    <div class="top-right">
-        <span id="expandBtn">⛶</span>
-        <span id="shareTopBtn">↗</span>
-        <span id="searchBtn">🔍</span>
+    <div class="top-left">LIVE</div>
+    <div class="top-center">
+        <span class="top-tab">นครราชสีมา</span>
+        <span class="top-tab">กำลังติดตาม</span>
+        <span class="top-tab active">สำหรับคุณ</span>
     </div>
+    <div class="top-right">🔍</div>
 </div>
 
-<!-- === VIDEO AREA === -->
+<!-- VIDEO AREA -->
 <div class="video-area">
-    <p class="placeholder-text">กดปุ่มกลางล่างเพื่อโหลดวิดีโอ</p>
+    <div class="video-placeholder">
+        วิดีโอจะแสดงที่นี่<br>
+        <span style="font-size:12px;opacity:0.6;">Thaipodee Market Online V2026</span>
+    </div>
 </div>
 
-<!-- === BOTTOM NAV === -->
+<!-- BOTTOM LEFT INFO -->
+<div class="bottom-info">
+    <div class="author-name">RANCHOLASPALMASOFICIAL</div>
+    <div class="video-desc">#frisianhorse #viralvideo ...เพิ่มเติม</div>
+    <div class="music-info">🎵 Billie Jean - Michael Jackson</div>
+</div>
+
+<!-- RIGHT ICONS 6 ตัว ตรงรูป -->
+<div class="side-icons">
+    <div class="icon-wrap">
+        <div class="icon-avatar">
+            <div class="icon-plus-badge">+</div>
+        </div>
+    </div>
+    <div class="icon-wrap">
+        <span class="icon-emoji">❤️</span>
+        <span class="icon-num">250.2K</span>
+    </div>
+    <div class="icon-wrap">
+        <span class="icon-emoji">💬</span>
+        <span class="icon-num">7,499</span>
+    </div>
+    <div class="icon-wrap">
+        <span class="icon-emoji">⭐</span>
+        <span class="icon-num">16.2K</span>
+    </div>
+    <div class="icon-wrap">
+        <span class="icon-emoji">↗️</span>
+        <span class="icon-num">37.7K</span>
+    </div>
+    <div class="icon-wrap">
+        <div class="icon-disc">🎵</div>
+    </div>
+</div>
+
+<!-- BOTTOM NAV 5 ปุ่ม — ปุ่ม+ พื้นขาวเต็มก้อน สีดำชัดเจน -->
 <div class="bottom-nav">
-    <div class="nav-item active" id="navHome">
+    <div class="nav-item active">
         <span class="nav-icon">🏠</span>
-        <span class="nav-label">หน้าหลัก</span>
+        <span class="nav-text">หน้าหลัก</span>
     </div>
-    <div class="nav-item shop-icon" id="navShop">
+    <div class="nav-item">
         <span class="nav-icon">🛒</span>
-        <span class="shop-dot"></span>
-        <span class="nav-label">ร้านค้า</span>
+        <span class="nav-text">ร้านค้า</span>
     </div>
-    <div class="nav-item" id="navUpload">
-        <div class="center-btn"><span>+</span></div>
+    <div class="nav-item nav-center">
+        <span>+</span>
     </div>
-    <div class="nav-item badge-wrap" id="navInbox">
+    <div class="nav-item nav-badge">
         <span class="nav-icon">💬</span>
-        <span class="badge-num">99+</span>
-        <span class="nav-label">กล่องข้อความ</span>
+        <div class="badge">99+</div>
+        <span class="nav-text">กล่องข้อความ</span>
     </div>
-    <div class="nav-item" id="navProfile">
+    <div class="nav-item">
         <span class="nav-icon">👤</span>
-        <span class="nav-label">โปรไฟล์</span>
+        <span class="nav-text">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-// === ทดสอบทำงาน — หน้าหลัก ===
 document.addEventListener('DOMContentLoaded', function() {
-    // ปุ่มบน
-    document.getElementById('backBtn').addEventListener('click', () => alert('ย้อนกลับ'));
-    document.getElementById('searchBtn').addEventListener('click', () => alert('ค้นหา'));
-    document.getElementById('expandBtn').addEventListener('click', () => alert('ขยาย'));
-    document.getElementById('shareTopBtn').addEventListener('click', () => alert('แชร์'));
-
-    // สลับแท็บ ตัวอย่าง/ฟีด
-    document.querySelectorAll('.tab-toggle').forEach(tab => {
+    // Top tabs
+    document.querySelectorAll('.top-tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            document.querySelectorAll('.tab-toggle').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
         });
     });
 
-    // สลับแท็บ ใกล้เคียง/ติดตาม/สำหรับคุณ
-    document.querySelectorAll('.tab-text').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.tab-text').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-        });
+    // Search
+    document.querySelector('.top-right').addEventListener('click', () => alert('ค้นหา'));
+
+    // Right icons
+    const rightLabels = ['โปรไฟล์', 'ถูกใจ', 'คอมเมนต์', 'บันทึก', 'แชร์', 'เสียง'];
+    document.querySelectorAll('.icon-wrap').forEach((btn, i) => {
+        btn.addEventListener('click', () => alert(rightLabels[i]));
     });
 
-    // ปุ่มล่าง — แจ้งเตือน + เตรียมพร้อมสำหรับเชื่อมหน้าต่อไป
-    document.getElementById('navHome').addEventListener('click', () => alert('อยู่ที่หน้าหลักแล้ว'));
-    document.getElementById('navShop').addEventListener('click', () => alert('✅ ร้านค้า — พร้อมเชื่อมหน้า 2'));
-    document.getElementById('navUpload').addEventListener('click', () => alert('✅ อัปโหลด — พร้อมเชื่อมหน้า 3'));
-    document.getElementById('navInbox').addEventListener('click', () => alert('✅ กล่องข้อความ — พร้อมเชื่อมหน้า 4'));
-    document.getElementById('navProfile').addEventListener('click', () => alert('✅ โปรไฟล์ — พร้อมเชื่อมหน้า 5'));
+    // Bottom nav
+    const navLabels = ['หน้าหลัก', 'ร้านค้า', 'อัปโหลด', 'กล่องข้อความ', 'โปรไฟล์'];
+    document.querySelectorAll('.nav-item').forEach((btn, i) => {
+        btn.addEventListener('click', () => alert(navLabels[i]));
+    });
 });
 </script>
 
