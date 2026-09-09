@@ -11,6 +11,7 @@
             background: #000; color: #fff;
             height: 100vh; height: 100dvh;
             overflow: hidden; position: fixed; inset: 0;
+            -webkit-user-select: none; user-select: none;
         }
 
         /* Header */
@@ -24,7 +25,7 @@
         .logo { width: 28px; height: 28px; border-radius: 4px; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; user-select: none; }
+        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
 
         /* Video Area */
         .video-area {
@@ -35,17 +36,17 @@
         }
         .video-text { color: #ccc; font-size: 14px; text-align: center; padding: 0 20px; }
 
-        /* Right Buttons — คลิกได้ชัดเจน */
+        /* Right Buttons */
         .side-buttons {
             position: absolute; right: 12px; bottom: 170px;
             display: flex; flex-direction: column; gap: 24px; z-index: 60;
         }
         .side-btn {
             display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; padding: 6px; user-select: none;
+            cursor: pointer; padding: 8px;
             -webkit-tap-highlight-color: transparent;
         }
-        .side-btn:active { transform: scale(0.95); }
+        .side-btn:active { transform: scale(0.92); opacity: 0.8; }
         .side-icon { font-size: 28px; }
         .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
 
@@ -60,7 +61,7 @@
         .username { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
         .desc { font-size: 13px; color: #ccc; line-height: 1.4; }
 
-        /* Bottom Nav — ปุ่มกดทำงานแน่นอน */
+        /* Bottom Nav */
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; right: 0;
             height: 70px; padding-bottom: env(safe-area-inset-bottom, 0);
@@ -69,7 +70,7 @@
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; gap: 2px;
-            cursor: pointer; padding: 8px 4px; user-select: none;
+            cursor: pointer; padding: 8px 4px;
             -webkit-tap-highlight-color: transparent;
         }
         .nav-item:active { opacity: 0.7; }
@@ -141,12 +142,12 @@
     <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
 </div>
 
-<!-- Right Buttons — กดได้ทุกปุ่ม -->
+<!-- Right Buttons -->
 <div class="side-buttons">
-    <div class="side-btn" onclick="like()"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
-    <div class="side-btn" onclick="comment()"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
-    <div class="side-btn" onclick="share()"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
-    <div class="side-btn" onclick="cart()"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
+    <div class="side-btn" onclick="event.stopPropagation(); like()"><span class="side-icon">❤️</span><span class="side-label">ถูกใจ</span></div>
+    <div class="side-btn" onclick="event.stopPropagation(); comment()"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
+    <div class="side-btn" onclick="event.stopPropagation(); share()"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
+    <div class="side-btn" onclick="event.stopPropagation(); cart()"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
 </div>
 
 <!-- Info Bar -->
@@ -158,39 +159,43 @@
     </div>
 </div>
 
-<!-- Bottom Nav — กดได้ทุกปุ่ม -->
+<!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="goHome()">
+    <div class="nav-item active" onclick="event.stopPropagation(); goHome()">
         <span class="nav-label">🏠 หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="goSearch()">
+    <div class="nav-item" onclick="event.stopPropagation(); goSearch()">
         <span class="nav-label">🔍 ค้นหา</span>
     </div>
-    <div class="nav-item" onclick="goCreate()">
+    <div class="nav-item" onclick="event.stopPropagation(); goCreate()">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="goMessages()">
+    <div class="nav-item" onclick="event.stopPropagation(); goMessages()">
         <span class="nav-label">💬 ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="goProfile()">
+    <div class="nav-item" onclick="event.stopPropagation(); goProfile()">
         <span class="nav-label">👤 โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-// ปุ่มเมนู
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        return false;
+    });
+});
+
 function toggleMenu() {
     document.getElementById('sideMenu').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('show');
 }
 
-// ปุ่มด้านขวา
 function like() { alert('❤️ กดถูกใจแล้ว!'); }
 function comment() { alert('💬 เปิดความคิดเห็น'); }
 function share() { alert('↗️ แชร์แล้ว!'); }
 function cart() { alert('🛒 เข้าตะกร้าสินค้า'); }
 
-// ปุ่มล่าง
 function goHome() { alert('🏠 หน้าแรก'); }
 function goSearch() { alert('🔍 ค้นหา'); }
 function goCreate() { alert('+ สร้างโพสต์ / อัปโหลดวิดีโอ'); }
