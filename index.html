@@ -2,92 +2,63 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>THAIPODEE V2026</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        html, body {
-            background: #000; color: #fff;
-            height: 100%; overflow: hidden;
-            position: fixed; inset: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: sans-serif; }
 
         /* Header */
         .header {
-            position: absolute; top: 0; left: 0; right: 0; height: 50px;
-            background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; height: 50px;
+            background: #000; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 12px; border-bottom: 1px solid #333; z-index: 100;
         }
-        .header-left { display: flex; align-items: center; gap: 8px; }
-        .logo { width: 28px; height: 28px; border-radius: 4px; background: #333; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
+        .menu-btn { font-size: 24px; padding: 8px; cursor: pointer; }
 
         /* Video Area */
         .video-area {
-            position: absolute; top: 50px; left: 0; right: 0; bottom: 70px;
-            background: #000;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+            margin-top: 50px; width: 100%; height: calc(100vh - 120px);
+            background: #000; display: flex; align-items: center; justify-content: center;
+            position: relative;
         }
-        .video-placeholder {
-            width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            color: #ddd; font-size: 16px;
-            text-align: center;
-        }
-        .video-player {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            display: none;
-            background: #000;
-        }
-        .video-text {
-            position: absolute; bottom: 90px; left: 16px; right: 100px;
-            color: #fff; font-size: 13px; line-height: 1.5;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-            z-index: 10;
+        .video-player { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .video-placeholder { color: #888; font-size: 16px; }
+        .video-desc {
+            position: absolute; bottom: 80px; left: 15px; right: 90px;
+            font-size: 13px; line-height: 1.5;
+            text-shadow: 0 1px 3px #000;
         }
 
-        /* ✅ ปุ่มด้านขวา — แก้ให้กดง่าย ไม่ถูกบัง */
+        /* ✅ ปุ่มด้านขวา — แก้ตรงนี้โดยเฉพาะ */
         .side-buttons {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 32px;
-            z-index: 200; /* สูงสุด — ไม่มีอะไรบัง */
-            pointer-events: none; /* ให้คลิกทะลุกล่อง */
+            position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 24px;
+            z-index: 9999; /* สูงสุดแน่นอน */
         }
         .side-btn {
-            display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; 
-            padding: 12px; /* พื้นที่กดใหญ่ขึ้น */
-            min-width: 50px; min-height: 50px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 50%;
-            pointer-events: auto; /* เปิดคลิกเฉพาะปุ่ม */
+            width: 56px; height: 56px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.5); border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            outline: none;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
         }
-        .side-btn:active { 
-            transform: scale(0.85); 
-            opacity: 0.9;
-            background: rgba(255,255,255,0.2);
-        }
-        .side-icon { font-size: 28px; line-height: 1; }
-        .side-label { font-size: 11px; color: #fff; margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+        .side-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
+        .side-icon { font-size: 24px; line-height: 1; }
+        .side-label { font-size: 10px; color: #fff; margin-top: 2px; }
 
         /* Bottom Nav */
         .bottom-nav {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
-            background: rgba(0,0,0,0.95); border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            background: #000; border-top: 1px solid #333;
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            cursor: pointer; padding: 8px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .nav-item:active { opacity: 0.7; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
         .nav-icon { font-size: 20px; }
         .nav-label { font-size: 11px; color: #aaa; }
         .plus-btn {
@@ -98,13 +69,13 @@
 
         /* Upload Modal */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 300; display: none; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 99999; display: none; align-items: center; justify-content: center;
             padding: 20px;
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 360px;
+            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 340px;
             border: 1px solid #333;
         }
         .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -113,37 +84,17 @@
             background: #222; border: 1px solid #444; border-radius: 8px;
             color: #fff; font-size: 14px;
         }
-        .file-select-row {
-            display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
-        }
-        .file-select-btn {
+        .file-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+        .file-btn {
             padding: 10px 14px; background: #333; border: 1px solid #555;
             border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;
-            white-space: nowrap;
         }
-        .file-name {
-            flex: 1; font-size: 13px; color: #90ee90;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .progress-container {
-            width: 100%; height: 8px; background: #333; border-radius: 4px;
-            margin: 12px 0; display: none;
-        }
-        .progress-bar {
-            height: 100%; background: #2563eb; width: 0%; border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        .status-text {
-            font-size: 13px; color: #aaa; text-align: center; margin-top: 8px;
-            display: none;
-        }
+        .file-name { flex: 1; font-size: 13px; color: #90ee90; word-break: break-all; }
         .btn {
             width: 100%; padding: 14px; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            margin-top: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px;
         }
         .btn-primary { background: #2563eb; color: #fff; }
-        .btn-primary:disabled { background: #333; opacity: 0.5; cursor: not-allowed; }
         .btn-close { background: #333; color: #fff; }
     </style>
 </head>
@@ -151,59 +102,56 @@
 
 <!-- Header -->
 <div class="header">
-    <div class="header-left">
-        <div class="logo"></div>
-        <span class="title">THAIPODEE</span>
-        <span class="version">V2026</span>
-    </div>
-    <div class="menu-btn" onclick="testMenu()">☰</div>
+    <span class="title">THAIPODEE</span>
+    <span class="version">V2026</span>
+    <div class="menu-btn" onclick="alert('เมนูทำงานแล้ว!')">☰</div>
 </div>
 
 <!-- Video Area -->
 <div class="video-area">
-    <div class="video-placeholder" id="videoPlaceholder">วิดีโอ / เนื้อหา<br>กด + เพื่ออัปโหลด</div>
-    <video class="video-player" id="videoPlayer" controls loop muted playsinline></video>
-    <p class="video-text" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
+    <div class="video-placeholder" id="videoPlaceholder">กด + เพื่ออัปโหลดวิดีโอ</div>
+    <video class="video-player" id="videoPlayer" controls loop muted playsinline style="display:none;"></video>
+    <p class="video-desc" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก 🌍</p>
 </div>
 
 <!-- ✅ ปุ่มด้านขวา — กดได้แน่นอน -->
 <div class="side-buttons">
-    <div class="side-btn" onclick="testLike()">
+    <button class="side-btn" onclick="alert('❤️ กดถูกใจแล้ว!')">
         <span class="side-icon">❤️</span>
         <span class="side-label">ถูกใจ</span>
-    </div>
-    <div class="side-btn" onclick="testComment()">
+    </button>
+    <button class="side-btn" onclick="alert('💬 เปิดความคิดเห็น')">
         <span class="side-icon">💬</span>
         <span class="side-label">ความคิด</span>
-    </div>
-    <div class="side-btn" onclick="testShare()">
+    </button>
+    <button class="side-btn" onclick="alert('↗️ แชร์แล้ว!')">
         <span class="side-icon">↗️</span>
         <span class="side-label">แชร์</span>
-    </div>
-    <div class="side-btn" onclick="testCart()">
+    </button>
+    <button class="side-btn" onclick="alert('🛒 เข้าตะกร้าสินค้า')">
         <span class="side-icon">🛒</span>
         <span class="side-label">ตะกร้า</span>
-    </div>
+    </button>
 </div>
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-    <div class="nav-item" onclick="testHome()">
+    <div class="nav-item" onclick="alert('🏠 หน้าแรก')">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="testSearch()">
+    <div class="nav-item" onclick="alert('🔍 ค้นหา')">
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
     <div class="nav-item" onclick="openUpload()">
         <div class="plus-btn">+</div>
     </div>
-    <div class="nav-item" onclick="testMessage()">
+    <div class="nav-item" onclick="alert('💬 ข้อความ')">
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" onclick="testProfile()">
+    <div class="nav-item" onclick="alert('👤 โปรไฟล์')">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
@@ -212,99 +160,52 @@
 <!-- Upload Modal -->
 <div class="modal" id="uploadModal">
     <div class="modal-content">
-        <h3 class="modal-title">อัปโหลดวิดีโอ / สร้างโพสต์</h3>
+        <h3 class="modal-title">อัปโหลดวิดีโอ</h3>
         <input type="text" class="input-field" id="descInput" placeholder="คำอธิบายวิดีโอ...">
-        <div class="file-select-row">
-            <input type="file" accept="video/*" id="videoInput" style="display:none" onchange="selectFile(this)">
-            <button class="file-select-btn" onclick="document.getElementById('videoInput').click()">เลือกไฟล์</button>
-            <span class="file-name" id="fileName">ยังไม่ได้เลือกไฟล์</span>
+        <div class="file-row">
+            <input type="file" accept="video/*" id="videoInput" style="display:none" onchange="pickFile(this)">
+            <button class="file-btn" onclick="document.getElementById('videoInput').click()">เลือกไฟล์</button>
+            <span class="file-name" id="fileName">ยังไม่ได้เลือก</span>
         </div>
-        <div class="progress-container" id="progressBox">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <p class="status-text" id="statusText"></p>
-        <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()">📤 อัปโหลด</button>
+        <button class="btn btn-primary" onclick="uploadVideo()">📤 อัปโหลด</button>
         <button class="btn btn-close" onclick="closeUpload()">ปิด</button>
     </div>
 </div>
 
 <script>
-// ปิดป๊อปอัพติดตั้งแอป
+// ปิดป๊อปอัพ
 window.addEventListener('beforeinstallprompt', e => e.preventDefault());
 
-// ✅ ปุ่มด้านขวา — เรียบง่าย ชัดเจน
-function testLike() { alert('❤️ กดถูกใจแล้ว!'); }
-function testComment() { alert('💬 เปิดความคิดเห็น'); }
-function testShare() { alert('↗️ แชร์แล้ว!'); }
-function testCart() { alert('🛒 เข้าตะกร้าสินค้า'); }
-function testMenu() { alert('☰ เมนูหลัก: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ'); }
-
-// ปุ่มล่าง
-function testHome() { alert('🏠 หน้าแรก'); }
-function testSearch() { alert('🔍 ค้นหา'); }
-function testMessage() { alert('💬 ข้อความ'); }
-function testProfile() { alert('👤 โปรไฟล์'); }
-
-// อัปโหลดวิดีโอ
-let selectedFile = null, videoBlobURL = null;
+let selectedFile = null;
 
 function openUpload() {
     document.getElementById('uploadModal').classList.add('show');
-    resetUpload();
+    selectedFile = null;
+    document.getElementById('fileName').textContent = 'ยังไม่ได้เลือก';
+    document.getElementById('descInput').value = '';
 }
 function closeUpload() {
     document.getElementById('uploadModal').classList.remove('show');
 }
-function resetUpload() {
-    selectedFile = null;
-    document.getElementById('fileName').textContent = 'ยังไม่ได้เลือกไฟล์';
-    document.getElementById('descInput').value = '';
-    document.getElementById('progressBox').style.display = 'none';
-    document.getElementById('progressBar').style.width = '0%';
-    document.getElementById('statusText').style.display = 'none';
-    document.getElementById('uploadBtn').disabled = false;
-}
-function selectFile(input) {
+function pickFile(input) {
     if (input.files.length > 0) {
         selectedFile = input.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
     }
 }
-function startUpload() {
+function uploadVideo() {
     if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อนครับ'); return; }
     const desc = document.getElementById('descInput').value || 'ไม่มีคำอธิบาย';
     
-    document.getElementById('uploadBtn').disabled = true;
-    document.getElementById('progressBox').style.display = 'block';
-    document.getElementById('statusText').style.display = 'block';
-    document.getElementById('statusText').textContent = 'กำลังประมวลผล...';
-    
-    let progress = 0;
-    const bar = document.getElementById('progressBar');
-    const timer = setInterval(() => {
-        progress += Math.random() * 12;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(timer);
-            showVideo(desc);
-        }
-        bar.style.width = progress + '%';
-    }, 150);
-}
-function showVideo(desc) {
-    if (videoBlobURL) URL.revokeObjectURL(videoBlobURL);
-    videoBlobURL = URL.createObjectURL(selectedFile);
-    
+    const url = URL.createObjectURL(selectedFile);
     document.getElementById('videoPlaceholder').style.display = 'none';
     const player = document.getElementById('videoPlayer');
-    player.src = videoBlobURL;
+    player.src = url;
     player.style.display = 'block';
     document.getElementById('videoDesc').textContent = desc;
     
-    setTimeout(() => {
-        closeUpload();
-        alert('✅ อัปโหลดสำเร็จ! วิดีโอแสดงแล้วครับ');
-    }, 500);
+    alert('✅ อัปโหลดสำเร็จ! วิดีโอแสดงแล้วครับ');
+    closeUpload();
 }
 </script>
 
