@@ -2,336 +2,229 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thaipodee Market Online V2026</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #000; color: #fff; min-height: 100vh; overflow-x: hidden; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    body { background: #000; color: #fff; min-height: 100vh; }
     .page { display: none; min-height: 100vh; padding-bottom: 80px; }
     .page.active { display: block; }
-    
+
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; z-index: 999; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex: 1; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .nav-item.active { color: #fff; }
-    .nav-icon { font-size: 22px; margin-bottom: 2px; }
-    .nav-label { font-size: 11px; }
-    .upload-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ff4080); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; color: #fff; }
-    
-    .video-container { position: relative; width: 100%; height: calc(100vh - 70px); }
-    .video-bg { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e); display: flex; align-items: center; justify-content: center; }
-    .video-placeholder { text-align: center; color: #888; }
-    .video-placeholder .icon { font-size: 48px; margin-bottom: 10px; }
-    .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+    .nav-icon { font-size: 22px; }
+    .upload-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ff4080); display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; }
+
+    .video-container { position: relative; width: 100%; height: calc(100vh - 70px); background: #000; }
+    .video-player { width: 100%; height: 100%; object-fit: contain; display: none; background: #000; }
+    .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .video-placeholder-content { text-align: center; color: #888; padding: 20px; }
+    .video-placeholder-content .icon { font-size: 64px; margin-bottom: 15px; }
+    .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 10; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-    .side-btn span { font-size: 12px; color: #fff; }
-    .side-icon { font-size: 28px; }
-    .profile-thumb { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .add-badge { position: absolute; bottom: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: #ff0050; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-    .video-info { position: absolute; left: 16px; right: 80px; bottom: 100px; }
-    .music-bar { position: absolute; bottom: 80px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
-    .music-disc { width: 40px; height: 40px; border-radius: 50%; background: #333; animation: spin 3s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    
-    .page-header { padding: 16px; text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
-    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; color: #fff; }
-    
-    .cart-page { padding: 16px; }
-    .cart-item { display: flex; align-items: center; background: #1a1a1a; border-radius: 10px; padding: 12px; margin-bottom: 12px; gap: 12px; }
-    .cart-item-img { width: 60px; height: 60px; border-radius: 8px; background: #333; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-    .badge-dot { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background: #ff0050; }
-    .cart-icon-wrap { position: relative; }
-    .empty-text { color: #666; margin-top: 60px; text-align: center; }
-    
-    .profile-page { padding: 20px; text-align: center; }
-    .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #333; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-    .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
-    .profile-username { color: #888; font-size: 14px; margin-bottom: 20px; }
-    .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
-    .stat-item { text-align: center; }
-    .stat-num { font-size: 18px; font-weight: bold; }
-    .stat-label { font-size: 12px; color: #888; }
-    .edit-profile-btn { background: #2a2a2a; border: none; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-bottom: 30px; }
-    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px; }
-    
-    .upload-page { padding: 16px; }
-    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin-bottom: 20px; cursor: pointer; }
-    .upload-area input[type="file"] { display: none; }
-    .upload-icon { font-size: 48px; margin-bottom: 10px; }
-    .file-name { color: #4ade80; margin-top: 12px; display: none; font-size: 14px; }
-    .form-group { margin-bottom: 20px; }
-    .form-label { font-size: 14px; color: #ccc; margin-bottom: 8px; display: block; }
+    .side-btn span { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    .side-icon { font-size: 28px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+    .video-info { position: absolute; left: 16px; right: 80px; bottom: 100px; z-index: 10; display: none; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    .video-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+    .video-desc { font-size: 14px; color: #ddd; }
+    .status-box { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 13px; z-index: 20; display: none; }
+
+    .page-header { padding: 16px; text-align: center; font-size: 18px; border-bottom: 1px solid #222; position: relative; }
+    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
+
+    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin: 20px; cursor: pointer; }
+    .upload-area input { display: none; }
+    .form-group { margin: 20px; }
     .form-input { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2a2a2a; color: #fff; font-size: 15px; }
-    textarea.form-input { min-height: 90px; resize: none; }
-    .privacy-box { background: #1a1a1a; border-radius: 8px; padding: 14px; margin-bottom: 30px; }
-    .privacy-title { font-size: 14px; color: #ccc; margin-bottom: 8px; }
-    .privacy-item { font-size: 15px; margin-bottom: 4px; }
-    .publish-btn { width: 100%; padding: 15px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
-    
-    .msg-badge { position: absolute; top: -5px; right: -5px; background: #ff0050; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center; }
-    .msg-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #222; cursor: pointer; }
-    .msg-avatar { width: 50px; height: 50px; border-radius: 50%; background: #333; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-    .msg-info { flex: 1; }
-    .msg-name { font-weight: 500; margin-bottom: 2px; }
-    .msg-preview { font-size: 13px; color: #888; }
-    .msg-time { font-size: 12px; color: #666; }
-    
-    .tabs { display: flex; border-bottom: 1px solid #222; }
-    .tab { flex: 1; text-align: center; padding: 12px; font-size: 15px; color: #888; cursor: pointer; }
-    .tab.active { color: #fff; border-bottom: 2px solid #fff; }
-    
-    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 15px; z-index: 9999; animation: fadeInOut 2.5s forwards; }
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-    }
+    .publish-btn { width: calc(100% - 40px); padding: 15px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; margin: 0 20px; }
+    .file-name { color: #4ade80; margin-top: 12px; display: none; word-break: break-all; }
   </style>
 </head>
 <body>
 
+<!-- หน้าหลัก -->
 <div class="page active" id="page-home">
   <div class="video-container">
-    <div class="video-bg">
-      <div class="video-placeholder">
+    <div class="video-placeholder" id="video-placeholder">
+      <div class="video-placeholder-content">
         <div class="icon">🎬</div>
-        <div id="home-message">กด + เพื่อโพสต์วิดีโอแรกของคุณ</div>
-        <div style="font-size:13px; color:#666; margin-top:8px;">Thaipodee Market Online V2026</div>
+        <div>กด + เพื่อเลือกวิดีโอ</div>
+        <div style="font-size:13px; color:#666; margin-top:8px;">แค่ไฟล์เดียว — ระบบจะจดจำไว้ให้ครับ</div>
       </div>
     </div>
+    <video class="video-player" id="video-player" controls playsinline muted></video>
+    
+    <div class="status-box" id="status-saved">✅ บันทึกแล้ว — จดจำไว้แล้ว</div>
     
     <div class="side-actions">
-      <div class="side-btn" onclick="goToPage('page-profile-me')">
-        <div class="profile-thumb">👤<span class="add-badge">+</span></div>
-      </div>
-      <div class="side-btn"><div class="side-icon">❤️</div><span id="like-count">0</span></div>
+      <div class="side-btn"><div class="side-icon">👤</div><span>ฉัน</span></div>
+      <div class="side-btn"><div class="side-icon">❤️</div><span>0</span></div>
       <div class="side-btn"><div class="side-icon">💬</div><span>0</span></div>
       <div class="side-btn"><div class="side-icon">⭐</div><span>0</span></div>
       <div class="side-btn"><div class="side-icon">➡️</div><span>แชร์</span></div>
     </div>
     
-    <div class="video-info" id="video-info-area">
-      <div style="font-weight:bold; margin-bottom:6px;" id="post-username">Thaipodee Official</div>
-      <div style="font-size:14px; color:#ddd; margin-bottom:8px;" id="post-caption">ยินดีต้อนรับสู่ Thaipodee Market Online V2026! 🇹🇭🌏</div>
-    </div>
-    
-    <div class="music-bar">
-      <div class="music-disc"></div>
-      <span>🎵 เสียงต้นฉบับ — Thaipodee Market</span>
-    </div>
-  </div>
-  
-  <div style="position:fixed; top:0; left:0; right:0; background:rgba(0,0,0,0.8); padding:10px 0; z-index:10;">
-    <div class="tabs">
-      <div class="tab">กำลังติดตาม</div>
-      <div class="tab active">สำหรับคุณ</div>
+    <div class="video-info" id="video-info">
+      <div class="video-title" id="vid-name">วิดีโอของฉัน</div>
+      <div class="video-desc" id="vid-desc">-</div>
     </div>
   </div>
 </div>
 
-<div class="page" id="page-cart">
+<!-- หน้าอัปโหลด -->
+<div class="page" id="page-upload">
   <div class="page-header">
     <span class="back-btn" onclick="goBack()">←</span>
-    ตะกร้าสินค้า
-  </div>
-  <div class="cart-page">
-    <div class="cart-item">
-      <div class="cart-item-img">📦</div>
-      <div style="flex:1;">
-        <div style="font-weight:500;">สินค้าตัวอย่าง</div>
-        <div style="font-size:13px; color:#888;">฿0.00</div>
-      </div>
-      <div>❌</div>
-    </div>
-    <div class="empty-text" style="margin-top:40px;">ตะกร้าว่างเปล่า</div>
-  </div>
-</div>
-
-<div class="page upload-page" id="page-upload">
-  <div class="page-header">
-    <span class="back-btn" onclick="goBack()">←</span>
-    สร้างโพสต์
+    เลือกวิดีโอ
   </div>
   
   <label class="upload-area">
     <input type="file" id="video-input" accept="video/*">
-    <div class="upload-icon">📷</div>
-    <div>แตะเพื่อเลือกวิดีโอ<br>หรือถ่ายวิดีโอใหม่</div>
+    <div style="font-size:48px; margin-bottom:10px;">📷</div>
+    <div>แตะเพื่อเลือกไฟล์วิดีโอ</div>
     <div class="file-name" id="video-name"></div>
   </label>
   
   <div class="form-group">
-    <label class="form-label">คำอธิบาย</label>
-    <textarea id="post-desc" class="form-input" placeholder="เขียนคำอธิบายและแฮชแท็ก..."></textarea>
+    <textarea class="form-input" id="post-desc" placeholder="คำอธิบาย (ไม่จำเป็น)..."></textarea>
   </div>
   
-  <div class="privacy-box">
-    <div class="privacy-title">ตั้งค่าการเผยแพร่</div>
-    <div class="privacy-item">• ทุกคนสามารถดูได้</div>
-    <div class="privacy-item" style="color:#888; font-size:13px;">• อนุญาตให้คอมเมนต์<br>• อนุญาตให้แชร์</div>
-  </div>
-  
-  <button class="publish-btn" onclick="submitPost()">เผยแพร่โพสต์</button>
+  <button class="publish-btn" onclick="saveAndShow()">บันทึกและแสดง</button>
 </div>
 
-<div class="page" id="page-messages">
-  <div class="page-header">
-    <span class="back-btn" onclick="goBack()">←</span>
-    ข้อความ
-  </div>
-  <div style="padding-top:10px;">
-    <div class="msg-item">
-      <div class="msg-avatar">👤</div>
-      <div class="msg-info">
-        <div class="msg-name">ผู้ใช้ 1</div>
-        <div class="msg-preview">สวัสดีครับ...</div>
-      </div>
-      <div class="msg-time">เมื่อวาน</div>
-    </div>
-    <div class="empty-text">ยังไม่มีข้อความเพิ่มเติม</div>
-  </div>
-</div>
-
-<div class="page profile-page" id="page-profile-me">
-  <div class="page-header">
-    <span class="back-btn" onclick="goBack()">←</span>
-    โปรไฟล์
-  </div>
-  <div class="profile-avatar">👤</div>
-  <div class="profile-name">ชื่อของฉัน</div>
-  <div class="profile-username">@myusername</div>
-  <div class="profile-stats">
-    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
-    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
-    <div class="stat-item"><div class="stat-num" id="total-posts">0</div><div class="stat-label">โพสต์</div></div>
-  </div>
-  <button class="edit-profile-btn">แก้ไขโปรไฟล์</button>
-  <div class="video-grid" id="profile-grid"></div>
-  <div class="empty-text" id="profile-empty">ยังไม่มีวิดีโอ — กด + เพื่อสร้างโพสต์แรกของคุณ!</div>
-</div>
-
+<!-- เมนูล่าง -->
 <nav class="bottom-nav">
-  <div class="nav-item active" onclick="goToPage('page-home')">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">หน้าหลัก</span>
-  </div>
-  <div class="nav-item" onclick="goToPage('page-cart')">
-    <div class="cart-icon-wrap">
-      <span class="nav-icon">🛒</span>
-      <span class="badge-dot"></span>
-    </div>
-    <span class="nav-label">ร้านค้า</span>
-  </div>
-  <div class="nav-item" style="display:flex; justify-content:center; align-items:center;" onclick="goToPage('page-upload')">
-    <div class="upload-btn">+</div>
-    <span class="nav-label" style="margin-top:4px;">อัปโหลด</span>
-  </div>
-  <div class="nav-item" onclick="goToPage('page-messages')">
-    <span class="nav-icon">💬</span>
-    <span class="msg-badge">99+</span>
-    <span class="nav-label">ข้อความ</span>
-  </div>
-  <div class="nav-item" onclick="goToPage('page-profile-me')">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">โปรไฟล์</span>
-  </div>
+  <div class="nav-item active" onclick="goTo('page-home')"><span class="nav-icon">🏠</span><br>หน้าหลัก</div>
+  <div class="nav-item" onclick="goTo('page-cart')"><span class="nav-icon">🛒</span><br>ร้านค้า</div>
+  <div class="nav-item" onclick="goTo('page-upload')"><div class="upload-btn">+</div><br>อัปโหลด</div>
+  <div class="nav-item" onclick="goTo('page-messages')"><span class="nav-icon">💬</span><br>ข้อความ</div>
+  <div class="nav-item" onclick="goTo('page-profile')"><span class="nav-icon">👤</span><br>โปรไฟล์</div>
 </nav>
 
 <script>
 let currentPage = 'page-home';
-let pageHistory = [];
-let postCount = 0;
+let history = [];
+let currentVideoBlob = null;
+let currentVideoName = '';
+let currentDesc = '';
 
-function goToPage(pageId) {
+// เปลี่ยนหน้า
+function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
+  document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach((item, idx) => {
-    const pageMap = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile-me'];
-    item.classList.toggle('active', pageMap[idx] === pageId);
+    const map = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile'];
+    item.classList.toggle('active', map[idx] === id);
   });
-  if (currentPage !== pageId) pageHistory.push(currentPage);
-  currentPage = pageId;
+  if (currentPage !== id) history.push(currentPage);
+  currentPage = id;
   window.scrollTo(0, 0);
 }
 
 function goBack() {
-  if (pageHistory.length > 0) {
-    const prevPage = pageHistory.pop();
-    goToPage(prevPage);
-  } else {
-    goToPage('page-home');
-  }
+  if (history.length > 0) goTo(history.pop());
+  else goTo('page-home');
 }
 
+// เมื่อเลือกไฟล์
 document.addEventListener('DOMContentLoaded', function() {
-  const videoInput = document.getElementById('video-input');
-  const videoName = document.getElementById('video-name');
-  if (videoInput && videoName) {
-    videoInput.addEventListener('change', function(e) {
+  const input = document.getElementById('video-input');
+  const nameDisplay = document.getElementById('video-name');
+  
+  if (input && nameDisplay) {
+    input.addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
-        videoName.textContent = '✅ ' + e.target.files[0].name;
-        videoName.style.display = 'block';
+        nameDisplay.textContent = '✅ ' + e.target.files[0].name;
+        nameDisplay.style.display = 'block';
       }
     });
   }
+  
+  // โหลดวิดีโอที่เคยบันทึกไว้เมื่อเปิดหน้า
+  loadSavedVideo();
 });
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2500);
-}
-
-function submitPost() {
-  const videoInput = document.getElementById('video-input');
+// 🔑 ฟังก์ชันหลัก — บันทึกไฟล์เดียว จำไว้ตลอด
+function saveAndShow() {
+  const input = document.getElementById('video-input');
   const desc = document.getElementById('post-desc').value.trim();
   
-  if (!videoInput || !videoInput.files.length) {
-    showToast('⚠️ กรุณาเลือกวิดีโอก่อน');
+  if (!input || !input.files.length) {
+    alert('กรุณาเลือกไฟล์วิดีโอก่อนครับ');
     return;
   }
   
-  const fileName = videoInput.files[0].name;
-  postCount++;
+  const file = input.files[0];
+  currentVideoName = file.name;
+  currentDesc = desc || 'วิดีโอของฉัน';
   
-  // อัปเดตหน้าหลัก — ทำก่อนทุกอย่าง
-  const infoArea = document.getElementById('video-info-area');
-  if (infoArea) {
-    infoArea.innerHTML = `
-      <div style="font-weight:bold; margin-bottom:6px;">คุณ — โพสต์ที่ ${postCount}</div>
-      <div style="font-size:14px; color:#ddd; margin-bottom:8px;">${desc || 'วิดีโอของฉัน 🎥'}</div>
-    `;
+  // อ่านไฟล์เป็น Base64 แล้วเก็บไว้ในเครื่อง — ไม่ต้องเซิร์ฟเวอร์!
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Data = e.target.result;
+    
+    // เก็บไว้ใน LocalStorage — ปิดเปิดเว็บใหม่ก็ยังอยู่!
+    try {
+      localStorage.setItem('savedVideoData', base64Data);
+      localStorage.setItem('savedVideoName', currentVideoName);
+      localStorage.setItem('savedVideoDesc', currentDesc);
+      localStorage.setItem('savedVideoType', file.type);
+    } catch (err) {
+      alert('⚠️ พื้นที่เก็บไม่พอ — ไฟล์อาจใหญ่เกินไป ลองไฟล์สั้นๆ ครับ');
+      return;
+    }
+    
+    // แสดงวิดีโอทันที
+    showVideo(base64Data, currentVideoName, currentDesc);
+    
+    // แจ้งว่าบันทึกเรียบร้อย
+    const status = document.getElementById('status-saved');
+    status.style.display = 'block';
+    setTimeout(() => { status.style.display = 'none'; }, 3000);
+    
+    // กลับหน้าหลัก
+    goTo('page-home');
+    
+    // ล้างฟอร์ม
+    input.value = '';
+    document.getElementById('video-name').style.display = 'none';
+    document.getElementById('post-desc').value = '';
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+// แสดงวิดีโอที่หน้าหลัก
+function showVideo(src, name, desc) {
+  const placeholder = document.getElementById('video-placeholder');
+  const player = document.getElementById('video-player');
+  const info = document.getElementById('video-info');
+  const vidName = document.getElementById('vid-name');
+  const vidDesc = document.getElementById('vid-desc');
+  
+  if (placeholder) placeholder.style.display = 'none';
+  if (player) {
+    player.src = src;
+    player.style.display = 'block';
+    player.muted = false;
+    player.play().catch(() => {});
   }
+  if (info) info.style.display = 'block';
+  if (vidName) vidName.textContent = name;
+  if (vidDesc) vidDesc.textContent = desc;
+}
+
+// 🔑 โหลดวิดีโอที่เคยบันทึกไว้ — ตอนเปิดหน้าเว็บใหม่
+function loadSavedVideo() {
+  const savedData = localStorage.getItem('savedVideoData');
+  const savedName = localStorage.getItem('savedVideoName');
+  const savedDesc = localStorage.getItem('savedVideoDesc');
   
-  // อัปเดตหน้าโปรไฟล์
-  const grid = document.getElementById('profile-grid');
-  const empty = document.getElementById('profile-empty');
-  if (grid) {
-    empty.style.display = 'none';
-    const newItem = document.createElement('div');
-    newItem.className = 'grid-item';
-    newItem.innerHTML = '🎥';
-    grid.insertBefore(newItem, grid.firstChild);
+  if (savedData && savedName) {
+    // มีไฟล์เก่าอยู่ — แสดงเลย!
+    showVideo(savedData, savedName, savedDesc || 'วิดีโอของฉัน');
   }
-  
-  // อัปเดตจำนวนโพสต์
-  const totalPosts = document.getElementById('total-posts');
-  if (totalPosts) totalPosts.textContent = postCount;
-  
-  // ล้างฟอร์ม
-  videoInput.value = '';
-  const videoName = document.getElementById('video-name');
-  if (videoName) videoName.style.display = 'none';
-  document.getElementById('post-desc').value = '';
-  
-  // แจ้งเตือนแบบไม่บล็อก
-  showToast('✅ โพสต์สำเร็จ! ' + fileName);
-  
-  // กลับหน้าหลัก — ทันที
-  setTimeout(() => goToPage('page-home'), 300);
 }
 </script>
 
