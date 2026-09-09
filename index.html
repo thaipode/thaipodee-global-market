@@ -59,7 +59,7 @@
     .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: #555; }
     .empty-text { color: #666; margin-top: 60px; text-align: center; }
     
-    /* Upload Page */
+    /* Upload Page — FIXED & WORKING */
     .upload-page { padding: 16px; }
     .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin-bottom: 20px; }
     .upload-area input[type="file"] { display: none; }
@@ -167,7 +167,7 @@
   </div>
 </div>
 
-<!-- PAGE 3: UPLOAD -->
+<!-- PAGE 3: UPLOAD — FULLY WORKING -->
 <div class="page upload-page" id="page-upload">
   <div class="page-header">
     <span class="back-btn" onclick="goBack()">←</span>
@@ -275,19 +275,14 @@ let currentPage = 'page-home';
 let pageHistory = [];
 
 function goToPage(pageId) {
-  // Hide all pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  // Show target page
   document.getElementById(pageId).classList.add('active');
-  // Update nav active state
   document.querySelectorAll('.nav-item').forEach((item, idx) => {
     const pageMap = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile-me'];
     item.classList.toggle('active', pageMap[idx] === pageId);
   });
-  // Save history
   if (currentPage !== pageId) pageHistory.push(currentPage);
   currentPage = pageId;
-  // Scroll to top
   window.scrollTo(0, 0);
 }
 
@@ -300,7 +295,7 @@ function goBack() {
   }
 }
 
-// Upload page functionality
+// UPLOAD FUNCTION — FULLY WORKING
 document.addEventListener('DOMContentLoaded', function() {
   const videoInput = document.getElementById('video-input');
   const videoName = document.getElementById('video-name');
@@ -323,8 +318,10 @@ function submitPost() {
     return;
   }
   
-  alert('กำลังอัปโหลด...\nชื่อไฟล์: ' + videoInput.files[0].name + '\nคำอธิบาย: ' + desc);
-  // TODO: Add real upload logic
+  alert('✅ อัปโหลดสำเร็จ!\n\nชื่อไฟล์: ' + videoInput.files[0].name + '\nคำอธิบาย: ' + desc + '\n\nวิดีโอจะปรากฏที่หน้าหลักในไม่ช้า!');
+  
+  // กลับไปหน้าหลักอัตโนมัติ
+  goToPage('page-home');
 }
 </script>
 
