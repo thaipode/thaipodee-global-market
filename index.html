@@ -3,171 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>THAIPODEE V2026</title>
+    <title>THAIPODEE — หน้าหลัก</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            background: #000; color: #fff; font-family: sans-serif;
+            background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100%; overflow: hidden;
         }
 
-        /* Header */
-        .header {
-            position: fixed; top: 0; left: 0; right: 0; height: 50px;
-            background: #000; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px; border-bottom: 1px solid #333; z-index: 1000;
-        }
-        .title { font-size: 16px; font-weight: bold; }
-        .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
-        .menu-btn { font-size: 24px; padding: 8px; cursor: pointer; }
-
-        /* Video Area */
-        .video-container {
-            position: fixed; top: 50px; left: 0; right: 0; bottom: 70px;
-            background: #000; z-index: 1;
+        /* === TOP BAR — ตรงรูปเป๊ะ === */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0; height: 48px;
             display: flex; align-items: center; justify-content: center;
+            background: #000; z-index: 200;
+            border-bottom: 1px solid #222;
         }
-        .video-placeholder {
-            color: #888; font-size: 16px; text-align: center; padding: 20px;
+        .back-btn { position: absolute; left: 12px; font-size: 20px; cursor: pointer; color: #fff; }
+        .live-label { position: absolute; left: 50px; font-size: 14px; font-weight: 500; }
+        .tab-toggle {
+            background: #333; border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; margin: 0 4px;
         }
-        .video-wrapper {
-            width: 100%; height: 100%; position: relative; display: none; background: #000;
+        .tab-toggle.active { background: #fff; color: #000; font-weight: 500; }
+        .tab-text { font-size: 14px; color: #999; cursor: pointer; margin: 0 12px; }
+        .tab-text.active { color: #fff; font-weight: 500; position: relative; }
+        .tab-text.active::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 2px; background: #fff; border-radius: 1px;
         }
-        .close-video-btn {
-            position: absolute; top: 10px; right: 10px; width: 44px; height: 44px;
-            border-radius: 50%; background: rgba(0,0,0,0.7); color: #fff; font-size: 28px;
-            border: none; cursor: pointer; z-index: 20;
+        .top-right { position: absolute; right: 12px; display: flex; gap: 14px; font-size: 20px; }
+        .top-right span { cursor: pointer; }
+
+        /* === VIDEO AREA === */
+        .video-area {
+            position: fixed; top: 48px; left: 0; right: 0; bottom: 75px;
             display: flex; align-items: center; justify-content: center;
+            background: #000;
         }
-        .close-video-btn:active { background: rgba(200,0,0,0.8); transform: scale(0.9); }
-        .video-player {
-            width: 100%; height: 100%; object-fit: contain; background: #000;
-            playsinline webkit-playsinline controlslist="nodownload nofullscreen noremoteplayback";
-        }
-        .video-desc {
-            position: absolute; bottom: 15px; left: 15px; right: 80px;
-            font-size: 13px; line-height: 1.5; text-shadow: 0 1px 3px #000;
-            z-index: 5; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px;
-        }
+        .placeholder-text { color: #666; font-size: 14px; text-align: center; }
 
-        /* ปุ่มด้านขวา — กดได้แน่นอน ชั้นบนสุด */
-        .side-buttons {
-            position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 28px;
-            z-index: 99999; pointer-events: none;
-        }
-        .side-btn {
-            width: 56px; height: 56px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.6); border-radius: 50%;
-            border: none; outline: none; cursor: pointer;
-            pointer-events: auto; -webkit-tap-highlight-color: transparent;
-        }
-        .side-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
-        .side-icon { font-size: 26px; line-height: 1; }
-        .side-label { font-size: 10px; color: #fff; margin-top: 2px; }
-
-        /* Bottom Nav */
+        /* === BOTTOM NAV — ตรงรูปเป๊ะ === */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
-            background: #000; border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
+            background: #000; display: flex; justify-content: space-around; align-items: center;
+            padding: 0 8px; z-index: 200;
+            border-top: 1px solid #222;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
-        .nav-icon { font-size: 20px; }
-        .nav-label { font-size: 11px; color: #aaa; }
-        .plus-btn {
-            width: 44px; height: 32px; background: #fff; border-radius: 6px;
-            color: #000; font-size: 22px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
         }
-
-        /* Upload Modal */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 999999; display: none; align-items: center; justify-content: center;
-            padding: 20px;
+        .nav-icon { font-size: 22px; }
+        .nav-label { font-size: 10px; color: #aaa; }
+        .nav-item.active .nav-label { color: #fff; }
+        .center-btn {
+            width: 50px; height: 35px; background: #fff; border-radius: 8px;
+            position: relative; overflow: hidden; cursor: pointer;
         }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 340px;
-            border: 1px solid #333;
+        .center-btn::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
+            background: #00f; border-radius: 8px 0 0 8px;
         }
-        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
-        .input-field {
-            width: 100%; padding: 12px; margin-bottom: 12px;
-            background: #222; border: 1px solid #444; border-radius: 8px;
-            color: #fff; font-size: 14px;
+        .center-btn span {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            font-size: 24px; font-weight: bold; color: #000; z-index: 1;
         }
-        .file-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
-        .file-btn {
-            padding: 10px 14px; background: #333; border: 1px solid #555;
-            border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;
+        .badge-wrap { position: relative; }
+        .badge-num {
+            position: absolute; top: -4px; right: -8px; background: #ff0050; color: #fff;
+            font-size: 9px; padding: 1px 4px; border-radius: 10px; min-width: 16px;
+            text-align: center; font-weight: 600;
         }
-        .file-name { flex: 1; font-size: 13px; color: #90ee90; word-break: break-all; }
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px;
+        .shop-icon { position: relative; }
+        .shop-dot {
+            position: absolute; top: 0; right: 0; width: 8px; height: 8px;
+            background: #ff0050; border-radius: 50%;
         }
-        .btn-primary { background: #2563eb; color: #fff; }
-        .btn-close { background: #333; color: #fff; }
     </style>
 </head>
 <body>
 
-<!-- Header -->
-<div class="header">
-    <span class="title">THAIPODEE</span>
-    <span class="version">V2026</span>
-    <div class="menu-btn" id="menuBtn">☰</div>
-</div>
-
-<!-- Video Area -->
-<div class="video-container">
-    <div class="video-placeholder" id="videoPlaceholder">กด + เพื่ออัปโหลดวิดีโอ</div>
-    <div class="video-wrapper" id="videoWrapper">
-        <button class="close-video-btn" id="closeVideoBtn">×</button>
-        <video class="video-player" id="videoPlayer" controls loop muted playsinline></video>
-        <p class="video-desc" id="videoDesc">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก 🌍</p>
+<!-- === TOP BAR === -->
+<div class="top-bar">
+    <span class="back-btn" id="backBtn">←</span>
+    <span class="live-label">LIVE</span>
+    <span class="tab-toggle active">ตัวอย่าง</span>
+    <span class="tab-toggle">ฟีด</span>
+    <span class="tab-text">ใกล้เคียง</span>
+    <span class="tab-text">กำลังติดตาม</span>
+    <span class="tab-text active">สำหรับคุณ</span>
+    <div class="top-right">
+        <span id="expandBtn">⛶</span>
+        <span id="shareTopBtn">↗</span>
+        <span id="searchBtn">🔍</span>
     </div>
 </div>
 
-<!-- ปุ่มด้านขวา -->
-<div class="side-buttons">
-    <button class="side-btn" id="btnLike">
-        <span class="side-icon">❤️</span>
-        <span class="side-label">ถูกใจ</span>
-    </button>
-    <button class="side-btn" id="btnComment">
-        <span class="side-icon">💬</span>
-        <span class="side-label">ความคิด</span>
-    </button>
-    <button class="side-btn" id="btnShare">
-        <span class="side-icon">↗️</span>
-        <span class="side-label">แชร์</span>
-    </button>
-    <button class="side-btn" id="btnCart">
-        <span class="side-icon">🛒</span>
-        <span class="side-label">ตะกร้า</span>
-    </button>
+<!-- === VIDEO AREA === -->
+<div class="video-area">
+    <p class="placeholder-text">กดปุ่มกลางล่างเพื่อโหลดวิดีโอ</p>
 </div>
 
-<!-- Bottom Nav -->
+<!-- === BOTTOM NAV === -->
 <div class="bottom-nav">
-    <div class="nav-item" id="navHome">
+    <div class="nav-item active" id="navHome">
         <span class="nav-icon">🏠</span>
-        <span class="nav-label">หน้าแรก</span>
+        <span class="nav-label">หน้าหลัก</span>
     </div>
-    <div class="nav-item" id="navSearch">
-        <span class="nav-icon">🔍</span>
-        <span class="nav-label">ค้นหา</span>
+    <div class="nav-item shop-icon" id="navShop">
+        <span class="nav-icon">🛒</span>
+        <span class="shop-dot"></span>
+        <span class="nav-label">ร้านค้า</span>
     </div>
     <div class="nav-item" id="navUpload">
-        <div class="plus-btn">+</div>
+        <div class="center-btn"><span>+</span></div>
     </div>
-    <div class="nav-item" id="navMessage">
+    <div class="nav-item badge-wrap" id="navInbox">
         <span class="nav-icon">💬</span>
-        <span class="nav-label">ข้อความ</span>
+        <span class="badge-num">99+</span>
+        <span class="nav-label">กล่องข้อความ</span>
     </div>
     <div class="nav-item" id="navProfile">
         <span class="nav-icon">👤</span>
@@ -175,98 +128,38 @@
     </div>
 </div>
 
-<!-- Upload Modal -->
-<div class="modal" id="uploadModal">
-    <div class="modal-content">
-        <h3 class="modal-title">อัปโหลดวิดีโอ</h3>
-        <input type="text" class="input-field" id="descInput" placeholder="คำอธิบายวิดีโอ...">
-        <div class="file-row">
-            <input type="file" accept="video/*" id="videoInput" style="display:none">
-            <button class="file-btn" id="selectFileBtn">เลือกไฟล์</button>
-            <span class="file-name" id="fileName">ยังไม่ได้เลือก</span>
-        </div>
-        <button class="btn btn-primary" id="uploadBtn">📤 อัปโหลด</button>
-        <button class="btn btn-close" id="closeModalBtn">ปิด</button>
-    </div>
-</div>
-
 <script>
-// ปิดป๊อปอัพ
-window.addEventListener('beforeinstallprompt', e => e.preventDefault());
-
-let selectedFile = null, videoURL = null;
-
-// ผูกทุกปุ่มเมื่อหน้าโหลดเสร็จ
+// === ทดสอบทำงาน — หน้าหลัก ===
 document.addEventListener('DOMContentLoaded', function() {
-    // ปุ่มด้านขวา
-    document.getElementById('btnLike').addEventListener('click', () => alert('❤️ กดถูกใจแล้ว!'));
-    document.getElementById('btnComment').addEventListener('click', () => alert('💬 เปิดความคิดเห็น'));
-    document.getElementById('btnShare').addEventListener('click', () => alert('↗️ แชร์แล้ว!'));
-    document.getElementById('btnCart').addEventListener('click', () => alert('🛒 เข้าตะกร้าสินค้า'));
-    
-    // ปุ่มเมนู
-    document.getElementById('menuBtn').addEventListener('click', () => alert('☰ เมนู: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ'));
-    
-    // ปุ่มล่าง
-    document.getElementById('navHome').addEventListener('click', () => alert('🏠 หน้าแรก'));
-    document.getElementById('navSearch').addEventListener('click', () => alert('🔍 ค้นหา'));
-    document.getElementById('navUpload').addEventListener('click', openUpload);
-    document.getElementById('navMessage').addEventListener('click', () => alert('💬 ข้อความ'));
-    document.getElementById('navProfile').addEventListener('click', () => alert('👤 โปรไฟล์'));
-    
-    // ปิดวิดีโอ
-    document.getElementById('closeVideoBtn').addEventListener('click', closeVideo);
-    
-    // อัปโหลด
-    document.getElementById('selectFileBtn').addEventListener('click', () => {
-        document.getElementById('videoInput').click();
+    // ปุ่มบน
+    document.getElementById('backBtn').addEventListener('click', () => alert('ย้อนกลับ'));
+    document.getElementById('searchBtn').addEventListener('click', () => alert('ค้นหา'));
+    document.getElementById('expandBtn').addEventListener('click', () => alert('ขยาย'));
+    document.getElementById('shareTopBtn').addEventListener('click', () => alert('แชร์'));
+
+    // สลับแท็บ ตัวอย่าง/ฟีด
+    document.querySelectorAll('.tab-toggle').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab-toggle').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
     });
-    document.getElementById('videoInput').addEventListener('change', pickFile);
-    document.getElementById('uploadBtn').addEventListener('click', uploadVideo);
-    document.getElementById('closeModalBtn').addEventListener('click', closeUpload);
+
+    // สลับแท็บ ใกล้เคียง/ติดตาม/สำหรับคุณ
+    document.querySelectorAll('.tab-text').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab-text').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // ปุ่มล่าง — แจ้งเตือน + เตรียมพร้อมสำหรับเชื่อมหน้าต่อไป
+    document.getElementById('navHome').addEventListener('click', () => alert('อยู่ที่หน้าหลักแล้ว'));
+    document.getElementById('navShop').addEventListener('click', () => alert('✅ ร้านค้า — พร้อมเชื่อมหน้า 2'));
+    document.getElementById('navUpload').addEventListener('click', () => alert('✅ อัปโหลด — พร้อมเชื่อมหน้า 3'));
+    document.getElementById('navInbox').addEventListener('click', () => alert('✅ กล่องข้อความ — พร้อมเชื่อมหน้า 4'));
+    document.getElementById('navProfile').addEventListener('click', () => alert('✅ โปรไฟล์ — พร้อมเชื่อมหน้า 5'));
 });
-
-// วิดีโอ
-function closeVideo() {
-    const player = document.getElementById('videoPlayer');
-    player.pause();
-    player.src = '';
-    if (videoURL) URL.revokeObjectURL(videoURL);
-    document.getElementById('videoWrapper').style.display = 'none';
-    document.getElementById('videoPlaceholder').style.display = 'flex';
-}
-
-// อัปโหลด
-function openUpload() {
-    document.getElementById('uploadModal').classList.add('show');
-    selectedFile = null;
-    document.getElementById('fileName').textContent = 'ยังไม่ได้เลือก';
-    document.getElementById('descInput').value = '';
-}
-function closeUpload() {
-    document.getElementById('uploadModal').classList.remove('show');
-}
-function pickFile(e) {
-    if (e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
-        document.getElementById('fileName').textContent = selectedFile.name;
-    }
-}
-function uploadVideo() {
-    if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อนครับ'); return; }
-    const desc = document.getElementById('descInput').value || 'ไม่มีคำอธิบาย';
-    
-    // แสดงวิดีโอ ไม่บังคับเต็มจอ
-    videoURL = URL.createObjectURL(selectedFile);
-    document.getElementById('videoPlaceholder').style.display = 'none';
-    const wrapper = document.getElementById('videoWrapper');
-    wrapper.style.display = 'block';
-    document.getElementById('videoPlayer').src = videoURL;
-    document.getElementById('videoDesc').textContent = desc;
-    
-    alert('✅ อัปโหลดสำเร็จ! กด × มุมขวาบนเพื่อปิดวิดีโอครับ');
-    closeUpload();
-}
 </script>
 
 </body>
