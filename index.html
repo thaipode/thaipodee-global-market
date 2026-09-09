@@ -48,7 +48,7 @@
     .upload-circle { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(45deg, #ff2442, #ff5a70); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; }
     .msg-badge { position: absolute; top: -5px; right: -5px; background: #ff2442; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; }
 
-    /* ==== หน้าอัปโหลด — เพิ่มขึ้นมา ไม่แก้หน้าแรก ==== */
+    /* ==== หน้าอัปโหลด ==== */
     .upload-page { padding: 20px; text-align: center; }
     .upload-title { font-size: 18px; font-weight: 600; margin-bottom: 30px; }
     .upload-box { border: 2px dashed #444; border-radius: 12px; padding: 50px 20px; margin-bottom: 20px; cursor: pointer; }
@@ -57,11 +57,12 @@
     .desc-input { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #252540; color: #fff; font-size: 15px; margin-bottom: 20px; }
     .post-btn { width: 100%; padding: 14px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff2442, #ff5a70); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
     .file-name { margin-top: 10px; color: #4ade80; font-size: 13px; display: none; }
+    .status-text { margin-top: 10px; font-size: 13px; color: #ffd700; display: none; }
   </style>
 </head>
 <body>
 
-<!-- ===== หน้าหลัก — เหมือนเดิมเป๊ะ 100% ไม่แก้เลย ===== -->
+<!-- ===== หน้าหลัก — เหมือนเดิมเป๊ะ ===== -->
 <div class="page active" id="page-home">
   <div class="top-tabs">
     <span>กำลังติดตาม</span>
@@ -69,18 +70,15 @@
   </div>
   <div class="top-search">🔍</div>
 
-  <!-- กลางจอ — เหมือนเดิมเป๊ะ -->
   <div class="center-content" id="centerPlaceholder">
     <div class="center-icon">🎬</div>
     <div class="center-text">วิดีโอจะแสดงที่นี่</div>
     <div class="center-sub">Thaipodee Market Online V2026</div>
   </div>
-  <!-- ✅ เปิดเสียงโดยตรง — ไม่มี muted แก้แค่ตรงนี้ -->
   <video class="video-player" id="videoPlayer" controls playsinline loop preload="metadata"></video>
 
-  <!-- ด้านขวา 6 ไอคอน — เหมือนเดิมเป๊ะ -->
   <div class="side-bar">
-    <div class="side-item" onclick="goUpload()">
+    <div class="side-item" onclick="switchPage('page-upload')">
       <div class="profile-wrap">
         <span class="side-icon">👤</span>
         <span class="plus-badge">+</span>
@@ -88,7 +86,7 @@
     </div>
     <div class="side-item">
       <span class="side-icon">❤️</span>
-      <span class="side-text">0</span>
+      <span class="side-text" id="likeCount">0</span>
     </div>
     <div class="side-item">
       <span class="side-icon">💬</span>
@@ -107,18 +105,17 @@
     </div>
   </div>
 
-  <!-- แถบเพลงล่างซ้าย — เหมือนเดิมเป๊ะ -->
   <div class="music-bar" id="musicBar">
     <span class="music-icon">🎵</span>
     <div class="music-text">
-      <div class="music-title">D D Y M Music</div>
-      <div>เพลงใหม่ — มาฟังกันนะ #ดนตรี #เพลง</div>
+      <div class="music-title" id="musicName">D D Y M Music</div>
+      <div id="musicDesc">เพลงใหม่ — มาฟังกันนะ #ดนตรี #เพลง</div>
     </div>
   </div>
   <span class="sound-btn" id="soundBtn" onclick="toggleSound()">🔊</span>
 </div>
 
-<!-- ===== หน้าอัปโหลด — เพิ่มใหม่ ไม่แตะหน้าแรกเลย ===== -->
+<!-- ===== หน้าอัปโหลด ===== -->
 <div class="page" id="page-upload">
   <div class="upload-page">
     <div class="upload-title">อัปโหลดวิดีโอ</div>
@@ -127,13 +124,14 @@
       <div class="upload-icon">📹</div>
       <div>แตะเพื่อเลือกวิดีโอ</div>
       <div class="file-name" id="fileName"></div>
+      <div class="status-text" id="statusText"></div>
     </label>
     <input type="text" class="desc-input" id="descInput" placeholder="เขียนคำอธิบาย...">
-    <button class="post-btn" onclick="postVideo()">เผยแพร่</button>
+    <button class="post-btn" onclick="saveAndShow()">เผยแพร่ & บันทึก</button>
   </div>
 </div>
 
-<!-- ===== หน้าอื่น ๆ — เหมือนเดิม เปลี่ยนเฉพาะหน้า ===== -->
+<!-- ===== หน้าอื่น ๆ ===== -->
 <div class="page" id="page-cart">
   <div style="padding:20px; text-align:center; padding-top:50px;">
     <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">ร้านค้า</div>
@@ -160,7 +158,7 @@
   </div>
 </div>
 
-<!-- ===== เมนูล่าง — เหมือนเดิมเป๊ะ ===== -->
+<!-- ===== เมนูล่าง ===== -->
 <nav class="bottom-nav">
   <div class="nav-item" data-page="page-home" onclick="switchPage('page-home')">
     <span class="nav-icon">🏠</span>
@@ -186,11 +184,67 @@
 
 <script>
 let currentPage = 'page-home';
-let videoFile = null;
+let selectedFile = null;
+let currentVideoUrl = null;
 let isMuted = false;
+let db = null;
 
 // ==========================================
-// เปลี่ยนหน้า — ไม่แก้อะไรเลย
+// เปิดฐานข้อมูล IndexedDB — เก็บไฟล์ไม่จำกัดขนาด
+// ==========================================
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('ThaipodeeVideoDB', 1);
+    req.onupgradeneeded = e => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains('videos')) {
+        db.createObjectStore('videos', { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(); };
+    req.onerror = reject;
+  });
+}
+
+// ==========================================
+// บันทึกวิดีโอลง IndexedDB
+// ==========================================
+function saveVideoToDB(file, desc) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readwrite');
+    const store = tx.objectStore('videos');
+    // ลบเก่าก่อน เก็บอันเดียว
+    store.clear();
+    // ใส่อันใหม่
+    store.put({
+      id: 'current',
+      file: file,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      description: desc,
+      savedAt: Date.now()
+    });
+    tx.oncomplete = () => resolve();
+    tx.onerror = reject;
+  });
+}
+
+// ==========================================
+// โหลดวิดีโอจาก IndexedDB
+// ==========================================
+function loadVideoFromDB() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readonly');
+    const store = tx.objectStore('videos');
+    const req = store.get('current');
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = reject;
+  });
+}
+
+// ==========================================
+// เปลี่ยนหน้า
 // ==========================================
 function switchPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -199,55 +253,88 @@ function switchPage(pageId) {
   window.scrollTo(0, 0);
 }
 
-function goUpload() {
-  switchPage('page-upload');
-}
-
 // ==========================================
-// ✅ เสียง — เปิดตลอดเวลา แก้แค่ตรงนี้
+// เสียง
 // ==========================================
 function toggleSound() {
   const video = document.getElementById('videoPlayer');
   const btn = document.getElementById('soundBtn');
   if (!video.src) return;
-  
   isMuted = !isMuted;
   video.muted = isMuted;
   btn.textContent = isMuted ? '🔇' : '🔊';
 }
 
 // ==========================================
-// ✅ โหลดวิดีโอ — ทำงานได้ + เสียงออก
+// เลือกไฟล์
 // ==========================================
 document.getElementById('videoInput').addEventListener('change', e => {
-  videoFile = e.target.files[0];
-  if (!videoFile) return;
-  document.getElementById('fileName').textContent = videoFile.name;
+  selectedFile = e.target.files[0];
+  if (!selectedFile) return;
+  document.getElementById('fileName').textContent = '✅ ' + selectedFile.name;
   document.getElementById('fileName').style.display = 'block';
+  document.getElementById('statusText').style.display = 'none';
 });
 
-function postVideo() {
-  if (!videoFile) { alert('กรุณาเลือกวิดีโอ'); return; }
+// ==========================================
+// บันทึก + แสดง
+// ==========================================
+async function saveAndShow() {
+  if (!selectedFile) { alert('กรุณาเลือกวิดีโอ'); return; }
+  const desc = document.getElementById('descInput').value.trim() || 'วิดีโอของฉัน';
   
-  const videoUrl = URL.createObjectURL(videoFile);
+  document.getElementById('statusText').textContent = '💾 กำลังบันทึก...';
+  document.getElementById('statusText').style.display = 'block';
+  
+  try {
+    await openDB();
+    await saveVideoToDB(selectedFile, desc);
+    
+    // แสดงทันที
+    if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
+    currentVideoUrl = URL.createObjectURL(selectedFile);
+    showVideo(currentVideoUrl);
+    
+    document.getElementById('statusText').textContent = '✅ บันทึกเรียบร้อย!';
+    setTimeout(() => {
+      document.getElementById('statusText').style.display = 'none';
+      switchPage('page-home');
+    }, 800);
+  } catch (err) {
+    console.error(err);
+    alert('❌ บันทึกไม่สำเร็จ: ' + err.message);
+  }
+}
+
+// ==========================================
+// แสดงวิดีโอ
+// ==========================================
+function showVideo(url) {
   const video = document.getElementById('videoPlayer');
   const placeholder = document.getElementById('centerPlaceholder');
-  
-  // แสดงวิดีโอ — เปิดเสียงทันที
   placeholder.style.display = 'none';
   video.style.display = 'block';
-  video.src = videoUrl;
-  video.muted = false; // ✅ ไม่ปิดเสียง
-  video.volume = 1.0;
-  
-  video.play().catch(e => {
-    console.log('แตะหน้าจอเพื่อเล่นเสียง');
-  });
-  
-  // กลับหน้าหลัก
-  switchPage('page-home');
-  alert('✅ อัปโหลดสำเร็จ! เสียงเปิดตามปกติ');
+  video.src = url;
+  video.muted = false;
+  video.play().catch(() => {});
 }
+
+// ==========================================
+// โหลดกลับมาอัตโนมัติเมื่อเปิดหน้า
+// ==========================================
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await openDB();
+    const saved = await loadVideoFromDB();
+    if (saved && saved.file) {
+      currentVideoUrl = URL.createObjectURL(saved.file);
+      showVideo(currentVideoUrl);
+      console.log('✅ โหลดวิดีโอสำเร็จ:', saved.name);
+    }
+  } catch (err) {
+    console.log('ไม่พบวิดีโอที่บันทึกไว้');
+  }
+});
 </script>
 
 </body>
