@@ -1,592 +1,331 @@
-<!-- ==============================================================
-MASTER VERSION — รวมทุกหน้าเป็นก้อนเดียว
-ชื่อแพลตฟอร์ม: Thaipodee Market Online V2026
-- หน้า 1: หน้าหลัก (ล็อกมาสเตอร์)
-- หน้า 2: ระบบนำทาง & ปุ่มทำงาน
-- หน้า 3: ตะกร้าสินค้า & สั่งซื้อ
-- หน้า 4: อัปโหลดโพสต์
-- หน้า 5: กล่องข้อความ
-- หน้าโปรไฟล์ผู้ใช้ + อื่นๆ
-============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Thaipodee Market Online V2026</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; }
-
-        /* === ระบบเปลี่ยนหน้า — หลักการสำคัญ === */
-        .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 1; opacity: 0; visibility: hidden; transition: opacity 0.25s ease; overflow: hidden; }
-        .page.active { opacity: 1; visibility: visible; z-index: 2; }
-        .page-white { background: #fff; color: #000; }
-        .page-white * { color: inherit; }
-
-        /* === ปุ่มย้อนกลับ === */
-        .back-btn { position: absolute; top: 40px; left: 16px; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; color: #fff; text-decoration: none; }
-        .page-white .back-btn { background: #f5f5f5; color: #000; }
-
-        /* =====================================================
-           หน้า 1: หน้าหลัก — LOCKED MASTER VERSION
-           ===================================================== */
-        /* Status Bar */
-        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; z-index: 20; background: transparent; }
-        
-        /* Top Navigation */
-        .top-nav { position: absolute; top: 24px; left: 0; right: 0; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 12px; z-index: 20; }
-        .top-left { position: absolute; left: 16px; font-size: 14px; color: #fff; }
-        .top-tabs { display: flex; gap: 24px; }
-        .top-tab { font-size: 14px; color: rgba(255,255,255,0.6); cursor: pointer; padding: 4px 0; }
-        .top-tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; }
-        .top-search { position: absolute; right: 16px; font-size: 20px; cursor: pointer; }
-
-        /* Video Area — Full Screen */
-        .video-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
-        .video-placeholder { text-align: center; color: rgba(255,255,255,0.5); font-size: 15px; line-height: 1.8; }
-
-        /* Bottom Left Info */
-        .bottom-info { position: absolute; left: 16px; bottom: 95px; right: 80px; z-index: 10; }
-        .shop-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); padding: 6px 10px; border-radius: 16px; font-size: 13px; margin-bottom: 8px; }
-        .author-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; cursor: pointer; }
-        .video-desc { font-size: 14px; line-height: 1.5; margin-bottom: 8px; color: #f0f0f0; }
-        .music-line { font-size: 13px; display: flex; align-items: center; gap: 6px; color: #f0f0f0; }
-
-        /* Right Side Icons */
-        .right-icons { position: absolute; right: 12px; bottom: 95px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 10; }
-        .icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
-        .icon-avatar { width: 48px; height: 48px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative; border: 2px solid #fff; }
-        .icon-badge { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: #fe2c55; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #fff; border: 2px solid #000; }
-        .icon-btn { font-size: 28px; transition: all 0.2s; }
-        .icon-btn.liked { color: #fe2c55; transform: scale(1.2); }
-        .icon-btn.saved { color: #ffd700; }
-        .icon-num { font-size: 11px; margin-top: 2px; }
-        .icon-disc { width: 48px; height: 48px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; font-size: 22px; animation: spin 3s linear infinite; border: 2px solid #fff; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 78px; background: #000; display: flex; justify-content: space-around; align-items: flex-start; padding: 10px 4px 20px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 30; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 20%; position: relative; }
-        .nav-icon { font-size: 24px; opacity: 0.6; }
-        .nav-item.active .nav-icon { opacity: 1; }
-        .nav-label { font-size: 10px; opacity: 0.5; }
-        .nav-item.active .nav-label { opacity: 1; }
-        
-        /* ✅ จุดแดงติดรถเข็น — ตรงตำแหน่ง มุมขวาบนของไอคอนโดยตรง */
-        .cart-icon-wrap { position: relative; }
-        .badge-dot { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #fe2c55; border-radius: 50%; z-index: 10; }
-        
-        /* Center Upload Button */
-        .upload-btn { width: 48px; height: 32px; background: #000; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
-        .upload-btn::after { content: ''; position: absolute; width: 36px; height: 24px; background: #fff; border-radius: 6px; z-index: -1; }
-        .upload-btn span { font-size: 22px; color: #000; font-weight: 900; position: relative; z-index: 2; }
-        
-        /* Message Badge */
-        .msg-badge { position: absolute; top: -4px; right: 8px; background: #fe2c55; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 10px; min-width: 16px; text-align: center; }
-
-        /* =====================================================
-           ส่วนเนื้อหาหน้าอื่น ๆ — ใช้ร่วมกัน
-           ===================================================== */
-        .page-content { padding: 80px 16px 90px; height: 100%; overflow-y: auto; }
-        .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; position: absolute; top: 32px; left: 0; right: 0; z-index: 5; }
-        .page-white .page-title { color: #000; }
-        .demo-box { background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
-        .page-white .demo-box { background: #f5f5f5; color: #000; }
-        .demo-box h3 { font-size: 16px; margin-bottom: 8px; }
-        .demo-box p { font-size: 13px; color: #888; }
-        .page-white .demo-box p { color: #666; }
-
-        /* =====================================================
-           หน้า 3: ตะกร้าสินค้า — สไตล์เฉพาะ
-           ===================================================== */
-        .cart-section { background: #fff; margin: 12px; border-radius: 12px; padding: 16px; color: #000; }
-        .cart-section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
-        .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .cart-item-img { width: 80px; height: 80px; border-radius: 8px; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-        .cart-item-info { flex: 1; }
-        .cart-item-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-        .cart-item-price { font-size: 15px; font-weight: 700; color: #fe2c55; margin-bottom: 8px; }
-        .cart-qty { display: flex; align-items: center; gap: 10px; }
-        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ddd; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .qty-num { font-size: 14px; min-width: 24px; text-align: center; }
-        .cart-del { color: #999; font-size: 13px; padding: 4px 8px; border: 1px solid #eee; border-radius: 4px; cursor: pointer; }
-        .coupon-row { display: flex; gap: 8px; margin-top: 10px; }
-        .coupon-input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        .coupon-btn { padding: 10px 16px; background: #fe2c55; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-        .address-card { padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
-        .address-card.active { border-color: #fe2c55; background: #fff5f5; }
-        .payment-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
-        .payment-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd; position: relative; }
-        .payment-radio.active { border-color: #fe2c55; }
-        .payment-radio.active::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #fe2c55; border-radius: 50%; }
-        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-        .summary-total { border-top: 1px solid #eee; margin-top: 8px; padding-top: 12px; font-size: 16px; font-weight: 700; color: #fe2c55; }
-        .cart-footer { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; padding: 12px 16px; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
-        .cart-total { font-size: 15px; }
-        .cart-total-price { font-size: 18px; font-weight: 700; color: #fe2c55; }
-        .checkout-btn { padding: 12px 32px; background: #fe2c55; color: #fff; border: none; border-radius: 25px; font-size: 15px; font-weight: 600; cursor: pointer; }
-
-        /* =====================================================
-           หน้าโปรไฟล์ผู้ใช้ — ตารางวิดีโอ 3 คอลัมน์
-           ===================================================== */
-        .profile-header { padding: 20px 16px; text-align: center; background: #fff; color: #000; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #ddd; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; overflow: hidden; border: 2px solid #eee; }
-        .profile-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-        .profile-username { font-size: 14px; color: #666; margin-bottom: 16px; }
-        .profile-stats { display: flex; justify-content: space-around; margin-bottom: 16px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 18px; font-weight: 700; }
-        .stat-label { font-size: 12px; color: #666; }
-        .profile-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
-        .btn-follow { background: #fe2c55; color: #fff; border: none; padding: 8px 32px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; }
-        .btn-msg { background: #f1f1f1; color: #000; border: none; padding: 8px 24px; border-radius: 4px; font-size: 15px; cursor: pointer; }
-        .profile-bio { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 20px; }
-        .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; background: #fff; }
-        .video-grid-item { aspect-ratio: 9/12; background: #333; position: relative; cursor: pointer; overflow: hidden; }
-        .video-grid-count { position: absolute; bottom: 6px; left: 6px; color: #fff; font-size: 11px; display: flex; align-items: center; gap: 3px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thaipodee Market Online V2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #000; color: #fff; min-height: 100vh; overflow-x: hidden; }
+    .page { display: none; min-height: 100vh; padding-bottom: 80px; }
+    .page.active { display: block; }
+    
+    /* Bottom Navigation */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; z-index: 999; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex: 1; }
+    .nav-item.active { color: #fff; }
+    .nav-icon { font-size: 22px; margin-bottom: 2px; }
+    .nav-label { font-size: 11px; }
+    .upload-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ff4080); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; color: #fff; }
+    
+    /* Home Page - Video Feed */
+    .video-container { position: relative; width: 100%; height: calc(100vh - 70px); }
+    .video-bg { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e); display: flex; align-items: center; justify-content: center; }
+    .video-placeholder { text-align: center; color: #888; }
+    .video-placeholder .icon { font-size: 48px; margin-bottom: 10px; }
+    .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+    .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .side-btn span { font-size: 12px; color: #fff; }
+    .side-icon { font-size: 28px; }
+    .profile-thumb { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .add-badge { position: absolute; bottom: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: #ff0050; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .video-info { position: absolute; left: 16px; right: 80px; bottom: 100px; }
+    .music-bar { position: absolute; bottom: 80px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
+    .music-disc { width: 40px; height: 40px; border-radius: 50%; background: #333; animation: spin 3s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    
+    /* Page Headers */
+    .page-header { padding: 16px; text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
+    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
+    
+    /* Cart Page */
+    .cart-page { padding: 16px; }
+    .cart-item { display: flex; align-items: center; background: #1a1a1a; border-radius: 10px; padding: 12px; margin-bottom: 12px; gap: 12px; }
+    .cart-item-img { width: 60px; height: 60px; border-radius: 8px; background: #333; }
+    .badge-dot { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background: #ff0050; }
+    .cart-icon-wrap { position: relative; }
+    
+    /* Profile Page */
+    .profile-page { padding: 20px; text-align: center; }
+    .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #333; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
+    .profile-username { color: #888; font-size: 14px; margin-bottom: 20px; }
+    .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 18px; font-weight: bold; }
+    .stat-label { font-size: 12px; color: #888; }
+    .edit-profile-btn { background: #2a2a2a; border: none; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-bottom: 30px; }
+    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: #555; }
+    .empty-text { color: #666; margin-top: 60px; text-align: center; }
+    
+    /* Upload Page */
+    .upload-page { padding: 16px; }
+    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; text-align: center; background: #1a1a1a; margin-bottom: 20px; }
+    .upload-area input[type="file"] { display: none; }
+    .upload-label { cursor: pointer; display: block; }
+    .upload-icon { font-size: 48px; margin-bottom: 10px; }
+    .file-name { color: #4ade80; margin-top: 12px; display: none; font-size: 14px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-size: 14px; color: #ccc; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2a2a2a; color: #fff; font-size: 15px; }
+    textarea.form-input { min-height: 90px; resize: none; }
+    .privacy-box { background: #1a1a1a; border-radius: 8px; padding: 14px; margin-bottom: 30px; }
+    .privacy-title { font-size: 14px; color: #ccc; margin-bottom: 8px; }
+    .privacy-item { font-size: 15px; margin-bottom: 4px; }
+    .publish-btn { width: 100%; padding: 15px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
+    
+    /* Messages Page */
+    .msg-badge { position: absolute; top: -5px; right: -5px; background: #ff0050; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center; }
+    .msg-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #222; cursor: pointer; }
+    .msg-avatar { width: 50px; height: 50px; border-radius: 50%; background: #333; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .msg-info { flex: 1; }
+    .msg-name { font-weight: 500; margin-bottom: 2px; }
+    .msg-preview { font-size: 13px; color: #888; }
+    .msg-time { font-size: 12px; color: #666; }
+    
+    /* Tabs */
+    .tabs { display: flex; border-bottom: 1px solid #222; }
+    .tab { flex: 1; text-align: center; padding: 12px; font-size: 15px; color: #888; cursor: pointer; }
+    .tab.active { color: #fff; border-bottom: 2px solid #fff; }
+  </style>
 </head>
 <body>
 
-<!-- ==============================================================
-PAGE 1: หน้าหลัก — LOCKED MASTER (ห้ามแก้)
-============================================================== -->
+<!-- PAGE 1: HOME / VIDEO FEED -->
 <div class="page active" id="page-home">
-    <div class="status-bar">
-        <span>17:54</span>
-        <span>📶 🔋</span>
+  <div class="video-container">
+    <div class="video-bg">
+      <div class="video-placeholder">
+        <div class="icon">🎬</div>
+        <div>วิดีโอจะแสดงที่นี่</div>
+        <div style="font-size:13px; color:#666; margin-top:8px;">Thaipodee Market Online V2026</div>
+      </div>
     </div>
-    <div class="top-nav">
-        <span class="top-left">LIVE</span>
-        <div class="top-tabs">
-            <span class="top-tab">กำลังติดตาม</span>
-            <span class="top-tab active">สำหรับคุณ</span>
-        </div>
-        <span class="top-search" onclick="goToPage('page-search')">🔍</span>
+    
+    <!-- Side Actions -->
+    <div class="side-actions">
+      <div class="side-btn" onclick="goToPage('page-profile-me')">
+        <div class="profile-thumb">👤<span class="add-badge">+</span></div>
+      </div>
+      <div class="side-btn">
+        <div class="side-icon">❤️</div>
+        <span>0</span>
+      </div>
+      <div class="side-btn">
+        <div class="side-icon">💬</div>
+        <span>0</span>
+      </div>
+      <div class="side-btn">
+        <div class="side-icon">⭐</div>
+        <span>0</span>
+      </div>
+      <div class="side-btn">
+        <div class="side-icon">➡️</div>
+        <span>แชร์</span>
+      </div>
     </div>
-    <div class="video-container">
-        <div class="video-placeholder">
-            🎥 วิดีโอจะแสดงที่นี่<br>
-            <span style="font-size:12px; opacity:0.6;">Thaipodee Market Online V2026</span>
-        </div>
+    
+    <!-- Video Info -->
+    <div class="video-info">
+      <div style="font-weight:bold; margin-bottom:6px;">D D Y M Music</div>
+      <div style="font-size:14px; color:#ddd; margin-bottom:8px;">เพลงใหม่ — มาฟังกันนะ 🎵 #ดนตรี #เพลง</div>
     </div>
-    <div class="bottom-info">
-        <div class="shop-tag">🛒 9.9 Sale · กีตาร์ไฟฟ้า ST</div>
-        <div class="author-name" onclick="goToPage('page-profile-other')">D D Y M Music</div>
-        <div class="video-desc">เพลงใหม่ — มาฟังกันนะ 🎸🎵 #ดนตรี #เพลง</div>
-        <div class="music-line">🎵 เสียงต้นฉบับ — D D Y M Music</div>
+    
+    <!-- Music Bar -->
+    <div class="music-bar">
+      <div class="music-disc"></div>
+      <span>🎵 เสียงต้นฉบับ — D D Y M Music</span>
     </div>
-    <div class="right-icons">
-        <div class="icon-wrap" onclick="goToPage('page-profile-other')">
-            <div class="icon-avatar">👤<div class="icon-badge">+</div></div>
-        </div>
-        <div class="icon-wrap" onclick="toggleLike(this)">
-            <span class="icon-btn">❤️</span>
-            <span class="icon-num">0</span>
-        </div>
-        <div class="icon-wrap" onclick="goToPage('page-comment')">
-            <span class="icon-btn">💬</span>
-            <span class="icon-num">0</span>
-        </div>
-        <div class="icon-wrap" onclick="toggleSave(this)">
-            <span class="icon-btn">⭐</span>
-            <span class="icon-num">0</span>
-        </div>
-        <div class="icon-wrap" onclick="goToPage('page-share')">
-            <span class="icon-btn">↗️</span>
-            <span class="icon-num">แชร์</span>
-        </div>
-        <div class="icon-wrap" onclick="goToPage('page-music')">
-            <div class="icon-disc">🎵</div>
-        </div>
+  </div>
+  
+  <!-- Top Tabs -->
+  <div style="position:fixed; top:0; left:0; right:0; background:rgba(0,0,0,0.8); padding:10px 0; z-index:10;">
+    <div class="tabs">
+      <div class="tab">กำลังติดตาม</div>
+      <div class="tab active">สำหรับคุณ</div>
     </div>
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="goToPage('page-home')">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">หน้าหลัก</span>
-        </div>
-        <div class="nav-item" onclick="goToPage('page-cart')">
-            <div class="cart-icon-wrap">
-                <span class="nav-icon">🛒</span>
-                <span class="badge-dot"></span>
-            </div>
-            <span class="nav-label">ร้านค้า</span>
-        </div>
-    <div class="nav-item" style="display:flex; justify-content:center; align-items:center;" onclick="goToPage('page-upload')">
-  <div class="upload-btn" style="font-size:26px; font-weight:bold; color:#fff; width:48px; height:48px; border-radius:50%; background:linear-gradient(45deg,#ff0050,#ff4080); display:flex; align-items:center; justify-content:center;">+</div>
-  <span class="nav-label">อัปโหลด</span>
+  </div>
 </div>
 
-
-
-            
-        <div class="nav-item" onclick="goToPage('page-messages')">
-            <span class="nav-icon">💬</span>
-            <span class="msg-badge">99+</span>
-            <span class="nav-label">ข้อความ</span>
-        </div>
-        <div class="nav-item" onclick="goToPage('page-profile-me')">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">โปรไฟล์</span>
-        </div>
+<!-- PAGE 2: CART -->
+<div class="page" id="page-cart">
+  <div class="page-header">
+    <span class="back-btn" onclick="goBack()">←</span>
+    ตะกร้าสินค้า
+  </div>
+  <div class="cart-page">
+    <div class="cart-item">
+      <div class="cart-item-img">📦</div>
+      <div style="flex:1;">
+        <div style="font-weight:500;">สินค้าตัวอย่าง</div>
+        <div style="font-size:13px; color:#888;">฿0.00</div>
+      </div>
+      <div>❌</div>
     </div>
+    <div class="empty-text" style="margin-top:40px;">ตะกร้าว่างเปล่า</div>
+  </div>
 </div>
 
-<!-- ==============================================================
-PAGE 3: ตะกร้าสินค้า
-============================================================== -->
-<div class="page page-white" id="page-cart">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">ตะกร้าสินค้า</h2>
-    <div class="page-content" style="padding-top: 80px;">
-        <div class="cart-section">
-            <div class="cart-section-title">สินค้าในตะกร้า (2 ชิ้น)</div>
-            <div class="cart-item">
-                <div class="cart-item-img">🎸</div>
-                <div class="cart-item-info">
-                    <div class="cart-item-name">กีตาร์ไฟฟ้า ST Telecaster</div>
-                    <div class="cart-item-price">3,990 บาท</div>
-                    <div class="cart-qty">
-                        <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
-                        <span class="qty-num">1</span>
-                        <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
-                        <span class="cart-del" onclick="removeItem(this)">ลบ</span>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-item">
-                <div class="cart-item-img">🔊</div>
-                <div class="cart-item-info">
-                    <div class="cart-item-name">แอมป์ขยายเสียง 20 วัตต์</div>
-                    <div class="cart-item-price">1,490 บาท</div>
-                    <div class="cart-qty">
-                        <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
-                        <span class="qty-num">1</span>
-                        <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
-                        <span class="cart-del" onclick="removeItem(this)">ลบ</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="cart-section">
-            <div class="cart-section-title">คูปองส่วนลด</div>
-            <div class="coupon-row">
-                <input type="text" class="coupon-input" placeholder="กรอกโค้ดคูปอง" id="coupon-code">
-                <button class="coupon-btn" onclick="applyCoupon()">ใช้งาน</button>
-            </div>
-        </div>
-        <div class="cart-section">
-            <div class="cart-section-title">ที่อยู่จัดส่ง</div>
-            <div class="address-card active" onclick="selectAddress(this)">
-                <div style="font-weight:600; font-size:14px; margin-bottom:4px;">จักรพงษ์ โพดีรจนกุล · 081-xxx-xxxx</div>
-                <div style="font-size:13px; color:#666;">123 ถ.มิตรภาพ ต.ในเมือง อ.เมือง จ.นครราชสีมา 30000</div>
-            </div>
-            <div class="address-card" onclick="selectAddress(this)">
-                <div style="font-weight:600; font-size:14px; margin-bottom:4px;">จักรพงษ์ โพดีรจนกุล · 081-xxx-xxxx</div>
-                <div style="font-size:13px; color:#666;">456 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110</div>
-            </div>
-        </div>
-        <div class="cart-section">
-            <div class="cart-section-title">วิธีชำระเงิน</div>
-            <div class="payment-row" onclick="selectPayment(this)">
-                <span>📱 พร้อมเพย์</span>
-                <div class="payment-radio active"></div>
-            </div>
-            <div class="payment-row" onclick="selectPayment(this)">
-                <span>💳 บัตรเครดิต/เดบิต</span>
-                <div class="payment-radio"></div>
-            </div>
-            <div class="payment-row" onclick="selectPayment(this)">
-                <span>🏦 โอนเงินผ่านธนาคาร</span>
-                <div class="payment-radio"></div>
-            </div>
-            <div class="payment-row" onclick="selectPayment(this)">
-                <span>🚚 เก็บเงินปลายทาง</span>
-                <div class="payment-radio"></div>
-            </div>
-        </div>
-        <div class="cart-section" style="margin-bottom: 80px;">
-            <div class="cart-section-title">สรุปรายการ</div>
-            <div class="summary-row"><span>ราคาสินค้า</span><span>5,480 บาท</span></div>
-            <div class="summary-row"><span>ค่าจัดส่ง</span><span>ฟรี</span></div>
-            <div class="summary-row"><span>ส่วนลด</span><span style="color:green;">−548 บาท</span></div>
-            <div class="summary-row summary-total"><span>ยอดสุทธิ</span><span>4,932 บาท</span></div>
-        </div>
-    </div>
-    <div class="cart-footer">
-        <div class="cart-total">รวม: <span class="cart-total-price">4,932 บาท</span></div>
-        <button class="checkout-btn" onclick="confirmOrder()">สั่งซื้อ</button>
-    </div>
+<!-- PAGE 3: UPLOAD -->
+<div class="page upload-page" id="page-upload">
+  <div class="page-header">
+    <span class="back-btn" onclick="goBack()">←</span>
+    สร้างโพสต์
+  </div>
+  
+  <div class="upload-area">
+    <input type="file" id="video-input" accept="video/*">
+    <label for="video-input" class="upload-label">
+      <div class="upload-icon">📷</div>
+      <div>แตะเพื่อเลือกวิดีโอ<br>หรือถ่ายวิดีโอใหม่</div>
+    </label>
+    <div class="file-name" id="video-name">✅ เลือกไฟล์แล้ว</div>
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label">คำอธิบาย</label>
+    <textarea id="post-desc" class="form-input" placeholder="เขียนคำอธิบายและแฮชแท็ก..."></textarea>
+  </div>
+  
+  <div class="privacy-box">
+    <div class="privacy-title">ตั้งค่าการเผยแพร่</div>
+    <div class="privacy-item">• ทุกคนสามารถดูได้</div>
+    <div class="privacy-item" style="color:#888; font-size:13px;">• อนุญาตให้คอมเมนต์<br>• อนุญาตให้แชร์</div>
+  </div>
+  
+  <button class="publish-btn" onclick="submitPost()">เผยแพร่โพสต์</button>
 </div>
 
-<!-- ==============================================================
-PAGE 4: อัปโหลดโพสต์
-============================================================== -->
-<div class="page" id="page-upload">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">สร้างโพสต์</h2>
-    <div class="page-content">
-        <div class="demo-box" style="text-align:center; padding:40px 20px; font-size:48px; margin-bottom:20px;">
-            📷
-            <p style="font-size:14px; margin-top:10px;">แตะเพื่อถ่ายวิดีโอ<br>หรือเลือกไฟล์จากอัลบั้ม</p>
-        </div>
-        <div class="demo-box">
-            <h3>📝 คำอธิบาย</h3>
-            <p style="border-bottom: 1px solid #333; padding: 8px 0; margin-top: 8px;">เขียนคำอธิบายและแฮชแท็ก...</p>
-        </div>
-        <div class="demo-box">
-            <h3>⚙️ ตั้งค่าการเผยแพร่</h3>
-            <p>· ทุกคนสามารถดูได้<br>· อนุญาตให้คอมเมนต์<br>· อนุญาตให้แชร์</p>
-        </div>
-        <button style="width:100%; padding:14px; background:#fe2c55; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:600; margin-top:20px; cursor:pointer;" onclick="publishPost()">เผยแพร่โพสต์</button>
-    </div>
-</div>
-
-<!-- ==============================================================
-PAGE 5: กล่องข้อความ
-============================================================== -->
+<!-- PAGE 4: MESSAGES -->
 <div class="page" id="page-messages">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">กล่องข้อความ</h2>
-    <div class="page-content">
-        <div class="demo-box">
-            <h3>🔔 คำขอติดตาม (3)</h3>
-            <p>คนที่ต้องการติดตามคุณ — ตอบรับหรือปฏิเสธ</p>
-        </div>
-        <div class="demo-box" style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="openChat()">
-            <div style="font-size:32px;">👤</div>
-            <div style="flex:1;">
-                <div style="font-weight:600;">ร้านค้าเครื่องดนตรี</div>
-                <div style="font-size:13px; color:#888;">สวัสดีครับ สินค้ามีพร้อมส่งครับ...</div>
-            </div>
-            <div style="font-size:11px; color:#666;">12:30</div>
-        </div>
-        <div class="demo-box" style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="openChat()">
-            <div style="font-size:32px;">👩</div>
-            <div style="flex:1;">
-                <div style="font-weight:600;">ฝ่ายบริการลูกค้า</div>
-                <div style="font-size:13px; color:#888;">ขอบคุณที่สั่งซื้อครับ...</div>
-            </div>
-            <div style="font-size:11px; color:#666;">เมื่อกี้</div>
-        </div>
-        <div class="demo-box" style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="openChat()">
-            <div style="font-size:32px;">👤</div>
-            <div style="flex:1;">
-                <div style="font-weight:600;">ผู้สนใจสินค้า</div>
-                <div style="font-size:13px; color:#888;">มีส่วนลดเพิ่มไหมครับ</div>
-            </div>
-            <div style="font-size:11px; color:#666;">2ชม.ที่แล้ว</div>
-        </div>
+  <div class="page-header">
+    <span class="back-btn" onclick="goBack()">←</span>
+    ข้อความ
+  </div>
+  <div style="padding-top:10px;">
+    <div class="msg-item">
+      <div class="msg-avatar">👤</div>
+      <div class="msg-info">
+        <div class="msg-name">ผู้ใช้ 1</div>
+        <div class="msg-preview">สวัสดีครับ...</div>
+      </div>
+      <div class="msg-time">เมื่อวาน</div>
     </div>
+    <div class="empty-text">ยังไม่มีข้อความเพิ่มเติม</div>
+  </div>
 </div>
 
-<!-- ==============================================================
-PAGE: โปรไฟล์ผู้อื่น — ตารางวิดีโอ 3 คอลัมน์
-============================================================== -->
-<div class="page page-white" id="page-profile-other">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <div class="profile-header">
-        <div class="profile-avatar">🎸</div>
-        <div class="profile-name">D D Y M Music</div>
-        <div class="profile-username">@ddymusic</div>
-        <div class="profile-stats">
-            <div class="stat-item"><div class="stat-num">128</div><div class="stat-label">กำลังติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">2,450</div><div class="stat-label">ผู้ติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">48.7K</div><div class="stat-label">ถูกใจ</div></div>
-        </div>
-        <div class="profile-buttons">
-            <button class="btn-follow">ติดตาม</button>
-            <button class="btn-msg">ข้อความ</button>
-        </div>
-        <div class="profile-bio">เพลง · ดนตรี · สร้างแรงบันดาลใจ 🎸🎵</div>
-    </div>
-    <div class="video-grid">
-        <div class="video-grid-item" onclick="openVideoFromProfile(0)"><div class="video-grid-count">▶ 17.2K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(1)"><div class="video-grid-count">▶ 5,326</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(2)"><div class="video-grid-count">▶ 14.5K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(3)"><div class="video-grid-count">▶ 45.7K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(4)"><div class="video-grid-count">▶ 19.9K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(5)"><div class="video-grid-count">▶ 26.3K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(6)"><div class="video-grid-count">▶ 12K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(7)"><div class="video-grid-count">▶ 8.5K</div></div>
-        <div class="video-grid-item" onclick="openVideoFromProfile(8)"><div class="video-grid-count">▶ 3.2K</div></div>
-    </div>
+<!-- PAGE 5: PROFILE - MYSELF -->
+<div class="page profile-page" id="page-profile-me">
+  <div class="page-header">
+    <span class="back-btn" onclick="goBack()">←</span>
+    โปรไฟล์
+  </div>
+  <div class="profile-avatar">👤</div>
+  <div class="profile-name">ชื่อของฉัน</div>
+  <div class="profile-username">@myusername</div>
+  <div class="profile-stats">
+    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
+    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+    <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ถูกใจ</div></div>
+  </div>
+  <button class="edit-profile-btn">แก้ไขโปรไฟล์</button>
+  <div class="video-grid">
+    <div class="grid-item">📷</div>
+    <div class="grid-item">📷</div>
+    <div class="grid-item">📷</div>
+    <div class="grid-item">📷</div>
+    <div class="grid-item">📷</div>
+    <div class="grid-item">📷</div>
+  </div>
+  <div class="empty-text">ยังไม่มีวิดีโอ — กด + เพื่อสร้างโพสต์แรกของคุณ!</div>
 </div>
 
-<!-- ==============================================================
-PAGE: โปรไฟล์ของฉัน
-============================================================== -->
-<div class="page page-white" id="page-profile-me">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <div class="profile-header">
-        <div class="profile-avatar">👤</div>
-        <div class="profile-name">ชื่อของฉัน</div>
-        <div class="profile-username">@myusername</div>
-        <div class="profile-stats">
-            <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ถูกใจ</div></div>
-        </div>
-        <div class="profile-buttons">
-            <button class="btn-msg" style="width:100%;">แก้ไขโปรไฟล์</button>
-        </div>
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="goToPage('page-home')">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">หน้าหลัก</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('page-cart')">
+    <div class="cart-icon-wrap">
+      <span class="nav-icon">🛒</span>
+      <span class="badge-dot"></span>
     </div>
-    <div class="video-grid">
-        <div style="padding:40px 20px; text-align:center; grid-column: span 3; color:#888;">ยังไม่มีวิดีโอ — กด + เพื่อสร้างโพสต์แรกของคุณ!</div>
-    </div>
-</div>
+    <span class="nav-label">ร้านค้า</span>
+  </div>
+  <div class="nav-item" style="display:flex; justify-content:center; align-items:center;" onclick="goToPage('page-upload')">
+    <div class="upload-btn">+</div>
+    <span class="nav-label" style="margin-top:4px;">อัปโหลด</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('page-messages')">
+    <span class="nav-icon">💬</span>
+    <span class="msg-badge">99+</span>
+    <span class="nav-label">ข้อความ</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('page-profile-me')">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">โปรไฟล์</span>
+  </div>
+</nav>
 
-<!-- ==============================================================
-หน้าอื่น ๆ — โครงสร้างพร้อมใช้งาน
-============================================================== -->
-<div class="page" id="page-comment">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">คอมเมนต์ (24)</h2>
-    <div class="page-content">
-        <div class="demo-box"><p>สินค้าน่าซื้อจังเลย — 2 ชม.ที่แล้ว</p></div>
-        <div class="demo-box"><p>ราคาเท่าไหร่คะ? — 1 ชม.ที่แล้ว</p></div>
-        <div class="demo-box"><p>มีของแถมไหมครับ — 30 นาทีที่แล้ว</p></div>
-    </div>
-</div>
-
-<div class="page" id="page-share">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">แชร์ไปยัง</h2>
-    <div class="page-content">
-        <div class="demo-box" onclick="alert('คัดลอกลิงก์แล้ว!')"><h3>🔗 คัดลอกลิงก์</h3></div>
-        <div class="demo-box"><h3>📱 แชร์ไปแอปอื่น</h3></div>
-        <div class="demo-box"><h3>📤 ฝังวิดีโอ</h3></div>
-    </div>
-</div>
-
-<div class="page" id="page-music">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">เสียงเพลง</h2>
-    <div class="page-content">
-        <div class="demo-box"><h3>🎵 ใช้เสียงนี้</h3><p>สำหรับวิดีโอของคุณ</p></div>
-        <div class="demo-box"><h3>ดูวิดีโออื่น ๆ ที่ใช้เพลงนี้</h3></div>
-    </div>
-</div>
-
-<div class="page" id="page-search">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <h2 class="page-title">ค้นหา</h2>
-    <div class="page-content">
-        <input type="text" placeholder="ค้นหา, ผู้ใช้, เพลง, แฮชแท็ก..." style="width:100%; padding:12px; border-radius:8px; border:none; background:#222; color:#fff; font-size:16px; margin-bottom:20px;">
-        <div class="demo-box"><h3>กำลังมาแรง</h3></div>
-    </div>
-</div>
-
-<!-- ==============================================================
-ระบบควบคุมทั้งหมด — หัวใจหลักของแอป
-============================================================== -->
 <script>
 let currentPage = 'page-home';
 let pageHistory = [];
 
-// เปลี่ยนหน้า
 function goToPage(pageId) {
-    if (pageId === currentPage) return;
-    pageHistory.push(currentPage);
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    currentPage = pageId;
-    updateNavState(pageId);
-    window.scrollTo(0, 0);
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Show target page
+  document.getElementById(pageId).classList.add('active');
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach((item, idx) => {
+    const pageMap = ['page-home', 'page-cart', 'page-upload', 'page-messages', 'page-profile-me'];
+    item.classList.toggle('active', pageMap[idx] === pageId);
+  });
+  // Save history
+  if (currentPage !== pageId) pageHistory.push(currentPage);
+  currentPage = pageId;
+  // Scroll to top
+  window.scrollTo(0, 0);
 }
 
-// ย้อนกลับ
 function goBack() {
-    if (pageHistory.length === 0) { goToPage('page-home'); return; }
-    const prev = pageHistory.pop();
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(prev).classList.add('active');
-    currentPage = prev;
-    updateNavState(prev);
-    window.scrollTo(0, 0);
-}
-
-// อัปเดตสีปุ่มล่าง
-function updateNavState(pageId) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const navMap = { 'page-home':0, 'page-cart':1, 'page-upload':2, 'page-messages':3, 'page-profile-me':4 };
-    if (navMap[pageId] !== undefined) {
-        document.querySelectorAll('.nav-item')[navMap[pageId]].classList.add('active');
-    }
-}
-
-// ปุ่มกดถูกใจ
-function toggleLike(el) {
-    const icon = el.querySelector('.icon-btn');
-    const num = el.querySelector('.icon-num');
-    let count = parseInt(num.textContent) || 0;
-    icon.classList.toggle('liked');
-    icon.classList.contains('liked') ? count++ : count--;
-    num.textContent = count;
-}
-
-// ปุ่มกดบันทึก
-function toggleSave(el) {
-    const icon = el.querySelector('.icon-btn');
-    const num = el.querySelector('.icon-num');
-    let count = parseInt(num.textContent) || 0;
-    icon.classList.toggle('saved');
-    icon.classList.contains('saved') ? count++ : count--;
-    num.textContent = count;
-}
-
-// เปิดวิดีโอจากโปรไฟล์
-function openVideoFromProfile(index) {
-    pageHistory.push(currentPage);
+  if (pageHistory.length > 0) {
+    const prevPage = pageHistory.pop();
+    goToPage(prevPage);
+  } else {
     goToPage('page-home');
-    alert('กำลังเปิดวิดีโอที่ ' + (index + 1));
+  }
 }
 
-// === ตะกร้าสินค้า ===
-function changeQty(btn, delta) {
-    const num = btn.parentElement.querySelector('.qty-num');
-    let val = parseInt(num.textContent) + delta;
-    if (val < 1) val = 1;
-    num.textContent = val;
-}
-function removeItem(btn) {
-    if (confirm('ต้องการลบสินค้านี้?')) btn.closest('.cart-item').style.opacity = '0.3';
-}
-function applyCoupon() { alert('คูปองถูกนำไปใช้แล้ว! ส่วนลด 10%'); }
-function selectAddress(box) {
-    document.querySelectorAll('.address-card').forEach(a => a.classList.remove('active'));
-    box.classList.add('active');
-}
-function selectPayment(box) {
-    document.querySelectorAll('.payment-radio').forEach(r => r.classList.remove('active'));
-    box.querySelector('.payment-radio').classList.add('active');
-}
-function confirmOrder() {
-    alert('✅ สั่งซื้อสำเร็จ!\nเลขที่: #THP-260909-0001\nรอชำระเงินภายใน 24 ชม.');
-    goBack();
-}
-
-// === อัปโหลด ===
-function publishPost() {
-    alert('✅ โพสต์สำเร็จ!');
-    goToPage('page-home');
-}
-
-// === ข้อความ ===
-function openChat() {
-    alert('เปิดการสนทนา — จะมาเติมในภายหลัง');
-}
-
-// === เริ่มต้นระบบ ===
+// Upload page functionality
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.top-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-        });
+  const videoInput = document.getElementById('video-input');
+  const videoName = document.getElementById('video-name');
+  if (videoInput && videoName) {
+    videoInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        videoName.textContent = '✅ ' + e.target.files[0].name;
+        videoName.style.display = 'block';
+      }
     });
+  }
 });
+
+function submitPost() {
+  const videoInput = document.getElementById('video-input');
+  const desc = document.getElementById('post-desc')?.value || '';
+  
+  if (!videoInput || !videoInput.files.length) {
+    alert('กรุณาเลือกวิดีโอก่อนครับ');
+    return;
+  }
+  
+  alert('กำลังอัปโหลด...\nชื่อไฟล์: ' + videoInput.files[0].name + '\nคำอธิบาย: ' + desc);
+  // TODO: Add real upload logic
+}
 </script>
 
 </body>
