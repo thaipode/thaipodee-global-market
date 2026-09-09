@@ -18,7 +18,8 @@
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; z-index: 999; }
     .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex: 1; }
     .nav-item.active { color: #fff; }
-    .nav-icon { font-size: 22px; margin-bottom: 2px; }
+    .nav-icon { font-size: 22px; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; }
+    .nav-icon img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #444; }
     .nav-label { font-size: 11px; }
     .upload-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ff4080); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; color: #fff; }
 
@@ -60,11 +61,10 @@
     .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 4px; }
     .grid-item { aspect-ratio: 9/12; background: #1a1a1a; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; overflow: hidden; position: relative; }
     .grid-item video { width: 100%; height: 100%; object-fit: cover; }
-    .grid-item .placeholder-icon { font-size: 32px; color: #555; }
     .empty-text { color: #666; text-align: center; margin-top: 60px; }
     .tip-text { font-size: 13px; color: #888; margin-bottom: 16px; }
     
-    /* Modal แก้โปรไฟล์ — ชัดเจน กดได้แน่นอน ทุกเครื่องแยกกัน */
+    /* Modal แก้โปรไฟล์ */
     .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-bg.open { display: flex; }
     .modal-card { background: #1e1e1e; border-radius: 16px; padding: 24px; width: 100%; max-width: 340px; border: 1px solid #333; }
@@ -88,7 +88,7 @@
 </head>
 <body>
 
-<!-- ✅ หน้าต้อนรับ — ตั้งชื่อเองครั้งแรก ทุกคนไม่ซ้ำกัน -->
+<!-- ✅ หน้าต้อนรับ — ตั้งชื่อเองครั้งแรก -->
 <div class="welcome-modal" id="welcomeModal">
   <div class="welcome-card">
     <div class="welcome-title">👋 ยินดีต้อนรับ!</div>
@@ -105,7 +105,7 @@
   </div>
 </div>
 
-<!-- ✅ Modal แก้โปรไฟล์ — กดได้แน่นอน ทุกเครื่องแยกกัน -->
+<!-- ✅ Modal แก้โปรไฟล์ -->
 <div class="modal-bg" id="editModal">
   <div class="modal-card">
     <div class="modal-head">แก้ไขโปรไฟล์</div>
@@ -202,7 +202,6 @@
   </div>
   <input type="file" id="avatar-input" accept="image/*" style="display:none;">
   
-  <!-- ✅ กดที่ชื่อได้เลย — เปิดหน้าแก้ไขทันที -->
   <div class="profile-name" id="dispName" onclick="openEditModal()">ชื่อของฉัน</div>
   <div class="profile-username" id="dispUser" onclick="openEditModal()">@thaipodee_user</div>
   
@@ -220,14 +219,13 @@
       <div class="stat-label">โพสต์</div>
     </div>
   </div>
-  <div class="tip-text">💡 แตะที่ชื่อ/ตัวเลข เพื่อแก้ไขโปรไฟล์</div>
+  <div class="tip-text">💡 แตะที่ชื่อ/รูป/ตัวเลข เพื่อแก้ไขโปรไฟล์</div>
   
-  <div class="video-grid" id="video-grid">
-    <!-- วิดีโอจะแสดงตัวอย่างจริง ไม่ใช่แค่ไอคอน -->
-  </div>
+  <div class="video-grid" id="video-grid"></div>
   <div class="empty-text" id="profile-empty">ยังไม่มีวิดีโอ — กด + เพื่ออัปโหลด</div>
 </div>
 
+<!-- ✅ แถบล่าง — ไอคอนโปรไฟล์เปลี่ยนตามด้านบน -->
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="goTo('page-home')">
     <span class="nav-icon">🏠</span>
@@ -245,8 +243,8 @@
     <span class="nav-icon">💬</span>
     <span class="nav-label">ข้อความ</span>
   </div>
-  <div class="nav-item" onclick="goTo('page-profile')">
-    <span class="nav-icon">👤</span>
+  <div class="nav-item" onclick="goTo('page-profile')" id="nav-profile-btn">
+    <span class="nav-icon" id="nav-profile-icon">👤</span>
     <span class="nav-label">โปรไฟล์</span>
   </div>
 </nav>
@@ -256,7 +254,19 @@ let currentPage = 'page-home';
 let history = [];
 let userVideos = [];
 
-// ==== โหลดข้อมูลผู้ใช้ — แยกแต่ละคน ไม่ซ้ำกัน ====
+// ==== อัปเดตไอคอนโปรไฟล์ที่แถบล่าง ให้ตรงกับด้านบน ====
+function updateNavProfile() {
+  const avatarImg = document.getElementById('avatar-img');
+  const navIcon = document.getElementById('nav-profile-icon');
+  
+  if (avatarImg && avatarImg.style.display === 'block' && avatarImg.src) {
+    navIcon.innerHTML = `<img src="${avatarImg.src}" alt="รูปโปรไฟล์">`;
+  } else {
+    navIcon.innerHTML = '👤';
+  }
+}
+
+// ==== โหลดข้อมูลผู้ใช้ ====
 function loadUserData() {
   const name = localStorage.getItem('userName');
   const user = localStorage.getItem('userHandle');
@@ -282,13 +292,15 @@ function loadUserData() {
     renderVideoGrid();
   }
 
-  // ==== ถ้ายังไม่เคยตั้งชื่อ — เปิดหน้าต้อนรับทันที ====
+  // เปิดหน้าต้อนรับถ้ายังไม่เคยตั้งชื่อ
   if (!name) {
     setTimeout(() => {
       document.getElementById('welcomeModal').classList.add('show');
       document.getElementById('welcomeName').focus();
     }, 300);
   }
+  
+  updateNavProfile(); // อัปเดตไอคอนล่างทันที
 }
 
 // ==== บันทึกชื่อตอนต้อนรับ ====
@@ -305,6 +317,8 @@ function saveWelcome() {
   document.getElementById('dispName').textContent = name;
   document.getElementById('dispUser').textContent = '@' + user;
   document.getElementById('welcomeModal').classList.remove('show');
+  
+  updateNavProfile();
 }
 
 // ==== เปิด-ปิด แก้โปรไฟล์ ====
@@ -327,27 +341,26 @@ function closeModal() {
   document.getElementById('editModal').classList.remove('open');
 }
 
-// ==== บันทึกการเปลี่ยนชื่อ — ทุกคนแก้ได้เอง แยกกัน ====
+// ==== บันทึกการแก้โปรไฟล์ ====
 function saveAll() {
   const name = document.getElementById('fName').value.trim() || 'ผู้ใช้งาน';
   const user = document.getElementById('fUser').value.trim() || 'user' + Date.now();
   const following = document.getElementById('fFollowing').value.trim() || '0';
   const followers = document.getElementById('fFollowers').value.trim() || '0';
   
-  // อัปเดตหน้าจอ
   document.getElementById('dispName').textContent = name;
   document.getElementById('dispUser').textContent = '@' + user;
   document.getElementById('dispFollowing').textContent = following;
   document.getElementById('dispFollowers').textContent = followers;
   
-  // บันทึกลงเครื่อง — แต่ละคนเก็บของตัวเอง
   localStorage.setItem('userName', name);
   localStorage.setItem('userHandle', user);
   localStorage.setItem('userFollowing', following);
   localStorage.setItem('userFollowers', followers);
   
   closeModal();
-  alert('✅ บันทึกเรียบร้อยแล้ว!');
+  updateNavProfile();
+  alert('✅ บันทึกเรียบร้อยแล้ว! แถบล่างเปลี่ยนตามด้วยครับ');
 }
 
 // ==== เปลี่ยนรูปโปรไฟล์ ====
@@ -366,6 +379,8 @@ document.getElementById('avatar-input').addEventListener('change', function(e) {
     document.getElementById('avatar-img').style.display = 'block';
     document.getElementById('avatar-icon').style.display = 'none';
     localStorage.setItem('userAvatar', dataUrl);
+    
+    updateNavProfile(); // เปลี่ยนรูป → แถบล่างเปลี่ยนเลย
   };
   reader.readAsDataURL(file);
 });
@@ -394,7 +409,7 @@ function goBack() {
   }
 }
 
-// ==== อัปโหลดวิดีโอ — แสดงตัวอย่างจริง ไม่ใช่แค่ไอคอน ====
+// ==== อัปโหลดวิดีโอ ====
 let currentVideoFile = null;
 document.getElementById('video-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
@@ -433,10 +448,7 @@ function saveAndShow() {
   localStorage.setItem('userVideos', JSON.stringify(userVideos));
   document.getElementById('dispPosts').textContent = userVideos.length;
   
-  // แสดงตัวอย่างวิดีโอในตาราง — เห็นภาพจริง ไม่ใช่แค่ไอคอน
   renderVideoGrid();
-  
-  // กลับไปหน้าหลัก
   goTo('page-home');
   
   // ล้างฟอร์ม
@@ -446,7 +458,7 @@ function saveAndShow() {
   document.getElementById('post-desc').value = '';
 }
 
-// ==== แสดงตารางวิดีโอ — เห็นภาพจริงทุกคน ====
+// ==== แสดงตารางวิดีโอ — เห็นภาพจริง ====
 function renderVideoGrid() {
   const grid = document.getElementById('video-grid');
   const empty = document.getElementById('profile-empty');
@@ -465,7 +477,6 @@ function renderVideoGrid() {
     item.className = 'grid-item';
     item.onclick = () => playVideo(idx);
     
-    // แสดงตัวอย่างวิดีโอจริง
     const videoEl = document.createElement('video');
     videoEl.src = vid.url;
     videoEl.muted = true;
@@ -488,7 +499,7 @@ function playVideo(index) {
   goTo('page-home');
 }
 
-// ==== เริ่มทำงานเมื่อโหลดเสร็จ ====
+// ==== เริ่มทำงาน ====
 document.addEventListener('DOMContentLoaded', function() {
   loadUserData();
 });
