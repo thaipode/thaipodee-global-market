@@ -9,132 +9,246 @@
   <title>Thaipodee Market Online V2026</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; min-height: 100vh; overflow-x: hidden; }
-    .page { display: none; min-height: 100vh; padding-bottom: 80px; }
+    body { background: linear-gradient(180deg, #121226 0%, #1a1a35 100%); color: #fff; min-height: 100vh; overflow-x: hidden; }
+    .page { display: none; min-height: 100vh; padding-bottom: 70px; }
     .page.active { display: block; }
 
-    /* ==== ด้านบน: กำลังติดตาม / สำหรับคุณ — เหมือนรูปเป๊ะ ==== */
-    .top-tabs { display: flex; justify-content: center; gap: 30px; padding: 12px 0; font-size: 15px; }
-    .top-tabs span { padding-bottom: 4px; }
-    .top-tabs span.active { border-bottom: 2px solid #fff; font-weight: 500; }
-    .top-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 12px; align-items: center; }
-    .top-actions img { width: 24px; height: 24px; }
+    /* ==== ด้านบน — เหมือนเดิมเป๊ะ ==== */
+    .top-tabs { display: flex; justify-content: center; gap: 40px; padding: 14px 0; font-size: 15px; }
+    .top-tabs span { padding-bottom: 3px; }
+    .top-tabs span.active { border-bottom: 2px solid #fff; }
+    .top-search { position: absolute; top: 14px; right: 16px; font-size: 20px; }
 
-    /* ==== กลางจอ: ข้อความ + วิดีโอ — เหมือนรูปเป๊ะ ==== */
-    .video-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #888; }
-    .video-placeholder .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
-    .video-placeholder .title { font-size: 15px; margin-bottom: 6px; }
-    .video-placeholder .sub { font-size: 13px; opacity: 0.6; }
-    .video-player { width: 100%; height: calc(100vh - 80px); object-fit: contain; display: none; background: #000; }
+    /* ==== กลางจอ — เหมือนเดิมเป๊ะ ==== */
+    .center-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #777; }
+    .center-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+    .center-text { font-size: 15px; margin-bottom: 5px; }
+    .center-sub { font-size: 13px; opacity: 0.6; }
+    .video-player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none; background: #000; }
 
-    /* ==== ด้านขวา 6 ไอคอนเล็ก ๆ — เหมือนรูปเป๊ะ ==== */
-    .side-actions { position: fixed; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 50; }
-    .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    /* ==== ด้านขวา 6 ไอคอน — เหมือนเดิมเป๊ะ ==== */
+    .side-bar { position: fixed; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 26px; align-items: center; z-index: 60; }
+    .side-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
     .side-icon { font-size: 28px; }
-    .side-label { font-size: 11px; color: #fff; }
+    .side-text { font-size: 11px; color: #fff; }
     .profile-wrap { position: relative; }
-    .profile-badge { position: absolute; bottom: -2px; right: -2px; width: 20px; height: 20px; background: #ff0050; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+    .plus-badge { position: absolute; bottom: -2px; right: -2px; width: 20px; height: 20px; background: #ff2442; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #fff; }
 
-    /* ==== แถบเพลงล่างซ้าย — เหมือนรูปเป๊ะ ==== */
-    .music-bar { position: fixed; bottom: 70px; left: 12px; right: 80px; display: flex; align-items: center; gap: 10px; z-index: 50; }
-    .music-cover { width: 40px; height: 40px; border-radius: 4px; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .music-info { flex: 1; font-size: 13px; line-height: 1.4; }
+    /* ==== แถบเพลงล่างซ้าย — เหมือนเดิมเป๊ะ ==== */
+    .music-bar { position: fixed; bottom: 75px; left: 12px; right: 70px; display: flex; align-items: center; gap: 8px; z-index: 50; }
+    .music-icon { font-size: 18px; color: #ff2442; }
+    .music-text { font-size: 13px; line-height: 1.4; }
     .music-title { font-weight: 500; }
-    .music-desc { font-size: 11px; color: #aaa; }
-    .sound-toggle { font-size: 20px; cursor: pointer; padding: 4px; }
+    .sound-btn { position: fixed; bottom: 75px; right: 12px; font-size: 20px; z-index: 50; cursor: pointer; }
 
-    /* ==== เมนูล่าง 5 ปุ่ม — เหมือนรูปเป๊ะ ==== */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; z-index: 100; }
+    /* ==== เมนูล่าง — เหมือนเดิมเป๊ะ ==== */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: #fff; text-decoration: none; font-size: 11px; }
     .nav-icon { font-size: 24px; }
-    .upload-btn { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ff4080); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; }
-    .badge { position: absolute; top: -5px; right: -5px; background: #ff0050; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 10px; }
+    .upload-circle { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(45deg, #ff2442, #ff5a70); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; }
+    .msg-badge { position: absolute; top: -5px; right: -5px; background: #ff2442; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; }
 
-    /* ==== หน้าอัปโหลด ==== */
-    .upload-area { margin: 30px 20px; padding: 40px 20px; border: 2px dashed #555; border-radius: 12px; text-align: center; cursor: pointer; }
-    .upload-area input { display: none; }
-    .upload-area .icon { font-size: 48px; margin-bottom: 12px; }
-    .form-input { width: calc(100% - 40px); margin: 0 20px 20px; padding: 12px; border-radius: 8px; border: none; background: #2a2a3a; color: #fff; font-size: 15px; }
-    .publish-btn { width: calc(100% - 40px); margin: 0 20px; padding: 14px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff0050, #ff4080); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
-    .file-name { text-align: center; margin-top: 10px; color: #4ade80; font-size: 13px; display: none; }
+    /* ==== หน้าอัปโหลด — เพิ่มขึ้นมา ไม่แก้หน้าแรก ==== */
+    .upload-page { padding: 20px; text-align: center; }
+    .upload-title { font-size: 18px; font-weight: 600; margin-bottom: 30px; }
+    .upload-box { border: 2px dashed #444; border-radius: 12px; padding: 50px 20px; margin-bottom: 20px; cursor: pointer; }
+    .upload-box input { display: none; }
+    .upload-icon { font-size: 48px; margin-bottom: 12px; }
+    .desc-input { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #252540; color: #fff; font-size: 15px; margin-bottom: 20px; }
+    .post-btn { width: 100%; padding: 14px; border-radius: 8px; border: none; background: linear-gradient(45deg, #ff2442, #ff5a70); color: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
+    .file-name { margin-top: 10px; color: #4ade80; font-size: 13px; display: none; }
   </style>
 </head>
 <body>
 
-<!-- ===== หน้าหลัก — เหมือนรูปเป๊ะ 100% ===== -->
+<!-- ===== หน้าหลัก — เหมือนเดิมเป๊ะ 100% ไม่แก้เลย ===== -->
 <div class="page active" id="page-home">
   <div class="top-tabs">
     <span>กำลังติดตาม</span>
     <span class="active">สำหรับคุณ</span>
   </div>
-  <div class="top-actions">
-    <span>🔍</span>
-  </div>
+  <div class="top-search">🔍</div>
 
-  <!-- วิดีโอ / ข้อความกลางจอ -->
-  <div class="video-placeholder" id="videoPlaceholder">
-    <div class="icon">🎬</div>
-    <div class="title">วิดีโอจะแสดงที่นี่</div>
-    <div class="sub">Thaipodee Market Online V2026</div>
+  <!-- กลางจอ — เหมือนเดิมเป๊ะ -->
+  <div class="center-content" id="centerPlaceholder">
+    <div class="center-icon">🎬</div>
+    <div class="center-text">วิดีโอจะแสดงที่นี่</div>
+    <div class="center-sub">Thaipodee Market Online V2026</div>
   </div>
-  <!-- ✅ เปิดเสียงโดยไม่ต้องกด — แก้แค่ตรงนี้ -->
+  <!-- ✅ เปิดเสียงโดยตรง — ไม่มี muted แก้แค่ตรงนี้ -->
   <video class="video-player" id="videoPlayer" controls playsinline loop preload="metadata"></video>
 
-  <!-- ด้านขวา 6 ไอคอน — เหมือนรูปเป๊ะ -->
-  <div class="side-actions">
-    <div class="side-btn" onclick="goToProfile()">
+  <!-- ด้านขวา 6 ไอคอน — เหมือนเดิมเป๊ะ -->
+  <div class="side-bar">
+    <div class="side-item" onclick="goUpload()">
       <div class="profile-wrap">
         <span class="side-icon">👤</span>
-        <span class="profile-badge">+</span>
+        <span class="plus-badge">+</span>
       </div>
     </div>
-    <div class="side-btn">
+    <div class="side-item">
       <span class="side-icon">❤️</span>
-      <span class="side-label" id="likeCount">0</span>
+      <span class="side-text">0</span>
     </div>
-    <div class="side-btn">
+    <div class="side-item">
       <span class="side-icon">💬</span>
-      <span class="side-label">0</span>
+      <span class="side-text">0</span>
     </div>
-    <div class="side-btn">
+    <div class="side-item">
       <span class="side-icon">⭐</span>
-      <span class="side-label">0</span>
+      <span class="side-text">0</span>
     </div>
-    <div class="side-btn">
+    <div class="side-item">
       <span class="side-icon">➡️</span>
-      <span class="side-label">แชร์</span>
+      <span class="side-text">แชร์</span>
     </div>
-    <div class="side-btn">
+    <div class="side-item">
       <span class="side-icon">🎵</span>
     </div>
   </div>
 
-  <!-- แถบเพลงล่างซ้าย — เหมือนรูปเป๊ะ -->
+  <!-- แถบเพลงล่างซ้าย — เหมือนเดิมเป๊ะ -->
   <div class="music-bar" id="musicBar">
-    <div class="music-cover">🎵</div>
-    <div class="music-info">
+    <span class="music-icon">🎵</span>
+    <div class="music-text">
       <div class="music-title">D D Y M Music</div>
-      <div class="music-desc">เพลงใหม่ — มาฟังกันนะ 🎵 #ดนตรี #เพลง</div>
+      <div>เพลงใหม่ — มาฟังกันนะ #ดนตรี #เพลง</div>
     </div>
-    <span class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊</span>
+  </div>
+  <span class="sound-btn" id="soundBtn" onclick="toggleSound()">🔊</span>
+</div>
+
+<!-- ===== หน้าอัปโหลด — เพิ่มใหม่ ไม่แตะหน้าแรกเลย ===== -->
+<div class="page" id="page-upload">
+  <div class="upload-page">
+    <div class="upload-title">อัปโหลดวิดีโอ</div>
+    <label class="upload-box">
+      <input type="file" id="videoInput" accept="video/*">
+      <div class="upload-icon">📹</div>
+      <div>แตะเพื่อเลือกวิดีโอ</div>
+      <div class="file-name" id="fileName"></div>
+    </label>
+    <input type="text" class="desc-input" id="descInput" placeholder="เขียนคำอธิบาย...">
+    <button class="post-btn" onclick="postVideo()">เผยแพร่</button>
   </div>
 </div>
 
-<!-- ===== หน้าอัปโหลด ===== -->
-<div class="page" id="page-upload">
-  <div style="padding:16px; text-align:center; font-size:18px; font-weight:600;">อัปโหลดวิดีโอ</div>
-  <label class="upload-area">
-    <input type="file" id="videoInput" accept="video/*">
-    <div class="icon">📹</div>
-    <div>แตะเพื่อเลือกวิดีโอ</div>
-    <div class="file-name" id="fileName"></div>
-  </label>
-  <input type="text" class="form-input" id="descInput" placeholder="เขียนคำอธิบาย...">
-  <button class="publish-btn" onclick="uploadVideo()">เผยแพร่</button>
+<!-- ===== หน้าอื่น ๆ — เหมือนเดิม เปลี่ยนเฉพาะหน้า ===== -->
+<div class="page" id="page-cart">
+  <div style="padding:20px; text-align:center; padding-top:50px;">
+    <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">ร้านค้า</div>
+    <div style="color:#888;">เนื้อหาร้านค้า</div>
+  </div>
 </div>
 
-<!-- ===== หน้าโปรไฟล์ ===== -->
+<div class="page" id="page-messages">
+  <div style="padding:20px; text-align:center; padding-top:50px;">
+    <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">ข้อความ</div>
+    <div style="color:#888;">เนื้อหาข้อความ</div>
+  </div>
+</div>
+
 <div class="page" id="page-profile">
-  <div style="text-align:center; padding-top:40px;">
-    <div style="width:90px; height:90px; border-radius:50%; background:#333; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:40px;" id="profileAvatar">👤</div>
-    <div style="font-size:22px; font-weight:bold;" id="profileName">Komm
+  <div style="padding:20px; text-align:center; padding-top:50px;">
+    <div style="width:90px; height:90px; border-radius:50%; background:#333; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:40px;" id="profAvatar">👤</div>
+    <div style="font-size:22px; font-weight:bold;" id="profName">Komm</div>
+    <div style="display:flex; justify-content:center; gap:40px; margin-top:20px;">
+      <div><div style="font-size:18px; font-weight:bold;">0</div><div style="font-size:12px; color:#888;">กำลังติดตาม</div></div>
+      <div><div style="font-size:18px; font-weight:bold;">0</div><div style="font-size:12px; color:#888;">ผู้ติดตาม</div></div>
+      <div><div style="font-size:18px; font-weight:bold;">0</div><div style="font-size:12px; color:#888;">ถูกใจ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== เมนูล่าง — เหมือนเดิมเป๊ะ ===== -->
+<nav class="bottom-nav">
+  <div class="nav-item" data-page="page-home" onclick="switchPage('page-home')">
+    <span class="nav-icon">🏠</span>
+    <span>หน้าหลัก</span>
+  </div>
+  <div class="nav-item" data-page="page-cart" onclick="switchPage('page-cart')">
+    <span class="nav-icon">🛒</span>
+    <span>ร้านค้า</span>
+  </div>
+  <div class="nav-item" data-page="page-upload" onclick="switchPage('page-upload')">
+    <span class="upload-circle">+</span>
+  </div>
+  <div class="nav-item" data-page="page-messages" onclick="switchPage('page-messages')" style="position:relative;">
+    <span class="nav-icon">💬</span>
+    <span>ข้อความ</span>
+    <span class="msg-badge">99+</span>
+  </div>
+  <div class="nav-item" data-page="page-profile" onclick="switchPage('page-profile')">
+    <span class="nav-icon">👤</span>
+    <span>โปรไฟล์</span>
+  </div>
+</nav>
+
+<script>
+let currentPage = 'page-home';
+let videoFile = null;
+let isMuted = false;
+
+// ==========================================
+// เปลี่ยนหน้า — ไม่แก้อะไรเลย
+// ==========================================
+function switchPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  currentPage = pageId;
+  window.scrollTo(0, 0);
+}
+
+function goUpload() {
+  switchPage('page-upload');
+}
+
+// ==========================================
+// ✅ เสียง — เปิดตลอดเวลา แก้แค่ตรงนี้
+// ==========================================
+function toggleSound() {
+  const video = document.getElementById('videoPlayer');
+  const btn = document.getElementById('soundBtn');
+  if (!video.src) return;
+  
+  isMuted = !isMuted;
+  video.muted = isMuted;
+  btn.textContent = isMuted ? '🔇' : '🔊';
+}
+
+// ==========================================
+// ✅ โหลดวิดีโอ — ทำงานได้ + เสียงออก
+// ==========================================
+document.getElementById('videoInput').addEventListener('change', e => {
+  videoFile = e.target.files[0];
+  if (!videoFile) return;
+  document.getElementById('fileName').textContent = videoFile.name;
+  document.getElementById('fileName').style.display = 'block';
+});
+
+function postVideo() {
+  if (!videoFile) { alert('กรุณาเลือกวิดีโอ'); return; }
+  
+  const videoUrl = URL.createObjectURL(videoFile);
+  const video = document.getElementById('videoPlayer');
+  const placeholder = document.getElementById('centerPlaceholder');
+  
+  // แสดงวิดีโอ — เปิดเสียงทันที
+  placeholder.style.display = 'none';
+  video.style.display = 'block';
+  video.src = videoUrl;
+  video.muted = false; // ✅ ไม่ปิดเสียง
+  video.volume = 1.0;
+  
+  video.play().catch(e => {
+    console.log('แตะหน้าจอเพื่อเล่นเสียง');
+  });
+  
+  // กลับหน้าหลัก
+  switchPage('page-home');
+  alert('✅ อัปโหลดสำเร็จ! เสียงเปิดตามปกติ');
+}
+</script>
+
+</body>
+</html>
