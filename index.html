@@ -7,68 +7,65 @@
     <link rel="icon" href="https://i.imgur.com/8ZxQrL9.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #000; color: #fff; padding-bottom: 80px; }
+        html { background: #000; color: #fff; }
+        body { margin: 0; padding: 0; padding-bottom: 80px; min-height: 100vh; }
 
-        /* Header */
+        /* Header — แสดงทันที ไม่รออะไร */
         .header {
             position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: #000; display: flex; align-items: center; justify-content: space-between;
             padding: 0 12px; border-bottom: 1px solid #333; z-index: 100;
         }
         .header-left { display: flex; align-items: center; gap: 8px; }
-        .logo { width: 28px; height: 28px; border-radius: 4px; }
+        .logo { width: 28px; height: 28px; border-radius: 4px; background: #333; }
         .title { font-size: 16px; font-weight: bold; }
         .version { font-size: 11px; color: #888; background: #222; padding: 2px 6px; border-radius: 4px; }
         .menu-btn { font-size: 24px; cursor: pointer; padding: 8px; }
 
-        /* Video Area */
+        /* Video Area — แสดงทันที ไม่มีโหลดช้า */
         .video-area {
-            margin-top: 50px; width: 100%; min-height: 60vh;
+            margin-top: 50px; width: 100%; min-height: calc(100vh - 200px);
             background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             display: flex; align-items: center; justify-content: center;
             flex-direction: column; padding: 20px;
         }
-        .video-text { color: #ccc; font-size: 14px; text-align: center; margin-bottom: 20px; }
         .video-placeholder {
-            width: 100%; max-width: 400px; aspect-ratio: 9/16;
-            background: rgba(0,0,0,0.3); border-radius: 12px;
+            width: 100%; max-width: 450px; aspect-ratio: 9/16;
+            background: rgba(0,0,0,0.2); border-radius: 0;
             display: flex; align-items: center; justify-content: center;
-            color: #888; font-size: 14px;
-            border: 2px dashed #555;
+            color: #bbb; font-size: 15px;
+        }
+        .video-text { 
+            color: #ddd; font-size: 13px; text-align: center; 
+            margin-top: 16px; padding: 0 20px; 
         }
 
-        /* Right Buttons */
+        /* Right Buttons — ตำแหน่งตรง เปิดทันที */
         .side-buttons {
-            position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 28px; z-index: 50;
+            position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 26px; z-index: 50;
         }
         .side-btn {
             display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; padding: 8px;
+            cursor: pointer; padding: 6px;
+            -webkit-tap-highlight-color: transparent;
         }
+        .side-btn:active { opacity: 0.7; }
         .side-icon { font-size: 26px; }
         .side-label { font-size: 10px; color: #aaa; margin-top: 2px; }
 
-        /* Info Bar */
-        .info-bar {
-            padding: 12px; display: flex; align-items: flex-start; gap: 10px;
-            border-bottom: 1px solid #222;
-        }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; flex-shrink: 0; }
-        .info-text { flex: 1; }
-        .username { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-        .desc { font-size: 13px; color: #ccc; line-height: 1.4; }
-
-        /* Bottom Nav */
+        /* Bottom Nav — ติดล่างสุด ชัดเจน */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
             background: #000; border-top: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center; z-index: 100;
         }
         .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
             cursor: pointer; padding: 8px;
+            -webkit-tap-highlight-color: transparent;
         }
+        .nav-item:active { opacity: 0.7; }
         .nav-icon { font-size: 20px; }
         .nav-label { font-size: 11px; color: #aaa; }
         .plus-btn {
@@ -79,13 +76,13 @@
 
         /* Upload Modal */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 300; display: none; align-items: center; justify-content: center;
             padding: 20px;
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px;
+            background: #111; border-radius: 12px; padding: 24px; width: 100%; max-width: 380px;
             border: 1px solid #333;
         }
         .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -108,14 +105,14 @@
 <!-- Header -->
 <div class="header">
     <div class="header-left">
-        <img src="https://i.imgur.com/8ZxQrL9.png" alt="Logo" class="logo">
+        <div class="logo"></div>
         <span class="title">THAIPODEE</span>
         <span class="version">V2026</span>
     </div>
-    <div class="menu-btn" onclick="alert('เมนูหลัก — โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ')">☰</div>
+    <div class="menu-btn" onclick="alert('เมนู: โปรไฟล์, ตะกร้า, คำสั่งซื้อ, คูปอง, ครีเอเตอร์, ข้อความ, โปรโมท, ขยายธุรกิจ')">☰</div>
 </div>
 
-<!-- Video Area -->
+<!-- Video Area — โหลดทันที ไม่ค้าง -->
 <div class="video-area">
     <div class="video-placeholder">วิดีโอ / เนื้อหา</div>
     <p class="video-text">THAIPODEE V2026 — แพลตฟอร์มตลาดโลก จากไทยสู่ทั่วโลก 🌍</p>
@@ -127,15 +124,6 @@
     <div class="side-btn" onclick="alert('💬 เปิดความคิดเห็น')"><span class="side-icon">💬</span><span class="side-label">ความคิด</span></div>
     <div class="side-btn" onclick="alert('↗️ แชร์แล้ว!')"><span class="side-icon">↗️</span><span class="side-label">แชร์</span></div>
     <div class="side-btn" onclick="alert('🛒 เข้าตะกร้าสินค้า')"><span class="side-icon">🛒</span><span class="side-label">ตะกร้า</span></div>
-</div>
-
-<!-- Info Bar -->
-<div class="info-bar">
-    <div class="avatar"></div>
-    <div class="info-text">
-        <div class="username">@thaipodee_official</div>
-        <div class="desc">THAIPODEE V2026 — แพลตฟอร์มออนไลน์ระดับโลก ซื้อ ขาย แชร์ ได้ทุกที่ทั่วโลก 🌍 🇹🇭</div>
-    </div>
 </div>
 
 <!-- Bottom Nav -->
@@ -173,7 +161,7 @@
 </div>
 
 <script>
-// ปิดป๊อปอัพติดตั้งแอปถาวร
+// ปิดป๊อปอัพติดตั้งแอป
 window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     return false;
@@ -188,11 +176,11 @@ function closeUpload() {
 }
 function uploadVideo() {
     const input = document.getElementById('videoInput');
-    if (input.files.length === 0) {
+    if (!input.files.length) {
         alert('กรุณาเลือกไฟล์วิดีโอก่อนครับ');
         return;
     }
-    alert('✅ กำลังอัปโหลด: ' + input.files[0].name + '\n\n(ต่อไปจะแสดงความคืบหน้า)');
+    alert('✅ เลือกไฟล์: ' + input.files[0].name + '\n(ระบบกำลังอัปโหลด)');
     closeUpload();
 }
 </script>
