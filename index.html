@@ -11,7 +11,48 @@
     html, body { background: #000; color: #fff; height: 100%; overflow: hidden; }
     .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; overflow: hidden; }
 
-    /* ===== วิดีโอเลื่อนได้ แต่ส่วนอื่นล็อกกับจอ ===== */
+    /* ===== แถบด้านบน — เหมือน TikTok ===== */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 16px;
+      padding-top: calc(10px + env(safe-area-inset-top));
+      z-index: 35;
+      pointer-events: none;
+    }
+    .top-bar > * { pointer-events: auto; }
+    .top-left { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; font-weight: 500; }
+    .top-tabs { display: flex; gap: 20px; font-size: 15px; }
+    .top-tab { color: #aaa; cursor: pointer; }
+    .top-tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+    .top-search { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 22px; cursor: pointer; }
+
+    /* ===== ปุ่มโปรไฟล์มุมขวาบน ===== */
+    .top-profile-btn {
+      position: fixed;
+      top: 50px;
+      right: 12px;
+      z-index: 35;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+    }
+    .top-profile-btn i { font-size: 20px; color: #fff; }
+
+    /* ===== วิดีโอ — เต็มจอ 100% ไม่มีแถบดำ ===== */
     .video-feed {
       position: absolute;
       top: 0;
@@ -38,25 +79,21 @@
     video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: cover; /* เต็มจอ สมส่วน */
       display: block;
     }
 
-    /* ===== ปุ่มด้านข้าง — ล็อกกับจอ ตรงกลางขวา ครบ 6 ปุ่ม ===== */
-    .fixed-side-actions {
-      position: fixed;
+    /* ===== ปุ่มด้านขวา — ลอยบนวิดีโอ ไม่มีแถบดำล็อก! ===== */
+    .side-actions {
+      position: absolute;
       right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
+      bottom: 120px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
       align-items: center;
-      z-index: 30;
-      pointer-events: none;
+      z-index: 25;
     }
-    .fixed-side-actions > * { pointer-events: auto; }
-
     .action-btn {
       display: flex;
       flex-direction: column;
@@ -68,24 +105,21 @@
     .action-btn i { font-size: 28px; margin-bottom: 4px; }
     .action-btn span { font-size: 11px; }
 
-    /* ===== ข้อความด้านซ้าย — ล็อกกับจอ ไม่เลื่อนตามวิดีโอ ===== */
-    .fixed-video-info {
-      position: fixed;
+    /* ===== ข้อความด้านซ้ายล่าง — ลอยบนวิดีโอ ===== */
+    .video-info {
+      position: absolute;
       left: 16px;
-      bottom: 95px;
-      right: 80px;
-      z-index: 30;
+      bottom: 100px;
+      right: 90px;
+      z-index: 25;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      pointer-events: none;
     }
-    .fixed-video-info > * { pointer-events: auto; }
-
     .video-username { font-weight: 700; margin-bottom: 6px; font-size: 15px; color: #fff; }
     .video-caption { font-size: 14px; line-height: 1.4; margin-bottom: 6px; color: #fff; }
     .video-music { display: flex; align-items: center; font-size: 12px; color: #eee; }
     .video-music i { margin-right: 6px; font-size: 14px; }
 
-    /* ===== Bottom Nav — ล็อกด้านล่างสุด ===== */
+    /* ===== Bottom Nav ===== */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -93,9 +127,10 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 480px;
-      background: rgba(0,0,0,0.95);
+      background: rgba(0,0,0,0.9);
       display: flex;
       justify-content: space-around;
+      align-items: center;
       padding: 8px 0 calc(12px + env(safe-area-inset-bottom));
       border-top: 1px solid #222;
       z-index: 100;
@@ -111,16 +146,16 @@
     .nav-item i { font-size: 22px; margin-bottom: 2px; }
     .nav-item span { font-size: 10px; }
     .nav-item.create-btn i {
-      font-size: 32px;
+      font-size: 30px;
       background: #f00;
       border-radius: 50%;
-      padding: 8px;
+      padding: 8px 10px;
     }
 
-    /* ===== Profile Grid — ไม่มีช่องดำ ===== */
+    /* ===== Profile Grid ===== */
     .videos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 4px;
     }
     .video-grid-item {
@@ -145,7 +180,7 @@
       border-radius: 2px;
     }
 
-    /* ===== Pages & Modal ===== */
+    /* ===== Pages ===== */
     .page {
       position: absolute;
       top: 0;
@@ -165,6 +200,7 @@
       font-size: 18px;
       font-weight: 600;
       position: relative;
+      padding-top: calc(16px + env(safe-area-inset-top));
     }
     .back-btn {
       position: absolute;
@@ -176,7 +212,8 @@
       cursor: pointer;
     }
 
-    .profile-container { padding: 20px; text-align: center; padding-bottom: 80px; }
+    /* ===== Profile Page ===== */
+    .profile-container { padding: 20px; text-align: center; padding-bottom: 80px; padding-top: 60px; }
     .profile-avatar {
       width: 80px; height: 80px; border-radius: 50%; background: #333;
       margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px;
@@ -193,8 +230,12 @@
       background: transparent; color: #fff; cursor: pointer; font-size: 14px;
     }
     .profile-btn.primary { background: #f00; border-color: #f00; }
+    .tabs { display: flex; justify-content: center; gap: 30px; margin-bottom: 16px; border-bottom: 1px solid #222; }
+    .tab { padding: 8px 16px; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { border-bottom-color: #fff; font-weight: 600; }
 
-    .edit-form { padding: 20px; padding-bottom: 80px; }
+    /* ===== Edit Profile ===== */
+    .edit-form { padding: 20px; padding-bottom: 80px; padding-top: 60px; }
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; margin-bottom: 6px; font-size: 14px; color: #aaa; }
     .form-input {
@@ -206,7 +247,8 @@
       border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px;
     }
 
-    .upload-container { padding: 20px; text-align: center; padding-bottom: 80px; }
+    /* ===== Upload Page ===== */
+    .upload-container { padding: 20px; text-align: center; padding-bottom: 80px; padding-top: 60px; }
     .upload-icon { font-size: 64px; color: #666; margin-bottom: 16px; }
     .upload-area {
       border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; margin-bottom: 20px; cursor: pointer;
@@ -221,10 +263,12 @@
       width: 100%; height: 6px; background: #333; border-radius: 3px; margin: 16px 0; overflow: hidden;
     }
     .progress-fill { height: 100%; background: #f00; width: 0%; transition: width 0.3s; }
+    .hidden { display: none !important; }
 
+    /* ===== Modal & Menu ===== */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 200; display: none;
+      background: rgba(0,0,0,0.85); z-index: 200; display: none;
       align-items: center; justify-content: center;
     }
     .modal-overlay.active { display: flex; }
@@ -251,19 +295,36 @@
     }
     .context-menu-item:hover { background: #333; }
     .context-menu-item.danger { color: #ff5555; }
-
-    .hidden { display: none !important; }
-    .tab-btn { padding: 6px 12px; border-bottom: 2px solid transparent; }
   </style>
 </head>
 <body>
   <div class="app-container">
 
-    <!-- ===== หน้าแรก — ปุ่ม+ข้อความล็อกกับจอ วิดีโอเลื่อนได้ ===== -->
+    <!-- ===== หน้าแรก — เหมือน TikTok วิดีโอเต็มจอ ไอคอนลอยบนวิดีโอ ===== -->
     <div id="homePage" class="page active">
-      <!-- ปุ่มด้านข้าง ล็อกกับจอ ครบ 6 ปุ่ม -->
-      <div class="fixed-side-actions">
-        <div class="action-btn like-btn" data-liked="false" data-index="0">
+      <!-- แถบด้านบน -->
+      <div class="top-bar">
+        <span class="top-left">นครราชสีมา</span>
+        <div class="top-tabs">
+          <span class="top-tab">กำลังติดตาม</span>
+          <span class="top-tab active">สำหรับคุณ</span>
+        </div>
+        <i class="fa fa-search top-search"></i>
+      </div>
+
+      <!-- ปุ่มโปรไฟล์มุมขวาบน -->
+      <div class="top-profile-btn" onclick="showPage('profile')">
+        <i class="fa fa-user"></i>
+      </div>
+
+      <!-- วิดีโอ Feed — เต็มจอ ไม่มีแถบดำ! -->
+      <div class="video-feed" id="homeVideoFeed">
+        <!-- วิดีโอจะแสดงที่นี่ -->
+      </div>
+
+      <!-- ปุ่มด้านขวา — ลอยบนวิดีโอ ไม่มีแถบดำล็อก! -->
+      <div class="side-actions">
+        <div class="action-btn like-btn" data-liked="false">
           <i class="fa fa-heart-o"></i>
           <span>0</span>
         </div>
@@ -272,33 +333,23 @@
           <span>0</span>
         </div>
         <div class="action-btn">
-          <i class="fa fa-star-o"></i>
+          <i class="fa fa-bookmark-o"></i>
           <span>0</span>
         </div>
         <div class="action-btn">
           <i class="fa fa-share"></i>
           <span>แชร์</span>
         </div>
-        <div class="action-btn">
-          <i class="fa fa-bookmark-o"></i>
-          <span>บันทึก</span>
-        </div>
-        <div class="action-btn">
-          <i class="fa fa-ellipsis-h"></i>
-          <span>เพิ่มเติม</span>
+        <div class="action-btn" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #f00, #f90); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <i class="fa fa-music" style="margin: 0; font-size: 18px;"></i>
         </div>
       </div>
 
-      <!-- ข้อความด้านซ้าย ล็อกกับจอ -->
-      <div class="fixed-video-info">
-        <p class="video-username" id="currentUsername">ไทยโพธิ์ดี มาร์เก็ต</p>
-        <p class="video-caption" id="currentCaption">วิดีโอแพลตฟอร์มนี้</p>
+      <!-- ข้อความด้านซ้ายล่าง — ลอยบนวิดีโอ -->
+      <div class="video-info">
+        <p class="video-username">ไทยโพธิ์ดี มาร์เก็ต</p>
+        <p class="video-caption">วิดีโอแพลตฟอร์มนี้ #ไทยโพธิ์ดี #มาร์เก็ตออนไลน์ #V2026</p>
         <p class="video-music"><i class="fa fa-music"></i> เสียงต้นฉบับ - ไทยโพธิ์ดี มาร์เก็ต</p>
-      </div>
-
-      <!-- วิดีโอ Feed — เลื่อนได้ปกติ -->
-      <div class="video-feed" id="homeVideoFeed">
-        <!-- วิดีโอจะแสดงที่นี่ -->
       </div>
     </div>
 
@@ -371,9 +422,9 @@
           <button class="profile-btn">ข้อความ</button>
         </div>
         <p class="text-sm text-gray-400 mb-4">Thaipodee Market Online V2026</p>
-        <div class="flex justify-center gap-4 mb-4">
-          <button class="tab-btn border-b-2 border-red-500 text-white pb-2 font-semibold" onclick="switchProfileTab('videos')">วิดีโอ</button>
-          <button class="tab-btn border-b-2 border-transparent text-gray-400 pb-2" onclick="switchProfileTab('likes')">ถูกใจ</button>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('videos')">วิดีโอ</div>
+          <div class="tab" onclick="switchTab('likes')">ถูกใจ</div>
         </div>
         <div class="videos-grid" id="userVideosGrid"></div>
       </div>
@@ -427,29 +478,51 @@
   </div>
 
   <script>
-    let userVideos = [], currentVideoIndex = null, longPressTimer = null, selectedVideoId = null;
+    let userVideos = [], selectedVideoId = null, currentVideoIndex = null, longPressTimer = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       loadUserProfile();
       loadUserVideos();
       renderVideoFeed();
       setupUpload();
-      setupLikeButtons();
+      setupLikeButton();
     });
 
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.querySelector('.fixed-side-actions').style.display = pageName === 'home' ? 'flex' : 'none';
-      document.querySelector('.fixed-video-info').style.display = pageName === 'home' ? 'block' : 'none';
+      
+      // ซ่อน/แสดงองค์ประกอบหน้าแรก
+      const isHome = pageName === 'home';
+      document.querySelector('.top-bar').style.display = isHome ? 'flex' : 'none';
+      document.querySelector('.top-profile-btn').style.display = isHome ? 'flex' : 'none';
+      document.querySelector('.side-actions').style.display = isHome ? 'flex' : 'none';
+      document.querySelector('.video-info').style.display = isHome ? 'block' : 'none';
       
       switch(pageName) {
-        case 'home': document.getElementById('homePage').classList.add('active'); document.querySelector('.nav-item:first-child').classList.add('active'); break;
-        case 'shop': document.getElementById('shopPage').classList.add('active'); document.querySelector('.nav-item:nth-child(2)').classList.add('active'); break;
-        case 'upload': document.getElementById('uploadPage').classList.add('active'); break;
-        case 'messages': document.getElementById('messagesPage').classList.add('active'); document.querySelector('.nav-item:nth-child(4)').classList.add('active'); break;
-        case 'profile': document.getElementById('profilePage').classList.add('active'); document.querySelector('.nav-item:nth-child(5)').classList.add('active'); renderUserVideosGrid(); break;
-        case 'editProfile': document.getElementById('editProfilePage').classList.add('active'); break;
+        case 'home':
+          document.getElementById('homePage').classList.add('active');
+          document.querySelector('.nav-item:first-child').classList.add('active');
+          break;
+        case 'shop':
+          document.getElementById('shopPage').classList.add('active');
+          document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+          break;
+        case 'upload':
+          document.getElementById('uploadPage').classList.add('active');
+          break;
+        case 'messages':
+          document.getElementById('messagesPage').classList.add('active');
+          document.querySelector('.nav-item:nth-child(4)').classList.add('active');
+          break;
+        case 'profile':
+          document.getElementById('profilePage').classList.add('active');
+          document.querySelector('.nav-item:nth-child(5)').classList.add('active');
+          renderUserVideosGrid();
+          break;
+        case 'editProfile':
+          document.getElementById('editProfilePage').classList.add('active');
+          break;
       }
       closeContextMenu();
     }
@@ -483,37 +556,38 @@
     function renderVideoFeed() {
       const feed = document.getElementById('homeVideoFeed');
       feed.innerHTML = '';
-      userVideos.forEach((v, i) => feed.appendChild(createVideoElement(v, i)));
+      
       if (userVideos.length === 0) {
-        feed.innerHTML = `<div class="video-container flex items-center justify-center"><div class="text-center px-6"><i class="fa fa-film text-4xl mb-4 text-gray-500"></i><h3 class="text-xl font-semibold mb-2">ยังไม่มีวิดีโอ</h3><p class="text-gray-400 mb-6">กดปุ่ม + เพื่ออัปโหลดวิดีโอแรกของคุณ</p><button onclick="showPage('upload')" class="px-6 py-3 bg-red-600 rounded-full text-white font-semibold">อัปโหลดเลย</button></div></div>`;
+        feed.innerHTML = `
+          <div class="video-container flex items-center justify-center">
+            <div class="text-center px-6">
+              <i class="fa fa-film text-5xl mb-4 text-gray-500"></i>
+              <h3 class="text-xl font-semibold mb-2">ยังไม่มีวิดีโอ</h3>
+              <p class="text-gray-400 mb-6">กดปุ่ม + เพื่ออัปโหลดวิดีโอแรกของคุณ</p>
+              <button onclick="showPage('upload')" class="px-6 py-3 bg-red-600 rounded-full text-white font-semibold">อัปโหลดเลย</button>
+            </div>
+          </div>
+        `;
+        return;
       }
-      updateVideoInfo(0);
-    }
-
-    function createVideoElement(video, index) {
-      const div = document.createElement('div');
-      div.className = 'video-container';
-      div.dataset.index = index;
-      div.innerHTML = `<video src="${video.url}" ${video.thumbnail?`poster="${video.thumbnail}"`:""} loop playsinline data-index="${index}"></video>`;
-      const vid = div.querySelector('video');
-      vid.addEventListener('click', e => e.target.paused ? e.target.play() : e.target.pause());
-      vid.addEventListener('play', () => updateVideoInfo(index));
-      vid.addEventListener('touchstart', e => {
-        selectedVideoId = video.id; currentVideoIndex = index;
-        longPressTimer = setTimeout(() => showContextMenu(e.touches[0].clientX, e.touches[0].clientY), 500);
+      
+      userVideos.forEach((v, i) => {
+        const div = document.createElement('div');
+        div.className = 'video-container';
+        div.innerHTML = `<video src="${v.url}" loop playsinline data-index="${i}"></video>`;
+        const vid = div.querySelector('video');
+        vid.addEventListener('click', e => e.target.paused ? e.target.play() : e.target.pause());
+        vid.addEventListener('touchstart', e => {
+          selectedVideoId = v.id; currentVideoIndex = i;
+          longPressTimer = setTimeout(() => showContextMenu(e.touches[0].clientX, e.touches[0].clientY), 500);
+        });
+        vid.addEventListener('touchend', () => clearTimeout(longPressTimer));
+        vid.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+        feed.appendChild(div);
       });
-      vid.addEventListener('touchend', () => clearTimeout(longPressTimer));
-      vid.addEventListener('touchmove', () => clearTimeout(longPressTimer));
-      return div;
     }
 
-    function updateVideoInfo(index) {
-      if (userVideos[index]) {
-        document.getElementById('currentCaption').textContent = userVideos[index].caption || 'วิดีโอแพลตฟอร์มนี้';
-      }
-    }
-
-    function setupLikeButtons() {
+    function setupLikeButton() {
       document.querySelector('.like-btn').addEventListener('click', function(){
         const liked = this.dataset.liked === 'true';
         this.dataset.liked = String(!liked);
@@ -524,14 +598,27 @@
     function renderUserVideosGrid() {
       const g = document.getElementById('userVideosGrid');
       g.innerHTML = '';
-      if (userVideos.length === 0) { g.innerHTML = '<p class="col-span-full text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>'; return; }
+      if (userVideos.length === 0) {
+        g.innerHTML = '<p class="col-span-full text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>';
+        return;
+      }
       userVideos.forEach((v, i) => {
         const item = document.createElement('div');
         item.className = 'video-grid-item';
-        item.innerHTML = v.thumbnail ? `<img src="${v.thumbnail}" alt="วิดีโอ">` : `<video src="${v.url}" loop playsinline muted></video>`;
-        item.addEventListener('click', () => { showPage('home'); setTimeout(() => { document.getElementById('homeVideoFeed').children[i]?.scrollIntoView({behavior:'smooth'}); }, 100); });
+        item.innerHTML = `<video src="${v.url}" loop playsinline muted></video>`;
+        item.addEventListener('click', () => {
+          showPage('home');
+          setTimeout(() => {
+            document.getElementById('homeVideoFeed').children[i]?.scrollIntoView({behavior:'smooth'});
+          }, 100);
+        });
         g.appendChild(item);
       });
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
     }
 
     function showContextMenu(x, y) {
@@ -587,7 +674,7 @@
     function publishVideo() {
       const f = window.selectedVideoFile; if (!f) return;
       const url = URL.createObjectURL(f);
-      userVideos.unshift({id:Date.now().toString(), url, caption:'วิดีโอแพลตฟอร์มนี้', createdAt:new Date().toISOString()});
+      userVideos.unshift({id:Date.now().toString(), url, caption:'วิดีโอแพลตฟอร์มนี้ #ไทยโพธิ์ดี #มาร์เก็ตออนไลน์ #V2026'});
       saveUserVideos();
       alert('เผยแพร่เรียบร้อยแล้ว! ✅');
       document.getElementById('videoInput').value = '';
@@ -598,15 +685,6 @@
       window.selectedVideoFile = null;
       renderVideoFeed();
       showPage('home');
-    }
-
-    function switchProfileTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('border-red-500','text-white','font-semibold');
-        b.classList.add('border-transparent','text-gray-400');
-      });
-      event.target.classList.add('border-red-500','text-white','font-semibold');
-      event.target.classList.remove('border-transparent','text-gray-400');
     }
   </script>
 </body>
