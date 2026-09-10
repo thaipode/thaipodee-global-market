@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <!-- ===================================================== -->
   <!-- 🔒 LOCKED — ห้ามแก้ไข เปลี่ยนแปลง หน้าจอนี้เด็ดขาด -->
-  <!-- ✅ แก้: ปุ่มโปรไฟล์เมนูล่าง เปลี่ยนรูปตามรูปโปรไฟล์ทันที -->
-  <!-- ✅ ครบทุกฟังก์ชันเดิม + แก้ไขใหม่ -->
+  <!-- ✅ เพิ่ม: บันทึกวิดีโอที่อัปโหลด → แสดงในหน้าโปรไฟล์ทันที -->
+  <!-- ✅ ทุกฟังก์ชันเดิมครบ + เพิ่มระบบคลังวิดีโอ -->
   <!-- 🔒 ล็อก ล็อก ล็อก ล็อก ล็อก -->
   <!-- ===================================================== -->
   <title>ไทยโพธิ์ดี มาร์เก็ต ออนไลน์ V2026</title>
@@ -145,7 +145,7 @@
     .music-line { display: flex; align-items: center; font-size: 12px; }
     .music-line i { margin-right: 6px; }
 
-    /* ===== หน้าโปรไฟล์ — 🔒 LOCKED ===== */
+    /* ===== หน้าโปรไฟล์ — 🔒 LOCKED ✅ เพิ่มคลังวิดีโอ ===== */
     .page { position: absolute; top: 0; left: 0; right: 0; width: 100%; height: 100vh; background: #000; z-index: 60; display: none; overflow-y: auto; padding-bottom: 80px; }
     .page.active { display: block; }
     .page-header { padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
@@ -183,9 +183,14 @@
     .profile-tabs { display: flex; justify-content: center; border-bottom: 1px solid #222; margin-bottom: 10px; }
     .profile-tab { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; }
     .profile-tab.active { border-bottom-color: #fff; font-weight: 600; }
-    .empty-state { color: #666; text-align: center; padding: 60px 20px; }
+    /* ✅ กริดแสดงวิดีโอในโปรไฟล์ */
+    .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 0 4px; }
+    .video-item { aspect-ratio: 9/12; background: #222; border-radius: 2px; overflow: hidden; cursor: pointer; position: relative; }
+    .video-item video { width: 100%; height: 100%; object-fit: cover; }
+    .video-item .duration { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.7); padding: 1px 4px; font-size: 10px; border-radius: 2px; }
+    .empty-state { color: #666; text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
 
-    /* ===== เมนูล่าง — 🔒 LOCKED ✅ แก้: ปุ่มโปรไฟล์รูปเปลี่ยนได้ ===== */
+    /* ===== เมนูล่าง — 🔒 LOCKED ===== */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       width: 100%; max-width: 100%;
@@ -201,7 +206,6 @@
       font-size: 26px; background: #fff; color: #000; border-radius: 4px;
       padding: 2px 10px;
     }
-    /* ✅ ปุ่มโปรไฟล์เมนูล่าง — เป็นรูปวงกลม เปลี่ยนตามรูปโปรไฟล์ */
     .nav-avatar {
       width: 24px; height: 24px; border-radius: 50%;
       background: #333; display: flex; align-items: center; justify-content: center;
@@ -268,7 +272,7 @@
       </div>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ — ✅ เปลี่ยนรูปโปรไฟล์ได้ + อัปเดตทุกจุด ===== -->
+    <!-- ===== หน้าโปรไฟล์ — ✅ เพิ่มคลังวิดีโอ แสดงผลอัตโนมัติ ===== -->
     <div id="profilePage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('homePage')"><i class="fas fa-chevron-left"></i></span>
@@ -303,15 +307,18 @@
         <div class="version">Thaipodee Market Online V2026</div>
 
         <div class="profile-tabs">
-          <div class="profile-tab active">วิดีโอ</div>
-          <div class="profile-tab">ถูกใจ</div>
+          <div class="profile-tab active" onclick="switchProfileTab('videos')">วิดีโอ</div>
+          <div class="profile-tab" onclick="switchProfileTab('likes')">ถูกใจ</div>
         </div>
 
-        <div class="empty-state">ยังไม่มีวิดีโอ</div>
+        <!-- ✅ กริดแสดงวิดีโอที่อัปโหลดแล้ว -->
+        <div class="videos-grid" id="videosGrid">
+          <div class="empty-state" id="emptyState">ยังไม่มีวิดีโอ</div>
+        </div>
       </div>
     </div>
 
-    <!-- ===== เมนูล่าง — ✅ ปุ่มโปรไฟล์เปลี่ยนรูปตาม + 🔒 LOCKED ===== -->
+    <!-- ===== เมนูล่าง — 🔒 LOCKED ===== -->
     <nav class="bottom-nav">
       <a class="nav-item" onclick="showPage('homePage')"><i class="fas fa-home"></i><span>หน้าแรก</span></a>
       <a class="nav-item"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></a>
@@ -332,6 +339,8 @@
   <script>
     let isFullscreen = false;
     let progressUpdateInterval;
+    // ✅ เก็บรายการวิดีโอที่อัปโหลด
+    let uploadedVideos = [];
 
     // เปลี่ยนหน้า — 🔒 LOCKED
     function showPage(pageId) {
@@ -339,7 +348,15 @@
       document.getElementById(pageId).classList.add('active');
     }
 
-    // ✅ เปลี่ยนรูปโปรไฟล์ — อัปเดตทุกจุด: หน้าโปรไฟล์ + ปุ่มด้านขวา + ปุ่มเมนูล่าง
+    // ✅ เปลี่ยนแท็บในโปรไฟล์
+    function switchProfileTab(tabName) {
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      // ถ้าเป็นแท็บวิดีโอ — อัปเดตแสดงผลล่าสุด
+      if (tabName === 'videos') renderVideosGrid();
+    }
+
+    // ✅ เปลี่ยนรูปโปรไฟล์ — อัปเดตทุกจุด
     function changeAvatar(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -347,20 +364,56 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const imageUrl = e.target.result;
-        // 1. อัปเดตรูปในหน้าโปรไฟล์
-        const profileAvatar = document.getElementById('profileAvatar');
-        profileAvatar.innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
-        // 2. อัปเดตรูปในปุ่มด้านขวา
-        const sideAvatar = document.getElementById('sideAvatar');
-        sideAvatar.innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
-        // 3. ✅ อัปเดตรูปในปุ่มเมนูล่าง มุมล่างขวา
-        const navAvatar = document.getElementById('navAvatar');
-        navAvatar.innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
+        document.getElementById('profileAvatar').innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
+        document.getElementById('sideAvatar').innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
+        document.getElementById('navAvatar').innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
       };
       reader.readAsDataURL(file);
     }
 
-    // ✅ กดวิดีโอ หยุด/เล่นต่อ + ไอคอนลอย
+    // ✅ แสดงวิดีโอในกริดโปรไฟล์
+    function renderVideosGrid() {
+      const grid = document.getElementById('videosGrid');
+      const empty = document.getElementById('emptyState');
+      
+      // ล้างของเก่า
+      grid.innerHTML = '';
+      
+      if (uploadedVideos.length === 0) {
+        grid.innerHTML = `<div class="empty-state">ยังไม่มีวิดีโอ</div>`;
+        return;
+      }
+      
+      // เพิ่มทีละรายการ — ใหม่สุดอยู่บนสุด
+      uploadedVideos.slice().reverse().forEach((vid, index) => {
+        const item = document.createElement('div');
+        item.className = 'video-item';
+        item.onclick = () => playVideoFromGrid(vid.url);
+        item.innerHTML = `
+          <video src="${vid.url}" muted loop playsinline></video>
+          <span class="duration">${formatTime(vid.duration)}</span>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    // ✅ เล่นวิดีโอที่กดจากกริดโปรไฟล์
+    function playVideoFromGrid(videoUrl) {
+      const video = document.getElementById('mainVideo');
+      video.src = videoUrl;
+      video.play();
+      showPage('homePage');
+    }
+
+    // ✅ จัดรูปแบบเวลา
+    function formatTime(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // ✅ กดวิดีโอ หยุด/เล่นต่อ
     function togglePlayPause() {
       const video = document.getElementById('mainVideo');
       const icon = document.getElementById('playPauseIcon');
@@ -424,7 +477,7 @@
       }
     }
 
-    // อัปโหลดวิดีโอ — 🔒 LOCKED
+    // ✅ อัปโหลดวิดีโอ — บันทึกเข้ารายการ + แสดงในโปรไฟล์ทันที
     function openUpload() {
       const input = document.createElement('input');
       input.type = 'file';
@@ -434,7 +487,7 @@
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!confirm(`เลือกไฟล์วิดีโอ:\nชื่อ: ${file.name}\nขนาด: ${(file.size / 1024 / 1024).toFixed(2)} MB\n\nกดตกลงเพื่อเล่น`)) return;
+        if (!confirm(`เลือกไฟล์วิดีโอ:\nชื่อ: ${file.name}\nขนาด: ${(file.size / 1024 / 1024).toFixed(2)} MB\n\nกดตกลงเพื่ออัปโหลด`)) return;
 
         const videoURL = URL.createObjectURL(file);
         const video = document.getElementById('mainVideo');
@@ -442,12 +495,25 @@
         video.muted = false;
         video.volume = 1.0;
 
-        video.oncanplay = () => {
+        video.onloadedmetadata = () => {
+          // ✅ บันทึกวิดีโอเข้ารายการ
+          uploadedVideos.push({
+            url: videoURL,
+            name: file.name,
+            duration: video.duration || 0,
+            time: Date.now()
+          });
+          
+          // ✅ อัปเดตแสดงทันทีในโปรไฟล์
+          renderVideosGrid();
+          
+          // เล่นวิดีโอ
           video.play().catch(err => {
             console.log('Autoplay:', err);
             video.muted = false;
             video.play();
           });
+          
           clearInterval(progressUpdateInterval);
           progressUpdateInterval = setInterval(updateProgressBar, 200);
           document.getElementById('playPauseInnerIcon').className = 'fas fa-pause';
