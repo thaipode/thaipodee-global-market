@@ -17,7 +17,7 @@
     .top-bar {
       position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 480px; display: flex; justify-content: center; align-items: center;
-      padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top)); z-index: 40; pointer-events: none;
+      padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top)); z-index: 90; pointer-events: none;
     }
     .top-bar > * { pointer-events: auto; }
     .live { position: absolute; left: 16px; font-size: 14px; font-weight: 600; }
@@ -26,7 +26,7 @@
     .tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
     .search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; }
 
-    /* ===== วิดีโอ — เต็มจอ ไม่มีเส้น ไม่มีขอบ ===== */
+    /* ===== วิดีโอ — เต็มจอ ===== */
     .video-feed {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       overflow-y: scroll; scroll-snap-type: y mandatory; z-index: 1;
@@ -49,7 +49,7 @@
     .side-btn span { font-size: 11px; }
     .profile-circle {
       width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff;
-      background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
+      background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; cursor: pointer;
     }
     .music-icon {
       width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ffdd55);
@@ -66,15 +66,15 @@
     .music-line { display: flex; align-items: center; font-size: 12px; }
     .music-line i { margin-right: 6px; }
 
-    /* ===== เมนูล่าง ===== */
+    /* ===== เมนูล่าง — กลับมาครบแล้ว! z-index สูงกว่าทุกอย่าง ===== */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 480px; background: #000; display: flex;
       justify-content: space-around; align-items: center;
       padding: 8px 0; padding-bottom: calc(8px + env(safe-area-inset-bottom));
-      border-top: 1px solid #222; z-index: 50;
+      border-top: 1px solid #222; z-index: 100; /* สูงสุด — ไม่หายแน่นอน! */
     }
-    .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #fff; text-decoration: none; }
     .nav-item i { font-size: 22px; margin-bottom: 2px; }
     .nav-item span { font-size: 10px; }
     .nav-item.middle i {
@@ -83,7 +83,7 @@
     }
 
     /* ===== หน้าโปรไฟล์ ===== */
-    .page { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: #000; z-index: 60; display: none; overflow-y: auto; }
+    .page { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: #000; z-index: 60; display: none; overflow-y: auto; padding-bottom: 80px; }
     .page.active { display: block; }
     .page-header { padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
     .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
@@ -96,14 +96,13 @@
     .stat-num { font-size: 18px; font-weight: 600; }
     .stat-label { font-size: 12px; color: #888; }
     .profile-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
-    .prof-btn { padding: 8px 24px; border-radius: 4px; border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; }
+    .prof-btn { padding: 8px 24px; border-radius: 4px; border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; font-size: 14px; }
     .prof-btn.primary { background: #ff0050; border-color: #ff0050; }
     .version { font-size: 12px; color: #666; margin-bottom: 20px; }
     .tabs { display: flex; justify-content: center; border-bottom: 1px solid #222; margin-bottom: 10px; }
     .tab-item { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; }
     .tab-item.active { border-bottom-color: #fff; font-weight: 600; }
     .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    .grid-item { aspect-ratio: 9/16; background: #1a1a1a; cursor: pointer; }
     .empty { color: #666; text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
   </style>
 </head>
@@ -123,7 +122,7 @@
 
       <div class="video-feed">
         <div class="video-slide">
-          <video src="" loop playsinline muted></video>
+          <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" loop playsinline autoplay muted></video>
           <div class="side-buttons">
             <div class="profile-circle" onclick="showPage('profilePage')"><i class="fas fa-user"></i></div>
             <div class="side-btn"><i class="fas fa-heart"></i><span>0</span></div>
@@ -171,14 +170,14 @@
       </div>
     </div>
 
-    <!-- ===== เมนูล่าง ===== -->
-    <div class="bottom-nav">
-      <div class="nav-item" onclick="showPage('homePage')"><i class="fas fa-home"></i><span>หน้าแรก</span></div>
-      <div class="nav-item"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></div>
-      <div class="nav-item middle"><i class="fas fa-plus"></i></div>
-      <div class="nav-item"><i class="fas fa-comment-dots"></i><span>ข้อความ</span></div>
-      <div class="nav-item" onclick="showPage('profilePage')"><i class="fas fa-user"></i><span>โปรไฟล์</span></div>
-    </div>
+    <!-- ===== เมนูล่าง — กลับมาครบแล้ว! z-index=100 สูงสุด ไม่หายแน่นอน ===== -->
+    <nav class="bottom-nav">
+      <a class="nav-item" onclick="showPage('homePage')"><i class="fas fa-home"></i><span>หน้าแรก</span></a>
+      <a class="nav-item"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></a>
+      <a class="nav-item middle"><i class="fas fa-plus"></i></a>
+      <a class="nav-item"><i class="fas fa-comment-dots"></i><span>ข้อความ</span></a>
+      <a class="nav-item" onclick="showPage('profilePage')"><i class="fas fa-user"></i><span>โปรไฟล์</span></a>
+    </nav>
   </div>
 
   <script>
