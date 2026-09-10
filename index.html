@@ -57,7 +57,13 @@
     .profile-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
     .profile-btn { padding: 8px 24px; border-radius: 4px; border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; font-size: 14px; }
     .profile-btn.primary { background: #f00; border-color: #f00; }
-    .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    
+    /* ✅ แก้แล้ว — ไม่มีช่องว่างดำๆ ว่างๆ แสดงเฉพาะวิดีโอที่มีจริง */
+    .videos-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+      gap: 4px; 
+    }
     .video-grid-item { aspect-ratio: 9/16; background: #1a1a1a; position: relative; cursor: pointer; overflow: hidden; }
     .video-grid-item img, .video-grid-item video { width: 100%; height: 100%; object-fit: cover; }
     .video-duration { position: absolute; bottom: 4px; right: 4px; font-size: 10px; background: rgba(0,0,0,0.7); padding: 0 4px; border-radius: 2px; }
@@ -360,7 +366,7 @@
       showPage('profile');
     }
 
-    // ===== VIDEO FEED — แก้เสียงแล้ว ไม่มี muted =====
+    // ===== VIDEO FEED — ไม่มี muted เสียงออกทันที 🔊 =====
     function renderVideoFeed() {
       const feed = document.getElementById('homeVideoFeed');
       feed.innerHTML = '';
@@ -390,7 +396,7 @@
       container.dataset.videoId = video.id;
       container.dataset.index = index;
       
-      // ✅ แก้เสียงแล้ว — ลบ muted ออก เหลือ loop playsinline
+      // ✅ ไม่มี muted — เสียงออกทันที 🔊
       container.innerHTML = `
         <video src="${video.url}" ${video.thumbnail ? `poster="${video.thumbnail}"` : ''} loop playsinline></video>
         
@@ -420,7 +426,7 @@
         </div>
       `;
       
-      // Play/Pause on tap — พร้อมเสียงเต็มที่ 🔊
+      // Play/Pause on tap — เสียงออกเต็มที่
       container.querySelector('video').addEventListener('click', (e) => {
         e.target.paused ? e.target.play() : e.target.pause();
       });
@@ -446,7 +452,7 @@
       return container;
     }
 
-    // ===== USER VIDEOS GRID =====
+    // ===== USER VIDEOS GRID — แก้แล้ว ไม่มีช่องดำว่างๆ =====
     function loadUserVideos() {
       const saved = localStorage.getItem('thaipodee_videos');
       if (saved) userVideos = JSON.parse(saved);
@@ -461,7 +467,7 @@
       grid.innerHTML = '';
       
       if (userVideos.length === 0) {
-        grid.innerHTML = '<p class="col-span-3 text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>';
+        grid.innerHTML = '<p class="col-span-full text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>';
         return;
       }
       
@@ -479,6 +485,7 @@
           <span class="video-duration">--:--</span>
         `;
         
+        // Long press to delete
         item.addEventListener('touchstart', (e) => {
           selectedVideoId = video.id;
           currentVideoIndex = index;
@@ -489,6 +496,7 @@
         item.addEventListener('touchend', () => clearTimeout(longPressTimer));
         item.addEventListener('touchmove', () => clearTimeout(longPressTimer));
         
+        // Click to play
         item.addEventListener('click', () => {
           showPage('home');
           setTimeout(() => {
@@ -503,8 +511,8 @@
     // ===== CONTEXT MENU =====
     function showContextMenu(x, y) {
       const menu = document.getElementById('contextMenu');
-      menu.style.left = Math.min(x, window.innerWidth - 170) + 'px';
-      menu.style.top = Math.min(y, window.innerHeight - 130) + 'px';
+      menu.style.left = Math.min(x - 80, window.innerWidth - 180) + 'px';
+      menu.style.top = Math.min(y, window.innerHeight - 150) + 'px';
       menu.classList.add('active');
     }
 
@@ -618,6 +626,7 @@
       
       alert('เผยแพร่เรียบร้อยแล้ว! ✅');
       
+      // Reset form
       document.getElementById('videoInput').value = '';
       document.getElementById('fileInfo').classList.add('hidden');
       document.getElementById('uploadArea').classList.remove('hidden');
@@ -625,8 +634,9 @@
       document.getElementById('progressFill').style.width = '0%';
       window.selectedVideoFile = null;
       
-      showPage('home');
+      // Refresh & go home
       renderVideoFeed();
+      showPage('home');
     }
 
     function switchProfileTab(tab) {
