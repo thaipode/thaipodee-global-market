@@ -60,7 +60,6 @@
     .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
     .video-grid-item { aspect-ratio: 9/16; background: #1a1a1a; position: relative; cursor: pointer; overflow: hidden; }
     .video-grid-item img, .video-grid-item video { width: 100%; height: 100%; object-fit: cover; }
-    .video-grid-item.draft { background: #222; display: flex; align-items: center; justify-content: center; }
     .video-duration { position: absolute; bottom: 4px; right: 4px; font-size: 10px; background: rgba(0,0,0,0.7); padding: 0 4px; border-radius: 2px; }
     
     /* Edit Profile */
@@ -111,7 +110,7 @@
       </div>
     </div>
 
-    <!-- Home Page (same as feed for now) -->
+    <!-- Home Page -->
     <div id="homePage" class="page active">
       <div class="video-feed" id="homeVideoFeed">
         <!-- Videos will be inserted here dynamically -->
@@ -329,7 +328,6 @@
           break;
       }
       
-      // Close context menu if open
       closeContextMenu();
     }
 
@@ -362,18 +360,16 @@
       showPage('profile');
     }
 
-    // ===== VIDEO FEED =====
+    // ===== VIDEO FEED — แก้เสียงแล้ว ไม่มี muted =====
     function renderVideoFeed() {
       const feed = document.getElementById('homeVideoFeed');
       feed.innerHTML = '';
       
-      // Render user's uploaded videos first
       userVideos.forEach((video, index) => {
         const videoEl = createVideoElement(video, index);
         feed.appendChild(videoEl);
       });
       
-      // If no videos, show placeholder
       if (userVideos.length === 0) {
         feed.innerHTML = `
           <div class="video-container flex items-center justify-center">
@@ -394,17 +390,16 @@
       container.dataset.videoId = video.id;
       container.dataset.index = index;
       
+      // ✅ แก้เสียงแล้ว — ลบ muted ออก เหลือ loop playsinline
       container.innerHTML = `
-        <video src="${video.url}" ${video.thumbnail ? `poster="${video.thumbnail}"` : ''} loop playsinline muted></video>
+        <video src="${video.url}" ${video.thumbnail ? `poster="${video.thumbnail}"` : ''} loop playsinline></video>
         
-        <!-- Video Info -->
         <div class="video-info">
           <p class="video-username">ไทยโพธิ์ดี มาร์เก็ต</p>
           <p class="video-caption">${video.caption || 'วิดีโอแพลตฟอร์มนี้'}</p>
           <p class="video-music"><i class="fa fa-music"></i> เสียงต้นฉบับ - ไทยโพธิ์ดี มาร์เก็ต</p>
         </div>
         
-        <!-- Side Actions -->
         <div class="side-actions">
           <div class="action-btn like-btn" data-liked="false">
             <i class="fa fa-heart-o"></i>
@@ -425,7 +420,7 @@
         </div>
       `;
       
-      // Play/Pause on tap
+      // Play/Pause on tap — พร้อมเสียงเต็มที่ 🔊
       container.querySelector('video').addEventListener('click', (e) => {
         e.target.paused ? e.target.play() : e.target.pause();
       });
@@ -445,19 +440,16 @@
           showContextMenu(e.touches[0].clientX, e.touches[0].clientY);
         }, 500);
       });
-      
       container.addEventListener('touchend', () => clearTimeout(longPressTimer));
       container.addEventListener('touchmove', () => clearTimeout(longPressTimer));
       
       return container;
     }
 
-    // ===== USER VIDEOS GRID (PROFILE PAGE) =====
+    // ===== USER VIDEOS GRID =====
     function loadUserVideos() {
       const saved = localStorage.getItem('thaipodee_videos');
-      if (saved) {
-        userVideos = JSON.parse(saved);
-      }
+      if (saved) userVideos = JSON.parse(saved);
     }
 
     function saveUserVideos() {
@@ -482,12 +474,11 @@
         item.innerHTML = `
           ${video.thumbnail 
             ? `<img src="${video.thumbnail}" alt="วิดีโอ">` 
-            : `<video src="${video.url}" muted></video>`
+            : `<video src="${video.url}" loop playsinline muted></video>`
           }
           <span class="video-duration">--:--</span>
         `;
         
-        // Long press for delete
         item.addEventListener('touchstart', (e) => {
           selectedVideoId = video.id;
           currentVideoIndex = index;
@@ -498,12 +489,10 @@
         item.addEventListener('touchend', () => clearTimeout(longPressTimer));
         item.addEventListener('touchmove', () => clearTimeout(longPressTimer));
         
-        // Tap to play
         item.addEventListener('click', () => {
           showPage('home');
           setTimeout(() => {
-            const feed = document.getElementById('homeVideoFeed');
-            feed.children[index]?.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('homeVideoFeed').children[index]?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
         });
         
@@ -511,7 +500,7 @@
       });
     }
 
-    // ===== CONTEXT MENU (LONG PRESS) =====
+    // ===== CONTEXT MENU =====
     function showContextMenu(x, y) {
       const menu = document.getElementById('contextMenu');
       menu.style.left = Math.min(x, window.innerWidth - 170) + 'px';
@@ -547,14 +536,10 @@
 
     function deleteConfirmed() {
       if (selectedVideoId !== null && currentVideoIndex !== null) {
-        // Remove from array
         userVideos.splice(currentVideoIndex, 1);
-        // Save to localStorage
         saveUserVideos();
-        // Re-render both feed and grid
         renderVideoFeed();
         renderUserVideosGrid();
-        // Close modal
         closeDeleteModal();
         alert('ลบวิดีโอเรียบร้อยแล้ว ✅');
       }
@@ -595,7 +580,6 @@
       document.getElementById('fileInfo').classList.remove('hidden');
       document.getElementById('uploadArea').classList.add('hidden');
       
-      // Simulate upload progress
       let progress = 0;
       const progressFill = document.getElementById('progressFill');
       const statusText = document.getElementById('uploadStatus');
@@ -613,7 +597,6 @@
         progressFill.style.width = progress + '%';
       }, 300);
       
-      // Store file for publishing
       window.selectedVideoFile = file;
     }
 
@@ -621,13 +604,7 @@
       const file = window.selectedVideoFile;
       if (!file) return;
       
-      // Create local video URL
       const videoUrl = URL.createObjectURL(file);
-      
-      // Create thumbnail from video
-      const video = document.createElement('video');
-      video.src = videoUrl;
-      video.crossOrigin = 'anonymous';
       
       const newVideo = {
         id: Date.now().toString(),
@@ -641,7 +618,6 @@
       
       alert('เผยแพร่เรียบร้อยแล้ว! ✅');
       
-      // Reset upload form
       document.getElementById('videoInput').value = '';
       document.getElementById('fileInfo').classList.add('hidden');
       document.getElementById('uploadArea').classList.remove('hidden');
@@ -649,13 +625,11 @@
       document.getElementById('progressFill').style.width = '0%';
       window.selectedVideoFile = null;
       
-      // Go to home and refresh
       showPage('home');
       renderVideoFeed();
     }
 
     function switchProfileTab(tab) {
-      // Simple tab switch
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('border-red-500', 'text-white', 'font-semibold');
         btn.classList.add('border-transparent', 'text-gray-400');
