@@ -8,46 +8,179 @@
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
-    .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; }
-    
-    /* Video Feed */
-    .video-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+    html, body { background: #000; color: #fff; height: 100%; overflow: hidden; }
+    .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; overflow: hidden; }
+
+    /* ===== วิดีโอเลื่อนได้ แต่ส่วนอื่นล็อกกับจอ ===== */
+    .video-feed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      z-index: 1;
+    }
     .video-feed::-webkit-scrollbar { display: none; }
-    .video-container { position: relative; width: 100%; height: 100vh; scroll-snap-align: start; flex-shrink: 0; }
-    video { width: 100%; height: 100%; object-fit: cover; background: #111; }
-    .video-placeholder { width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; }
-    .video-placeholder i { font-size: 48px; margin-bottom: 12px; }
-    
-    /* Right Side Actions */
-    .side-actions { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 10; }
-    .action-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      background: #000;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ===== ปุ่มด้านข้าง — ล็อกกับจอ ตรงกลางขวา ครบ 6 ปุ่ม ===== */
+    .fixed-side-actions {
+      position: fixed;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .fixed-side-actions > * { pointer-events: auto; }
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
     .action-btn i { font-size: 28px; margin-bottom: 4px; }
     .action-btn span { font-size: 11px; }
-    
-    /* Video Info */
-    .video-info { position: absolute; left: 16px; bottom: 130px; right: 80px; z-index: 10; }
-    .video-username { font-weight: 600; margin-bottom: 8px; font-size: 15px; }
-    .video-caption { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
-    .video-music { display: flex; align-items: center; font-size: 12px; }
+
+    /* ===== ข้อความด้านซ้าย — ล็อกกับจอ ไม่เลื่อนตามวิดีโอ ===== */
+    .fixed-video-info {
+      position: fixed;
+      left: 16px;
+      bottom: 95px;
+      right: 80px;
+      z-index: 30;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+    }
+    .fixed-video-info > * { pointer-events: auto; }
+
+    .video-username { font-weight: 700; margin-bottom: 6px; font-size: 15px; color: #fff; }
+    .video-caption { font-size: 14px; line-height: 1.4; margin-bottom: 6px; color: #fff; }
+    .video-music { display: flex; align-items: center; font-size: 12px; color: #eee; }
     .video-music i { margin-right: 6px; font-size: 14px; }
-    
-    /* Bottom Nav */
-    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #000; display: flex; justify-content: space-around; padding: 8px 0 12px; border-top: 1px solid #222; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #fff; text-decoration: none; }
+
+    /* ===== Bottom Nav — ล็อกด้านล่างสุด ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(12px + env(safe-area-inset-bottom));
+      border-top: 1px solid #222;
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      color: #fff;
+      text-decoration: none;
+    }
     .nav-item i { font-size: 22px; margin-bottom: 2px; }
     .nav-item span { font-size: 10px; }
-    .nav-item.create-btn i { font-size: 32px; background: #f00; border-radius: 50%; padding: 8px; }
-    
-    /* Pages */
-    .page { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: #000; z-index: 50; display: none; overflow-y: auto; }
+    .nav-item.create-btn i {
+      font-size: 32px;
+      background: #f00;
+      border-radius: 50%;
+      padding: 8px;
+    }
+
+    /* ===== Profile Grid — ไม่มีช่องดำ ===== */
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 4px;
+    }
+    .video-grid-item {
+      aspect-ratio: 9/16;
+      background: #1a1a1a;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .video-grid-item img, .video-grid-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-duration {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      font-size: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+
+    /* ===== Pages & Modal ===== */
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      z-index: 50;
+      display: none;
+      overflow-y: auto;
+    }
     .page.active { display: block; }
-    .page-header { padding: 16px; border-bottom: 1px solid #222; text-align: center; font-size: 18px; font-weight: 600; position: relative; }
-    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #fff; cursor: pointer; }
-    
-    /* Profile Page */
-    .profile-container { padding: 20px; text-align: center; }
-    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #333; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .page-header {
+      padding: 16px;
+      border-bottom: 1px solid #222;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .profile-container { padding: 20px; text-align: center; padding-bottom: 80px; }
+    .profile-avatar {
+      width: 80px; height: 80px; border-radius: 50%; background: #333;
+      margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px;
+    }
     .profile-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
     .profile-username { color: #888; font-size: 14px; margin-bottom: 20px; }
     .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
@@ -55,75 +188,121 @@
     .stat-num { font-size: 18px; font-weight: 600; }
     .stat-label { font-size: 12px; color: #888; }
     .profile-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
-    .profile-btn { padding: 8px 24px; border-radius: 4px; border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; font-size: 14px; }
-    .profile-btn.primary { background: #f00; border-color: #f00; }
-    
-    /* ✅ แก้แล้ว — ไม่มีช่องว่างดำๆ ว่างๆ แสดงเฉพาะวิดีโอที่มีจริง */
-    .videos-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-      gap: 4px; 
+    .profile-btn {
+      padding: 8px 24px; border-radius: 4px; border: 1px solid #333;
+      background: transparent; color: #fff; cursor: pointer; font-size: 14px;
     }
-    .video-grid-item { aspect-ratio: 9/16; background: #1a1a1a; position: relative; cursor: pointer; overflow: hidden; }
-    .video-grid-item img, .video-grid-item video { width: 100%; height: 100%; object-fit: cover; }
-    .video-duration { position: absolute; bottom: 4px; right: 4px; font-size: 10px; background: rgba(0,0,0,0.7); padding: 0 4px; border-radius: 2px; }
-    
-    /* Edit Profile */
-    .edit-form { padding: 20px; }
+    .profile-btn.primary { background: #f00; border-color: #f00; }
+
+    .edit-form { padding: 20px; padding-bottom: 80px; }
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; margin-bottom: 6px; font-size: 14px; color: #aaa; }
-    .form-input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 16px; }
-    .submit-btn { width: 100%; padding: 14px; background: #f00; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-    
-    /* Upload Page */
-    .upload-container { padding: 20px; text-align: center; }
+    .form-input {
+      width: 100%; padding: 12px; background: #222; border: 1px solid #333;
+      border-radius: 6px; color: #fff; font-size: 16px;
+    }
+    .submit-btn {
+      width: 100%; padding: 14px; background: #f00; color: #fff; border: none;
+      border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px;
+    }
+
+    .upload-container { padding: 20px; text-align: center; padding-bottom: 80px; }
     .upload-icon { font-size: 64px; color: #666; margin-bottom: 16px; }
-    .upload-area { border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; margin-bottom: 20px; cursor: pointer; }
+    .upload-area {
+      border: 2px dashed #444; border-radius: 12px; padding: 40px 20px; margin-bottom: 20px; cursor: pointer;
+    }
     .upload-area.highlight { border-color: #f00; background: rgba(255,0,0,0.05); }
     .file-input { display: none; }
-    .selected-file { background: #222; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-    .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin: 16px 0; overflow: hidden; }
+    .selected-file {
+      background: #222; padding: 12px; border-radius: 6px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .progress-bar {
+      width: 100%; height: 6px; background: #333; border-radius: 3px; margin: 16px 0; overflow: hidden;
+    }
     .progress-fill { height: 100%; background: #f00; width: 0%; transition: width 0.3s; }
-    
-    /* Delete Confirmation Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: center; justify-content: center; }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 200; display: none;
+      align-items: center; justify-content: center;
+    }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: #1a1a1a; border-radius: 12px; padding: 24px; width: 85%; max-width: 340px; text-align: center; }
+    .modal-content {
+      background: #1a1a1a; border-radius: 12px; padding: 24px;
+      width: 85%; max-width: 340px; text-align: center;
+    }
     .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
     .modal-text { font-size: 14px; color: #aaa; margin-bottom: 24px; line-height: 1.5; }
     .modal-buttons { display: flex; gap: 12px; }
     .modal-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; font-size: 15px; cursor: pointer; }
     .modal-btn.cancel { background: #333; color: #fff; }
     .modal-btn.delete { background: #f00; color: #fff; }
-    
-    /* Long-press context menu */
-    .context-menu { position: fixed; background: #222; border-radius: 8px; padding: 8px 0; min-width: 160px; z-index: 150; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+
+    .context-menu {
+      position: fixed; background: #222; border-radius: 8px; padding: 8px 0;
+      min-width: 160px; z-index: 150; display: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
     .context-menu.active { display: block; }
-    .context-menu-item { padding: 10px 16px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .context-menu-item {
+      padding: 10px 16px; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
     .context-menu-item:hover { background: #333; }
     .context-menu-item.danger { color: #ff5555; }
-    
-    /* Hidden elements */
+
     .hidden { display: none !important; }
+    .tab-btn { padding: 6px 12px; border-bottom: 2px solid transparent; }
   </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- Video Feed Page -->
-    <div id="feedPage" class="page active">
-      <div class="video-feed" id="videoFeed">
-        <!-- Videos will be inserted here dynamically -->
-      </div>
-    </div>
 
-    <!-- Home Page -->
+    <!-- ===== หน้าแรก — ปุ่ม+ข้อความล็อกกับจอ วิดีโอเลื่อนได้ ===== -->
     <div id="homePage" class="page active">
+      <!-- ปุ่มด้านข้าง ล็อกกับจอ ครบ 6 ปุ่ม -->
+      <div class="fixed-side-actions">
+        <div class="action-btn like-btn" data-liked="false" data-index="0">
+          <i class="fa fa-heart-o"></i>
+          <span>0</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-comment-o"></i>
+          <span>0</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-star-o"></i>
+          <span>0</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-share"></i>
+          <span>แชร์</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-bookmark-o"></i>
+          <span>บันทึก</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-ellipsis-h"></i>
+          <span>เพิ่มเติม</span>
+        </div>
+      </div>
+
+      <!-- ข้อความด้านซ้าย ล็อกกับจอ -->
+      <div class="fixed-video-info">
+        <p class="video-username" id="currentUsername">ไทยโพธิ์ดี มาร์เก็ต</p>
+        <p class="video-caption" id="currentCaption">วิดีโอแพลตฟอร์มนี้</p>
+        <p class="video-music"><i class="fa fa-music"></i> เสียงต้นฉบับ - ไทยโพธิ์ดี มาร์เก็ต</p>
+      </div>
+
+      <!-- วิดีโอ Feed — เลื่อนได้ปกติ -->
       <div class="video-feed" id="homeVideoFeed">
-        <!-- Videos will be inserted here dynamically -->
+        <!-- วิดีโอจะแสดงที่นี่ -->
       </div>
     </div>
 
-    <!-- Shop Page -->
+    <!-- ร้านค้า -->
     <div id="shopPage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('home')"><i class="fa fa-chevron-left"></i></span>
@@ -135,7 +314,7 @@
       </div>
     </div>
 
-    <!-- Upload Page -->
+    <!-- อัปโหลด -->
     <div id="uploadPage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('home')"><i class="fa fa-chevron-left"></i></span>
@@ -145,13 +324,11 @@
         <i class="fa fa-film upload-icon"></i>
         <h3 class="text-xl font-semibold mb-2">แตะเพื่อเลือกวิดีโอ</h3>
         <p class="text-gray-400 mb-6">รองรับ MP4, MOV สูงสุด 10 นาที</p>
-        
         <div class="upload-area" id="uploadArea">
           <input type="file" id="videoInput" accept="video/*" class="file-input">
           <i class="fa fa-cloud-upload text-3xl mb-2"></i>
           <p>หรือลากวิดีโอมาวางที่นี่</p>
         </div>
-        
         <div id="fileInfo" class="hidden">
           <div class="selected-file">
             <span id="fileName">video.mp4</span>
@@ -162,12 +339,11 @@
           </div>
           <p id="uploadStatus">กำลังเตรียม...</p>
         </div>
-        
-        <button id="publishBtn" class="submit-btn mt-6 hidden">เผยแพร่ & บันทึก</button>
+        <button id="publishBtn" class="submit-btn hidden">เผยแพร่ & บันทึก</button>
       </div>
     </div>
 
-    <!-- Messages Page -->
+    <!-- ข้อความ -->
     <div id="messagesPage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('home')"><i class="fa fa-chevron-left"></i></span>
@@ -179,49 +355,31 @@
       </div>
     </div>
 
-    <!-- Profile Page -->
+    <!-- โปรไฟล์ -->
     <div id="profilePage" class="page">
       <div class="profile-container">
-        <div class="profile-avatar">
-          <i class="fa fa-user"></i>
-        </div>
+        <div class="profile-avatar"><i class="fa fa-user"></i></div>
         <h2 class="profile-name" id="profileDisplayName">ไทยโพธิ์ดี มาร์เก็ต</h2>
         <p class="profile-username" id="profileUsername">@thaipodee_user</p>
-        
         <div class="profile-stats">
-          <div class="stat-item">
-            <div class="stat-num" id="followingCount">0</div>
-            <div class="stat-label">กำลังติดตาม</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num" id="followersCount">0</div>
-            <div class="stat-label">ผู้ติดตาม</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num" id="likesCount">0</div>
-            <div class="stat-label">ถูกใจ</div>
-          </div>
+          <div class="stat-item"><div class="stat-num" id="followingCount">0</div><div class="stat-label">กำลังติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num" id="followersCount">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num" id="likesCount">0</div><div class="stat-label">ถูกใจ</div></div>
         </div>
-        
         <div class="profile-buttons">
           <button class="profile-btn primary" onclick="showPage('editProfile')">แก้ไขโปรไฟล์</button>
           <button class="profile-btn">ข้อความ</button>
         </div>
-        
         <p class="text-sm text-gray-400 mb-4">Thaipodee Market Online V2026</p>
-        
         <div class="flex justify-center gap-4 mb-4">
           <button class="tab-btn border-b-2 border-red-500 text-white pb-2 font-semibold" onclick="switchProfileTab('videos')">วิดีโอ</button>
           <button class="tab-btn border-b-2 border-transparent text-gray-400 pb-2" onclick="switchProfileTab('likes')">ถูกใจ</button>
         </div>
-        
-        <div class="videos-grid" id="userVideosGrid">
-          <!-- User videos will be inserted here -->
-        </div>
+        <div class="videos-grid" id="userVideosGrid"></div>
       </div>
     </div>
 
-    <!-- Edit Profile Page -->
+    <!-- แก้ไขโปรไฟล์ -->
     <div id="editProfilePage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('profile')"><i class="fa fa-chevron-left"></i></span>
@@ -240,42 +398,22 @@
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- เมนูล่าง -->
     <nav class="bottom-nav">
-      <a class="nav-item active" onclick="showPage('home')">
-        <i class="fa fa-home"></i>
-        <span>หน้าแรก</span>
-      </a>
-      <a class="nav-item" onclick="showPage('shop')">
-        <i class="fa fa-shopping-cart"></i>
-        <span>ร้านค้า</span>
-      </a>
-      <a class="nav-item create-btn" onclick="showPage('upload')">
-        <i class="fa fa-plus"></i>
-      </a>
-      <a class="nav-item" onclick="showPage('messages')">
-        <i class="fa fa-comment"></i>
-        <span>ข้อความ</span>
-      </a>
-      <a class="nav-item" onclick="showPage('profile')">
-        <i class="fa fa-user"></i>
-        <span>โปรไฟล์</span>
-      </a>
+      <a class="nav-item active" onclick="showPage('home')"><i class="fa fa-home"></i><span>หน้าแรก</span></a>
+      <a class="nav-item" onclick="showPage('shop')"><i class="fa fa-shopping-cart"></i><span>ร้านค้า</span></a>
+      <a class="nav-item create-btn" onclick="showPage('upload')"><i class="fa fa-plus"></i></a>
+      <a class="nav-item" onclick="showPage('messages')"><i class="fa fa-comment"></i><span>ข้อความ</span></a>
+      <a class="nav-item" onclick="showPage('profile')"><i class="fa fa-user"></i><span>โปรไฟล์</span></a>
     </nav>
 
-    <!-- Context Menu (Long Press) -->
+    <!-- เมนูคลิกค้าง -->
     <div class="context-menu" id="contextMenu">
-      <div class="context-menu-item" onclick="copyVideoLink()">
-        <i class="fa fa-link"></i>
-        <span>คัดลอกลิงก์</span>
-      </div>
-      <div class="context-menu-item danger" onclick="confirmDeleteVideo()">
-        <i class="fa fa-trash"></i>
-        <span>ลบวิดีโอ</span>
-      </div>
+      <div class="context-menu-item" onclick="copyVideoLink()"><i class="fa fa-link"></i><span>คัดลอกลิงก์</span></div>
+      <div class="context-menu-item danger" onclick="confirmDeleteVideo()"><i class="fa fa-trash"></i><span>ลบวิดีโอ</span></div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- ยืนยันลบ -->
     <div class="modal-overlay" id="deleteModal">
       <div class="modal-content">
         <h3 class="modal-title">ลบวิดีโอ</h3>
@@ -289,259 +427,125 @@
   </div>
 
   <script>
-    // ===== GLOBAL STATE =====
-    let userVideos = [];
-    let currentVideoIndex = null;
-    let longPressTimer = null;
-    let selectedVideoId = null;
+    let userVideos = [], currentVideoIndex = null, longPressTimer = null, selectedVideoId = null;
 
-    // ===== INITIALIZE =====
     document.addEventListener('DOMContentLoaded', () => {
       loadUserProfile();
       loadUserVideos();
       renderVideoFeed();
       setupUpload();
+      setupLikeButtons();
     });
 
-    // ===== PAGE NAVIGATION =====
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector('.fixed-side-actions').style.display = pageName === 'home' ? 'flex' : 'none';
+      document.querySelector('.fixed-video-info').style.display = pageName === 'home' ? 'block' : 'none';
       
       switch(pageName) {
-        case 'home':
-          document.getElementById('homePage').classList.add('active');
-          document.querySelector('.nav-item:first-child').classList.add('active');
-          break;
-        case 'shop':
-          document.getElementById('shopPage').classList.add('active');
-          document.querySelector('.nav-item:nth-child(2)').classList.add('active');
-          break;
-        case 'upload':
-          document.getElementById('uploadPage').classList.add('active');
-          break;
-        case 'messages':
-          document.getElementById('messagesPage').classList.add('active');
-          document.querySelector('.nav-item:nth-child(4)').classList.add('active');
-          break;
-        case 'profile':
-          document.getElementById('profilePage').classList.add('active');
-          document.querySelector('.nav-item:nth-child(5)').classList.add('active');
-          renderUserVideosGrid();
-          break;
-        case 'editProfile':
-          document.getElementById('editProfilePage').classList.add('active');
-          break;
+        case 'home': document.getElementById('homePage').classList.add('active'); document.querySelector('.nav-item:first-child').classList.add('active'); break;
+        case 'shop': document.getElementById('shopPage').classList.add('active'); document.querySelector('.nav-item:nth-child(2)').classList.add('active'); break;
+        case 'upload': document.getElementById('uploadPage').classList.add('active'); break;
+        case 'messages': document.getElementById('messagesPage').classList.add('active'); document.querySelector('.nav-item:nth-child(4)').classList.add('active'); break;
+        case 'profile': document.getElementById('profilePage').classList.add('active'); document.querySelector('.nav-item:nth-child(5)').classList.add('active'); renderUserVideosGrid(); break;
+        case 'editProfile': document.getElementById('editProfilePage').classList.add('active'); break;
       }
-      
       closeContextMenu();
     }
 
-    // ===== PROFILE FUNCTIONS =====
     function loadUserProfile() {
       const saved = localStorage.getItem('thaipodee_profile');
       if (saved) {
-        const profile = JSON.parse(saved);
-        document.getElementById('profileDisplayName').textContent = profile.displayNameTh || 'ไทยโพธิ์ดี มาร์เก็ต';
-        document.getElementById('profileUsername').textContent = profile.username || '@thaipodee_user';
-        document.getElementById('displayNameTh').value = profile.displayNameTh || 'ไทยโพธิ์ดี มาร์เก็ต';
-        document.getElementById('displayNameEn').value = profile.displayNameEn || 'Thaipodee Market Online V2026';
+        const p = JSON.parse(saved);
+        document.getElementById('profileDisplayName').textContent = p.displayNameTh || 'ไทยโพธิ์ดี มาร์เก็ต';
+        document.getElementById('profileUsername').textContent = p.username || '@thaipodee_user';
+        document.getElementById('displayNameTh').value = p.displayNameTh || 'ไทยโพธิ์ดี มาร์เก็ต';
+        document.getElementById('displayNameEn').value = p.displayNameEn || 'Thaipodee Market Online V2026';
       }
     }
 
     function saveProfile() {
-      const displayNameTh = document.getElementById('displayNameTh').value.trim();
-      const displayNameEn = document.getElementById('displayNameEn').value.trim();
-      
-      const profile = {
-        displayNameTh: displayNameTh || 'ไทยโพธิ์ดี มาร์เก็ต',
-        displayNameEn: displayNameEn || 'Thaipodee Market Online V2026',
-        username: '@thaipodee_user'
-      };
-      
-      localStorage.setItem('thaipodee_profile', JSON.stringify(profile));
-      document.getElementById('profileDisplayName').textContent = profile.displayNameTh;
-      
+      const th = document.getElementById('displayNameTh').value.trim() || 'ไทยโพธิ์ดี มาร์เก็ต';
+      const en = document.getElementById('displayNameEn').value.trim() || 'Thaipodee Market Online V2026';
+      localStorage.setItem('thaipodee_profile', JSON.stringify({displayNameTh:th, displayNameEn:en, username:'@thaipodee_user'}));
+      document.getElementById('profileDisplayName').textContent = th;
       alert('บันทึกเรียบร้อย! ✅');
       showPage('profile');
     }
 
-    // ===== VIDEO FEED — ไม่มี muted เสียงออกทันที 🔊 =====
+    function loadUserVideos() {
+      const s = localStorage.getItem('thaipodee_videos');
+      if (s) userVideos = JSON.parse(s);
+    }
+    function saveUserVideos() { localStorage.setItem('thaipodee_videos', JSON.stringify(userVideos)); }
+
     function renderVideoFeed() {
       const feed = document.getElementById('homeVideoFeed');
       feed.innerHTML = '';
-      
-      userVideos.forEach((video, index) => {
-        const videoEl = createVideoElement(video, index);
-        feed.appendChild(videoEl);
-      });
-      
+      userVideos.forEach((v, i) => feed.appendChild(createVideoElement(v, i)));
       if (userVideos.length === 0) {
-        feed.innerHTML = `
-          <div class="video-container flex items-center justify-center">
-            <div class="video-placeholder text-center px-6">
-              <i class="fa fa-film mb-4"></i>
-              <h3 class="text-xl font-semibold mb-2">ยังไม่มีวิดีโอ</h3>
-              <p class="text-gray-400 mb-6">กดปุ่ม + เพื่ออัปโหลดวิดีโอแรกของคุณ</p>
-              <button onclick="showPage('upload')" class="px-6 py-3 bg-red-600 rounded-full text-white font-semibold">อัปโหลดเลย</button>
-            </div>
-          </div>
-        `;
+        feed.innerHTML = `<div class="video-container flex items-center justify-center"><div class="text-center px-6"><i class="fa fa-film text-4xl mb-4 text-gray-500"></i><h3 class="text-xl font-semibold mb-2">ยังไม่มีวิดีโอ</h3><p class="text-gray-400 mb-6">กดปุ่ม + เพื่ออัปโหลดวิดีโอแรกของคุณ</p><button onclick="showPage('upload')" class="px-6 py-3 bg-red-600 rounded-full text-white font-semibold">อัปโหลดเลย</button></div></div>`;
       }
+      updateVideoInfo(0);
     }
 
     function createVideoElement(video, index) {
-      const container = document.createElement('div');
-      container.className = 'video-container';
-      container.dataset.videoId = video.id;
-      container.dataset.index = index;
-      
-      // ✅ ไม่มี muted — เสียงออกทันที 🔊
-      container.innerHTML = `
-        <video src="${video.url}" ${video.thumbnail ? `poster="${video.thumbnail}"` : ''} loop playsinline></video>
-        
-        <div class="video-info">
-          <p class="video-username">ไทยโพธิ์ดี มาร์เก็ต</p>
-          <p class="video-caption">${video.caption || 'วิดีโอแพลตฟอร์มนี้'}</p>
-          <p class="video-music"><i class="fa fa-music"></i> เสียงต้นฉบับ - ไทยโพธิ์ดี มาร์เก็ต</p>
-        </div>
-        
-        <div class="side-actions">
-          <div class="action-btn like-btn" data-liked="false">
-            <i class="fa fa-heart-o"></i>
-            <span>0</span>
-          </div>
-          <div class="action-btn">
-            <i class="fa fa-comment-o"></i>
-            <span>0</span>
-          </div>
-          <div class="action-btn">
-            <i class="fa fa-star-o"></i>
-            <span>0</span>
-          </div>
-          <div class="action-btn">
-            <i class="fa fa-share"></i>
-            <span>แชร์</span>
-          </div>
-        </div>
-      `;
-      
-      // Play/Pause on tap — เสียงออกเต็มที่
-      container.querySelector('video').addEventListener('click', (e) => {
-        e.target.paused ? e.target.play() : e.target.pause();
+      const div = document.createElement('div');
+      div.className = 'video-container';
+      div.dataset.index = index;
+      div.innerHTML = `<video src="${video.url}" ${video.thumbnail?`poster="${video.thumbnail}"`:""} loop playsinline data-index="${index}"></video>`;
+      const vid = div.querySelector('video');
+      vid.addEventListener('click', e => e.target.paused ? e.target.play() : e.target.pause());
+      vid.addEventListener('play', () => updateVideoInfo(index));
+      vid.addEventListener('touchstart', e => {
+        selectedVideoId = video.id; currentVideoIndex = index;
+        longPressTimer = setTimeout(() => showContextMenu(e.touches[0].clientX, e.touches[0].clientY), 500);
       });
-      
-      // Like button
-      container.querySelector('.like-btn').addEventListener('click', function() {
+      vid.addEventListener('touchend', () => clearTimeout(longPressTimer));
+      vid.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+      return div;
+    }
+
+    function updateVideoInfo(index) {
+      if (userVideos[index]) {
+        document.getElementById('currentCaption').textContent = userVideos[index].caption || 'วิดีโอแพลตฟอร์มนี้';
+      }
+    }
+
+    function setupLikeButtons() {
+      document.querySelector('.like-btn').addEventListener('click', function(){
         const liked = this.dataset.liked === 'true';
         this.dataset.liked = String(!liked);
         this.querySelector('i').className = liked ? 'fa fa-heart-o' : 'fa fa-heart text-red-500';
       });
-      
-      // Long press for context menu
-      container.addEventListener('touchstart', (e) => {
-        selectedVideoId = video.id;
-        currentVideoIndex = index;
-        longPressTimer = setTimeout(() => {
-          showContextMenu(e.touches[0].clientX, e.touches[0].clientY);
-        }, 500);
-      });
-      container.addEventListener('touchend', () => clearTimeout(longPressTimer));
-      container.addEventListener('touchmove', () => clearTimeout(longPressTimer));
-      
-      return container;
-    }
-
-    // ===== USER VIDEOS GRID — แก้แล้ว ไม่มีช่องดำว่างๆ =====
-    function loadUserVideos() {
-      const saved = localStorage.getItem('thaipodee_videos');
-      if (saved) userVideos = JSON.parse(saved);
-    }
-
-    function saveUserVideos() {
-      localStorage.setItem('thaipodee_videos', JSON.stringify(userVideos));
     }
 
     function renderUserVideosGrid() {
-      const grid = document.getElementById('userVideosGrid');
-      grid.innerHTML = '';
-      
-      if (userVideos.length === 0) {
-        grid.innerHTML = '<p class="col-span-full text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>';
-        return;
-      }
-      
-      userVideos.forEach((video, index) => {
+      const g = document.getElementById('userVideosGrid');
+      g.innerHTML = '';
+      if (userVideos.length === 0) { g.innerHTML = '<p class="col-span-full text-gray-500 text-center py-10">ยังไม่มีวิดีโอ</p>'; return; }
+      userVideos.forEach((v, i) => {
         const item = document.createElement('div');
         item.className = 'video-grid-item';
-        item.dataset.videoId = video.id;
-        item.dataset.index = index;
-        
-        item.innerHTML = `
-          ${video.thumbnail 
-            ? `<img src="${video.thumbnail}" alt="วิดีโอ">` 
-            : `<video src="${video.url}" loop playsinline muted></video>`
-          }
-          <span class="video-duration">--:--</span>
-        `;
-        
-        // Long press to delete
-        item.addEventListener('touchstart', (e) => {
-          selectedVideoId = video.id;
-          currentVideoIndex = index;
-          longPressTimer = setTimeout(() => {
-            showContextMenu(e.touches[0].clientX, e.touches[0].clientY);
-          }, 500);
-        });
-        item.addEventListener('touchend', () => clearTimeout(longPressTimer));
-        item.addEventListener('touchmove', () => clearTimeout(longPressTimer));
-        
-        // Click to play
-        item.addEventListener('click', () => {
-          showPage('home');
-          setTimeout(() => {
-            document.getElementById('homeVideoFeed').children[index]?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        });
-        
-        grid.appendChild(item);
+        item.innerHTML = v.thumbnail ? `<img src="${v.thumbnail}" alt="วิดีโอ">` : `<video src="${v.url}" loop playsinline muted></video>`;
+        item.addEventListener('click', () => { showPage('home'); setTimeout(() => { document.getElementById('homeVideoFeed').children[i]?.scrollIntoView({behavior:'smooth'}); }, 100); });
+        g.appendChild(item);
       });
     }
 
-    // ===== CONTEXT MENU =====
     function showContextMenu(x, y) {
-      const menu = document.getElementById('contextMenu');
-      menu.style.left = Math.min(x - 80, window.innerWidth - 180) + 'px';
-      menu.style.top = Math.min(y, window.innerHeight - 150) + 'px';
-      menu.classList.add('active');
+      const m = document.getElementById('contextMenu');
+      m.style.left = Math.min(x - 80, window.innerWidth - 180) + 'px';
+      m.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+      m.classList.add('active');
     }
+    function closeContextMenu() { document.getElementById('contextMenu').classList.remove('active'); }
+    document.addEventListener('click', e => { if (!e.target.closest('.context-menu')) closeContextMenu(); });
 
-    function closeContextMenu() {
-      document.getElementById('contextMenu').classList.remove('active');
-    }
-
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.context-menu')) closeContextMenu();
-    });
-
-    function copyVideoLink() {
-      closeContextMenu();
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        alert('คัดลอกลิงก์เรียบร้อย! ✅');
-      });
-    }
-
-    function confirmDeleteVideo() {
-      closeContextMenu();
-      document.getElementById('deleteModal').classList.add('active');
-    }
-
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').classList.remove('active');
-      selectedVideoId = null;
-      currentVideoIndex = null;
-    }
-
+    function copyVideoLink() { closeContextMenu(); navigator.clipboard.writeText(window.location.href).then(() => alert('คัดลอกลิงก์เรียบร้อย! ✅')); }
+    function confirmDeleteVideo() { closeContextMenu(); document.getElementById('deleteModal').classList.add('active'); }
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); selectedVideoId = null; currentVideoIndex = null; }
     function deleteConfirmed() {
       if (selectedVideoId !== null && currentVideoIndex !== null) {
         userVideos.splice(currentVideoIndex, 1);
@@ -553,99 +557,56 @@
       }
     }
 
-    // ===== UPLOAD FUNCTIONS =====
     function setupUpload() {
-      const uploadArea = document.getElementById('uploadArea');
-      const videoInput = document.getElementById('videoInput');
-      
-      uploadArea.addEventListener('click', () => videoInput.click());
-      uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('highlight');
-      });
-      uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('highlight'));
-      uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('highlight');
-        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-      });
-      
-      videoInput.addEventListener('change', (e) => {
-        if (e.target.files.length) handleFile(e.target.files[0]);
-      });
-      
+      const area = document.getElementById('uploadArea'), input = document.getElementById('videoInput');
+      area.addEventListener('click', () => input.click());
+      area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('highlight'); });
+      area.addEventListener('dragleave', () => area.classList.remove('highlight'));
+      area.addEventListener('drop', e => { e.preventDefault(); area.classList.remove('highlight'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+      input.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
       document.getElementById('publishBtn').addEventListener('click', publishVideo);
     }
 
     function handleFile(file) {
-      if (!file.type.startsWith('video/')) {
-        alert('กรุณาเลือกไฟล์วิดีโอเท่านั้น ❌');
-        return;
-      }
-      
+      if (!file.type.startsWith('video/')) { alert('กรุณาเลือกไฟล์วิดีโอเท่านั้น ❌'); return; }
       document.getElementById('fileName').textContent = file.name;
-      document.getElementById('fileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+      document.getElementById('fileSize').textContent = (file.size/(1024*1024)).toFixed(2)+' MB';
       document.getElementById('fileInfo').classList.remove('hidden');
       document.getElementById('uploadArea').classList.add('hidden');
-      
-      let progress = 0;
-      const progressFill = document.getElementById('progressFill');
-      const statusText = document.getElementById('uploadStatus');
-      
-      statusText.textContent = 'กำลังบันทึก...';
-      
-      const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          statusText.textContent = 'เตรียมเผยแพร่';
-          document.getElementById('publishBtn').classList.remove('hidden');
-        }
-        progressFill.style.width = progress + '%';
+      let p = 0;
+      const fill = document.getElementById('progressFill'), status = document.getElementById('uploadStatus');
+      status.textContent = 'กำลังบันทึก...';
+      const t = setInterval(() => {
+        p += Math.random()*15;
+        if (p >= 100) { p = 100; clearInterval(t); status.textContent = 'เตรียมเผยแพร่'; document.getElementById('publishBtn').classList.remove('hidden'); }
+        fill.style.width = p+'%';
       }, 300);
-      
       window.selectedVideoFile = file;
     }
 
     function publishVideo() {
-      const file = window.selectedVideoFile;
-      if (!file) return;
-      
-      const videoUrl = URL.createObjectURL(file);
-      
-      const newVideo = {
-        id: Date.now().toString(),
-        url: videoUrl,
-        caption: 'วิดีโอแพลตฟอร์มนี้',
-        createdAt: new Date().toISOString()
-      };
-      
-      userVideos.unshift(newVideo);
+      const f = window.selectedVideoFile; if (!f) return;
+      const url = URL.createObjectURL(f);
+      userVideos.unshift({id:Date.now().toString(), url, caption:'วิดีโอแพลตฟอร์มนี้', createdAt:new Date().toISOString()});
       saveUserVideos();
-      
       alert('เผยแพร่เรียบร้อยแล้ว! ✅');
-      
-      // Reset form
       document.getElementById('videoInput').value = '';
       document.getElementById('fileInfo').classList.add('hidden');
       document.getElementById('uploadArea').classList.remove('hidden');
       document.getElementById('publishBtn').classList.add('hidden');
       document.getElementById('progressFill').style.width = '0%';
       window.selectedVideoFile = null;
-      
-      // Refresh & go home
       renderVideoFeed();
       showPage('home');
     }
 
     function switchProfileTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-red-500', 'text-white', 'font-semibold');
-        btn.classList.add('border-transparent', 'text-gray-400');
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('border-red-500','text-white','font-semibold');
+        b.classList.add('border-transparent','text-gray-400');
       });
-      event.target.classList.add('border-red-500', 'text-white', 'font-semibold');
-      event.target.classList.remove('border-transparent', 'text-gray-400');
+      event.target.classList.add('border-red-500','text-white','font-semibold');
+      event.target.classList.remove('border-transparent','text-gray-400');
     }
   </script>
 </body>
