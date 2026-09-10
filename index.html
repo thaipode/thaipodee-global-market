@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <!-- ===================================================== -->
   <!-- 🔒 LOCKED — ห้ามแก้ไข เปลี่ยนแปลง หน้าจอนี้เด็ดขาด -->
-  <!-- ✅ ครบทุกฟังก์ชัน: กดหยุด-เล่นต่อ + ไอคอนลอย + ขยายเต็มจอ + แถบความคืบหน้า + ลากเลื่อน -->
-  <!-- ✅ ตั้งแต่บรรทัดแรกถึงสุดท้าย — ไม่ตัด ไม่ขาด -->
+  <!-- ✅ เพิ่ม: เปลี่ยนรูปโปรไฟล์ได้ → กดปุ่ม → เลือกรูป → แสดงทันที -->
+  <!-- ✅ ครบทุกฟังก์ชัน: กดหยุด-เล่นต่อ + ขยายเต็มจอ + แถบความคืบหน้า + ลากเลื่อน -->
   <!-- 🔒 ล็อก ล็อก ล็อก ล็อก ล็อก -->
   <!-- ===================================================== -->
   <title>ไทยโพธิ์ดี มาร์เก็ต ออนไลน์ V2026</title>
@@ -58,15 +58,15 @@
       scroll-snap-align: start;
       display: flex; align-items: center; justify-content: center;
       background: #000;
-      cursor: pointer; /* ✅ บอกชัดเจนว่ากดได้ */
+      cursor: pointer;
     }
     .video-slide video { 
       width: 100%; height: 100%; 
-      object-fit: contain; /* ✅ แสดงเต็ม ไม่ตัดหัว-เท้า */
+      object-fit: contain;
       display: block; background: #000;
     }
 
-    /* ✅ ไอคอนลอย หยุด/เล่น ตรงกลางวิดีโอ */
+    /* ✅ ไอคอนลอย หยุด/เล่น */
     .play-pause-icon {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
@@ -78,7 +78,7 @@
     }
     .play-pause-icon.show { opacity: 1; }
 
-    /* ===== ปุ่มขยาย-ล็อกเต็มหน้าจอ — 🔒 LOCKED ===== */
+    /* ===== ปุ่มขยายเต็มจอ — 🔒 LOCKED ===== */
     .fullscreen-btn {
       position: absolute; right: 16px; bottom: 200px;
       width: 40px; height: 40px;
@@ -92,7 +92,7 @@
     .fullscreen-btn:active { transform: scale(0.9); }
     .fullscreen-btn.locked { background: rgba(255,0,0,0.5); }
 
-    /* ===== แถบความคืบหน้าวิดีโอ — 🔒 LOCKED ===== */
+    /* ===== แถบความคืบหน้า — 🔒 LOCKED ===== */
     .progress-bar-container {
       position: absolute; bottom: 180px; left: 16px; right: 80px;
       height: 4px; background: rgba(255,255,255,0.2);
@@ -127,7 +127,9 @@
     .profile-circle {
       width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff;
       background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; cursor: pointer;
+      overflow: hidden;
     }
+    .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
     .music-icon {
       width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #ff0050, #ffdd55);
       display: flex; align-items: center; justify-content: center;
@@ -142,6 +144,46 @@
     .caption { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
     .music-line { display: flex; align-items: center; font-size: 12px; }
     .music-line i { margin-right: 6px; }
+
+    /* ===== หน้าโปรไฟล์ — 🔒 LOCKED ===== */
+    .page { position: absolute; top: 0; left: 0; right: 0; width: 100%; height: 100vh; background: #000; z-index: 60; display: none; overflow-y: auto; padding-bottom: 80px; }
+    .page.active { display: block; }
+    .page-header { padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
+    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
+
+    .profile-page { padding: 20px; padding-top: 40px; text-align: center; }
+    /* ✅ รูปโปรไฟล์ + ปุ่มเปลี่ยนรูป */
+    .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
+    .avatar { 
+      width: 96px; height: 96px; border-radius: 50%; 
+      background: #333; display: flex; align-items: center; justify-content: center; 
+      font-size: 40px; overflow: hidden; border: 3px solid #fff;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .change-avatar-btn {
+      position: absolute; bottom: 0; right: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #ff0050; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; cursor: pointer; border: 2px solid #000;
+    }
+    #avatarInput { display: none; }
+
+    .username { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .user-handle { color: #888; font-size: 14px; margin-bottom: 20px; }
+    .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 600; }
+    .stat-label { font-size: 12px; color: #888; }
+    .profile-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+    .prof-btn { padding: 8px 24px; border-radius: 4px; border: none; font-size: 14px; cursor: pointer; }
+    .prof-btn.primary { background: #ff0050; color: #fff; }
+    .prof-btn.secondary { background: #222; color: #fff; }
+    .version { font-size: 12px; color: #666; margin-bottom: 20px; }
+    .profile-tabs { display: flex; justify-content: center; border-bottom: 1px solid #222; margin-bottom: 10px; }
+    .profile-tab { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; }
+    .profile-tab.active { border-bottom-color: #fff; font-weight: 600; }
+    .empty-state { color: #666; text-align: center; padding: 60px 20px; }
 
     /* ===== เมนูล่าง — 🔒 LOCKED ===== */
     .bottom-nav {
@@ -159,29 +201,6 @@
       font-size: 26px; background: #fff; color: #000; border-radius: 4px;
       padding: 2px 10px;
     }
-
-    /* ===== หน้าโปรไฟล์ — 🔒 LOCKED ===== */
-    .page { position: absolute; top: 0; left: 0; right: 0; width: 100%; height: 100vh; background: #000; z-index: 60; display: none; overflow-y: auto; padding-bottom: 80px; }
-    .page.active { display: block; }
-    .page-header { padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); text-align: center; font-size: 18px; font-weight: 600; border-bottom: 1px solid #222; position: relative; }
-    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; }
-
-    .profile-page { padding: 20px; padding-top: 60px; text-align: center; }
-    .avatar { width: 80px; height: 80px; border-radius: 50%; background: #333; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
-    .username { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-    .handle { color: #888; font-size: 14px; margin-bottom: 20px; }
-    .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 20px; }
-    .stat-num { font-size: 18px; font-weight: 600; }
-    .stat-label { font-size: 12px; color: #888; }
-    .profile-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
-    .prof-btn { padding: 8px 24px; border-radius: 4px; border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; font-size: 14px; }
-    .prof-btn.primary { background: #ff0050; border-color: #ff0050; }
-    .version { font-size: 12px; color: #666; margin-bottom: 20px; }
-    .tabs { display: flex; justify-content: center; border-bottom: 1px solid #222; margin-bottom: 10px; }
-    .tab-item { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; }
-    .tab-item.active { border-bottom-color: #fff; font-weight: 600; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    .empty { color: #666; text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -202,17 +221,17 @@
         <div class="video-slide" id="firstVideoSlide" onclick="togglePlayPause()">
           <video id="mainVideo" loop playsinline></video>
 
-          <!-- ✅ ไอคอนลอย หยุด/เล่น ตรงกลางวิดีโอ -->
+          <!-- ✅ ไอคอนลอย หยุด/เล่น -->
           <div class="play-pause-icon" id="playPauseIcon">
             <i class="fas fa-pause" id="playPauseInnerIcon"></i>
           </div>
 
-          <!-- ✅ ปุ่มขยาย-ล็อกเต็มหน้าจอ -->
+          <!-- ✅ ปุ่มขยายเต็มจอ -->
           <div class="fullscreen-btn" id="fullscreenBtn" onclick="event.stopPropagation(); toggleFullscreen()">
             <i class="fas fa-expand" id="fullscreenIcon"></i>
           </div>
 
-          <!-- ✅ แถบความคืบหน้าวิดีโอ -->
+          <!-- ✅ แถบความคืบหน้า -->
           <div class="progress-bar-container" id="progressContainer" onclick="event.stopPropagation(); seekVideo(event)">
             <div class="progress-bar" id="progressBar">
               <div class="progress-thumb"></div>
@@ -221,7 +240,9 @@
 
           <!-- ปุ่มด้านขวา — 🔒 LOCKED -->
           <div class="side-buttons">
-            <div class="profile-circle" onclick="event.stopPropagation(); showPage('profilePage')"><i class="fas fa-user"></i></div>
+            <div class="profile-circle" onclick="event.stopPropagation(); showPage('profilePage')" id="sideAvatar">
+              <i class="fas fa-user"></i>
+            </div>
             <div class="side-btn"><i class="fas fa-heart"></i><span>0</span></div>
             <div class="side-btn"><i class="fas fa-comment"></i><span>0</span></div>
             <div class="side-btn"><i class="fas fa-bookmark"></i><span>0</span></div>
@@ -239,33 +260,46 @@
       </div>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ — 🔒 LOCKED ===== -->
+    <!-- ===== หน้าโปรไฟล์ — ✅ เพิ่มเปลี่ยนรูปโปรไฟล์ได้ ===== -->
     <div id="profilePage" class="page">
       <div class="page-header">
         <span class="back-btn" onclick="showPage('homePage')"><i class="fas fa-chevron-left"></i></span>
         โปรไฟล์
       </div>
       <div class="profile-page">
-        <div class="avatar"><i class="fas fa-user"></i></div>
-        <div class="username">ไทยโพธิ์ดีมาร์เก็ต</div>
-        <div class="handle">@thaipodee_user</div>
-        <div class="stats">
-          <div><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
-          <div><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
-          <div><div class="stat-num">0</div><div class="stat-label">ถูกใจ</div></div>
+        <!-- ✅ รูปโปรไฟล์ + ปุ่มเปลี่ยนรูป -->
+        <div class="avatar-container">
+          <div class="avatar" id="profileAvatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">
+            <i class="fas fa-camera"></i>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" onchange="changeAvatar(event)">
         </div>
+
+        <div class="username">ไทยโพธิ์ดีมาร์เก็ต</div>
+        <div class="user-handle">@thaipodee_user</div>
+
+        <div class="stats">
+          <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">ถูกใจ</div></div>
+        </div>
+
         <div class="profile-buttons">
           <button class="prof-btn primary">แก้ไขโปรไฟล์</button>
-          <button class="prof-btn">ข้อความ</button>
+          <button class="prof-btn secondary">ติดตาม</button>
         </div>
+
         <div class="version">Thaipodee Market Online V2026</div>
-        <div class="tabs">
-          <div class="tab-item active">วิดีโอ</div>
-          <div class="tab-item">ถูกใจ</div>
+
+        <div class="profile-tabs">
+          <div class="profile-tab active">วิดีโอ</div>
+          <div class="profile-tab">ถูกใจ</div>
         </div>
-        <div class="grid">
-          <div class="empty">ยังไม่มีวิดีโอ</div>
-        </div>
+
+        <div class="empty-state">ยังไม่มีวิดีโอ</div>
       </div>
     </div>
 
@@ -292,7 +326,25 @@
       document.getElementById(pageId).classList.add('active');
     }
 
-    // ✅ กดวิดีโอ หยุด / เล่นต่อ + ไอคอนลอยโชว์
+    // ✅ เปลี่ยนรูปโปรไฟล์ — กดกล้อง → เลือกรูป → แสดงทันที ทั้งหน้าโปรไฟล์และแถบด้านขวา
+    function changeAvatar(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageUrl = e.target.result;
+        // อัปเดตรูปในหน้าโปรไฟล์
+        const profileAvatar = document.getElementById('profileAvatar');
+        profileAvatar.innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
+        // อัปเดตรูปในปุ่มด้านขวาด้วย
+        const sideAvatar = document.getElementById('sideAvatar');
+        sideAvatar.innerHTML = `<img src="${imageUrl}" alt="รูปโปรไฟล์">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ✅ กดวิดีโอ หยุด/เล่นต่อ + ไอคอนลอย
     function togglePlayPause() {
       const video = document.getElementById('mainVideo');
       const icon = document.getElementById('playPauseIcon');
@@ -306,7 +358,6 @@
         innerIcon.className = 'fas fa-play';
       }
       
-      // โชว์ไอคอนตรงกลาง 0.5 วินาที แล้วค่อยหายไป
       icon.classList.add('show');
       clearTimeout(window.playIconTimer);
       window.playIconTimer = setTimeout(() => {
@@ -314,7 +365,7 @@
       }, 500);
     }
 
-    // ✅ ปุ่มขยาย-ล็อกเต็มหน้าจอ
+    // ✅ ปุ่มขยายเต็มจอ
     function toggleFullscreen() {
       const elem = document.documentElement;
       const btn = document.getElementById('fullscreenBtn');
@@ -381,10 +432,8 @@
             video.muted = false;
             video.play();
           });
-          // เริ่มอัปเดตแถบความคืบหน้า
           clearInterval(progressUpdateInterval);
           progressUpdateInterval = setInterval(updateProgressBar, 200);
-          // ตั้งไอคอนเป็นหยุด
           document.getElementById('playPauseInnerIcon').className = 'fas fa-pause';
         };
 
