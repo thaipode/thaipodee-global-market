@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <!-- ===================================================== -->
   <!-- 🔒 LOCKED — ห้ามแก้ไข เปลี่ยนแปลง หน้าจอนี้เด็ดขาด -->
-  <!-- ✅ มีปุ่มขยาย-ล็อกเต็มหน้าจอ + แถบความคืบหน้า + ทุกอย่างครบ -->
+  <!-- ✅ ครบทุกฟังก์ชัน: กดหยุด-เล่นต่อ + ไอคอนลอย + ขยายเต็มจอ + แถบความคืบหน้า + ลากเลื่อน -->
+  <!-- ✅ ตั้งแต่บรรทัดแรกถึงสุดท้าย — ไม่ตัด ไม่ขาด -->
   <!-- 🔒 ล็อก ล็อก ล็อก ล็อก ล็อก -->
   <!-- ===================================================== -->
   <title>ไทยโพธิ์ดี มาร์เก็ต ออนไลน์ V2026</title>
@@ -57,6 +58,7 @@
       scroll-snap-align: start;
       display: flex; align-items: center; justify-content: center;
       background: #000;
+      cursor: pointer; /* ✅ บอกชัดเจนว่ากดได้ */
     }
     .video-slide video { 
       width: 100%; height: 100%; 
@@ -64,7 +66,19 @@
       display: block; background: #000;
     }
 
-    /* ===== ปุ่มขยาย-ล็อกเต็มหน้าจอ — ✅ เพิ่มใหม่ ===== */
+    /* ✅ ไอคอนลอย หยุด/เล่น ตรงกลางวิดีโอ */
+    .play-pause-icon {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 80px; color: #fff;
+      opacity: 0; pointer-events: none;
+      text-shadow: 0 0 20px rgba(0,0,0,0.6);
+      transition: opacity 0.2s ease;
+      z-index: 20;
+    }
+    .play-pause-icon.show { opacity: 1; }
+
+    /* ===== ปุ่มขยาย-ล็อกเต็มหน้าจอ — 🔒 LOCKED ===== */
     .fullscreen-btn {
       position: absolute; right: 16px; bottom: 200px;
       width: 40px; height: 40px;
@@ -78,7 +92,7 @@
     .fullscreen-btn:active { transform: scale(0.9); }
     .fullscreen-btn.locked { background: rgba(255,0,0,0.5); }
 
-    /* ===== แถบความคืบหน้าวิดีโอ — ✅ เหมือน TikTok ===== */
+    /* ===== แถบความคืบหน้าวิดีโอ — 🔒 LOCKED ===== */
     .progress-bar-container {
       position: absolute; bottom: 180px; left: 16px; right: 80px;
       height: 4px; background: rgba(255,255,255,0.2);
@@ -185,16 +199,21 @@
       </div>
 
       <div class="video-feed" id="videoFeed">
-        <div class="video-slide" id="firstVideoSlide">
+        <div class="video-slide" id="firstVideoSlide" onclick="togglePlayPause()">
           <video id="mainVideo" loop playsinline></video>
 
+          <!-- ✅ ไอคอนลอย หยุด/เล่น ตรงกลางวิดีโอ -->
+          <div class="play-pause-icon" id="playPauseIcon">
+            <i class="fas fa-pause" id="playPauseInnerIcon"></i>
+          </div>
+
           <!-- ✅ ปุ่มขยาย-ล็อกเต็มหน้าจอ -->
-          <div class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()">
+          <div class="fullscreen-btn" id="fullscreenBtn" onclick="event.stopPropagation(); toggleFullscreen()">
             <i class="fas fa-expand" id="fullscreenIcon"></i>
           </div>
 
           <!-- ✅ แถบความคืบหน้าวิดีโอ -->
-          <div class="progress-bar-container" id="progressContainer" onclick="seekVideo(event)">
+          <div class="progress-bar-container" id="progressContainer" onclick="event.stopPropagation(); seekVideo(event)">
             <div class="progress-bar" id="progressBar">
               <div class="progress-thumb"></div>
             </div>
@@ -202,7 +221,7 @@
 
           <!-- ปุ่มด้านขวา — 🔒 LOCKED -->
           <div class="side-buttons">
-            <div class="profile-circle" onclick="showPage('profilePage')"><i class="fas fa-user"></i></div>
+            <div class="profile-circle" onclick="event.stopPropagation(); showPage('profilePage')"><i class="fas fa-user"></i></div>
             <div class="side-btn"><i class="fas fa-heart"></i><span>0</span></div>
             <div class="side-btn"><i class="fas fa-comment"></i><span>0</span></div>
             <div class="side-btn"><i class="fas fa-bookmark"></i><span>0</span></div>
@@ -273,6 +292,28 @@
       document.getElementById(pageId).classList.add('active');
     }
 
+    // ✅ กดวิดีโอ หยุด / เล่นต่อ + ไอคอนลอยโชว์
+    function togglePlayPause() {
+      const video = document.getElementById('mainVideo');
+      const icon = document.getElementById('playPauseIcon');
+      const innerIcon = document.getElementById('playPauseInnerIcon');
+      
+      if (video.paused) {
+        video.play();
+        innerIcon.className = 'fas fa-pause';
+      } else {
+        video.pause();
+        innerIcon.className = 'fas fa-play';
+      }
+      
+      // โชว์ไอคอนตรงกลาง 0.5 วินาที แล้วค่อยหายไป
+      icon.classList.add('show');
+      clearTimeout(window.playIconTimer);
+      window.playIconTimer = setTimeout(() => {
+        icon.classList.remove('show');
+      }, 500);
+    }
+
     // ✅ ปุ่มขยาย-ล็อกเต็มหน้าจอ
     function toggleFullscreen() {
       const elem = document.documentElement;
@@ -300,7 +341,7 @@
       const video = document.getElementById('mainVideo');
       const container = document.getElementById('progressContainer');
       const rect = container.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
+      const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       if (video.duration) {
         video.currentTime = percent * video.duration;
       }
@@ -343,6 +384,8 @@
           // เริ่มอัปเดตแถบความคืบหน้า
           clearInterval(progressUpdateInterval);
           progressUpdateInterval = setInterval(updateProgressBar, 200);
+          // ตั้งไอคอนเป็นหยุด
+          document.getElementById('playPauseInnerIcon').className = 'fas fa-pause';
         };
 
         document.getElementById('videoFeed').scrollTop = 0;
