@@ -12,37 +12,39 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Noto Sans Thai, sans-serif; }
     body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
-    .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; }
+    .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
     
-    .header { position: absolute; top: 0; left: 0; right: 0; z-index: 100; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
+    .header { position: relative; flex-shrink: 0; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
     .logo-area { display: flex; flex-direction: column; align-items: center; }
     .logo-th { font-size: 18px; font-weight: 700; color: #FFD700; }
     .logo-en { font-size: 11px; color: #aaa; margin-top: 2px; }
-    .header-actions { display: flex; gap: 16px; align-items: center; }
     .icon-btn { font-size: 22px; cursor: pointer; }
     
-    /* ===== แก้จุดสำคัญ — เห็นเมนูล่างได้ ===== */
-    .video-feed { height: calc(100vh - 85px); overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+    /* ===== ส่วนสำคัญ — ปรับให้ฟีดวิดีโอเหลือที่ว่างสำหรับเมนูล่าง ===== */
+    .video-feed { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; }
     .video-feed::-webkit-scrollbar { display: none; }
-    .video-card { height: 100%; position: relative; scroll-snap-align: start; }
+    .video-card { height: 100vh; position: relative; scroll-snap-align: start; }
     video { width: 100%; height: 100%; object-fit: cover; background: #111; }
     
-    .video-info { position: absolute; bottom: 90px; left: 16px; right: 70px; }
+    .empty-state { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; }
+    .empty-state p { color: #aaa; }
+    
+    .video-info { position: absolute; bottom: 100px; left: 16px; right: 70px; }
     .creator-name { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
     .video-desc { font-size: 13px; color: #eee; line-height: 1.4; margin-bottom: 8px; }
     .sound-tag { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #ddd; }
     
-    .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .side-actions { position: absolute; right: 12px; bottom: 110px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
     .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
     .action-icon { font-size: 28px; }
     .action-count { font-size: 11px; color: #fff; }
-    .profile-circle { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; background: #333; }
-    .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
-    .music-disc { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #FFD700, #FF6B00); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; }
+    .profile-circle { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; background: #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .music-disc { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #FFD700, #FF6B00); display: flex; align-items: center; justify-content: center; font-size: 20px; animation: spin 3s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* ===== เมนูล่าง — ล็อกตำแหน่งเดิม 5 ปุ่ม ===== */
-    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 24px; background: rgba(0,0,0,0.85); }
+    /* ===== เมนูล่าง — ล็อกตำแหน่ง 5 ปุ่ม แสดงชัดเจนเสมอ ===== */
+    .bottom-nav { flex-shrink: 0; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 24px; background: rgba(0,0,0,0.9); border-top: 1px solid #222; position: relative; z-index: 50; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .nav-icon { font-size: 24px; }
     .nav-label { font-size: 10px; color: #aaa; }
@@ -51,7 +53,7 @@
     .create-btn::before { content: ''; position: absolute; width: 100%; height: 2px; background: #FF0000; transform: rotate(45deg); }
     .create-btn::after { content: ''; position: absolute; width: 2px; height: 100%; background: #FF0000; transform: rotate(45deg); }
     
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     .modal.show { display: flex; }
     .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
     .upload-area { width: 100%; max-width: 360px; height: 200px; border: 2px dashed #666; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; cursor: pointer; }
@@ -79,19 +81,17 @@
       <div class="logo-th">ไทยโพธิ์ดี</div>
       <div class="logo-en">Thaipodee Market Online Platform</div>
     </div>
-    <div class="header-actions">
-      <div class="icon-btn" onclick="searchContent()">🔍</div>
-    </div>
+    <div class="icon-btn" onclick="searchContent()">🔍</div>
   </div>
 
   <div class="video-feed" id="videoFeed">
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;">
-      <h3 style="font-size:18px;margin-bottom:8px;">ยังไม่มีวิดีโอ</h3>
-      <p style="color:#aaa;">เป็นคนแรกที่อัปโหลดวิดีโอ!</p>
+    <div class="empty-state">
+      <h3>ยังไม่มีวิดีโอ</h3>
+      <p>เป็นคนแรกที่อัปโหลดวิดีโอ!</p>
     </div>
   </div>
 
-  <!-- ===== เมนูล่าง — ล็อก 5 ปุ่ม ตำแหน่งเดิม ===== -->
+  <!-- ===== เมนูล่าง — แสดงทันที ไม่ซ่อน! ===== -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('home')">
       <span class="nav-icon">🏠</span>
@@ -150,7 +150,7 @@
     const snapshot = await db.collection('videos').orderBy('createdAt', 'desc').get();
     
     if (snapshot.empty) {
-      feed.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;"><h3 style="font-size:18px;margin-bottom:8px;">ยังไม่มีวิดีโอ</h3><p style="color:#aaa;">เป็นคนแรกที่อัปโหลดวิดีโอ!</p></div>`;
+      feed.innerHTML = `<div class="empty-state"><h3>ยังไม่มีวิดีโอ</h3><p>เป็นคนแรกที่อัปโหลดวิดีโอ!</p></div>`;
       return;
     }
     
@@ -170,7 +170,7 @@
           <div class="action-btn" onclick="likeVideo('${doc.id}')"><span class="action-icon">❤️</span><span class="action-count">${v.likes || 0}</span></div>
           <div class="action-btn"><span class="action-icon">💬</span><span class="action-count">${v.comments || 0}</span></div>
           <div class="action-btn"><span class="action-icon">↗️</span><span class="action-count">แชร์</span></div>
-          <div class="action-btn"><div class="profile-circle"><span>👤</span></div></div>
+          <div class="action-btn"><div class="profile-circle">👤</div></div>
           <div class="music-disc">🎵</div>
         </div>
       `;
