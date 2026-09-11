@@ -21,28 +21,22 @@
     .icon-btn { font-size: 22px; cursor: pointer; }
     .version-tag { position: absolute; top: 12px; right: 12px; font-size: 11px; color: #888; z-index: 11; }
     
-    .video-feed { flex: 1; overflow-y: auto; position: relative; }
+    .video-feed { flex: 1; overflow-y: auto; position: relative; scroll-snap-type: y mandatory; }
     .empty-state { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
     .empty-state h3 { font-size: 18px; margin-bottom: 8px; }
     .empty-state p { color: #aaa; font-size: 14px; }
     
-    .video-card { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    video { width: 100%; height: 100%; object-fit: cover; background: #111; }
-    .video-info { position: absolute; bottom: 100px; left: 16px; right: 70px; }
+    .video-card { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; scroll-snap-align: start; }
+    video { width: 100%; height: 100%; object-fit: cover; background: #111; outline: none; }
+    .video-info { position: absolute; bottom: 100px; left: 16px; right: 70px; z-index: 5; }
     .creator-name { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
     .video-desc { font-size: 13px; line-height: 1.4; margin-bottom: 8px; }
     .sound-tag { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #ddd; }
     
-    /* ==== เมนูขวา — ตรงตามตัวอย่าง: รูปโปรไฟล์บนสุด + ปุ่ม + แดง ==== */
+    /* ==== เมนูขวา — ตรง TikTok: รูปโปรไฟล์บนสุด + ปุ่ม + แดง ==== */
     .side-actions { 
-      position: absolute; 
-      right: 12px; 
-      bottom: 110px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 22px; 
-      z-index: 20;
+      position: absolute; right: 12px; bottom: 110px; 
+      display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 20;
     }
     .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; }
     .action-icon { font-size: 28px; }
@@ -65,7 +59,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* ==== เมนูล่าง — ตรงตามตัวอย่าง: ปุ่มกลาง + พื้นขาว ขอบแดง ==== */
+    /* ==== เมนูล่าง — ตรง TikTok: ปุ่มกลาง + พื้นขาว ขอบแดง ==== */
     .bottom-nav { 
       flex-shrink: 0; display: flex; justify-content: space-around; align-items: center; 
       padding: 8px 0 24px; background: rgba(0,0,0,0.95); border-top: 1px solid #333; 
@@ -80,7 +74,7 @@
       background: #ff0000; color: #fff;
       font-size: 10px; padding: 2px 5px; border-radius: 10px;
     }
-    /* ปุ่มกลาง: + สีแดง พื้นขาว ขอบแดง */
+    /* ปุ่มกลาง TikTok: + สีแดง พื้นขาว ขอบแดง */
     .create-btn { 
       width: 48px; height: 32px; 
       background: #ffffff; border: 1px solid #ff0000; border-radius: 6px; 
@@ -88,7 +82,7 @@
       color: #ff0000; font-size: 26px; font-weight: bold; cursor: pointer;
     }
     
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
     .modal.show { display: flex; }
     .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
     .upload-area { width: 100%; max-width: 360px; min-height: 180px; border: 2px dashed #666; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; cursor: pointer; }
@@ -126,7 +120,7 @@
     </div>
   </div>
 
-  <!-- ===== เมนูขวา — ตรงตามตัวอย่าง: รูปโปรไฟล์บนสุด + ปุ่ม + แดง ===== -->
+  <!-- ===== เมนูขวา — ตรง TikTok: รูปโปรไฟล์บนสุด + ปุ่ม + แดง ===== -->
   <div class="side-actions">
     <div class="action-btn" onclick="switchTab('profile')">
       <div class="profile-circle">👤</div>
@@ -153,7 +147,7 @@
     </div>
   </div>
 
-  <!-- ===== เมนูล่าง — ตรงตามตัวอย่าง: ปุ่มกลาง + พื้นขาว ขอบแดง ===== -->
+  <!-- ===== เมนูล่าง — ตรง TikTok: ปุ่มกลาง + พื้นขาว ขอบแดง ===== -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('home')">
       <span class="nav-icon">🏠</span>
@@ -185,8 +179,8 @@
       <span>แตะเพื่อเลือกวิดีโอ</span>
       <input type="file" id="videoFile" class="file-input" accept="video/*" onchange="handleFileSelect(event)">
     </div>
-    <div class="size-note">💡 แนะนำ: วิดีโอไม่เกิน 1 นาที, ขนาดไม่เกิน 50MB จะอัปโหลดเร็วที่สุด</div>
-    <video id="previewVideo" class="preview-video" controls muted></video>
+    <div class="size-note">💡 แนะนำ: วิดีโอไม่เกิน 1 นาที, ไม่เกิน 50MB อัปโหลดเร็วสุด</div>
+    <video id="previewVideo" class="preview-video" controls muted playsinline></video>
     <input type="text" id="videoDesc" class="input-field" placeholder="คำอธิบายวิดีโอ...">
     <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
     <button class="btn btn-primary" onclick="uploadVideo()">อัปโหลด</button>
@@ -209,6 +203,20 @@
   const storage = firebase.storage();
   let selectedFile = null;
 
+  // เล่นวิดีโออัตโนมัติเมื่อเข้าถึง
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const video = entry.target.querySelector('video');
+      if (video) {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, { threshold: 0.6 });
+
   async function loadVideos() {
     const feed = document.getElementById('videoFeed');
     const snapshot = await db.collection('videos').orderBy('createdAt', 'desc').get();
@@ -224,7 +232,7 @@
       const card = document.createElement('div');
       card.className = 'video-card';
       card.innerHTML = `
-        <video src="${v.videoUrl}" autoplay loop muted playsinline controls></video>
+        <video src="${v.videoUrl}" autoplay loop muted playsinline preload="auto"></video>
         <div class="video-info">
           <div class="creator-name">@${v.creator || 'thaipodee_user'}</div>
           <div class="video-desc">${v.description || ''}</div>
@@ -257,6 +265,7 @@
         </div>
       `;
       feed.appendChild(card);
+      observer.observe(card);
     });
   }
 
@@ -285,11 +294,7 @@
   }
 
   async function uploadVideo() {
-    if (!selectedFile) {
-      alert('กรุณาเลือกวิดีโอ');
-      return;
-    }
-
+    if (!selectedFile) { alert('กรุณาเลือกวิดีโอ'); return; }
     const desc = document.getElementById('videoDesc').value || 'วิดีโอจาก ไทยโพธิ์ดี Market Online Platform';
     const btn = event.target;
 
@@ -300,14 +305,7 @@
 
     try {
       const fileRef = storage.ref(`videos/${Date.now()}_${selectedFile.name}`);
-      const metadata = {
-        contentType: selectedFile.type,
-        customMetadata: {
-          originalName: selectedFile.name,
-          uploadedAt: new Date().toISOString()
-        }
-      };
-
+      const metadata = { contentType: selectedFile.type };
       const uploadTask = fileRef.put(selectedFile, metadata);
 
       uploadTask.on('state_changed',
@@ -316,20 +314,13 @@
           document.getElementById('progressFill').style.width = pct + '%';
         },
         (err) => {
-          console.error('Upload error:', err);
-          let msg = 'อัปโหลดล้มเหลว: ';
-          if (err.code === 'storage/unauthorized') msg += 'ไม่มีสิทธิ์เข้าถึงที่เก็บไฟล์';
-          else if (err.code === 'storage/quota-exceeded') msg += 'พื้นที่เก็บไฟล์เต็ม';
-          else if (err.code === 'storage/canceled') msg += 'ถูกยกเลิก';
-          else msg += err.message;
-          alert(msg);
+          alert('อัปโหลดล้มเหลว: ' + err.message);
           btn.disabled = false;
           btn.textContent = 'อัปโหลด';
           document.getElementById('progressBar').style.display = 'none';
         },
         async () => {
           const videoUrl = await uploadTask.snapshot.ref.getDownloadURL();
-          
           await db.collection('videos').add({
             description: desc,
             videoUrl,
@@ -338,7 +329,6 @@
             comments: 0,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-
           alert('อัปโหลดสำเร็จ! ✅');
           closeUploadModal();
           btn.disabled = false;
@@ -348,10 +338,9 @@
         }
       );
     } catch (e) {
-      alert('เกิดข้อผิดพลาด: ' + e.message);
+      alert('ผิดพลาด: ' + e.message);
       btn.disabled = false;
       btn.textContent = 'อัปโหลด';
-      document.getElementById('progressBar').style.display = 'none';
     }
   }
 
