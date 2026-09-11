@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Thaipodee Market Online Platform v2026</title>
-  <!-- Firebase SDK -->
+  <title>ไทยโพธิ์ดี Market Online Platform v2026</title>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
@@ -15,7 +14,6 @@
     body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
     .app-container { position: relative; width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; }
     
-    /* Header */
     .header { position: absolute; top: 0; left: 0; right: 0; z-index: 100; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
     .logo-area { display: flex; flex-direction: column; align-items: center; }
     .logo-th { font-size: 18px; font-weight: 700; color: #FFD700; }
@@ -23,19 +21,17 @@
     .header-actions { display: flex; gap: 16px; align-items: center; }
     .icon-btn { font-size: 22px; cursor: pointer; }
     
-    /* Video Feed */
-    .video-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+    /* ===== แก้จุดสำคัญ — เห็นเมนูล่างได้ ===== */
+    .video-feed { height: calc(100vh - 85px); overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
     .video-feed::-webkit-scrollbar { display: none; }
-    .video-card { height: 100vh; position: relative; scroll-snap-align: start; }
+    .video-card { height: 100%; position: relative; scroll-snap-align: start; }
     video { width: 100%; height: 100%; object-fit: cover; background: #111; }
     
-    /* Video Info */
     .video-info { position: absolute; bottom: 90px; left: 16px; right: 70px; }
     .creator-name { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
     .video-desc { font-size: 13px; color: #eee; line-height: 1.4; margin-bottom: 8px; }
     .sound-tag { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #ddd; }
     
-    /* Right Side Actions */
     .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
     .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
     .action-icon { font-size: 28px; }
@@ -45,7 +41,7 @@
     .music-disc { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #FFD700, #FF6B00); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Bottom Nav */
+    /* ===== เมนูล่าง — ล็อกตำแหน่งเดิม 5 ปุ่ม ===== */
     .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 24px; background: rgba(0,0,0,0.85); }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .nav-icon { font-size: 24px; }
@@ -55,7 +51,6 @@
     .create-btn::before { content: ''; position: absolute; width: 100%; height: 2px; background: #FF0000; transform: rotate(45deg); }
     .create-btn::after { content: ''; position: absolute; width: 2px; height: 100%; background: #FF0000; transform: rotate(45deg); }
     
-    /* Upload Modal */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     .modal.show { display: flex; }
     .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
@@ -78,7 +73,6 @@
 <div class="app-container">
   <span class="version-tag">v2026</span>
   
-  <!-- Header -->
   <div class="header">
     <div class="icon-btn" onclick="toggleProfile()">☰</div>
     <div class="logo-area">
@@ -90,12 +84,14 @@
     </div>
   </div>
 
-  <!-- Video Feed -->
   <div class="video-feed" id="videoFeed">
-    <!-- Videos will be loaded here from Firestore -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;">
+      <h3 style="font-size:18px;margin-bottom:8px;">ยังไม่มีวิดีโอ</h3>
+      <p style="color:#aaa;">เป็นคนแรกที่อัปโหลดวิดีโอ!</p>
+    </div>
   </div>
 
-  <!-- Bottom Navigation -->
+  <!-- ===== เมนูล่าง — ล็อก 5 ปุ่ม ตำแหน่งเดิม ===== -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('home')">
       <span class="nav-icon">🏠</span>
@@ -118,7 +114,6 @@
     </div>
   </div>
 
-  <!-- Upload Modal -->
   <div class="modal" id="uploadModal">
     <div class="modal-title">อัปโหลดวิดีโอ</div>
     <div class="upload-area" onclick="document.getElementById('videoFile').click()">
@@ -135,7 +130,6 @@
 </div>
 
 <script>
-  // ========== FIREBASE CONFIG — ใส่ค่าที่ได้จาก Firebase ==========
   const firebaseConfig = {
     apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQ2uG_VxWYtE",
     authDomain: "thaipodee-market.firebaseapp.com",
@@ -145,41 +139,36 @@
     appId: "1:802626775100:web:8b2f2914532d2c9e9c3b39"
   };
 
-  // Init Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const storage = firebase.storage();
   
   let selectedFile = null;
-  let videos = [];
 
-  // ========== Load Videos from Firestore ==========
   async function loadVideos() {
     const feed = document.getElementById('videoFeed');
-    feed.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;">กำลังโหลด...</div>';
-    
     const snapshot = await db.collection('videos').orderBy('createdAt', 'desc').get();
-    videos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
-    if (videos.length === 0) {
-      feed.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:24px;text-align:center;"><h3>ยังไม่มีวิดีโอ</h3><p style="color:#aaa;margin-top:8px;">เป็นคนแรกที่อัปโหลดวิดีโอ!</p></div>';
+    if (snapshot.empty) {
+      feed.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;"><h3 style="font-size:18px;margin-bottom:8px;">ยังไม่มีวิดีโอ</h3><p style="color:#aaa;">เป็นคนแรกที่อัปโหลดวิดีโอ!</p></div>`;
       return;
     }
     
     feed.innerHTML = '';
-    videos.forEach(video => {
+    snapshot.docs.forEach(doc => {
+      const v = doc.data();
       const card = document.createElement('div');
       card.className = 'video-card';
       card.innerHTML = `
-        <video src="${video.videoUrl}" autoplay loop muted playsinline></video>
+        <video src="${v.videoUrl}" autoplay loop muted playsinline></video>
         <div class="video-info">
-          <div class="creator-name">@${video.creator || 'thaipodee'}</div>
-          <div class="video-desc">${video.description || ''}</div>
-          <div class="sound-tag">🎵 เสียงต้นฉบับ - ไทยโพดี</div>
+          <div class="creator-name">@${v.creator || 'thaipodee_user'}</div>
+          <div class="video-desc">${v.description || ''}</div>
+          <div class="sound-tag">🎵 เสียงต้นฉบับ - ไทยโพธิ์ดี</div>
         </div>
         <div class="side-actions">
-          <div class="action-btn" onclick="likeVideo('${video.id}')"><span class="action-icon">❤️</span><span class="action-count">${video.likes || 0}</span></div>
-          <div class="action-btn"><span class="action-icon">💬</span><span class="action-count">${video.comments || 0}</span></div>
+          <div class="action-btn" onclick="likeVideo('${doc.id}')"><span class="action-icon">❤️</span><span class="action-count">${v.likes || 0}</span></div>
+          <div class="action-btn"><span class="action-icon">💬</span><span class="action-count">${v.comments || 0}</span></div>
           <div class="action-btn"><span class="action-icon">↗️</span><span class="action-count">แชร์</span></div>
           <div class="action-btn"><div class="profile-circle"><span>👤</span></div></div>
           <div class="music-disc">🎵</div>
@@ -189,7 +178,6 @@
     });
   }
 
-  // ========== Upload Functions ==========
   function openUploadModal() { document.getElementById('uploadModal').classList.add('show'); }
   function closeUploadModal() { 
     document.getElementById('uploadModal').classList.remove('show'); 
@@ -208,13 +196,12 @@
 
   async function uploadVideo() {
     if (!selectedFile) { alert('กรุณาเลือกวิดีโอ'); return; }
-    const desc = document.getElementById('videoDesc').value || 'วิดีโอจาก Thaipodee Market Online Platform';
+    const desc = document.getElementById('videoDesc').value || 'วิดีโอจาก ไทยโพธิ์ดี Market Online Platform';
     const btn = event.target;
     btn.disabled = true;
     btn.textContent = 'กำลังอัปโหลด...';
     document.getElementById('progressBar').style.display = 'block';
     
-    // Upload to Storage
     const fileRef = storage.ref(`videos/${Date.now()}_${selectedFile.name}`);
     const uploadTask = fileRef.put(selectedFile);
     
@@ -226,7 +213,6 @@
       (err) => { alert('อัปโหลดล้มเหลว: ' + err.message); btn.disabled = false; },
       async () => {
         const videoUrl = await uploadTask.snapshot.ref.getDownloadURL();
-        // Save to Firestore
         await db.collection('videos').add({
           description: desc,
           videoUrl,
@@ -240,7 +226,7 @@
         btn.disabled = false;
         btn.textContent = 'อัปโหลด';
         document.getElementById('progressBar').style.display = 'none';
-        loadVideos(); // รีเฟรชรายการ
+        loadVideos();
       }
     );
   }
@@ -252,7 +238,6 @@
   function toggleProfile() { console.log('Profile'); }
   function searchContent() { console.log('Search'); }
 
-  // ========== Init ==========
   document.addEventListener('DOMContentLoaded', loadVideos);
 </script>
 
