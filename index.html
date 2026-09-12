@@ -3,330 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThaiPodee Market Online</title>
-    
-    <script>
-        const APP_CONFIG = {
-            CLOUD_NAME: 'thaipodee',
-            UPLOAD_PRESET: 'thaipodee_upload',
-            FOLDER: 'thaipodee_videos'
-        };
-    </script>
-
+    <title>อัปโหลดวิดีโอ - ThaiPodee</title>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        html, body {
-            background: #000;
-            color: #fff;
-            height: 100%;
-            overflow: hidden;
-        }
+        body { background: #000; color: #fff; min-height: 100vh; padding: 20px; }
 
-        .splash {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.8s ease;
+        .back-btn { 
+            position: absolute; top: 15px; left: 15px; 
+            color: #fff; text-decoration: none; font-size: 18px; z-index: 10;
         }
+        .upload-container { max-width: 500px; margin: 60px auto 0; padding: 20px; }
+        .upload-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 30px; }
+        
+        .upload-area { 
+            border: 2px dashed #444; border-radius: 12px; padding: 50px 20px; 
+            text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 20px;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: #ffcc00; background: rgba(255,204,0,0.05); }
+        .upload-icon { font-size: 56px; margin-bottom: 12px; }
+        .upload-text { font-size: 16px; color: #ccc; }
+        
+        .preview-box { width: 100%; border-radius: 8px; margin-bottom: 15px; background: #111; display: none; }
+        .preview-box.active { display: block; }
+        
+        .input-desc { 
+            width: 100%; padding: 14px; background: #222; border: none; 
+            border-radius: 8px; color: #fff; font-size: 15px; margin-bottom: 15px; outline: none;
+        }
+        .input-desc::placeholder { color: #777; }
+        
+        .btn-upload { 
+            width: 100%; padding: 15px; background: #ffcc00; color: #000; 
+            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; 
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-upload:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-upload.uploading { background: #ff9900; }
+        
+        .btn-cancel { 
+            width: 100%; padding: 13px; background: #333; color: #fff; 
+            border: none; border-radius: 8px; font-size: 15px; margin-top: 10px; cursor: pointer;
+        }
+        
+        .status-msg { 
+            text-align: center; padding: 14px; border-radius: 8px; 
+            margin-top: 15px; display: none; font-size: 15px; line-height: 1.5;
+        }
+        .status-msg.success { display: block; background: rgba(0,200,100,0.2); color: #0f8; }
+        .status-msg.error { display: block; background: rgba(255,50,50,0.2); color: #f55; }
+        .status-msg.info { display: block; background: rgba(50,150,255,0.2); color: #5af; }
 
-        .logo-wrapper {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            margin-bottom: 24px;
-        }
-
-        .logo-ring {
-            position: absolute;
-            inset: 0;
-            border: 10px solid #fff;
-            border-radius: 50%;
-        }
-
-        .logo-cross-line {
-            position: absolute;
-            background: #fff;
-        }
-        .logo-cross-line.v {
-            width: 3px;
-            height: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .logo-cross-line.h {
-            width: 100%;
-            height: 3px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .logo-map {
-            position: absolute;
-            inset: 25px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><path fill="white" d="M150,40 C180,50 210,70 230,100 C250,130 250,160 240,180 C230,200 210,210 190,215 C170,220 155,235 145,255 C135,275 120,285 110,275 C100,265 100,245 105,225 C110,205 100,185 85,165 C70,145 75,125 90,105 C110,75 130,55 150,40 Z"/></svg>') no-repeat center;
-            background-size: contain;
-        }
-
-        .app-name {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-        }
-
-        .sub-name {
-            font-size: 15px;
-            opacity: 0.65;
-            margin-top: 8px;
-        }
-
-        .app-container {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            position: relative;
-            background: #000;
-        }
-
-        .video-container {
-            width: 100%;
-            height: 100vh;
-            position: relative;
-            scroll-snap-type: y mandatory;
-            overflow-y: auto;
-        }
-
-        .video-slide {
-            height: 100vh;
-            position: relative;
-            scroll-snap-align: start;
-            background: #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
-        }
-
-        .side-icons {
-            position: absolute;
-            right: 15px;
-            bottom: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            z-index: 10;
-        }
-
-        .side-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .side-icon span {
-            font-size: 11px;
-            margin-top: 4px;
-        }
-
-        .icon-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 65px;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #333;
-            z-index: 20;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            color: #888;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #fff;
-        }
-
-        .nav-plus {
-            width: 45px;
-            height: 30px;
-            background: #ffcc00;
-            border-radius: 6px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .nav-plus::before,
-        .nav-plus::after {
-            content: '';
-            position: absolute;
-            background: #000;
-        }
-
-        .nav-plus::before {
-            width: 18px;
-            height: 2px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-        }
-
-        .nav-plus::after {
-            width: 2px;
-            height: 18px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%,-50%);
-        }
-
-        .video-info {
-            position: absolute;
-            left: 15px;
-            bottom: 100px;
-            z-index: 10;
-            max-width: 75%;
-        }
-
-        .video-info h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .video-info p {
-            font-size: 13px;
-            opacity: 0.8;
-            line-height: 1.4;
-        }
-
-        .empty-state {
-            color: #888;
-            text-align: center;
-            padding: 40px;
-            font-size: 15px;
-            line-height: 1.8;
-        }
+        #videoInput { display: none; }
+        .file-info { font-size: 13px; color: #888; margin-top: 8px; }
     </style>
 </head>
 <body>
 
-<div class="splash" id="splashScreen">
-    <div class="logo-wrapper">
-        <div class="logo-ring"></div>
-        <div class="logo-cross-line v"></div>
-        <div class="logo-cross-line h"></div>
-        <div class="logo-map"></div>
-    </div>
-    <div class="app-name">THAIPODEE</div>
-    <div class="sub-name">Market Online</div>
-</div>
+<a href="javascript:history.back()" class="back-btn">← กลับ</a>
 
-<div class="app-container" id="appMain">
-    <div class="video-container" id="videoContainer">
-        <div class="video-slide">
-            <div class="empty-state">
-                🎥 ยินดีต้อนรับสู่ ThaiPodee<br><br>
-                กดปุ่ม ➕ ด้านล่างเพื่ออัปโหลดวิดีโอแรกของคุณ!<br>
-                รองรับทุกขนาดไฟล์ — ไม่จำกัดความยาว 🇹🇭
-            </div>
-        </div>
-    </div>
+<div class="upload-container">
+    <h1 class="upload-title">อัปโหลดวิดีโอ</h1>
 
-    <div class="bottom-nav">
-        <div class="nav-item active">🏠<span>หน้าแรก</span></div>
-        <div class="nav-item">🔍<span>ค้นหา</span></div>
-        <div class="nav-item nav-plus" onclick="goUpload()">➕<span>โพสต์</span></div>
-        <div class="nav-item">💬<span>ข้อความ</span></div>
-        <div class="nav-item">👤<span>โปรไฟล์</span></div>
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">🎥</div>
+        <p class="upload-text">แตะเพื่อเลือกวิดีโอ หรือลากไฟล์มาวางที่นี่</p>
+        <p class="file-info">รองรับทุกขนาดไฟล์ — ไม่จำกัดความยาววิดีโอ</p>
     </div>
+    <input type="file" id="videoInput" accept="video/*">
+
+    <video class="preview-box" id="previewVid" controls muted></video>
+
+    <input type="text" class="input-desc" id="descInput" placeholder="คำอธิบายวิดีโอ...">
+
+    <button class="btn-upload" id="uploadBtn">อัปโหลด</button>
+    <button class="btn-cancel" id="cancelBtn">ยกเลิก</button>
+
+    <div class="status-msg" id="statusMsg"></div>
 </div>
 
 <script>
-    function showMainApp() {
-        const splash = document.getElementById('splashScreen');
-        const main = document.getElementById('appMain');
-        
-        splash.style.opacity = '0';
-        
-        setTimeout(() => {
-            splash.style.display = 'none';
-            main.style.display = 'block';
-            console.log('✅ เข้าสู่หน้าหลักสำเร็จ!');
-            loadVideos();
-        }, 800);
-    }
-    
-    window.addEventListener('load', () => {
-        setTimeout(showMainApp, 3000);
+    // ===== ตั้งค่า Cloudinary — เปลี่ยน Cloud Name ให้ตรงกับของคุณ =====
+    const CLOUD_NAME = 'thaipodee'; 
+    const UPLOAD_PRESET = 'thaipodee_upload';
+
+    const uploadArea = document.getElementById('uploadArea');
+    const videoInput = document.getElementById('videoInput');
+    const previewVid = document.getElementById('previewVid');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const descInput = document.getElementById('descInput');
+
+    let selectedFile = null;
+
+    // เปิดเลือกไฟล์
+    uploadArea.addEventListener('click', () => videoInput.click());
+
+    // ลากวาง
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault(); uploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
     });
 
-    function goUpload() {
-        window.location.href = 'upload.html';
-    }
+    // เลือกไฟล์
+    videoInput.addEventListener('change', e => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+    });
 
-    function loadVideos() {
-        const saved = localStorage.getItem('latestVideo');
-        if (!saved) {
-            console.log('📭 ยังไม่มีวิดีโอที่อัปโหลด');
+    // ตรวจสอบไฟล์
+    function handleFile(file) {
+        if (!file.type.startsWith('video/')) {
+            showStatus('กรุณาเลือกไฟล์วิดีโอเท่านั้น', 'error');
             return;
         }
+        selectedFile = file;
+        showStatus(`เลือกไฟล์: ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`, 'info');
+        const url = URL.createObjectURL(file);
+        previewVid.src = url;
+        previewVid.classList.add('active');
+        uploadBtn.disabled = false;
+    }
+
+    // อัปโหลด
+    uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) { showStatus('กรุณาเลือกวิดีโอก่อน', 'error'); return; }
         
+        uploadBtn.classList.add('uploading');
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'กำลังอัปโหลด...';
+        showStatus('กำลังอัปโหลดวิดีโอ กรุณารอสักครู่...', 'info');
+
         try {
-            const data = JSON.parse(saved);
-            const container = document.getElementById('videoContainer');
-            container.innerHTML = '';
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            formData.append('folder', 'thaipodee_videos');
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
             
-            const slide = document.createElement('div');
-            slide.className = 'video-slide';
-            slide.innerHTML = `
-                <video src="${data.url}" loop muted playsinline controls></video>
-                <div class="video-info">
-                    <h3>@ThaiPodee_Official</h3>
-                    <p>${data.description || 'ยินดีต้อนรับสู่ ThaiPodee 🇹🇭'}</p>
-                </div>
-                <div class="side-icons">
-                    <div class="side-icon"><div class="icon-circle">❤️</div><span>0</span></div>
-                    <div class="side-icon"><div class="icon-circle">💬</div><span>0</span></div>
-                    <div class="side-icon"><div class="icon-circle">↗️</div><span>แชร์</span></div>
-                    <div class="side-icon"><div class="icon-circle">🎵</div><span>เสียง</span></div>
-                </div>
-            `;
-            container.appendChild(slide);
-            console.log('✅ โหลดวิดีโอสำเร็จ!');
+            if (data.secure_url) {
+                showStatus('✅ อัปโหลดสำเร็จ!', 'success');
+                localStorage.setItem('latestVideo', JSON.stringify({
+                    url: data.secure_url,
+                    publicId: data.public_id,
+                    description: descInput.value,
+                    createdAt: new Date().toISOString()
+                }));
+                
+                setTimeout(() => {
+                    history.back(); // กลับหน้าแรกเอง
+                }, 1500);
+            } else {
+                throw new Error(data.error?.message || 'อัปโหลดไม่สำเร็จ');
+            }
         } catch (err) {
-            console.error('❌ โหลดวิดีโอไม่สำเร็จ:', err);
+            showStatus('❌ ผิดพลาด: ' + err.message, 'error');
+            uploadBtn.classList.remove('uploading');
+            uploadBtn.textContent = 'อัปโหลด';
+            uploadBtn.disabled = false;
         }
+    });
+
+    // ยกเลิก
+    cancelBtn.addEventListener('click', () => history.back());
+
+    function showStatus(text, type) {
+        statusMsg.textContent = text;
+        statusMsg.className = `status-msg ${type}`;
     }
 </script>
 
