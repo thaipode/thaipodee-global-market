@@ -61,7 +61,7 @@
             </div>
           </div>
 
-          <!-- ส่วนล่าง + ปุ่มขวา -->
+          <!-- ส่วนล่าง + ปุ่มขวา 6 ปุ่ม -->
           <div class="flex justify-between items-end mb-2">
             <div class="w-3/4 pr-4">
               <div class="flex items-center gap-2 mb-2">
@@ -75,7 +75,6 @@
               </div>
             </div>
 
-            <!-- ปุ่มขวา 6 ปุ่ม -->
             <div class="flex flex-col items-center gap-6 text-xl">
               <button id="btnProfile" class="flex flex-col items-center gap-1">
                 <img id="sideProfilePic" src="https://picsum.photos/seed/thaipodee/48/48" class="w-10 h-10 rounded-full object-cover border-2 border-white">
@@ -108,7 +107,7 @@
     </div>
   </div>
 
-  <!-- หน้าอัปโหลด -->
+  <!-- หน้าอัปโหลดวิดีโอ -->
   <div id="uploadScreen" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
     <div class="p-4 flex items-center justify-between border-b border-white/10 safe-top">
       <button id="btnUploadClose" class="text-xl"><i class="fa fa-times"></i></button>
@@ -120,7 +119,7 @@
       <div id="uploadArea" class="w-full max-w-md aspect-video border-2 border-dashed border-gray-600 rounded-xl flex flex-col items-center justify-center mb-6 hover:border-primary transition-colors cursor-pointer">
         <div class="text-5xl text-gray-500 mb-4"><i class="fa fa-cloud-upload"></i></div>
         <p class="text-lg mb-2">แตะเพื่อเลือกไฟล์วิดีโอ</p>
-        <p class="text-sm text-gray-400">รองรับ MP4, MOV</p>
+        <p class="text-sm text-gray-400">รองรับไฟล์ MP4, MOV</p>
         <input type="file" id="videoInput" accept="video/*" class="hidden">
       </div>
 
@@ -172,15 +171,15 @@
 
       <h4 class="w-full text-left font-semibold mb-3">วิดีโอของฉัน</h4>
       <div id="myVideosGrid" class="w-full grid grid-cols-3 gap-1">
-        <div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอ</div>
+        <div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอที่โพสต์</div>
       </div>
     </div>
   </div>
 
   <script>
-    // ========== ตัวแปรหลัก — ใช้ ml_default ที่มีอยู่แล้ว ไม่ต้องสร้างใหม่! ==========
-    const UPLOAD_PRESET = 'ml_default'; // ✅ มีอยู่แล้วในระบบ ใช้ได้ทันที!
+    // ========== ตัวแปรหลัก — แก้ปัญหา 403 โดยใช้ API Key ตรง ๆ ==========
     const CLOUD_NAME = 'orjpnytt';
+    const API_KEY = '583622848327282'; // ✅ API Key จากบัญชีจริง
     const CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
     // ข้อมูลโปรไฟล์ — บันทึกในเครื่อง ไม่หาย
@@ -283,11 +282,13 @@
     function showStatus(text, type = 'info') {
       statusMsg.textContent = text;
       statusMsg.className = 'mt-4 text-center text-sm block';
-      statusMsg.classList.add(type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400');
+      if (type === 'success') statusMsg.classList.add('text-green-400');
+      if (type === 'error') statusMsg.classList.add('text-red-400');
+      if (type === 'info') statusMsg.classList.add('text-blue-400');
       statusMsg.classList.remove('hidden');
     }
 
-    // ========== อัปโหลดวิดีโอ — ใช้ ml_default ที่มีอยู่แล้ว! ==========
+    // ========== อัปโหลดวิดีโอ — ใช้ API Key โดยตรง ไม่ต้อง Preset! แก้ 403 แล้ว! ==========
     btnUpload.addEventListener('click', async () => {
       if (!window.selectedVideoFile) {
         showStatus('กรุณาเลือกไฟล์วิดีโอก่อน', 'error');
@@ -296,13 +297,14 @@
       
       btnUpload.disabled = true;
       btnUpload.textContent = 'กำลังอัปโหลด...';
-      showStatus('กำลังอัปโหลดวิดีโอ...', 'info');
+      showStatus('กำลังอัปโหลดวิดีโอไปยังเซิร์ฟเวอร์...', 'info');
 
       try {
         const formData = new FormData();
         formData.append('file', window.selectedVideoFile);
-        formData.append('upload_preset', UPLOAD_PRESET); // ✅ ml_default มีอยู่แล้ว!
+        formData.append('api_key', API_KEY); // ✅ ใช้ API Key โดยตรง — ไม่ต้อง Preset!
         formData.append('folder', 'thaipodee_videos');
+        formData.append('timestamp', Math.floor(Date.now() / 1000));
         if (descInput.value) formData.append('context', `alt=${encodeURIComponent(descInput.value)}`);
 
         const res = await fetch(CLOUD_URL, {
@@ -328,7 +330,7 @@
 
         showStatus('✅ อัปโหลดวิดีโอสำเร็จ!', 'success');
         
-        // แสดงวิดีโอที่หน้าแรก
+        // แสดงวิดีโอที่หน้าแรก + เปิดเสียง
         document.getElementById('videoPlayer').src = data.secure_url;
         document.getElementById('videoPlayer').muted = false;
         document.getElementById('videoPlayer').volume = 1;
@@ -352,13 +354,15 @@
     function renderMyVideos() {
       const grid = document.getElementById('myVideosGrid');
       if (!profileData.videos.length) {
-        grid.innerHTML = `<div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอ</div>`;
+        grid.innerHTML = `<div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอที่โพสต์</div>`;
         return;
       }
       grid.innerHTML = profileData.videos.map(v => `
         <div class="aspect-square bg-gray-800 relative overflow-hidden rounded-sm">
           <video src="${v.url}" muted class="w-full h-full object-cover" preload="metadata"></video>
-          <div class="absolute bottom-1 right-1 text-xs bg-black/60 px-1 rounded"><i class="fa fa-play"></i></div>
+          <div class="absolute bottom-1 right-1 text-xs bg-black/60 px-1 rounded">
+            <i class="fa fa-play"></i>
+          </div>
         </div>
       `).join('');
     }
@@ -366,12 +370,16 @@
     // ========== เริ่มทำงาน ==========
     document.addEventListener('DOMContentLoaded', () => {
       loadProfile();
+      btnUpload.disabled = true;
+      btnUpload.classList.add('opacity-50');
       
-      // เปิดเสียงเมื่อกดวิดีโอ
+      // กดวิดีโอ = เปิด/ปิดเสียง
       const mainVideo = document.getElementById('videoPlayer');
       mainVideo.addEventListener('click', () => {
         mainVideo.muted = !mainVideo.muted;
-        mainVideo.muted ? mainVideo.pause() : mainVideo.play();
+        if (!mainVideo.muted) mainVideo.volume = 1;
+        if (mainVideo.paused) mainVideo.play();
+        else mainVideo.pause();
       });
     });
   </script>
