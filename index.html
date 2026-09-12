@@ -177,9 +177,9 @@
   </div>
 
   <script>
-    // ========== ตัวแปรหลัก — ต้องสร้าง Preset ชื่อ thaipodee_upload ใน Cloudinary! ==========
+    // ========== ใช้ ml_default — มีอยู่แล้วทุกบัญชี! ไม่ต้องสร้างใหม่! ไม่ต้องหาปุ่ม Save! ==========
     const CLOUD_NAME = 'orjpnytt';
-    const UPLOAD_PRESET = 'thaipodee_upload'; // ✅ ต้องสร้างใน Cloudinary!
+    const UPLOAD_PRESET = 'ml_default'; // ✅ มีอยู่แล้ว! เปิดใช้งานได้เลย!
     const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
     // ข้อมูลโปรไฟล์ — บันทึกในเครื่อง ไม่หาย
@@ -276,7 +276,7 @@
       $('statusMsg').classList.add(type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400');
     }
 
-    // ========== อัปโหลดวิดีโอ — ใช้ Preset thaipodee_upload ==========
+    // ========== อัปโหลดวิดีโอ — ใช้ ml_default ที่มีอยู่แล้ว! ==========
     $('btnUpload').addEventListener('click', async () => {
       if (!window.selectedVideoFile) {
         showStatus('กรุณาเลือกไฟล์วิดีโอก่อน', 'error');
@@ -290,7 +290,7 @@
       try {
         const formData = new FormData();
         formData.append('file', window.selectedVideoFile);
-        formData.append('upload_preset', UPLOAD_PRESET); // ✅ ต้องสร้างใน Cloudinary!
+        formData.append('upload_preset', UPLOAD_PRESET); // ✅ ml_default มีอยู่แล้ว!
         formData.append('folder', 'thaipodee_videos');
         if ($('descInput').value) formData.append('context', `alt=${encodeURIComponent($('descInput').value)}`);
 
@@ -331,7 +331,7 @@
 
       } catch (err) {
         console.error('Upload error:', err);
-        showStatus('❌ ไม่สำเร็จ: ' + err.message + ' — โปรดสร้าง Upload Preset ชื่อ thaipodee_upload ใน Cloudinary!', 'error');
+        showStatus('❌ ไม่สำเร็จ: ' + err.message, 'error');
         $('btnUpload').disabled = false;
       }
       
