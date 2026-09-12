@@ -9,72 +9,38 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background: #000;
-      color: #fff;
+      height: 100%; width: 100%; overflow: hidden;
+      background: #000; color: #fff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .app {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-    }
+    .app { position: fixed; inset: 0; display: flex; flex-direction: column; }
 
-    /* ===== พื้นที่วิดีโอ — เต็มจอ ไม่มีอะไรซ้อนทับ ===== */
+    /* ===== วิดีโอ — ไม่มีโลโก้ซ้อนทับ ===== */
     .video-container {
-      flex: 1;
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
+      flex: 1; position: relative; width: 100%; height: 100%;
+      background: #000; overflow: hidden;
     }
     video, .img-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width: 100%; height: 100%; object-fit: cover;
     }
     .hint {
-      position: absolute;
-      top: 50%; left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      text-align: center;
-      color: #aaa;
-      z-index: 5;
-      cursor: pointer;
+      text-align: center; color: #aaa; z-index: 5; cursor: pointer;
     }
     .hint i { font-size: 48px; margin-bottom: 12px; }
 
-    /* ===== ✅ รูปโปรไฟล์คนกดถูกใจ — มุมซ้ายล่าง เลื่อนขึ้น วนลูป ===== */
+    /* ===== รูปคนกดถูกใจ — มุมซ้ายล่าง 3 อัน วนลูป ===== */
     .likers-container {
-      position: absolute;
-      left: 12px;
-      bottom: 100px;
-      width: 48px;
-      height: 200px;
-      z-index: 10;
-      pointer-events: none;
-      overflow: hidden;
+      position: absolute; left: 12px; bottom: 100px;
+      width: 48px; height: 200px; z-index: 10; pointer-events: none; overflow: hidden;
     }
     .liker-avatar {
-      position: absolute;
-      left: 0;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      background: #333;
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
-      animation: likerRise 12s ease-in-out infinite;
+      position: absolute; left: 0; width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid #fff; background: #333; background-size: cover; background-position: center;
+      opacity: 0; animation: likerRise 12s ease-in-out infinite;
     }
     .liker-avatar:nth-child(1) { animation-delay: 0s; }
     .liker-avatar:nth-child(2) { animation-delay: 4s; }
@@ -86,189 +52,226 @@
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
 
-    /* ===== ปุ่มด้านขวา — ตำแหน่งตรงกับ TikTok ===== */
+    /* ===== ปุ่มด้านขวา ===== */
     .side-actions {
-      position: absolute;
-      right: 12px;
-      top: 35%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px;
-      z-index: 10;
+      position: absolute; right: 12px; top: 35%;
+      display: flex; flex-direction: column; align-items: center; gap: 28px; z-index: 10;
     }
     .side-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      color: #fff;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
     .side-btn i { font-size: 28px; }
     .side-btn span { font-size: 11px; }
-
-    /* ===== จานเพลงหมุน ===== */
     .music-disc {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #333, #111);
-      border: 3px solid #555;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: spin 3s linear infinite;
-      animation-play-state: paused;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #333, #111); border: 3px solid #555;
+      display: flex; align-items: center; justify-content: center;
+      animation: spin 3s linear infinite; animation-play-state: paused;
     }
     .music-disc.playing { animation-play-state: running; }
-    .music-disc img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    /* ===== ปุ่มเต็มจอ ===== */
-    .fullscreen-btn {
-      position: absolute;
-      right: 16px;
-      bottom: 90px;
-      font-size: 22px;
-      color: rgba(255,255,255,0.8);
-      background: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 11;
-    }
-
-    /* ===== ข้อความล่างซ้าย — ชื่อ + เวลา + คำอธิบาย + ผู้ชม ===== */
+    /* ===== ข้อความล่างซ้าย ===== */
     .caption {
-      position: absolute;
-      left: 76px;
-      right: 80px;
-      bottom: 90px;
-      z-index: 10;
-      pointer-events: none;
+      position: absolute; left: 76px; right: 80px; bottom: 90px; z-index: 10; pointer-events: none;
     }
     .caption .username { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
     .caption .time-ago { font-size: 13px; color: #aaa; margin-left: 8px; font-weight: 400; }
     .caption .desc { font-size: 14px; line-height: 1.4; margin-bottom: 4px; }
-    .caption .meta { font-size: 12px; color: #aaa; margin-bottom: 4px; }
     .caption .views { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 4px; }
-    .caption .views i { font-size: 10px; }
 
-    /* ===== แถบล่าง — ตรงกับ TikTok ===== */
+    /* ===== แถบล่าง ===== */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: #000;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-top: 1px solid #222;
-      z-index: 20;
+      position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+      background: #000; display: flex; justify-content: space-around; align-items: center;
+      border-top: 1px solid #222; z-index: 20;
     }
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      color: #999;
-      font-size: 11px;
-      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: #999; font-size: 11px; cursor: pointer;
     }
     .nav-item i { font-size: 22px; }
     .nav-item.active { color: #fff; }
     .upload-btn {
-      width: 44px;
-      height: 32px;
-      background: linear-gradient(180deg, #fff, #ddd);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-size: 24px;
-      font-weight: 600;
-      position: relative;
+      width: 44px; height: 32px; background: linear-gradient(180deg, #fff, #ddd);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: #000; font-size: 24px; font-weight: 600; position: relative;
     }
     .upload-btn::before {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      background: linear-gradient(90deg, #25f4ee, #fe28ea);
-      border-radius: 6px;
-      z-index: -1;
+      content: ''; position: absolute; inset: -2px;
+      background: linear-gradient(90deg, #25f4ee, #fe28ea); border-radius: 7px; z-index: -1;
     }
 
-    /* ===== หน้าโปรไฟล์ ===== */
+    /* ===== ✅ หน้าโปรไฟล์ — ครบทุกฟีเจอร์ ===== */
     .profile-screen {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 100;
-      overflow-y: auto;
-      display: none;
+      position: fixed; inset: 0; background: #000; z-index: 100; overflow-y: auto; display: none;
     }
-    .profile-header {
-      padding: 20px 16px;
-      text-align: center;
+    .profile-top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-bottom: 1px solid #222;
     }
+    .top-left-icons { display: flex; gap: 16px; align-items: center; }
+    .top-left-icons i { font-size: 20px; color: #fff; cursor: pointer; }
+    .top-right-icons { display: flex; gap: 20px; align-items: center; position: relative; }
+    .top-right-icons i { font-size: 20px; color: #fff; cursor: pointer; }
+    .viewer-icon { position: relative; cursor: pointer; }
+    .viewer-badge {
+      position: absolute; top: -6px; right: -6px; background: #fff; color: #000;
+      font-size: 11px; font-weight: 700; padding: 1px 5px; border-radius: 10px;
+    }
+    .badge-red {
+      background: #fe2c55; color: #fff; font-size: 11px; font-weight: 700;
+      padding: 2px 6px; border-radius: 10px; position: absolute; top: -6px; right: -6px; cursor: pointer;
+    }
+    .profile-header { padding: 20px 16px; text-align: center; position: relative; }
+    .avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
     .profile-avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: #333;
-      margin: 0 auto 12px;
-      border: 2px solid #555;
-      background-size: cover;
-      background-position: center;
-    }
-    .profile-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-    .profile-stats {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin: 16px 0;
-    }
-    .stat-item { text-align: center; }
-    .stat-num { font-size: 18px; font-weight: 700; }
-    .stat-label { font-size: 12px; color: #999; }
-    .videos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      padding: 0 3px 60px;
-    }
-    .video-cell {
-      aspect-ratio: 9/16;
-      background: #1a1a1a;
-      position: relative;
-      overflow: hidden;
+      width: 96px; height: 96px; border-radius: 50%; background: #333;
+      border: 2px solid #555; background-size: cover; background-position: center;
       cursor: pointer;
     }
-    .video-cell video, .video-cell img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .avatar-add-btn {
+      position: absolute; bottom: 0; right: 0; width: 28px; height: 28px;
+      background: #00f2ea; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: #000; font-size: 18px; font-weight: 700; cursor: pointer; border: 2px solid #000;
     }
+    .profile-name-row {
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px; position: relative;
+    }
+    .profile-name { font-size: 22px; font-weight: 700; }
+    .edit-name-btn { color: #999; cursor: pointer; font-size: 16px; }
+    .profile-username { color: #999; font-size: 14px; margin-bottom: 16px; }
+    .profile-stats {
+      display: flex; justify-content: center; gap: 32px; margin: 16px 0;
+    }
+    .stat-item { text-align: center; cursor: pointer; }
+    .stat-num { font-size: 18px; font-weight: 700; }
+    .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
+    .profile-bio {
+      padding: 0 24px; font-size: 14px; line-height: 1.5; color: #ddd; margin-bottom: 16px;
+    }
+    .profile-contact {
+      padding: 0 24px; margin-bottom: 16px; font-size: 14px;
+    }
+    .contact-item { display: flex; align-items: center; gap: 8px; color: #00f2ea; margin-bottom: 8px; cursor: pointer; }
+    .contact-item i { width: 16px; text-align: center; }
+    .shop-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fe2c55; color: #fff; padding: 8px 20px; border-radius: 4px;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px;
+    }
+    .tabs-bar {
+      display: flex; justify-content: space-around; border-bottom: 1px solid #222; margin-top: 12px;
+    }
+    .tab-item {
+      padding: 12px 0; font-size: 14px; color: #999; cursor: pointer; position: relative;
+    }
+    .tab-item.active { color: #fff; border-bottom: 2px solid #fff; }
+    .videos-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+      padding: 0 3px 80px;
+    }
+    .video-cell {
+      aspect-ratio: 9/16; background: #1a1a1a; position: relative; overflow: hidden; cursor: pointer;
+    }
+    .video-cell video, .video-cell img { width: 100%; height: 100%; object-fit: cover; }
     .cell-views {
-      position: absolute;
-      bottom: 4px;
-      left: 4px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 3px;
+      position: absolute; bottom: 4px; left: 4px; font-size: 12px;
+      display: flex; align-items: center; gap: 3px;
       text-shadow: 0 0 3px rgba(0,0,0,0.8);
     }
+
+    /* ===== ✅ Modal สลับบัญชี ===== */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-bottom { align-items: flex-end; padding: 0; }
+    .modal-content {
+      background: #fff; color: #000; border-radius: 12px; padding: 24px;
+      width: 100%; max-width: 380px; max-height: 80vh; overflow-y: auto;
+    }
+    .modal-bottom .modal-content { border-radius: 16px 16px 0 0; }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 18px; font-weight: 600; }
+    .modal-close { font-size: 24px; cursor: pointer; color: #999; }
+    .account-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid #eee; cursor: pointer;
+    }
+    .account-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: #ddd;
+      background-size: cover; background-position: center;
+    }
+    .account-name { flex: 1; font-size: 15px; }
+    .account-check { color: #fe2c55; font-size: 20px; font-weight: 700; }
+    .add-account {
+      display: flex; align-items: center; gap: 12px; padding: 16px 0;
+      margin-top: 8px; cursor: pointer;
+    }
+    .add-account-icon {
+      width: 44px; height: 44px; border-radius: 50%; background: #f0f0f0;
+      display: flex; align-items: center; justify-content: center; font-size: 24px; color: #999;
+    }
+
+    /* ===== ✅ หน้ายอดการดูโปรไฟล์ — ตรงเป๊ะตามภาพ ===== */
+    .viewer-screen {
+      position: fixed; inset: 0; background: #fff; color: #000;
+      z-index: 150; overflow-y: auto; display: none;
+    }
+    .viewer-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; border-bottom: 1px solid #eee;
+      position: sticky; top: 0; background: #fff;
+    }
+    .viewer-back { font-size: 20px; cursor: pointer; }
+    .viewer-title { font-size: 18px; font-weight: 600; }
+    .viewer-settings { font-size: 20px; cursor: pointer; }
+    .viewer-list { padding: 12px 16px; }
+    .viewer-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .viewer-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: #ddd;
+      background-size: cover; background-position: center; position: relative;
+    }
+    .online-dot {
+      position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
+      background: #25d366; border-radius: 50%; border: 2px solid #fff;
+    }
+    .viewer-info { flex: 1; }
+    .viewer-name { font-weight: 500; font-size: 15px; margin-bottom: 2px; }
+    .viewer-status { font-size: 12px; color: #888; }
+    .viewer-btn {
+      padding: 6px 16px; border-radius: 4px; font-size: 14px; font-weight: 500; border: none; cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-follow { background: #fe2c55; color: #fff; }
+    .btn-following { background: #f0f0f0; color: #000; }
+    .btn-nudge { background: #fff8e1; color: #f57c00; }
+    .btn-requested { background: #f0f0f0; color: #888; }
+
+    /* Modal แก้ชื่อ */
+    .modal-dark { background: rgba(0,0,0,0.8); }
+    .modal-dark .modal-content { background: #1a1a1a; color: #fff; }
+    .modal-input {
+      width: 100%; padding: 12px; background: #333; border: none; border-radius: 6px;
+      color: #fff; font-size: 15px; margin-bottom: 12px;
+    }
+    .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-btn { flex: 1; padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: 500; }
+    .modal-btn.cancel { background: #333; color: #fff; }
+    .modal-btn.save { background: #fe2c55; color: #fff; }
   </style>
 </head>
 <body>
   <div class="app" id="app">
-    <!-- ===== พื้นที่วิดีโอ — ไม่มีโลโก้ซ้อนทับ ===== -->
+    <!-- ===== วิดีโอ ===== -->
     <div class="video-container" id="videoContainer">
       <div class="hint" id="hint">
         <i class="fas fa-plus-circle"></i>
@@ -277,20 +280,14 @@
       <video id="vid" loop playsinline style="display:none;"></video>
       <img class="img-content" id="pic" style="display:none;" alt="">
 
-      <!-- ✅ รูปโปรไฟล์คนกดถูกใจ — มุมซ้ายล่าง วนลูป 3 อัน -->
-      <div class="likers-container" id="likersContainer">
-        <!-- จะเพิ่มรูปแบบไดนามิกผ่าน JS -->
-      </div>
+      <div class="likers-container" id="likersContainer"></div>
 
-      <!-- ข้อความล่างซ้าย -->
       <div class="caption" id="caption" style="display:none;">
-        <div class="username">Thaipodee_market <span class="time-ago" id="timeAgo">2 วันที่แล้ว</span></div>
+        <div class="username">Thaipodee Market <span class="time-ago" id="timeAgo">2 วันที่แล้ว</span></div>
         <div class="desc">วิดีโอแรกของเรา — Thaipodee Market Online</div>
-        <div class="meta">เสียงต้นฉบับ · สร้างด้วย AI · ประกอบด้วยเสียง</div>
         <div class="views"><i class="fas fa-play"></i> ผู้ชม <span id="viewCount">0</span> ครั้ง</div>
       </div>
 
-      <!-- ปุ่มด้านขวา -->
       <div class="side-actions">
         <div class="side-btn" id="avatarBtn">
           <div style="width:40px;height:40px;border-radius:50%;background:#333;border:2px solid #fff;overflow:hidden;">
@@ -318,11 +315,6 @@
           <img src="https://picsum.photos/50/50" alt="">
         </div>
       </div>
-
-      <!-- ปุ่มเต็มจอ -->
-      <div class="fullscreen-btn" id="fullscreenBtn">
-        <i class="fas fa-expand"></i>
-      </div>
     </div>
 
     <!-- แถบล่าง -->
@@ -334,18 +326,146 @@
       <div class="nav-item" id="navProfile"><i class="fas fa-user"></i><span>โปรไฟล์</span></div>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ ===== -->
+    <!-- ===== ✅ หน้าโปรไฟล์ — ครบทุกฟีเจอร์ ===== -->
     <div class="profile-screen" id="profileScreen">
-      <div class="profile-header">
-        <div class="profile-avatar" id="profileAvatar"></div>
-        <div class="profile-name" id="profileName">Thaipodee Market</div>
-        <div class="profile-stats">
-          <div class="stat-item"><div class="stat-num" id="postCount">0</div><div class="stat-label">โพสต์</div></div>
-          <div class="stat-item"><div class="stat-num">128</div><div class="stat-label">ผู้ติดตาม</div></div>
-          <div class="stat-item"><div class="stat-num">342</div><div class="stat-label">กำลังติดตาม</div></div>
+      <!-- แถบบน -->
+      <div class="profile-top-bar">
+        <div class="top-left-icons">
+          <i class="fas fa-bars"></i>
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="top-right-icons">
+          <!-- ✅ กดแล้วเปิดรายการคนมาดูโปรไฟล์ -->
+          <div class="viewer-icon" id="viewerIcon">
+            <i class="fas fa-user-friends"></i>
+            <span class="viewer-badge">8</span>
+          </div>
+          <i class="fas fa-share-alt"></i>
+          <i class="fas fa-ellipsis-v"></i>
         </div>
       </div>
+
+      <!-- เนื้อหาโปรไฟล์ -->
+      <div class="profile-header">
+        <div class="avatar-wrap">
+          <div class="profile-avatar" id="profileAvatar"></div>
+          <div class="avatar-add-btn" id="avatarAddBtn">+</div>
+        </div>
+        <div class="profile-name-row">
+          <div class="profile-name" id="profileName">THAIPODEE PRODUCT ENGINEERING</div>
+          <!-- ✅ กดแล้วเปิดสลับบัญชี -->
+          <span class="badge-red" id="switchAccountBtn">9+</span>
+          <i class="fas fa-pencil-alt edit-name-btn" id="editNameBtn"></i>
+        </div>
+        <div class="profile-username">@podee.office.cancel</div>
+
+        <!-- สถิติ -->
+        <div class="profile-stats">
+          <div class="stat-item">
+            <div class="stat-num">3,270</div>
+            <div class="stat-label">กำลังติดตาม</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">1,236</div>
+            <div class="stat-label">ผู้ติดตาม</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">2,739</div>
+            <div class="stat-label">ถูกใจ</div>
+          </div>
+        </div>
+
+        <!-- คำบรรยาย -->
+        <div class="profile-bio">
+          บริการที่ปรึกษา บริหารโครงการ จัดหา ออกแบบ เขียนแบบ ปรับปรุง ซ่อมแซม สร้างบ้าน ประกอบ ติดตั้งเครื่องจักรกลทุกชนิด
+        </div>
+
+        <!-- ติดต่อ — เฉพาะอีเมล ไม่มีเบอร์โทร -->
+        <div class="profile-contact">
+          <div class="contact-item" id="emailContact">
+            <i class="fas fa-envelope"></i>
+            <span>อีเมล</span>
+          </div>
+        </div>
+
+        <!-- ปุ่มร้านค้า / คำสั่งซื้อ -->
+        <div class="shop-btn" id="shopBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span>คำสั่งซื้อของคุณ</span>
+        </div>
+
+        <!-- แถบแท็บ -->
+        <div class="tabs-bar">
+          <div class="tab-item active"><i class="fas fa-th"></i></div>
+          <div class="tab-item"><i class="fas fa-lock"></i></div>
+          <div class="tab-item"><i class="fas fa-heart"></i></div>
+        </div>
+      </div>
+
+      <!-- ตารางวิดีโอ -->
       <div class="videos-grid" id="videosGrid"></div>
+    </div>
+
+    <!-- ===== ✅ หน้ายอดการดูโปรไฟล์ — ตรงเป๊ะตามภาพ ===== -->
+    <div class="viewer-screen" id="viewerScreen">
+      <div class="viewer-header">
+        <i class="fas fa-arrow-left viewer-back" id="viewerBack"></i>
+        <div class="viewer-title">ยอดการดูโปรไฟล์</div>
+        <i class="fas fa-cog viewer-settings"></i>
+      </div>
+      <div class="viewer-list" id="viewerList">
+        <!-- รายการจะถูกเติมด้วย JS -->
+      </div>
+    </div>
+
+    <!-- ===== ✅ Modal สลับบัญชี ===== -->
+    <div class="modal modal-bottom" id="accountModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">สลับบัญชี</div>
+          <i class="fas fa-times modal-close" id="accountClose"></i>
+        </div>
+        <div id="accountList">
+          <!-- รายการบัญชี -->
+          <div class="account-item" data-account="1">
+            <div class="account-avatar" style="background: #000; display:flex;align-items:center;justify-content:center;color:#fff;">
+              <span style="font-size:12px;">P</span>
+            </div>
+            <div class="account-name">podee.office.cancel</div>
+            <i class="fas fa-check account-check"></i>
+          </div>
+          <div class="account-item" data-account="2">
+            <div class="account-avatar" style="background: #555; display:flex;align-items:center;justify-content:center;color:#fff;">
+              <span style="font-size:12px;">🎵</span>
+            </div>
+            <div class="account-name">thaipodee.music.band</div>
+            <span class="badge-red" style="position:static;">9+</span>
+          </div>
+          <div class="account-item" data-account="3">
+            <div class="account-avatar" style="background: #777; display:flex;align-items:center;justify-content:center;color:#fff;">
+              <span style="font-size:12px;">ก</span>
+            </div>
+            <div class="account-name">kompodee</div>
+            <span class="badge-red" style="position:static;">9+</span>
+          </div>
+          <div class="add-account" id="addAccountBtn">
+            <div class="add-account-icon">+</div>
+            <span>เพิ่มบัญชี</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Modal แก้ชื่อ ===== -->
+    <div class="modal modal-dark" id="nameModal">
+      <div class="modal-content">
+        <div class="modal-title">แก้ไขชื่อโปรไฟล์</div>
+        <input type="text" class="modal-input" id="nameInput" placeholder="ใส่ชื่อใหม่">
+        <div class="modal-buttons">
+          <div class="modal-btn cancel" id="nameCancel">ยกเลิก</div>
+          <div class="modal-btn save" id="nameSave">บันทึก</div>
+        </div>
+      </div>
     </div>
 
     <!-- ซ่อน input file -->
@@ -359,56 +479,71 @@
     const caption = $('caption'), likeBtn = $('likeBtn'), likeCount = $('likeCount');
     const musicDisc = $('musicDisc'), viewCount = $('viewCount');
     const profileScreen = $('profileScreen'), videosGrid = $('videosGrid');
-    const navProfile = $('navProfile'), navHome = $('navHome');
-    const uploadBtn = $('uploadBtn'), fullscreenBtn = $('fullscreenBtn');
+    const navProfile = $('navProfile'), navHome = $('navHome'), navShop = $('navShop');
+    const uploadBtn = $('uploadBtn'), timeAgo = $('timeAgo');
     const likersContainer = $('likersContainer');
-    const timeAgo = $('timeAgo');
+    const profileAvatar = $('profileAvatar'), avatarAddBtn = $('avatarAddBtn'), avatarInput = $('avatarInput');
+    const profileName = $('profileName'), editNameBtn = $('editNameBtn');
+    const nameModal = $('nameModal'), nameInput = $('nameInput'), nameCancel = $('nameCancel'), nameSave = $('nameSave');
+    const shopBtn = $('shopBtn');
+    const viewerIcon = $('viewerIcon'), viewerScreen = $('viewerScreen'), viewerBack = $('viewerBack'), viewerList = $('viewerList');
+    const switchAccountBtn = $('switchAccountBtn'), accountModal = $('accountModal'), accountClose = $('accountClose');
 
     let posts = [], isVideo = false, totalViews = 0, totalLikes = 0, isLiked = false;
-    let postDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // เริ่มที่ 2 วันที่แล้ว
+    let postDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
     let likers = [];
-    let isFullscreen = false;
+    let profileAvatarUrl = null;
 
-    // ===== ตัวอย่างรูปโปรไฟล์คนกดถูกใจ =====
+    // ตัวอย่างรูปคนกดถูกใจ
     const sampleAvatars = [
-      'https://i.pravatar.cc/100?img=1',
-      'https://i.pravatar.cc/100?img=2',
-      'https://i.pravatar.cc/100?img=3',
-      'https://i.pravatar.cc/100?img=4',
-      'https://i.pravatar.cc/100?img=5',
-      'https://i.pravatar.cc/100?img=6',
+      'https://i.pravatar.cc/100?img=1', 'https://i.pravatar.cc/100?img=2',
+      'https://i.pravatar.cc/100?img=3', 'https://i.pravatar.cc/100?img=4',
+      'https://i.pravatar.cc/100?img=5', 'https://i.pravatar.cc/100?img=6',
     ];
 
-    // ===== สร้างรูปโปรไฟล์คนกดถูกใจ วนลูป 3 อัน =====
+    // ✅ ข้อมูลคนมาดูโปรไฟล์ — ตรงเป๊ะตามภาพ
+    const viewerData = [
+      { name: 'Dystoverse', avatar: '', status: 'follow' },
+      { name: '', avatar: '', status: 'follow' },
+      { name: ':-', avatar: '', status: 'following' },
+      { name: 'Khun Minkky', avatar: '', status: 'follow' },
+      { name: 'januarihasudungansiahaan', avatar: '', status: 'follow' },
+      { name: 'Tosapon Samruamram', avatar: '', status: 'nudge', sub: 'ใช้งานตอนนี้', online: true },
+      { name: 'Jaoaeimz', avatar: '', status: 'nudge' },
+      { name: 'Nee', avatar: '', status: 'requested' },
+      { name: 'aek_maiaek', avatar: '', status: 'nudge', sub: 'ใช้งานเมื่อ 1 ชั่วโมงที่แล้ว' },
+      { name: 'MECHANIC da Nina 💛🌻✨🦋', avatar: '', status: 'following' },
+      { name: 'Chatchai Phodee', avatar: '', status: 'following' },
+      { name: 'user7175932873850', avatar: '', status: 'following' },
+      { name: 'THAIPODEE MD', avatar: '', status: 'nudge' },
+      { name: 'asllanir_2851', avatar: '', status: 'requested' },
+    ];
+
+    // แสดงรูปคนกดถูกใจ
     function renderLikers() {
       likersContainer.innerHTML = '';
-      const displayLikers = likers.slice(0, 3);
-      displayLikers.forEach((src, idx) => {
+      const display = likers.slice(0, 3);
+      display.forEach((src, i) => {
         const el = document.createElement('div');
         el.className = 'liker-avatar';
         el.style.backgroundImage = `url(${src})`;
-        el.style.animationDelay = `${idx * 4}s`;
+        el.style.animationDelay = `${i * 4}s`;
         likersContainer.appendChild(el);
       });
     }
 
-    // ===== คำนวณเวลาที่โพสต์ =====
+    // อัปเดตเวลาที่โพสต์
     function updateTimeAgo() {
-      const now = new Date();
-      const diffMs = now - postDate;
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      if (diffDays > 0) {
-        timeAgo.textContent = `${diffDays} วันที่แล้ว`;
-      } else if (diffHours > 0) {
-        timeAgo.textContent = `${diffHours} ชม. ที่แล้ว`;
-      } else {
-        timeAgo.textContent = 'เมื่อสักครู่';
-      }
+      const diff = Date.now() - postDate;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      if (days > 0) timeAgo.textContent = `${days} วันที่แล้ว`;
+      else if (hours > 0) timeAgo.textContent = `${hours} ชม. ที่แล้ว`;
+      else timeAgo.textContent = 'เมื่อสักครู่';
     }
-    setInterval(updateTimeAgo, 60000); // อัปเดตทุกนาที
+    setInterval(updateTimeAgo, 60000);
 
-    // ===== อัปโหลดวิดีโอ =====
+    // อัปโหลดวิดีโอ
     hint.addEventListener('click', () => fileInput.click());
     uploadBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => {
@@ -422,82 +557,154 @@
       postDate = new Date();
       updateTimeAgo();
       if (f.type.startsWith('video/')) {
-        isVideo = true;
-        vid.src = url;
-        vid.style.display = 'block';
-        pic.style.display = 'none';
-        vid.play().catch(() => {});
-        musicDisc.classList.add('playing');
+        isVideo = true; vid.src = url; vid.style.display = 'block'; pic.style.display = 'none';
+        vid.play().catch(() => {}); musicDisc.classList.add('playing');
       } else {
-        isVideo = false;
-        pic.src = url;
-        pic.style.display = 'block';
-        vid.style.display = 'none';
+        isVideo = false; pic.src = url; pic.style.display = 'block'; vid.style.display = 'none';
         musicDisc.classList.remove('playing');
       }
       posts.unshift({ type: isVideo ? 'video' : 'image', url, views: totalViews, date: new Date() });
+      document.getElementById('statPosts').textContent = posts.length;
       renderProfileGrid();
     });
 
-    // ===== กดหัวใจ =====
+    // กดหัวใจ
     likeBtn.addEventListener('click', () => {
       if (!isLiked) {
-        totalLikes++;
-        isLiked = true;
+        totalLikes++; isLiked = true;
         likeBtn.querySelector('i').className = 'fas fa-heart';
         likeBtn.querySelector('i').style.color = '#fe2c55';
-        // เพิ่มคนกดถูกใจ
-        const newAvatar = sampleAvatars[likers.length % sampleAvatars.length];
-        likers.unshift(newAvatar);
+        likers.unshift(sampleAvatars[likers.length % sampleAvatars.length]);
         renderLikers();
       } else {
-        totalLikes--;
-        isLiked = false;
+        totalLikes--; isLiked = false;
         likeBtn.querySelector('i').className = 'far fa-heart';
         likeBtn.querySelector('i').style.color = '#fff';
-        likers.shift();
-        renderLikers();
+        likers.shift(); renderLikers();
       }
       likeCount.textContent = totalLikes;
     });
 
-    // ===== กดวิดีโอเพิ่มยอดดู =====
+    // กดวิดีโอเล่น/หยุด
     $('videoContainer').addEventListener('click', e => {
-      if ([hint, uploadBtn, fullscreenBtn].includes(e.target)) return;
+      if ([hint, uploadBtn].includes(e.target)) return;
       if (isVideo && vid.src) {
-        if (vid.paused) {
-          vid.play();
-          musicDisc.classList.add('playing');
-          totalViews++;
-          viewCount.textContent = totalViews;
-          if (posts[0]) posts[0].views = totalViews;
-        } else {
-          vid.pause();
-          musicDisc.classList.remove('playing');
-        }
+        if (vid.paused) { vid.play(); musicDisc.classList.add('playing'); totalViews++; viewCount.textContent = totalViews; }
+        else { vid.pause(); musicDisc.classList.remove('playing'); }
       }
     });
 
-    // ===== เต็มจอ =====
-    fullscreenBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        fullscreenBtn.querySelector('i').className = 'fas fa-compress';
-      } else {
-        document.exitFullscreen();
-        fullscreenBtn.querySelector('i').className = 'fas fa-expand';
-      }
+    // เปิด-ปิด โปรไฟล์
+    navProfile.addEventListener('click', () => { profileScreen.style.display = 'block'; });
+    navHome.addEventListener('click', () => { profileScreen.style.display = 'none'; });
+    navShop.addEventListener('click', () => { profileScreen.style.display = 'block'; });
+
+    // เปลี่ยนรูปโปรไฟล์
+    avatarAddBtn.addEventListener('click', () => avatarInput.click());
+    avatarInput.addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      profileAvatarUrl = URL.createObjectURL(f);
+      profileAvatar.style.backgroundImage = `url(${profileAvatarUrl})`;
+      $('mainAvatarImg').src = profileAvatarUrl;
+      $('mainAvatarImg').style.display = 'block';
+      $('avatarPlaceholder').style.display = 'none';
     });
 
-    // ===== สลับหน้าโปรไฟล์ =====
-    navProfile.addEventListener('click', () => {
+    // เปลี่ยนชื่อโปรไฟล์
+    editNameBtn.addEventListener('click', () => {
+      nameInput.value = profileName.textContent;
+      nameModal.style.display = 'flex';
+    });
+    nameCancel.addEventListener('click', () => { nameModal.style.display = 'none'; });
+    nameSave.addEventListener('click', () => {
+      const newName = nameInput.value.trim();
+      if (newName) profileName.textContent = newName;
+      nameModal.style.display = 'none';
+    });
+    nameModal.addEventListener('click', e => {
+      if (e.target === nameModal) nameModal.style.display = 'none';
+    });
+
+    // ปุ่มร้านค้า
+    shopBtn.addEventListener('click', () => { alert('เปิดหน้าร้านค้า & คำสั่งซื้อ'); });
+
+    // อีเมล — กดเพื่อติดต่อ
+    $('emailContact').addEventListener('click', () => {
+      window.location.href = 'mailto:contact@thaipodee.com?subject=ติดต่อจาก Thaipodee Market';
+    });
+
+    // ✅ กดไอคอนคนดูโปรไฟล์ → เปิดรายการ
+    viewerIcon.addEventListener('click', () => {
+      profileScreen.style.display = 'none';
+      viewerScreen.style.display = 'block';
+      renderViewerList();
+    });
+    viewerBack.addEventListener('click', () => {
+      viewerScreen.style.display = 'none';
       profileScreen.style.display = 'block';
     });
-    navHome.addEventListener('click', () => {
-      profileScreen.style.display = 'none';
+
+    // ✅ แสดงรายการคนมาดูโปรไฟล์ — ตรงเป๊ะตามภาพ
+    function renderViewerList() {
+      viewerList.innerHTML = '';
+      viewerData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'viewer-item';
+        
+        let btnClass = '';
+        let btnText = '';
+        if (item.status === 'follow') { btnClass = 'btn-follow'; btnText = 'ติดตาม'; }
+        else if (item.status === 'following') { btnClass = 'btn-following'; btnText = 'กำลังติดตาม'; }
+        else if (item.status === 'nudge') { btnClass = 'btn-nudge'; btnText = '👆 สะกิด'; }
+        else if (item.status === 'requested') { btnClass = 'btn-requested'; btnText = 'ร้องขอแล้ว'; }
+
+        el.innerHTML = `
+          <div class="viewer-avatar" style="background: #ddd; ${item.online ? 'box-shadow: inset 0 0 0 2px #fff;' : ''}">
+            ${item.online ? '<div class="online-dot"></div>' : ''}
+          </div>
+          <div class="viewer-info">
+            <div class="viewer-name">${item.name || 'ผู้ใช้'}</div>
+            ${item.sub ? `<div class="viewer-status">${item.sub}</div>` : ''}
+          </div>
+          <button class="viewer-btn ${btnClass}">${btnText}</button>
+        `;
+        viewerList.appendChild(el);
+      });
+    }
+
+    // ✅ กด Badge 9+ → เปิดสลับบัญชี
+    switchAccountBtn.addEventListener('click', () => {
+      accountModal.style.display = 'flex';
     });
+    accountClose.addEventListener('click', () => {
+      accountModal.style.display = 'none';
+    });
+    accountModal.addEventListener('click', e => {
+      if (e.target === accountModal) accountModal.style.display = 'none';
+    });
+
+    // สลับบัญชี
+    document.querySelectorAll('.account-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.account-item').forEach(a => {
+          a.querySelector('.account-check')?.remove();
+          a.querySelector('.badge-red')?.style && (a.querySelector('.badge-red').style.display = 'inline');
+        });
+        const check = document.createElement('i');
+        check.className = 'fas fa-check account-check';
+        item.appendChild(check);
+        accountModal.style.display = 'none';
+      });
+    });
+
+    // เพิ่มบัญชี
+    $('addAccountBtn').addEventListener('click', () => {
+      alert('เปิดหน้าลงทะเบียน/เพิ่มบัญชีใหม่');
+    });
+
+    // แสดงตารางวิดีโอ
     function renderProfileGrid() {
-      $('postCount').textContent = posts.length;
       videosGrid.innerHTML = '';
       posts.forEach(p => {
         const cell = document.createElement('div');
@@ -513,7 +720,7 @@
       });
     }
 
-    // ===== อัปเดตเวลาตอนโหลด =====
+    // เริ่มต้น
     updateTimeAgo();
   </script>
 </body>
