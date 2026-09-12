@@ -20,9 +20,11 @@
             border: 2px dashed #444; border-radius: 12px; padding: 50px 20px; 
             text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 20px;
         }
+        .upload-area.has-file { border-color: #00ff88; background: rgba(0,255,136,0.05); }
         .upload-area:hover, .upload-area.dragover { border-color: #ffcc00; background: rgba(255,204,0,0.05); }
         .upload-icon { font-size: 56px; margin-bottom: 12px; }
         .upload-text { font-size: 16px; color: #ccc; }
+        .upload-area.has-file .upload-text { color: #00ff88; font-weight: bold; }
         
         .preview-box { width: 100%; border-radius: 8px; margin-bottom: 15px; background: #111; display: none; }
         .preview-box.active { display: block; }
@@ -38,7 +40,8 @@
             border: none; border-radius: 8px; font-size: 17px; font-weight: bold; 
             cursor: pointer; transition: all 0.2s;
         }
-        .btn-upload:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-upload:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-upload.ready { background: #00dd66; color: #fff; }
         .btn-upload.uploading { background: #ff9900; }
         
         .btn-cancel { 
@@ -56,6 +59,8 @@
 
         #videoInput { display: none; }
         .file-info { font-size: 13px; color: #888; margin-top: 8px; }
+        .file-selected { color: #00ff88; font-size: 14px; margin-top: 10px; display: none; }
+        .file-selected.show { display: block; }
     </style>
 </head>
 <body>
@@ -69,6 +74,7 @@
         <div class="upload-icon">🎥</div>
         <p class="upload-text">แตะเพื่อเลือกวิดีโอ หรือลากไฟล์มาวางที่นี่</p>
         <p class="file-info">รองรับทุกขนาดไฟล์ — ไม่จำกัดความยาววิดีโอ</p>
+        <p class="file-selected" id="fileSelected">✅ เลือกไฟล์แล้ว — กดอัปโหลดได้เลย!</p>
     </div>
     <input type="file" id="videoInput" accept="video/*">
 
@@ -76,14 +82,13 @@
 
     <input type="text" class="input-desc" id="descInput" placeholder="คำอธิบายวิดีโอ...">
 
-    <button class="btn-upload" id="uploadBtn">อัปโหลด</button>
+    <button class="btn-upload" id="uploadBtn" disabled>กรุณาเลือกวิดีโอก่อน</button>
     <button class="btn-cancel" id="cancelBtn">ยกเลิก</button>
 
     <div class="status-msg" id="statusMsg"></div>
 </div>
 
 <script>
-    // ===== ตั้งค่า Cloudinary — เปลี่ยน Cloud Name ให้ตรงกับของคุณ =====
     const CLOUD_NAME = 'thaipodee'; 
     const UPLOAD_PRESET = 'thaipodee_upload';
 
@@ -94,13 +99,12 @@
     const cancelBtn = document.getElementById('cancelBtn');
     const statusMsg = document.getElementById('statusMsg');
     const descInput = document.getElementById('descInput');
+    const fileSelected = document.getElementById('fileSelected');
 
     let selectedFile = null;
 
-    // เปิดเลือกไฟล์
     uploadArea.addEventListener('click', () => videoInput.click());
 
-    // ลากวาง
     uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
     uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
     uploadArea.addEventListener('drop', e => {
@@ -108,33 +112,39 @@
         if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
     });
 
-    // เลือกไฟล์
     videoInput.addEventListener('change', e => {
         if (e.target.files.length) handleFile(e.target.files[0]);
     });
 
-    // ตรวจสอบไฟล์
     function handleFile(file) {
         if (!file.type.startsWith('video/')) {
             showStatus('กรุณาเลือกไฟล์วิดีโอเท่านั้น', 'error');
             return;
         }
         selectedFile = file;
-        showStatus(`เลือกไฟล์: ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`, 'info');
+        
+        // ✅ เปลี่ยนสถานะชัดเจน
+        uploadArea.classList.add('has-file');
+        fileSelected.classList.add('show');
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'อัปโหลดเลย';
+        uploadBtn.classList.add('ready');
+        
+        showStatus(`✅ เลือกไฟล์: ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`, 'info');
+        
         const url = URL.createObjectURL(file);
         previewVid.src = url;
         previewVid.classList.add('active');
-        uploadBtn.disabled = false;
     }
 
-    // อัปโหลด
     uploadBtn.addEventListener('click', async () => {
         if (!selectedFile) { showStatus('กรุณาเลือกวิดีโอก่อน', 'error'); return; }
         
+        uploadBtn.classList.remove('ready');
         uploadBtn.classList.add('uploading');
         uploadBtn.disabled = true;
-        uploadBtn.textContent = 'กำลังอัปโหลด...';
-        showStatus('กำลังอัปโหลดวิดีโอ กรุณารอสักครู่...', 'info');
+        uploadBtn.textContent = 'กำลังอัปโหลด... กรุณารอ';
+        showStatus('กำลังอัปโหลดวิดีโอ กรุณารอจนเสร็จ — อย่าปิดหน้านี้!', 'info');
 
         try {
             const formData = new FormData();
@@ -150,7 +160,7 @@
             const data = await res.json();
             
             if (data.secure_url) {
-                showStatus('✅ อัปโหลดสำเร็จ!', 'success');
+                showStatus('✅ อัปโหลดสำเร็จ! กำลังกลับไปหน้าแรก...', 'success');
                 localStorage.setItem('latestVideo', JSON.stringify({
                     url: data.secure_url,
                     publicId: data.public_id,
@@ -159,20 +169,19 @@
                 }));
                 
                 setTimeout(() => {
-                    history.back(); // กลับหน้าแรกเอง
-                }, 1500);
+                    history.back();
+                }, 1800);
             } else {
                 throw new Error(data.error?.message || 'อัปโหลดไม่สำเร็จ');
             }
         } catch (err) {
             showStatus('❌ ผิดพลาด: ' + err.message, 'error');
             uploadBtn.classList.remove('uploading');
-            uploadBtn.textContent = 'อัปโหลด';
+            uploadBtn.textContent = 'ลองอีกครั้ง';
             uploadBtn.disabled = false;
         }
     });
 
-    // ยกเลิก
     cancelBtn.addEventListener('click', () => history.back());
 
     function showStatus(text, type) {
