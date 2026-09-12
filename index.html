@@ -86,6 +86,21 @@
     const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon'), app=$('app');
     let posts=[], isVid=false, liked=false, likeCount=0, isFullscreen=false;
 
+    // ✅ ป้องกันปุ่มย้อนกลับของเบราว์เซอร์ — ไม่ให้หลุดออกจากแอป
+    history.pushState(null, '', location.href);
+    window.addEventListener('popstate', ()=>{
+      history.pushState(null, '', location.href);
+      // ถ้ามีหน้าเปิดอยู่ → ปิดหน้านั้น แทนที่จะย้อนกลับออก
+      if(profScr.style.display==='block'){
+        profScr.style.display='none';
+        nProf.classList.remove('active');
+        return;
+      }
+      // ถ้าอยู่ที่หน้าแรกแล้ว → ไม่ออกไปไหน
+      closeAll();
+      nHome.classList.add('active');
+    });
+
     function closeAll(){
       profScr.style.display='none';
       document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
@@ -94,7 +109,6 @@
     hint.addEventListener('click', ()=>file.click());
     up.addEventListener('click', ()=>file.click());
 
-    // ปุ่มเต็มจออยู่แถบล่าง
     fullscreenBtn.addEventListener('click', (e)=>{
       e.stopPropagation();
       isFullscreen=!isFullscreen;
