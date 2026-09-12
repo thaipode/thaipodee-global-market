@@ -34,7 +34,26 @@
     .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:5;cursor:pointer}
     .hint i{font-size:48px;margin-bottom:12px}
 
-    /* ===== ปุ่มด้านขวา — FIX ตำแหน่ง right:12px เรียงห่างกัน 24px ===== */
+    /* ===== ✅ โลโก้มุมขวาบน — FIX ตำแหน่งตรงกับ TikTok ===== */
+    .top-logo{
+      position:absolute;
+      top:12px;             /* ✅ FIX: ห่างจากบน 12px ตายตัว */
+      right:12px;           /* ✅ FIX: ห่างจากขวา 12px ตายตัว */
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:15;
+      overflow:hidden;
+      border:2px solid rgba(255,255,255,0.8);
+    }
+    .top-logo img{width:100%;height:100%;object-fit:cover}
+    .top-logo-text{font-size:10px;font-weight:700;color:#000;text-align:center;line-height:1.2}
+
+    /* ===== ปุ่มด้านขวา — FIX ตำแหน่ง right:12px top:28% ห่างกัน 24px ===== */
     .side-actions{
       position:absolute;
       right:12px;          /* ✅ FIX: ห่างขอบขวา 12px ตายตัว */
@@ -80,7 +99,7 @@
       z-index:11;
     }
 
-    /* ===== ข้อความคำอธิบาย — FIX ตำแหน่ง ===== */
+    /* ===== ข้อความคำอธิบาย + ✅ ผู้ชม — FIX ตำแหน่ง ===== */
     .caption{
       position:absolute;
       left:16px;           /* ✅ FIX: ห่างขอบซ้าย 16px */
@@ -89,9 +108,12 @@
       z-index:10;
       pointer-events:none;
     }
-    .caption .username{font-weight:700;font-size:15px;margin-bottom:6px}
-    .caption .desc{font-size:14px;line-height:1.4;margin-bottom:6px}
-    .caption .meta{font-size:12px;color:#ddd}
+    .caption .username{font-weight:700;font-size:15px;margin-bottom:4px}
+    .caption .desc{font-size:14px;line-height:1.4;margin-bottom:4px}
+    .caption .meta{font-size:12px;color:#ddd;margin-bottom:4px}
+    /* ✅ จำนวนผู้ชม — FIX ตำแหน่ง */
+    .caption .views{font-size:12px;color:#aaa;display:flex;align-items:center;gap:4px}
+    .caption .views i{font-size:10px}
 
     /* ===== แถบล่าง — FIX ชิดล่างสุด ตายตัว ===== */
     .bottom-nav{
@@ -219,8 +241,14 @@
 </head>
 <body id="body">
   <div class="app" id="app">
-    <!-- ===== หน้าแรก — FIX ตำแหน่งทุกจุดแล้ว ===== -->
+    <!-- ===== หน้าแรก — FIX ตำแหน่งทุกจุด + เพิ่มโลโก้+ผู้ชม ===== -->
     <div class="video-container" id="videoContainer">
+      <!-- ✅ โลโก้มุมขวาบน — FIX ตำแหน่งตรงกับ TikTok -->
+      <div class="top-logo" id="topLogo">
+        <img id="logoImg" src="https://picsum.photos/72/72" alt="Thaipodee" style="display:none;">
+        <div class="top-logo-text" id="logoPlaceholder">THAI<br>PODEE</div>
+      </div>
+
       <div class="hint" id="hint">
         <i class="fas fa-plus-circle"></i>
         <p>แตะเพื่ออัปโหลด</p>
@@ -228,11 +256,13 @@
       <video id="vid" loop playsinline style="display:none;" muted></video>
       <img id="pic" class="img" style="display:none;" alt="">
       
-      <!-- ข้อความคำอธิบาย — FIX ตำแหน่ง -->
+      <!-- ข้อความคำอธิบาย + ✅ ผู้ชม — FIX ตำแหน่ง -->
       <div class="caption" id="caption" style="display:none;">
         <div class="username" id="capUser">Thaipodee_market</div>
         <div class="desc" id="capDesc">วิดีโอแรกของเรา — Thaipodee Market Online</div>
         <div class="meta" id="capMeta">เสียงต้นฉบับ · สร้างด้วย AI · ประกอบด้วยสื่อ</div>
+        <!-- ✅ จำนวนผู้ชม — เพิ่มตรงนี้ -->
+        <div class="views"><i class="fas fa-play"></i> ผู้ชม <span id="viewCount">0</span> ครั้ง</div>
       </div>
 
       <!-- ปุ่มด้านขวา — FIX ตำแหน่ง right:12px top:28% ห่างกัน 24px -->
@@ -348,12 +378,13 @@
 
     <input type="file" id="fileInput" accept="video/*,image/*" style="display:none;">
     <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+    <input type="file" id="logoInput" accept="image/*" style="display:none;">
   </div>
 
   <script>
     const $=id=>document.getElementById(id);
     const videoContainer=$('videoContainer'), vid=$('vid'), pic=$('pic'), hint=$('hint'), fileInput=$('fileInput');
-    const caption=$('caption'), capUser=$('capUser'), capDesc=$('capDesc'), capMeta=$('capMeta');
+    const caption=$('caption'), capUser=$('capUser'), capDesc=$('capDesc'), capMeta=$('capMeta'), viewCount=$('viewCount');
     const likeBtn=$('likeBtn'), likeCount=$('likeCount'), musicDisc=$('musicDisc');
     const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon');
     const uploadBtn=$('uploadBtn');
@@ -364,8 +395,9 @@
     const mainAvatar=$('mainAvatar'), mainAvatarPlaceholder=$('mainAvatarPlaceholder');
     const topAvatarImg=$('topAvatarImg'), topAvatarPlace=$('topAvatarPlace');
     const videosGrid=$('videosGrid');
+    const logoInput=$('logoInput'), logoImg=$('logoImg'), logoPlaceholder=$('logoPlaceholder');
     
-    let posts=[], isVideo=false, liked=false, countLikes=0, isFullscreen=false;
+    let posts=[], isVideo=false, liked=false, countLikes=0, isFullscreen=false, totalViews=0;
 
     history.pushState(null, '', location.href);
     window.addEventListener('popstate', ()=>{
@@ -400,6 +432,10 @@
       pic.style.display='none';
       caption.style.display='block';
       isVideo=f.type.startsWith('video/');
+      // ✅ เพิ่มยอดดูเมื่อโพสต์วิดีโอ
+      totalViews=Math.floor(Math.random()*100)+10; // สุ่ม 10-100 ครั้ง
+      viewCount.textContent=totalViews;
+      
       if(isVideo){
         vid.style.display='block';
         vid.src=url;
@@ -411,15 +447,19 @@
         pic.src=url;
         musicDisc.classList.remove('playing');
       }
-      posts.unshift({type:isVideo?'video':'image',url,views:Math.floor(Math.random()*200)});
+      posts.unshift({type:isVideo?'video':'image',url,views:totalViews});
     });
 
+    // ✅ เพิ่มยอดดูเมื่อกดเล่นวิดีโอ
     videoContainer.addEventListener('click', e=>{
       if([hint,uploadBtn,fullscreenBtn].includes(e.target)) return;
       if(isVideo && vid.src){
         if(vid.paused){
           vid.play();
           musicDisc.classList.add('playing');
+          totalViews++;
+          viewCount.textContent=totalViews;
+          if(posts[0]) posts[0].views=totalViews;
         }else{
           vid.pause();
           musicDisc.classList.remove('playing');
@@ -445,6 +485,15 @@
       profileAvatar.src=url; profileAvatar.style.display='block'; profileAvatarPlace.style.display='none';
       mainAvatar.src=url; mainAvatar.style.display='block'; mainAvatarPlaceholder.style.display='none';
       topAvatarImg.src=url; topAvatarImg.style.display='block'; topAvatarPlace.style.display='none';
+    });
+
+    // เปลี่ยนโลโก้
+    document.getElementById('topLogo').addEventListener('click', ()=>logoInput.click());
+    logoInput.addEventListener('change', e=>{
+      const f=e.target.files[0];
+      if(!f) return;
+      const url=URL.createObjectURL(f);
+      logoImg.src=url; logoImg.style.display='block'; logoPlaceholder.style.display='none';
     });
 
     fullscreenBtn.addEventListener('click', e=>{
