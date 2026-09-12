@@ -10,11 +10,11 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%;width:100%;overflow:hidden;background:#000;color:#fff;font-family:sans-serif}
     .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
-    .main{flex:1;position:relative;width:100%;overflow:hidden;background:#000;cursor:pointer}
-    video,.img{width:100%;height:100%;object-fit:contain;position:absolute;top:0;left:0;background:#000}
+    .main{flex:1;position:relative;width:100%;overflow:hidden;background:#000;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    video,.img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;background:#000}
     .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:6;cursor:pointer}
     .hint i{font-size:48px;margin-bottom:12px}
-    .side{position:absolute;right:12px;bottom:90px;display:flex;flex-direction:column;gap:24px;z-index:10}
+    .side{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;z-index:10}
     .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
     .side-item i{font-size:28px}
     .bottom{height:60px;min-height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);z-index:20}
@@ -83,12 +83,9 @@
       document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
     }
 
-    // ✅ ปุ่มบวกตรงกลางจอ — ทำงานแน่นอน
     hint.addEventListener('click', ()=>file.click());
-    // ✅ ปุ่มบวกด้านล่าง — ทำงานแน่นอน
     up.addEventListener('click', ()=>file.click());
 
-    // เลือกไฟล์ — ทั้งรูปและวิดีโอ
     file.addEventListener('change', (e)=>{
       const f=e.target.files[0];
       if(!f) return;
@@ -111,7 +108,6 @@
       grid.innerHTML=posts.map(p=>`<div class="cell">${p.type==='video'?'<video src="'+p.url+'" muted></video>':'<img src="'+p.url+'" alt="">'}</div>`).join('');
     });
 
-    // กดวิดีโอเพื่อหยุด/เล่น
     main.addEventListener('click', (e)=>{
       if(e.target===hint || e.target===up) return;
       if(isVid && vid.src){
@@ -120,7 +116,6 @@
       }
     });
 
-    // ไลค์
     like.addEventListener('click', ()=>{
       liked=!liked;
       likeCount+=liked?1:-1;
@@ -128,7 +123,6 @@
       like.querySelector('i').className=liked?'fas fa-heart text-red-500':'far fa-heart text-2xl';
     });
 
-    // เมนูล่าง
     nHome.addEventListener('click', ()=>{closeAll();nHome.classList.add('active');});
     nSearch.addEventListener('click', ()=>{closeAll();nSearch.classList.add('active');});
     nMsg.addEventListener('click', ()=>{closeAll();nMsg.classList.add('active');});
