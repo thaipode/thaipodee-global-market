@@ -8,56 +8,121 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{height:100%;width:100%;overflow:hidden;background:#000;color:#fff;font-family:sans-serif}
-    .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
+    html,body{height:100%;width:100%;overflow:hidden;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#000}
     .main{
       flex:1;
       position:relative;
       width:100%;
+      height:100%;
       overflow:hidden;
       background:#000;
       cursor:pointer;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:0 0 60px 0
     }
     video,.img{
+      position:absolute;
+      inset:0;
       width:100%;
       height:100%;
       object-fit:cover;
-      background:#000
+      background:#000;
     }
-    .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:6;cursor:pointer}
+    .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:5;cursor:pointer}
     .hint i{font-size:48px;margin-bottom:12px}
+    /* ปุ่มด้านขวา — เหมือน TikTok */
     .side{
       position:absolute;
-      right:8px;
-      top:50%;
-      transform:translateY(-50%);
+      right:12px;
+      bottom:140px;
       display:flex;
       flex-direction:column;
+      align-items:center;
       gap:24px;
-      z-index:10
+      z-index:10;
     }
     .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-    .side-item i{font-size:28px}
-    .bottom{height:60px;min-height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);z-index:20}
-    .nav{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#888}
+    .side-item i{font-size:28px;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+    .side-item span{font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+    /* จานเพลงหมุน */
+    .music-disc{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#333,#111);
+      border:3px solid #555;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      animation:spin 3s linear infinite;
+      animation-play-state:paused;
+    }
+    .music-disc.playing{animation-play-state:running}
+    .music-disc img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    /* ข้อความมุมล่างซ้าย */
+    .caption{
+      position:absolute;
+      left:16px;
+      bottom:90px;
+      right:80px;
+      z-index:10;
+      pointer-events:none;
+    }
+    .caption .username{font-weight:700;font-size:15px;margin-bottom:6px;text-shadow:0 1px 3px rgba(0,0,0,0.6)}
+    .caption .desc{font-size:14px;line-height:1.4;margin-bottom:6px;text-shadow:0 1px 3px rgba(0,0,0,0.6);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .caption .meta{font-size:12px;color:#ddd;text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+    /* แถบล่าง — เหมือน TikTok */
+    .bottom{
+      height:60px;
+      min-height:60px;
+      background:#000;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      flex-shrink:0;
+      padding-bottom:env(safe-area-inset-bottom);
+      z-index:20;
+      border-top:1px solid #1a1a1a;
+    }
+    .nav{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#999;font-size:11px}
+    .nav i{font-size:22px}
     .nav.active{color:#fff}
-    .plus{width:44px;height:44px;background:#fff;color:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;cursor:pointer}
+    .plus-btn{
+      width:44px;
+      height:32px;
+      background:linear-gradient(180deg,#fff,#ddd);
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#000;
+      font-size:24px;
+      font-weight:600;
+      cursor:pointer;
+      position:relative;
+    }
+    .plus-btn::before{
+      content:'';
+      position:absolute;
+      inset:-2px;
+      background:linear-gradient(90deg,#25f4ee,#fe28ea);
+      border-radius:7px;
+      z-index:-1;
+    }
+    /* หน้าโปรไฟล์ */
     .profile{position:fixed;inset:0;background:#000;z-index:100;padding:20px;overflow-y:auto;display:none}
     .close{position:absolute;top:10px;right:10px;font-size:24px;cursor:pointer}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:20px}
-    .cell{aspect-ratio:9/16;background:#222;border-radius:4px;overflow:hidden}
-    .fullscreen-mode .main{padding-bottom:0}
-    .fullscreen-mode video, .fullscreen-mode .img{
-      width:100%;
-      height:100%;
-      object-fit:cover
-    }
-    .fullscreen-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#888;font-size:20px}
-    .fullscreen-btn.active{color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:20px}
+    .cell{aspect-ratio:9/16;background:#1a1a1a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
+    .cell video,.cell img{width:100%;height:100%;object-fit:cover}
+    .cell .play-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;color:rgba(255,255,255,0.8);pointer-events:none}
+    .avatar{width:80px;height:80px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;margin:0 auto}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .name-input{background:#1a1a1a;border:none;border-radius:6px;padding:8px 12px;color:#fff;text-align:center;font-size:18px;margin-top:12px;width:100%;max-width:260px;outline:none}
+    .fullscreen-btn{position:absolute;top:12px;right:12px;font-size:22px;color:rgba(255,255,255,0.8);background:rgba(0,0,0,0.4);padding:6px 10px;border-radius:6px;z-index:15;cursor:pointer}
   </style>
 </head>
 <body id="body">
@@ -67,130 +132,249 @@
         <i class="fas fa-plus-circle"></i>
         <p>แตะเพื่ออัปโหลด</p>
       </div>
-      <video id="vid" loop playsinline style="display:none;"></video>
+      <video id="vid" loop playsinline style="display:none;" muted></video>
       <img id="pic" class="img" style="display:none;" alt="">
-    </div>
-    <div class="side">
-      <div class="side-item" id="pTop"><i class="fas fa-user-circle text-white text-2xl"></i></div>
-      <div class="side-item" id="like"><i class="far fa-heart text-2xl"></i><span id="lc" class="text-xs mt-1">0</span></div>
-      <div class="side-item"><i class="far fa-comment text-2xl"></i><span class="text-xs mt-1">0</span></div>
-      <div class="side-item"><i class="far fa-bookmark text-2xl"></i></div>
-      <div class="side-item"><i class="fas fa-music text-2xl"></i></div>
-      <div class="side-item"><i class="fas fa-ellipsis-v text-2xl"></i></div>
-    </div>
-    <div class="bottom">
-      <div class="nav active" id="nHome"><i class="fas fa-home text-xl"></i></div>
-      <div class="nav" id="nSearch"><i class="fas fa-search text-xl"></i></div>
-      <div class="nav plus" id="up">+</div>
-      <div class="nav" id="nMsg"><i class="far fa-paper-plane text-xl"></i></div>
-      <div class="nav" id="nProf"><i class="far fa-user text-xl"></i></div>
+      
+      <!-- ข้อความมุมล่างซ้าย -->
+      <div class="caption" id="caption" style="display:none;">
+        <div class="username" id="capUser">Thaipodee_market</div>
+        <div class="desc" id="capDesc">วิดีโอแรกของเรา — Thaipodee Market Online</div>
+        <div class="meta" id="capMeta">เสียงต้นฉบับ · สร้างด้วย AI · ประกอบด้วยสื่อ</div>
+      </div>
+      
+      <!-- ปุ่มเต็มจอ -->
       <div class="fullscreen-btn" id="fullscreenBtn">
         <i class="fas fa-expand" id="fullscreenIcon"></i>
       </div>
     </div>
-    <input type="file" id="file" accept="video/*,image/*" style="display:none;">
-    <div class="profile" id="profScr">
-      <i class="fas fa-times close" id="closeP"></i>
-      <div class="text-center mt-10">
-        <div class="w-20 h-20 bg-gray-600 rounded-full mx-auto"></div>
-        <h2 class="text-xl mt-3 font-bold">Thaipodee_market</h2>
-        <p class="text-gray-400 mt-1">@Thaipodee_market</p>
-        <div class="flex justify-center gap-8 mt-5">
-          <div><div id="vc" class="font-bold">0</div><div class="text-xs text-gray-400">วิดีโอ</div></div>
-          <div><div class="font-bold">0</div><div class="text-xs text-gray-400">ติดตาม</div></div>
+    
+    <!-- ปุ่มด้านขวา — เหมือน TikTok -->
+    <div class="side">
+      <div class="side-item" id="avatarBtnMain">
+        <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-white/80">
+          <img id="mainAvatar" src="" class="w-full h-full object-cover" alt="">
+          <i class="fas fa-user text-base text-white/80" id="mainAvatarPlaceholder"></i>
+        </div>
+      </div>
+      <div class="side-item" id="likeBtn">
+        <i class="far fa-heart"></i>
+        <span id="likeCount">0</span>
+      </div>
+      <div class="side-item">
+        <i class="far fa-comment"></i>
+        <span>0</span>
+      </div>
+      <div class="side-item">
+        <i class="far fa-bookmark"></i>
+        <span>0</span>
+      </div>
+      <div class="side-item">
+        <i class="fas fa-share"></i>
+        <span>17</span>
+      </div>
+      <div class="side-item music-disc" id="musicDisc">
+        <img src="https://picsum.photos/50/50" alt="">
+      </div>
+    </div>
+    
+    <!-- แถบล่าง — เหมือน TikTok -->
+    <div class="bottom">
+      <div class="nav active" id="nHome"><i class="fas fa-home"></i><span>หน้าหลัก</span></div>
+      <div class="nav" id="nDiscover"><i class="fas fa-compass"></i><span>ค้นพบ</span></div>
+      <div class="plus-btn" id="uploadBtn">+</div>
+      <div class="nav" id="nInbox"><i class="fas fa-inbox"></i><span>กล่องขาเข้า</span></div>
+      <div class="nav" id="nProfile"><i class="fas fa-user"></i><span>โปรไฟล์</span></div>
+    </div>
+    
+    <input type="file" id="fileInput" accept="video/*,image/*" style="display:none;">
+    <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+    
+    <!-- หน้าโปรไฟล์ -->
+    <div class="profile" id="profilePage">
+      <i class="fas fa-times close" id="closeProfile"></i>
+      <div class="text-center mt-12">
+        <div class="avatar" id="avatarBtn">
+          <img id="avatarImg" src="" alt="" style="display:none;">
+          <i class="fas fa-user text-2xl text-gray-400" id="avatarPlace"></i>
+        </div>
+        <input type="text" class="name-input" id="profileName" value="Thaipodee_market" maxlength="24">
+        <p class="text-gray-400 mt-2">@<span id="profileHandle">Thaipodee_market</span></p>
+        <div class="flex justify-center gap-10 mt-6">
+          <div class="text-center"><div class="font-bold text-lg" id="videoCount">0</div><div class="text-xs text-gray-400">วิดีโอ</div></div>
+          <div class="text-center"><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">ผู้ติดตาม</div></div>
+          <div class="text-center"><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">ถูกใจ</div></div>
         </div>
       </div>
       <h4 class="font-semibold mt-8 mb-3">ผลงานของฉัน</h4>
-      <div class="grid" id="grid">
-        <div class="col-span-3 text-center py-8 text-gray-400">ยังไม่มีโพสต์</div>
+      <div class="grid" id="postsGrid">
+        <div class="col-span-3 text-center py-10 text-gray-400">ยังไม่มีโพสต์</div>
       </div>
     </div>
   </div>
+
   <script>
     const $=id=>document.getElementById(id);
-    const main=$('main'), hint=$('hint'), vid=$('vid'), pic=$('pic'), file=$('file');
-    const nHome=$('nHome'), nSearch=$('nSearch'), nMsg=$('nMsg'), nProf=$('nProf');
-    const profScr=$('profScr'), closeP=$('closeP');
-    const like=$('like'), lc=$('lc'), up=$('up'), grid=$('grid'), vc=$('vc');
-    const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon'), app=$('app');
-    let posts=[], isVid=false, liked=false, likeCount=0, isFullscreen=false;
+    // Elements
+    const main=$('main'), hint=$('hint'), vid=$('vid'), pic=$('pic'), fileInput=$('fileInput');
+    const caption=$('caption'), capUser=$('capUser'), capDesc=$('capDesc'), capMeta=$('capMeta');
+    const likeBtn=$('likeBtn'), likeCount=$('likeCount'), musicDisc=$('musicDisc');
+    const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon');
+    const uploadBtn=$('uploadBtn'), nHome=$('nHome'), nDiscover=$('nDiscover'), nInbox=$('nInbox'), nProfile=$('nProfile');
+    const profilePage=$('profilePage'), closeProfile=$('closeProfile');
+    const avatarBtn=$('avatarBtn'), avatarInput=$('avatarInput'), avatarImg=$('avatarImg'), avatarPlace=$('avatarPlace');
+    const mainAvatar=$('mainAvatar'), mainAvatarPlaceholder=$('mainAvatarPlaceholder');
+    const profileName=$('profileName'), profileHandle=$('profileHandle');
+    const postsGrid=$('postsGrid'), videoCount=$('videoCount');
+    
+    let posts=[], isVideo=false, liked=false, countLikes=0, isFullscreen=false;
 
+    // ป้องกันย้อนกลับหลุด
     history.pushState(null, '', location.href);
     window.addEventListener('popstate', ()=>{
       history.pushState(null, '', location.href);
-      if(profScr.style.display==='block'){
-        profScr.style.display='none';
-        nProf.classList.remove('active');
+      if(profilePage.style.display==='block'){
+        closeAll();
         return;
       }
-      closeAll();
+      resetNav();
       nHome.classList.add('active');
     });
 
     function closeAll(){
-      profScr.style.display='none';
-      document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+      profilePage.style.display='none';
+      resetNav();
+    }
+    function resetNav(){
+      [nHome,nDiscover,nInbox,nProfile].forEach(n=>n.classList.remove('active'));
     }
 
-    hint.addEventListener('click', ()=>file.click());
-    up.addEventListener('click', ()=>file.click());
+    // อัปโหลด
+    hint.addEventListener('click', ()=>fileInput.click());
+    uploadBtn.addEventListener('click', ()=>fileInput.click());
 
-    fullscreenBtn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      isFullscreen=!isFullscreen;
-      if(isFullscreen){
-        app.classList.add('fullscreen-mode');
-        fullscreenIcon.className='fas fa-compress';
-        fullscreenBtn.classList.add('active');
-      }else{
-        app.classList.remove('fullscreen-mode');
-        fullscreenIcon.className='fas fa-expand';
-        fullscreenBtn.classList.remove('active');
-      }
-    });
-
-    file.addEventListener('change', (e)=>{
+    fileInput.addEventListener('change', e=>{
       const f=e.target.files[0];
       if(!f) return;
       const url=URL.createObjectURL(f);
       hint.style.display='none';
       vid.style.display='none';
       pic.style.display='none';
-      isVid=f.type.startsWith('video/');
-      if(isVid){
+      caption.style.display='block';
+      isVideo=f.type.startsWith('video/');
+      if(isVideo){
         vid.style.display='block';
         vid.src=url;
         vid.muted=false;
-        vid.play().catch(()=>{});
+        vid.play().catch(()=>vid.muted=true);
+        musicDisc.classList.add('playing');
       }else{
         pic.style.display='block';
         pic.src=url;
+        musicDisc.classList.remove('playing');
       }
-      posts.unshift({type:isVid?'video':'image',url});
-      vc.textContent=posts.length;
-      grid.innerHTML=posts.map(p=>`<div class="cell">${p.type==='video'?'<video src="'+p.url+'" muted></video>':'<img src="'+p.url+'" alt="">'}</div>`).join('');
+      posts.unshift({type:isVideo?'video':'image',url});
+      videoCount.textContent=posts.length;
+      renderPosts();
     });
 
-    main.addEventListener('click', (e)=>{
-      if(e.target===hint || e.target===up || e.target===fullscreenBtn) return;
-      if(isVid && vid.src){
-        if(vid.paused) vid.play();
-        else vid.pause();
+    // กดเล่น/หยุด + จานเพลงหมุน
+    main.addEventListener('click', e=>{
+      if([hint,uploadBtn,fullscreenBtn].includes(e.target)) return;
+      if(isVideo && vid.src){
+        if(vid.paused){
+          vid.play();
+          musicDisc.classList.add('playing');
+        }else{
+          vid.pause();
+          musicDisc.classList.remove('playing');
+        }
       }
     });
 
-    like.addEventListener('click', ()=>{
+    // ไลค์
+    likeBtn.addEventListener('click', ()=>{
       liked=!liked;
-      likeCount+=liked?1:-1;
-      lc.textContent=likeCount;
-      like.querySelector('i').className=liked?'fas fa-heart text-red-500':'far fa-heart text-2xl';
+      countLikes+=liked?1:-1;
+      likeCount.textContent=countLikes;
+      likeBtn.querySelector('i').className=liked?'fas fa-heart text-red-500':'far fa-heart';
     });
 
+    // เปลี่ยนรูปโปรไฟล์ — ทั้งหน้าแรกและหน้าโปรไฟล์
+    avatarBtn.addEventListener('click', ()=>avatarInput.click());
+    avatarBtnMain.addEventListener('click', ()=>avatarInput.click());
+    avatarInput.addEventListener('change', e=>{
+      const f=e.target.files[0];
+      if(!f) return;
+      const url=URL.createObjectURL(f);
+      avatarImg.src=url; avatarImg.style.display='block'; avatarPlace.style.display='none';
+      mainAvatar.src=url; mainAvatar.style.display='block'; mainAvatarPlaceholder.style.display='none';
+    });
+
+    // เปลี่ยนชื่อ
+    profileName.addEventListener('input', ()=>{
+      const name=profileName.value.trim()||'Thaipodee_market';
+      profileHandle.textContent=name;
+      capUser.textContent=name;
+    });
+
+    // เต็มจอ
+    fullscreenBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      isFullscreen=!isFullscreen;
+      if(isFullscreen){
+        document.documentElement.requestFullscreen?.();
+        fullscreenIcon.className='fas fa-compress';
+      }else{
+        document.exitFullscreen?.();
+        fullscreenIcon.className='fas fa-expand';
+      }
+    });
+
+    // เมนู
     nHome.addEventListener('click', ()=>{closeAll();nHome.classList.add('active');});
-    nSearch.addEventListener('click', ()=>{closeAll();nSearch.classList.add('active');});
-    nMsg.addEventListener('click', ()=>{closeAll();nMsg.classList.add('active');});
-    nProf.addEventListener('click', ()=>{closeAll();nProf.classList.add('active');profScr.style.display='block';});
-    closeP.addEventListener('click', ()=>{profScr.style.display='none';nProf.classList.remove('active');});
+    nDiscover.addEventListener('click', ()=>{closeAll();nDiscover.classList.add('active');});
+    nInbox.addEventListener('click', ()=>{closeAll();nInbox.classList.add('active');});
+    nProfile.addEventListener('click', ()=>{closeAll();nProfile.classList.add('active');profilePage.style.display='block';});
+    closeProfile.addEventListener('click', closeAll);
+
+    // แสดงผลงาน + กดเล่นได้
+    function renderPosts(){
+      if(posts.length===0){
+        postsGrid.innerHTML='<div class="col-span-3 text-center py-10 text-gray-400">ยังไม่มีโพสต์</div>';
+        return;
+      }
+      postsGrid.innerHTML=posts.map((p,i)=>`
+        <div class="cell" data-idx="${i}">
+          ${p.type==='video'
+            ?`<video src="${p.url}" muted loop></video><i class="fas fa-play play-icon"></i>`
+            :`<img src="${p.url}" alt="">`
+          }
+        </div>
+      `).join('');
+      document.querySelectorAll('.cell').forEach(c=>{
+        c.addEventListener('click', ()=>{
+          const idx=parseInt(c.dataset.idx);
+          const p=posts[idx];
+          closeAll();
+          hint.style.display='none';
+          vid.style.display='none';
+          pic.style.display='none';
+          caption.style.display='block';
+          isVideo=p.type==='video';
+          if(isVideo){
+            vid.style.display='block';
+            vid.src=p.url;
+            vid.muted=false;
+            vid.play().catch(()=>vid.muted=true);
+            musicDisc.classList.add('playing');
+          }else{
+            pic.style.display='block';
+            pic.src=p.url;
+            musicDisc.classList.remove('playing');
+          }
+        });
+      });
+    }
   </script>
 </body>
 </html>
