@@ -5,26 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThaiPodee Market Online</title>
     
-    <!-- ===== ตั้งค่าคลาวด์ — แก้ตรงนี้ให้ตรงกับของคุณ ===== -->
+    <!-- ===== ตั้งค่าคลาวด์ — ใส่ชื่อจริงของคุณ ===== -->
     <script>
         const APP_CONFIG = {
-            CLOUD_NAME: 'thaipodee',           // ✅ ใส่ชื่อคลาวด์จริงของคุณ
-            UPLOAD_PRESET: 'thaipodee_upload',  // ✅ ชื่อ Preset ที่สร้างไว้
+            CLOUD_NAME: 'thaipodee',           // ✅ ต้องตรงกับ Cloudinary Dashboard
+            UPLOAD_PRESET: 'thaipodee_upload',  // ✅ ต้องตรงกับที่สร้างไว้
             FOLDER: 'thaipodee_videos'
         };
     </script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-    <!-- ====================================================== -->
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
+        html, body { background: #000; color: #fff; height: 100%; overflow: hidden; }
 
         /* ===== หน้าเปิดแอป — โลโก้หมุน ===== */
-        .splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.8s ease; }
+        .splash { 
+            position: fixed; inset: 0; background: #000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 100; transition: opacity 0.8s ease;
+        }
         .logo-container { position: relative; width: 200px; height: 200px; margin-bottom: 30px; }
-        .logo-gear { position: absolute; inset: 0; border: 12px solid #fff; border-radius: 500px; animation: rotate 10s linear infinite; }
-        .logo-map { position: absolute; inset: 30px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><path fill="white" d="M150,40 C180,50 210,70 230,100 C250,130 250,160 240,180 C230,200 210,210 190,215 C170,220 155,235 145,255 C135,275 120,285 110,275 C100,265 100,245 105,225 C110,205 100,185 85,165 C70,145 75,125 90,105 C110,75 130,55 150,40 Z"/></svg>') no-repeat center; background-size: contain; }
+        .logo-gear { 
+            position: absolute; inset: 0; 
+            border: 12px solid #fff; border-radius: 50%; 
+            animation: rotate 10s linear infinite;
+        }
+        .logo-map { 
+            position: absolute; inset: 30px; 
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><path fill="white" d="M150,40 C180,50 210,70 230,100 C250,130 250,160 240,180 C230,200 210,210 190,215 C170,220 155,235 145,255 C135,275 120,285 110,275 C100,265 100,245 105,225 C110,205 100,185 85,165 C70,145 75,125 90,105 C110,75 130,55 150,40 Z"/></svg>') no-repeat center; 
+            background-size: contain;
+        }
         .logo-cross { position: absolute; inset: 0; }
         .logo-cross::before, .logo-cross::after { content: ''; position: absolute; background: white; }
         .logo-cross::before { width: 3px; height: 100%; left: 50%; transform: translateX(-50%); }
@@ -33,23 +44,45 @@
         .sub-name { font-size: 16px; opacity: 0.7; margin-top: 5px; }
         @keyframes rotate { from{transform: rotate(0deg);} to{transform: rotate(360deg);} }
 
-        /* ===== หน้าหลัก TikTok-Style ===== */
-        .app-container { display: none; height: 100vh; position: relative; }
-        .video-container { width: 100%; height: 100vh; position: relative; scroll-snap-type: y mandatory; overflow-y: auto; }
-        .video-slide { height: 100vh; position: relative; scroll-snap-align: start; background: #111; display: flex; align-items: center; justify-content: center; }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        /* ===== หน้าหลัก — แก้ไขให้แน่นอนว่าแสดงผล ===== */
+        .app-container { 
+            display: none; width: 100%; height: 100vh; 
+            position: relative; background: #000;
+        }
+        .video-container { 
+            width: 100%; height: 100vh; position: relative; 
+            scroll-snap-type: y mandatory; overflow-y: auto;
+        }
+        .video-slide { 
+            height: 100vh; position: relative; scroll-snap-align: start; 
+            background: #111; display: flex; align-items: center; justify-content: center;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 
         /* ===== ไอคอนด้านขวา ===== */
-        .side-icons { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 10; }
+        .side-icons { 
+            position: absolute; right: 15px; bottom: 120px; 
+            display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 10;
+        }
         .side-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .side-icon span { font-size: 11px; margin-top: 4px; }
-        .icon-circle { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .icon-circle { 
+            width: 48px; height: 48px; border-radius: 50%; 
+            background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
 
         /* ===== เมนูล่าง ===== */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 20; }
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; height: 65px; 
+            background: #000; display: flex; justify-content: space-around; align-items: center; 
+            border-top: 1px solid #333; z-index: 20;
+        }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #888; cursor: pointer; }
         .nav-item.active { color: #fff; }
-        .nav-plus { width: 45px; height: 30px; background: #ffcc00; border-radius: 6px; position: relative; cursor: pointer; }
+        .nav-plus { 
+            width: 45px; height: 30px; background: #ffcc00; border-radius: 6px; 
+            position: relative; cursor: pointer;
+        }
         .nav-plus::before, .nav-plus::after { content: ''; position: absolute; background: #000; }
         .nav-plus::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
         .nav-plus::after { width: 2px; height: 18px; left: 50%; top: 50%; transform: translate(-50%,-50%); }
@@ -58,6 +91,12 @@
         .video-info { position: absolute; left: 15px; bottom: 100px; z-index: 10; max-width: 75%; }
         .video-info h3 { font-size: 16px; margin-bottom: 8px; }
         .video-info p { font-size: 13px; opacity: 0.8; line-height: 1.4; }
+        
+        /* ===== ข้อความแจ้งเตือนเมื่อไม่มีวิดีโอ ===== */
+        .empty-state { 
+            color: #888; text-align: center; padding: 40px; 
+            font-size: 15px; line-height: 1.8;
+        }
     </style>
 </head>
 <body>
@@ -73,10 +112,18 @@
     <div class="sub-name">Market Online</div>
 </div>
 
-<!-- ===== แอปหลัก ===== -->
+<!-- ===== แอปหลัก — แก้ไขให้แสดงผลแน่นอน ===== -->
 <div class="app-container" id="appMain">
     <div class="video-container" id="videoContainer">
-        <!-- วิดีโอจะถูกเพิ่มตรงนี้แบบอัตโนมัติ -->
+        <!-- ข้อความเริ่มต้น เมื่อยังไม่มีวิดีโอ -->
+        <div class="video-slide">
+            <div class="empty-state">
+                🎥 ยินดีต้อนรับสู่ ThaiPodee<br><br>
+                กดปุ่ม ➕ ด้านล่างเพื่ออัปโหลดวิดีโอแรกของคุณ!<br>
+                รองรับทุกขนาดไฟล์ — ไม่จำกัดความยาว 🇹🇭
+            </div>
+        </div>
+        <!-- วิดีโอที่อัปโหลดจะแสดงด้านล่างนี้ -->
     </div>
 
     <!-- เมนูล่าง -->
@@ -90,58 +137,275 @@
 </div>
 
 <script>
-    // ===== ปิดหน้าเปิดแอป =====
-    setTimeout(() => {
-        document.getElementById('splashScreen').style.opacity = '0';
+    // ===== ปิดหน้าเปิดแอป — แก้ไขให้ทำงานแน่นอน =====
+    function showMainApp() {
+        const splash = document.getElementById('splashScreen');
+        const main = document.getElementById('appMain');
+        
+        splash.style.opacity = '0';
+        
         setTimeout(() => {
-            document.getElementById('splashScreen').style.display = 'none';
-            document.getElementById('appMain').style.display = 'block';
-            loadVideos(); // โหลดวิดีโอที่อัปโหลดมา
+            splash.style.display = 'none';
+            main.style.display = 'block';
+            console.log('✅ เข้าสู่หน้าหลักสำเร็จ!');
+            loadVideos(); // โหลดวิดีโอ
         }, 800);
-    }, 3000);
+    }
+    
+    // รอโหลดหน้าเสร็จ แล้วค่อยเปลี่ยนหน้า
+    window.addEventListener('load', () => {
+        setTimeout(showMainApp, 3000);
+    });
 
     // ===== ไปหน้าอัปโหลด =====
     function goUpload() {
-        window.location.href = 'upload.html'; // ไปหน้าอัปโหลด
+        window.location.href = 'upload.html';
     }
 
     // ===== โหลดวิดีโอจากคลาวด์ =====
     function loadVideos() {
         const saved = localStorage.getItem('latestVideo');
-        if (!saved) return;
+        if (!saved) {
+            console.log('📭 ยังไม่มีวิดีโอที่อัปโหลด');
+            return;
+        }
         
-        const data = JSON.parse(saved);
-        const container = document.getElementById('videoContainer');
-        
-        const slide = document.createElement('div');
-        slide.className = 'video-slide';
-        slide.innerHTML = `
-            <video src="${data.url}" loop muted playsinline controls></video>
-            <div class="video-info">
-                <h3>@ThaiPodee_Official</h3>
-                <p>${data.description || 'ยินดีต้อนรับสู่ ThaiPodee 🇹🇭'}</p>
-            </div>
-            <div class="side-icons">
-                <div class="side-icon"><div class="icon-circle">❤️</div><span>0</span></div>
-                <div class="side-icon"><div class="icon-circle">💬</div><span>0</span></div>
-                <div class="side-icon"><div class="icon-circle">↗️</div><span>แชร์</span></div>
-                <div class="side-icon"><div class="icon-circle">🎵</div><span>เสียง</span></div>
-            </div>
-        `;
-        container.appendChild(slide);
+        try {
+            const data = JSON.parse(saved);
+            const container = document.getElementById('videoContainer');
+            
+            // ลบข้อความเริ่มต้นออกก่อน
+            container.innerHTML = '';
+            
+            // เพิ่มวิดีโอ
+            const slide = document.createElement('div');
+            slide.className = 'video-slide';
+            slide.innerHTML = `
+                <video src="${data.url}" loop muted playsinline controls></video>
+                <div class="video-info">
+                    <h3>@ThaiPodee_Official</h3>
+                    <p>${data.description || 'ยินดีต้อนรับสู่ ThaiPodee 🇹🇭'}</p>
+                </div>
+                <div class="side-icons">
+                    <div class="side-icon"><div class="icon-circle">❤️</div><span>0</span></div>
+                    <div class="side-icon"><div class="icon-circle">💬</div><span>0</span></div>
+                    <div class="side-icon"><div class="icon-circle">↗️</div><span>แชร์</span></div>
+                    <div class="side-icon"><div class="icon-circle">🎵</div><span>เสียง</span></div>
+                </div>
+            `;
+            container.appendChild(slide);
+            console.log('✅ โหลดวิดีโอสำเร็จ!');
+        } catch (err) {
+            console.error('❌ โหลดวิดีโอไม่สำเร็จ:', err);
+        }
     }
-
-    // เล่น-หยุดวิดีโออัตโนมัติ
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-            const vid = e.target.querySelector('video');
-            if (vid) e.isIntersecting ? vid.play() : vid.pause();
-        });
-    }, { threshold: 0.5 });
-    setTimeout(() => {
-        document.querySelectorAll('.video-slide').forEach(s => observer.observe(s));
-    }, 1000);
 </script>
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThaiPodee Market Online</title>
+    
+    <!-- ===== ตั้งค่าคลาวด์ — ใส่ชื่อจริงของคุณ ===== -->
+    <script>
+        const APP_CONFIG = {
+            CLOUD_NAME: 'thaipodee',           // ✅ ต้องตรงกับ Cloudinary Dashboard
+            UPLOAD_PRESET: 'thaipodee_upload',  // ✅ ต้องตรงกับที่สร้างไว้
+            FOLDER: 'thaipodee_videos'
+        };
+    </script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        html, body { background: #000; color: #fff; height: 100%; overflow: hidden; }
+
+        /* ===== หน้าเปิดแอป — โลโก้หมุน ===== */
+        .splash { 
+            position: fixed; inset: 0; background: #000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 100; transition: opacity 0.8s ease;
+        }
+        .logo-container { position: relative; width: 200px; height: 200px; margin-bottom: 30px; }
+        .logo-gear { 
+            position: absolute; inset: 0; 
+            border: 12px solid #fff; border-radius: 50%; 
+            animation: rotate 10s linear infinite;
+        }
+        .logo-map { 
+            position: absolute; inset: 30px; 
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><path fill="white" d="M150,40 C180,50 210,70 230,100 C250,130 250,160 240,180 C230,200 210,210 190,215 C170,220 155,235 145,255 C135,275 120,285 110,275 C100,265 100,245 105,225 C110,205 100,185 85,165 C70,145 75,125 90,105 C110,75 130,55 150,40 Z"/></svg>') no-repeat center; 
+            background-size: contain;
+        }
+        .logo-cross { position: absolute; inset: 0; }
+        .logo-cross::before, .logo-cross::after { content: ''; position: absolute; background: white; }
+        .logo-cross::before { width: 3px; height: 100%; left: 50%; transform: translateX(-50%); }
+        .logo-cross::after { width: 100%; height: 3px; top: 50%; transform: translateY(-50%); }
+        .app-name { font-size: 32px; font-weight: bold; letter-spacing: 2px; }
+        .sub-name { font-size: 16px; opacity: 0.7; margin-top: 5px; }
+        @keyframes rotate { from{transform: rotate(0deg);} to{transform: rotate(360deg);} }
+
+        /* ===== หน้าหลัก — แก้ไขให้แน่นอนว่าแสดงผล ===== */
+        .app-container { 
+            display: none; width: 100%; height: 100vh; 
+            position: relative; background: #000;
+        }
+        .video-container { 
+            width: 100%; height: 100vh; position: relative; 
+            scroll-snap-type: y mandatory; overflow-y: auto;
+        }
+        .video-slide { 
+            height: 100vh; position: relative; scroll-snap-align: start; 
+            background: #111; display: flex; align-items: center; justify-content: center;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
+
+        /* ===== ไอคอนด้านขวา ===== */
+        .side-icons { 
+            position: absolute; right: 15px; bottom: 120px; 
+            display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 10;
+        }
+        .side-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .side-icon span { font-size: 11px; margin-top: 4px; }
+        .icon-circle { 
+            width: 48px; height: 48px; border-radius: 50%; 
+            background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+
+        /* ===== เมนูล่าง ===== */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; height: 65px; 
+            background: #000; display: flex; justify-content: space-around; align-items: center; 
+            border-top: 1px solid #333; z-index: 20;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #888; cursor: pointer; }
+        .nav-item.active { color: #fff; }
+        .nav-plus { 
+            width: 45px; height: 30px; background: #ffcc00; border-radius: 6px; 
+            position: relative; cursor: pointer;
+        }
+        .nav-plus::before, .nav-plus::after { content: ''; position: absolute; background: #000; }
+        .nav-plus::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .nav-plus::after { width: 2px; height: 18px; left: 50%; top: 50%; transform: translate(-50%,-50%); }
+
+        /* ===== ข้อมูลวิดีโอ ซ้ายล่าง ===== */
+        .video-info { position: absolute; left: 15px; bottom: 100px; z-index: 10; max-width: 75%; }
+        .video-info h3 { font-size: 16px; margin-bottom: 8px; }
+        .video-info p { font-size: 13px; opacity: 0.8; line-height: 1.4; }
+        
+        /* ===== ข้อความแจ้งเตือนเมื่อไม่มีวิดีโอ ===== */
+        .empty-state { 
+            color: #888; text-align: center; padding: 40px; 
+            font-size: 15px; line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== หน้าเปิดแอป — โลโก้หมุน ===== -->
+<div class="splash" id="splashScreen">
+    <div class="logo-container">
+        <div class="logo-gear"></div>
+        <div class="logo-map"></div>
+        <div class="logo-cross"></div>
+    </div>
+    <div class="app-name">THAIPODEE</div>
+    <div class="sub-name">Market Online</div>
+</div>
+
+<!-- ===== แอปหลัก — แก้ไขให้แสดงผลแน่นอน ===== -->
+<div class="app-container" id="appMain">
+    <div class="video-container" id="videoContainer">
+        <!-- ข้อความเริ่มต้น เมื่อยังไม่มีวิดีโอ -->
+        <div class="video-slide">
+            <div class="empty-state">
+                🎥 ยินดีต้อนรับสู่ ThaiPodee<br><br>
+                กดปุ่ม ➕ ด้านล่างเพื่ออัปโหลดวิดีโอแรกของคุณ!<br>
+                รองรับทุกขนาดไฟล์ — ไม่จำกัดความยาว 🇹🇭
+            </div>
+        </div>
+        <!-- วิดีโอที่อัปโหลดจะแสดงด้านล่างนี้ -->
+    </div>
+
+    <!-- เมนูล่าง -->
+    <div class="bottom-nav">
+        <div class="nav-item active">🏠<span>หน้าแรก</span></div>
+        <div class="nav-item">🔍<span>ค้นหา</span></div>
+        <div class="nav-item nav-plus" onclick="goUpload()">➕<span>โพสต์</span></div>
+        <div class="nav-item">💬<span>ข้อความ</span></div>
+        <div class="nav-item">👤<span>โปรไฟล์</span></div>
+    </div>
+</div>
+
+<script>
+    // ===== ปิดหน้าเปิดแอป — แก้ไขให้ทำงานแน่นอน =====
+    function showMainApp() {
+        const splash = document.getElementById('splashScreen');
+        const main = document.getElementById('appMain');
+        
+        splash.style.opacity = '0';
+        
+        setTimeout(() => {
+            splash.style.display = 'none';
+            main.style.display = 'block';
+            console.log('✅ เข้าสู่หน้าหลักสำเร็จ!');
+            loadVideos(); // โหลดวิดีโอ
+        }, 800);
+    }
+    
+    // รอโหลดหน้าเสร็จ แล้วค่อยเปลี่ยนหน้า
+    window.addEventListener('load', () => {
+        setTimeout(showMainApp, 3000);
+    });
+
+    // ===== ไปหน้าอัปโหลด =====
+    function goUpload() {
+        window.location.href = 'upload.html';
+    }
+
+    // ===== โหลดวิดีโอจากคลาวด์ =====
+    function loadVideos() {
+        const saved = localStorage.getItem('latestVideo');
+        if (!saved) {
+            console.log('📭 ยังไม่มีวิดีโอที่อัปโหลด');
+            return;
+        }
+        
+        try {
+            const data = JSON.parse(saved);
+            const container = document.getElementById('videoContainer');
+            
+            // ลบข้อความเริ่มต้นออกก่อน
+            container.innerHTML = '';
+            
+            // เพิ่มวิดีโอ
+            const slide = document.createElement('div');
+            slide.className = 'video-slide';
+            slide.innerHTML = `
+                <video src="${data.url}" loop muted playsinline controls></video>
+                <div class="video-info">
+                    <h3>@ThaiPodee_Official</h3>
+                    <p>${data.description || 'ยินดีต้อนรับสู่ ThaiPodee 🇹🇭'}</p>
+                </div>
+                <div class="side-icons">
+                    <div class="side-icon"><div class="icon-circle">❤️</div><span>0</span></div>
+                    <div class="side-icon"><div class="icon-circle">💬</div><span>0</span></div>
+                    <div class="side-icon"><div class="icon-circle">↗️</div><span>แชร์</span></div>
+                    <div class="side-icon"><div class="icon-circle">🎵</div><span>เสียง</span></div>
+                </div>
+            `;
+            container.appendChild(slide);
+            console.log('✅ โหลดวิดีโอสำเร็จ!');
+        } catch (err) {
+            console.error('❌ โหลดวิดีโอไม่สำเร็จ:', err);
+        }
+    }
+</script>
+
+</body>
+</html>
+
