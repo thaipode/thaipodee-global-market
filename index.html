@@ -2,197 +2,117 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thaipodee Market Online V2026</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#FF0050',
-            dark: '#000000',
-            light: '#FFFFFF',
-            secondary: '#25F4EE',
-          },
-        },
-      }
-    }
-  </script>
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto { content-visibility: auto; }
-      .scroll-snap-full { scroll-snap-type: y mandatory; }
-      .snap-start { scroll-snap-align: start; }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      .video-full { object-fit: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-      .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-      .safe-top { padding-top: env(safe-area-inset-top); }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; overflow: hidden; background: #000; }
-    video::-webkit-media-controls { display: flex !important; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #000; color: white; font-family: sans-serif; }
+    .app-container { height: 100vh; display: flex; flex-direction: column; position: relative; }
+    .video-container { flex: 1; position: relative; background: #000; }
+    video { width: 100%; height: 100%; object-fit: cover; }
+    .side-icons { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+    .side-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .side-icon i { font-size: 28px; }
+    .side-icon span { font-size: 11px; }
+    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-item i { font-size: 22px; }
+    .nav-item span { font-size: 10px; }
+    .upload-btn { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 10; }
+    .upload-btn i { font-size: 32px; color: white; cursor: pointer; }
+    input[type="file"] { display: none; }
+    .profile-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+    .profile-pic-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; }
+    .profile-page { position: fixed; inset: 0; background: #000; z-index: 100; padding: 20px; overflow-y: auto; display: none; }
+    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 20px; }
+    .video-thumb { aspect-ratio: 9/16; background: #222; border-radius: 4px; overflow: hidden; position: relative; cursor: pointer; }
+    .video-thumb video { width: 100%; height: 100%; object-fit: cover; }
+    .close-btn { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; }
   </style>
 </head>
-<body class="bg-black text-white overflow-hidden">
-  <!-- Feed วิดีโอ -->
-  <div id="feedScreen" class="fixed inset-0 z-0">
-    <div id="videoFeed" class="h-full overflow-y-auto scroll-snap-full no-scrollbar">
-      <div class="h-screen w-full snap-start relative flex items-center justify-center">
-        <video id="videoPlayer" class="video-full" playsinline controls loop muted>
-          <source src="" type="video/mp4">
-          เบราว์เซอร์ไม่รองรับวิดีโอ
-        </video>
+<body>
+  <div class="app-container" id="mainApp">
+    <div class="video-container" id="videoContainer">
+      <video id="mainVideo" loop playsinline muted></video>
+      <div id="noVideoMessage" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+        <i class="fa-solid fa-cloud-upload text-5xl mb-4"></i>
+        <p>แตะเพื่อเลือกไฟล์วิดีโอ</p>
+        <p class="text-sm">รองรับไฟล์ MP4, MOV</p>
+      </div>
+    </div>
 
-        <div class="absolute inset-0 flex flex-col justify-between px-4 py-6 safe-top safe-bottom">
-          <!-- เมนูบน -->
-          <div class="flex justify-between items-center">
-            <div class="text-xl font-bold">
-              <span class="text-white">Thaipodee</span>
-              <span class="text-primary">Market</span>
-            </div>
-            <div class="flex gap-5 text-xl">
-              <button class="hover:opacity-80"><i class="fa fa-search"></i></button>
-              <button class="hover:opacity-80"><i class="fa fa-paper-plane"></i></button>
-            </div>
-          </div>
+    <div class="upload-btn">
+      <label for="videoInput">
+        <i class="fa-solid fa-plus"></i>
+      </label>
+      <input type="file" id="videoInput" accept="video/mp4,video/quicktime">
+    </div>
 
-          <!-- ส่วนล่าง + ปุ่มขวา 6 ปุ่ม -->
-          <div class="flex justify-between items-end mb-2">
-            <div class="w-3/4 pr-4">
-              <div class="flex items-center gap-2 mb-2">
-                <img id="profilePicDisplay" src="https://picsum.photos/seed/Thaipodee/40/40" class="w-8 h-8 rounded-full object-cover border border-white/30">
-                <span id="profileNameDisplay" class="font-semibold">Thaipodee_market</span>
-              </div>
-              <p class="text-sm opacity-80 mb-2">ยินดีต้อนรับสู่ Thaipodee Market — แพลตฟอร์มสร้างสรรค์และแชร์วิดีโอสั้น</p>
-              <div class="flex items-center gap-2 text-sm">
-                <i class="fa fa-music"></i>
-                <marquee scrollamount="3" class="w-3/4">เสียงต้นฉบับ — Thaipodee Original Sound</marquee>
-              </div>
-            </div>
+    <div class="side-icons">
+      <div class="side-icon" id="goProfile">
+        <img id="profilePicDisplay" src="https://picsum.photos/seed/Thaipodee/40/40" class="profile-pic" alt="Profile">
+        <span id="profileNameDisplay">Thaipodee_market</span>
+      </div>
+      <div class="side-icon"><i class="fa-solid fa-heart"></i><span>0</span></div>
+      <div class="side-icon"><i class="fa-solid fa-comment"></i><span>0</span></div>
+      <div class="side-icon"><i class="fa-solid fa-bookmark"></i><span>0</span></div>
+      <div class="side-icon"><i class="fa-solid fa-music"></i><span>เสียง</span></div>
+      <div class="side-icon"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    </div>
 
-            <div class="flex flex-col items-center gap-6 text-xl">
-              <button id="btnProfile" class="flex flex-col items-center gap-1">
-                <img id="sideProfilePic" src="https://picsum.photos/seed/Thaipodee/48/48" class="w-10 h-10 rounded-full object-cover border-2 border-white">
-              </button>
-              <button class="flex flex-col items-center gap-1 hover:text-primary"><i class="fa fa-heart"></i><span class="text-xs mt-1">0</span></button>
-              <button class="flex flex-col items-center gap-1 hover:text-primary"><i class="fa fa-comment"></i><span class="text-xs mt-1">0</span></button>
-              <button class="flex flex-col items-center gap-1 hover:text-primary"><i class="fa fa-bookmark"></i><span class="text-xs mt-1">บันทึก</span></button>
-              <button class="flex flex-col items-center gap-1 hover:text-primary"><i class="fa fa-share-alt"></i><span class="text-xs mt-1">แชร์</span></button>
-              <button class="flex flex-col items-center gap-1 hover:text-secondary"><i class="fa fa-music"></i></button>
-            </div>
-          </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><i class="fa-solid fa-home"></i><span>หน้าแรก</span></div>
+      <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>ค้นหา</span></div>
+      <div class="nav-item"><i class="fa-solid fa-plus-square"></i><span>สร้าง</span></div>
+      <div class="nav-item"><i class="fa-solid fa-message"></i><span>ข้อความ</span></div>
+      <div class="nav-item" id="openProfile">
+        <i class="fa-solid fa-user"></i><span>ฉัน</span>
+      </div>
+    </div>
+
+    <div class="profile-page" id="profilePage">
+      <i class="fa-solid fa-xmark close-btn" id="closeProfile"></i>
+      <div class="flex flex-col items-center pt-8">
+        <div class="relative">
+          <img id="profilePagePic" src="https://picsum.photos/seed/Thaipodee/40/40" class="profile-pic-lg" alt="Profile">
+          <button id="btnChangePic" class="absolute bottom-0 right-0 w-8 h-8 bg-white text-black rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-camera text-sm"></i>
+          </button>
+          <input type="file" id="profilePicInput" accept="image/*" class="hidden">
+        </div>
+        <h3 id="profilePageName" class="text-xl font-bold mt-3 mb-1">Thaipodee_market</h3>
+        <p class="text-gray-400 text-sm mb-6">@Thaipodee_market</p>
+        <div class="flex gap-8 text-center">
+          <div><div class="font-bold text-lg" id="videoCount">0</div><div class="text-xs text-gray-400">วิดีโอ</div></div>
+          <div><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">ผู้ติดตาม</div></div>
+          <div><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">กำลังติดตาม</div></div>
+        </div>
+      </div>
+      <h4 class="w-full text-left font-semibold mb-3 mt-6">วิดีโอของฉัน</h4>
+      <div id="myVideosGrid" class="w-full grid grid-cols-3 gap-1">
+        <div class="aspect-square bg-gray-800/50 flex items-center justify-center col-span-3 py-8 text-gray-400">
+          ยังไม่มีวิดีโอ กดปุ่ม + เพื่ออัปโหลด
         </div>
       </div>
     </div>
-
-    <!-- เมนูล่าง 4 ปุ่ม -->
-    <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 py-3 px-6 safe-bottom">
-      <div class="flex justify-between items-center text-xl">
-        <button class="flex flex-col items-center gap-1 text-white"><i class="fa fa-home"></i><span class="text-xs mt-1">หน้าแรก</span></button>
-        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-white"><i class="fa fa-compass"></i><span class="text-xs mt-1">ค้นพบ</span></button>
-        <button id="btnUploadOpen" class="flex flex-col items-center gap-1 -mt-3">
-          <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white text-2xl shadow-lg">+</div>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-white"><i class="fa fa-inbox"></i><span class="text-xs mt-1">ข้อความ</span></button>
-        <button id="btnProfileBottom" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white">
-          <img id="bottomProfilePic" src="https://picsum.photos/seed/Thaipodee/32/32" class="w-8 h-8 rounded-full object-cover border border-white/30">
-          <span class="text-xs mt-1">ฉัน</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- หน้าอัปโหลดวิดีโอ -->
-  <div id="uploadScreen" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
-    <div class="p-4 flex items-center justify-between border-b border-white/10 safe-top">
-      <button id="btnUploadClose" class="text-xl"><i class="fa fa-times"></i></button>
-      <h2 class="text-lg font-semibold">อัปโหลดวิดีโอ</h2>
-      <div class="w-8"></div>
-    </div>
-
-    <div class="flex-1 flex flex-col items-center justify-center p-6">
-      <div id="uploadArea" class="w-full max-w-md aspect-video border-2 border-dashed border-gray-600 rounded-xl flex flex-col items-center justify-center mb-6 hover:border-primary transition-colors cursor-pointer">
-        <div class="text-5xl text-gray-500 mb-4"><i class="fa fa-cloud-upload"></i></div>
-        <p class="text-lg mb-2">แตะเพื่อเลือกไฟล์วิดีโอ</p>
-        <p class="text-sm text-gray-400">รองรับไฟล์ MP4, MOV</p>
-        <input type="file" id="videoInput" accept="video/*" class="hidden">
-      </div>
-
-      <div id="fileInfo" class="w-full max-w-md mb-4 hidden">
-        <p class="text-sm text-green-400 flex items-center gap-2">
-          <i class="fa fa-check-circle"></i>
-          <span id="fileName">ชื่อไฟล์</span>
-        </p>
-      </div>
-
-      <video id="previewVid" class="w-full max-w-md rounded-xl mb-6 hidden" controls playsinline></video>
-
-      <input type="text" id="descInput" placeholder="เขียนคำอธิบายวิดีโอ..." class="w-full max-w-md bg-gray-800 border border-gray-700 rounded-lg p-3 mb-4 text-white">
-      
-      <div class="flex gap-4 w-full max-w-md">
-        <button id="btnCancel" class="flex-1 py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">ยกเลิก</button>
-        <button id="btnUpload" class="flex-1 py-3 rounded-lg bg-primary hover:bg-primary/90 transition-colors font-semibold opacity-50" disabled>โพสต์วิดีโอ</button>
-      </div>
-
-      <div id="statusMsg" class="mt-4 text-center text-sm hidden"></div>
-    </div>
-  </div>
-
-  <!-- หน้าโปรไฟล์ -->
-  <div id="profileScreen" class="fixed inset-0 bg-black z-40 hidden overflow-y-auto">
-    <div class="p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-black safe-top">
-      <button id="btnProfileBack" class="text-xl"><i class="fa fa-arrow-left"></i></button>
-      <h2 class="text-lg font-semibold">โปรไฟล์</h2>
-      <button id="btnEditProfile" class="text-primary">แก้ไข</button>
-    </div>
-
-    <div class="p-6 flex flex-col items-center">
-      <div class="relative mb-4">
-        <img id="profilePagePic" src="https://picsum.photos/seed/Thaipodee/120/120" class="w-24 h-24 rounded-full object-cover border-2 border-white">
-        <button id="btnChangePic" class="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-lg">
-          <i class="fa fa-camera"></i>
-        </button>
-        <input type="file" id="profilePicInput" accept="image/*" class="hidden">
-      </div>
-      
-      <h3 id="profilePageName" class="text-xl font-bold mb-1">Thaipodee_market</h3>
-      <p class="text-gray-400 text-sm mb-6">@Thaipodee_market</p>
-      
-      <div class="flex gap-8 mb-8 text-center">
-        <div><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">วิดีโอ</div></div>
-        <div><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">ผู้ติดตาม</div></div>
-        <div><div class="font-bold text-lg">0</div><div class="text-xs text-gray-400">กำลังติดตาม</div></div>
-      </div>
-
-      <h4 class="w-full text-left font-semibold mb-3">วิดีโอของฉัน</h4>
-      <div id="myVideosGrid" class="w-full grid grid-cols-3 gap-1">
-        <div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอที่โพสต์</div>
-      </div>
-    </div>
   </div>
 
   <script>
-    // ========== ตัวเล็กทั้งหมด ตรงกับ Cloudinary เป๊ะ! thaipodee_upload ==========
+    // ========== ห้ามแก้ 3 บรรทัดนี้ ==========
     const CLOUD_NAME = 'orjpnytt';
-    const UPLOAD_PRESET = 'Thaipodee_upload'; // ✅ ตัวเล็กทุกตัว! ตรงเป๊ะ!
+    const UPLOAD_PRESET = 'Thaipodee_upload';
     const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
-    // ข้อมูลโปรไฟล์ — บันทึกในเครื่อง ไม่หาย
     let profileData = {
       name: 'Thaipodee_market',
       picture: 'https://picsum.photos/seed/Thaipodee/40/40',
       videos: []
     };
 
-    // ช่วยลัด
     const $ = id => document.getElementById(id);
 
-    // โหลด/บันทึก โปรไฟล์
     function loadProfile() {
       const saved = localStorage.getItem('Thaipodee_profile');
       if (saved) profileData = JSON.parse(saved);
@@ -205,167 +125,94 @@
     function updateAllProfileViews() {
       $('profileNameDisplay').textContent = profileData.name;
       $('profilePicDisplay').src = profileData.picture;
-      $('sideProfilePic').src = profileData.picture;
-      $('bottomProfilePic').src = profileData.picture;
       $('profilePageName').textContent = profileData.name;
       $('profilePagePic').src = profileData.picture;
+      $('videoCount').textContent = profileData.videos.length;
       renderMyVideos();
     }
 
-    // ========== เปิด-ปิด หน้าจอ ==========
-    $('btnUploadOpen').addEventListener('click', () => $('uploadScreen').classList.remove('hidden'));
-    $('btnUploadClose').addEventListener('click', () => { $('uploadScreen').classList.add('hidden'); resetUploadForm(); });
-    $('btnCancel').addEventListener('click', () => { $('uploadScreen').classList.add('hidden'); resetUploadForm(); });
-
-    $('btnProfile').addEventListener('click', () => $('profileScreen').classList.remove('hidden'));
-    $('btnProfileBottom').addEventListener('click', () => $('profileScreen').classList.remove('hidden'));
-    $('btnProfileBack').addEventListener('click', () => $('profileScreen').classList.add('hidden'));
-
-    // เปลี่ยนรูปโปรไฟล์
-    $('btnChangePic').addEventListener('click', () => $('profilePicInput').click());
-    $('profilePicInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => { profileData.picture = ev.target.result; saveProfile(); };
-      reader.readAsDataURL(file);
-    });
-
-    // แก้ไขชื่อ
-    $('btnEditProfile').addEventListener('click', () => {
-      const newName = prompt('ใส่ชื่อโปรไฟล์:', profileData.name);
-      if (newName && newName.trim()) { profileData.name = newName.trim(); saveProfile(); }
-    });
-
-    // ========== เลือกไฟล์วิดีโอ ==========
-    $('uploadArea').addEventListener('click', () => $('videoInput').click());
-    $('videoInput').addEventListener('change', (e) => e.target.files[0] && handleFile(e.target.files[0]));
-
-    function handleFile(file) {
-      if (!file.type.startsWith('video/')) {
-        showStatus('กรุณาเลือกไฟล์วิดีโอเท่านั้น', 'error');
-        return;
-      }
-      $('fileName').textContent = file.name;
-      $('fileInfo').classList.remove('hidden');
-      
-      const url = URL.createObjectURL(file);
-      $('previewVid').src = url;
-      $('previewVid').classList.remove('hidden');
-      
-      $('btnUpload').disabled = false;
-      $('btnUpload').classList.remove('opacity-50');
-      window.selectedVideoFile = file;
-    }
-
-    function resetUploadForm() {
-      $('videoInput').value = '';
-      $('previewVid').src = '';
-      $('previewVid').classList.add('hidden');
-      $('fileInfo').classList.add('hidden');
-      $('descInput').value = '';
-      $('statusMsg').classList.add('hidden');
-      $('btnUpload').disabled = true;
-      $('btnUpload').classList.add('opacity-50');
-      delete window.selectedVideoFile;
-    }
-
-    function showStatus(text, type = 'info') {
-      $('statusMsg').textContent = text;
-      $('statusMsg').classList.remove('hidden', 'text-green-400', 'text-red-400', 'text-blue-400');
-      $('statusMsg').classList.add(type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400');
-    }
-
-    // ========== อัปโหลดวิดีโอ — ตัวเล็กทั้งหมด ตรงกับ Cloudinary เป๊ะ! ==========
-    $('btnUpload').addEventListener('click', async () => {
-      if (!window.selectedVideoFile) {
-        showStatus('กรุณาเลือกไฟล์วิดีโอก่อน', 'error');
-        return;
-      }
-      
-      $('btnUpload').disabled = true;
-      $('btnUpload').textContent = 'กำลังอัปโหลด...';
-      showStatus('กำลังอัปโหลดวิดีโอไปยังเซิร์ฟเวอร์...', 'info');
-
-      try {
-        const formData = new FormData();
-        formData.append('file', window.selectedVideoFile);
-        formData.append('upload_preset', UPLOAD_PRESET); // ✅ Thaipodee_upload ตัวเล็ก!
-        formData.append('folder', 'Thaipodee_videos');
-        if ($('descInput').value) formData.append('context', `alt=${encodeURIComponent($('descInput').value)}`);
-
-        const res = await fetch(UPLOAD_URL, {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await res.json();
-        
-        if (!res.ok || data.error) {
-          throw new Error(data.error?.message || `Server error: ${res.status}`);
-        }
-
-        // บันทึกวิดีโอลงโปรไฟล์
-        const newVideo = {
-          id: data.public_id,
-          url: data.secure_url,
-          thumbnail: data.thumbnail_url || data.secure_url,
-          description: $('descInput').value || '',
-          createdAt: new Date().toISOString()
-        };
-        profileData.videos.unshift(newVideo);
-        saveProfile();
-
-        showStatus('✅ อัปโหลดวิดีโอสำเร็จ!', 'success');
-        
-        // แสดงวิดีโอที่หน้าแรก + เปิดเสียง
-        $('videoPlayer').src = data.secure_url;
-        $('videoPlayer').muted = false;
-        $('videoPlayer').volume = 1;
-        $('videoPlayer').play().catch(() => {});
-
-        setTimeout(() => {
-          $('uploadScreen').classList.add('hidden');
-          resetUploadForm();
-        }, 1500);
-
-      } catch (err) {
-        console.error('Upload error:', err);
-        showStatus('❌ ไม่สำเร็จ: ' + err.message, 'error');
-        $('btnUpload').disabled = false;
-      }
-      
-      $('btnUpload').textContent = 'โพสต์วิดีโอ';
-    });
-
-    // ========== แสดงวิดีโอของฉัน ==========
     function renderMyVideos() {
       const grid = $('myVideosGrid');
-      if (!profileData.videos.length) {
-        grid.innerHTML = `<div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอที่โพสต์</div>`;
+      if (profileData.videos.length === 0) {
+        grid.innerHTML = `<div class="aspect-square bg-gray-800/50 flex items-center justify-center col-span-3 py-8 text-gray-400">ยังไม่มีวิดีโอ</div>`;
         return;
       }
-      grid.innerHTML = profileData.videos.map(v => `
-        <div class="aspect-square bg-gray-800 relative overflow-hidden rounded-sm">
-          <video src="${v.url}" muted class="w-full h-full object-cover" preload="metadata"></video>
-          <div class="absolute bottom-1 right-1 text-xs bg-black/60 px-1 rounded">
-            <i class="fa fa-play"></i>
-          </div>
+      grid.innerHTML = profileData.videos.map((v, i) => `
+        <div class="video-thumb" onclick="playFromProfile(${i})">
+          <video src="${v.url}" muted></video>
         </div>
       `).join('');
     }
 
-    // ========== เริ่มทำงาน ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      loadProfile();
-      
-      // กดวิดีโอ = เปิด/ปิดเสียง
-      $('videoPlayer').addEventListener('click', () => {
-        $('videoPlayer').muted = !$('videoPlayer').muted;
-        if ($('videoPlayer').muted) $('videoPlayer').pause();
-        else { $('videoPlayer').volume = 1; $('videoPlayer').play(); }
-      });
+    $('btnChangePic').addEventListener('click', () => $('profilePicInput').click());
+    $('profilePicInput').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      profileData.picture = URL.createObjectURL(file);
+      saveProfile();
     });
+
+    $('openProfile').addEventListener('click', () => {
+      $('profilePage').style.display = 'block';
+      renderMyVideos();
+    });
+    $('goProfile').addEventListener('click', () => {
+      $('profilePage').style.display = 'block';
+      renderMyVideos();
+    });
+    $('closeProfile').addEventListener('click', () => {
+      $('profilePage').style.display = 'none';
+    });
+
+    function playFromProfile(index) {
+      const v = profileData.videos[index];
+      if (!v) return;
+      $('mainVideo').src = v.url;
+      $('mainVideo').play();
+      $('noVideoMessage').style.display = 'none';
+      $('profilePage').style.display = 'none';
+    }
+
+    $('videoInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const localUrl = URL.createObjectURL(file);
+      $('mainVideo').src = localUrl;
+      $('mainVideo').play();
+      $('noVideoMessage').style.display = 'none';
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('cloud_name', CLOUD_NAME);
+
+      try {
+        const res = await fetch(UPLOAD_URL, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.secure_url) {
+          profileData.videos.unshift({
+            url: data.secure_url,
+            publicId: data.public_id
+          });
+          saveProfile();
+          alert('อัปโหลดสำเร็จ! ✅');
+        } else {
+          alert('อัปโหลดไม่สำเร็จ: ' + JSON.stringify(data));
+        }
+      } catch (err) {
+        alert('เกิดข้อผิดพลาด: ' + err.message);
+      }
+    });
+
+    $('mainVideo').addEventListener('click', () => {
+      $('mainVideo').muted = !$('mainVideo').muted;
+    });
+
+    loadProfile();
   </script>
 </body>
 </html>
