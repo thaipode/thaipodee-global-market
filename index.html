@@ -8,19 +8,15 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{height:100%;width:100%;overflow:hidden;background:#fff;color:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+    html,body{height:100%;width:100%;overflow:hidden;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#000}
 
-    /* ===== หน้าแรก — ล็อกไว้แล้ว ===== */
-    .main-screen{position:fixed;inset:0;display:flex;flex-direction:column;background:#000;z-index:10}
-    .video-area{
+    /* ===== พื้นที่วิดีโอ — FIX ตรงกลางจอตายตัว ===== */
+    .video-container{
       flex:1;
       position:relative;
       width:100%;
       height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
       overflow:hidden;
       background:#000;
       cursor:pointer;
@@ -37,21 +33,23 @@
     }
     .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:5;cursor:pointer}
     .hint i{font-size:48px;margin-bottom:12px}
-    /* ปุ่มด้านขวา หน้าแรก — ล็อก */
-    .side{
+
+    /* ===== ปุ่มด้านขวา — FIX ตำแหน่ง right:12px เรียงห่างกัน 24px ===== */
+    .side-actions{
       position:absolute;
-      right:12px;
-      bottom:140px;
+      right:12px;          /* ✅ FIX: ห่างขอบขวา 12px ตายตัว */
+      top:28%;             /* ✅ FIX: เริ่มห่างจากด้านบน 28% ของจอ */
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:24px;
+      gap:24px;            /* ✅ FIX: ห่างกันแต่ละปุ่ม 24px ตายตัว */
       z-index:10;
     }
-    .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
-    .side-item i{font-size:28px}
-    .side-item span{font-size:11px}
-    /* จานเพลงหมุน — ล็อก */
+    .side-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+    .side-btn i{font-size:28px}
+    .side-btn span{font-size:11px}
+
+    /* ===== จานเพลงหมุน — FIX ตำแหน่ง ===== */
     .music-disc{
       width:48px;
       height:48px;
@@ -67,32 +65,41 @@
     .music-disc.playing{animation-play-state:running}
     .music-disc img{width:24px;height:24px;border-radius:50%;object-fit:cover}
     @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    /* ปุ่มเต็มจอ — ล็อก: อยู่ใต้จานเพลง ห่าง 8px */
+
+    /* ===== ปุ่มเต็มจอ — FIX มุมขวาล่าง ตายตัว ===== */
     .fullscreen-btn{
-      margin-top:8px;
+      position:absolute;
+      right:16px;          /* ✅ FIX: ห่างขอบขวา 16px */
+      bottom:90px;         /* ✅ FIX: ห่างจากด้านล่าง 90px — ใต้ข้อความคำอธิบาย */
       font-size:22px;
       color:rgba(255,255,255,0.8);
       background:rgba(0,0,0,0.4);
       padding:8px 12px;
       border-radius:6px;
       cursor:pointer;
+      z-index:11;
     }
-    /* ข้อความมุมล่างซ้าย — ล็อก */
+
+    /* ===== ข้อความคำอธิบาย — FIX ตำแหน่ง ===== */
     .caption{
       position:absolute;
-      left:16px;
-      bottom:90px;
-      right:80px;
+      left:16px;           /* ✅ FIX: ห่างขอบซ้าย 16px */
+      bottom:90px;         /* ✅ FIX: ห่างจากด้านล่าง 90px */
+      right:80px;          /* ✅ FIX: ห่างจากปุ่มด้านขวา 80px */
       z-index:10;
       pointer-events:none;
-      color:#fff;
     }
     .caption .username{font-weight:700;font-size:15px;margin-bottom:6px}
     .caption .desc{font-size:14px;line-height:1.4;margin-bottom:6px}
     .caption .meta{font-size:12px;color:#ddd}
-    /* แถบล่าง หน้าแรก — ล็อก */
+
+    /* ===== แถบล่าง — FIX ชิดล่างสุด ตายตัว ===== */
     .bottom-nav{
-      height:60px;
+      position:fixed;
+      bottom:0;            /* ✅ FIX: ชิดขอบล่างสุด */
+      left:0;
+      right:0;
+      height:60px;         /* ✅ FIX: สูง 60px ตายตัว */
       background:#000;
       display:flex;
       justify-content:space-around;
@@ -126,7 +133,7 @@
       z-index:-1;
     }
 
-    /* ===== หน้าโปรไฟล์ — ตรง TikTok เป๊ะ ล็อกไว้แล้ว ===== */
+    /* ===== หน้าโปรไฟล์ — FIX ตำแหน่งไว้แล้ว ===== */
     .profile-screen{
       position:fixed;
       inset:0;
@@ -135,7 +142,6 @@
       overflow-y:auto;
       display:none;
     }
-    /* แถบด้านบน โปรไฟล์ — ล็อก */
     .profile-top-bar{
       display:flex;
       justify-content:space-between;
@@ -156,8 +162,6 @@
     .top-right-actions{display:flex;align-items:center;gap:20px}
     .top-right-actions i{font-size:20px;cursor:pointer}
     .follower-badge{font-size:14px;color:#000}
-
-    /* ส่วนหัวโปรไฟล์ — ล็อก */
     .profile-header{padding:20px 16px;text-align:center}
     .avatar-wrap{position:relative;display:inline-block;margin-bottom:12px}
     .avatar-lg{width:96px;height:96px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid #ddd}
@@ -166,29 +170,24 @@
       position:absolute;bottom:4px;right:4px;width:24px;height:24px;background:#000;color:#fff;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10
     }
     .profile-name-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px}
-    .profile-name{font-size:22px;font-weight:700}
+    .profile-name{font-size:22px;font-weight:700;color:#000}
     .verified-badge{background:red;color:#fff;font-size:12px;padding:2px 6px;border-radius:4px}
     .edit-pen{font-size:18px;color:#888;cursor:pointer}
     .profile-handle{color:#666;font-size:14px;margin-bottom:16px}
-    /* ตัวเลขสถิติ — ล็อก */
     .stats-row{display:flex;justify-content:center;gap:32px;margin-bottom:16px}
     .stat-item{text-align:center}
-    .stat-num{font-size:18px;font-weight:700}
+    .stat-num{font-size:18px;font-weight:700;color:#000}
     .stat-label{font-size:12px;color:#666}
-    /* คำบรรยาย + ปุ่ม — ล็อก */
     .bio{font-size:14px;line-height:1.5;color:#333;margin-bottom:12px;max-width:320px;margin-left:auto;margin-right:auto}
     .profile-buttons{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
-    .btn-outline{padding:6px 16px;border:1px solid #ddd;border-radius:4px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px}
-    /* แถบเมนูแท็บ — ล็อก */
+    .btn-outline{padding:6px 16px;border:1px solid #ddd;border-radius:4px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;color:#000}
     .profile-tabs{display:flex;justify-content:center;border-bottom:1px solid #eee;margin-bottom:8px}
     .tab-item{padding:10px 20px;font-size:18px;color:#999;border-bottom:2px solid transparent;cursor:pointer}
     .tab-item.active{color:#000;border-bottom-color:#000}
-    /* ตารางวิดีโอ — ล็อก 3 คอลัมน์ */
     .videos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 3px}
     .video-cell{aspect-ratio:9/16;background:#f5f5f5;position:relative;overflow:hidden;cursor:pointer}
     .video-cell img,.video-cell video{width:100%;height:100%;object-fit:cover}
     .play-count{position:absolute;bottom:4px;left:4px;color:#fff;font-size:12px;display:flex;align-items:center;gap:3px;text-shadow:0 0 3px rgba(0,0,0,0.8)}
-    /* แถบล่าง โปรไฟล์ — ล็อก */
     .profile-bottom-nav{
       position:sticky;
       bottom:0;
@@ -220,69 +219,68 @@
 </head>
 <body id="body">
   <div class="app" id="app">
-    <!-- ===== หน้าแรก ===== -->
-    <div class="main-screen" id="mainScreen">
-      <div class="video-area" id="videoArea">
-        <div class="hint" id="hint">
-          <i class="fas fa-plus-circle"></i>
-          <p>แตะเพื่ออัปโหลด</p>
-        </div>
-        <video id="vid" loop playsinline style="display:none;" muted></video>
-        <img id="pic" class="img" style="display:none;" alt="">
-        
-        <!-- ข้อความมุมล่างซ้าย -->
-        <div class="caption" id="caption" style="display:none;">
-          <div class="username" id="capUser">Thaipodee_market</div>
-          <div class="desc" id="capDesc">วิดีโอแรกของเรา — Thaipodee Market Online</div>
-          <div class="meta" id="capMeta">เสียงต้นฉบับ · สร้างด้วย AI · ประกอบด้วยสื่อ</div>
-        </div>
+    <!-- ===== หน้าแรก — FIX ตำแหน่งทุกจุดแล้ว ===== -->
+    <div class="video-container" id="videoContainer">
+      <div class="hint" id="hint">
+        <i class="fas fa-plus-circle"></i>
+        <p>แตะเพื่ออัปโหลด</p>
       </div>
+      <video id="vid" loop playsinline style="display:none;" muted></video>
+      <img id="pic" class="img" style="display:none;" alt="">
       
-      <!-- ปุ่มด้านขวา หน้าแรก -->
-      <div class="side">
-        <div class="side-item" id="avatarBtnMain">
+      <!-- ข้อความคำอธิบาย — FIX ตำแหน่ง -->
+      <div class="caption" id="caption" style="display:none;">
+        <div class="username" id="capUser">Thaipodee_market</div>
+        <div class="desc" id="capDesc">วิดีโอแรกของเรา — Thaipodee Market Online</div>
+        <div class="meta" id="capMeta">เสียงต้นฉบับ · สร้างด้วย AI · ประกอบด้วยสื่อ</div>
+      </div>
+
+      <!-- ปุ่มด้านขวา — FIX ตำแหน่ง right:12px top:28% ห่างกัน 24px -->
+      <div class="side-actions">
+        <div class="side-btn" id="avatarBtnMain">
           <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-white/80">
             <img id="mainAvatar" src="" class="w-full h-full object-cover" alt="">
             <i class="fas fa-user text-base text-white/80" id="mainAvatarPlaceholder"></i>
           </div>
         </div>
-        <div class="side-item" id="likeBtn">
+        <div class="side-btn" id="likeBtn">
           <i class="far fa-heart"></i>
           <span id="likeCount">0</span>
         </div>
-        <div class="side-item">
+        <div class="side-btn">
           <i class="far fa-comment"></i>
           <span>0</span>
         </div>
-        <div class="side-item">
+        <div class="side-btn">
           <i class="far fa-bookmark"></i>
           <span>0</span>
         </div>
-        <div class="side-item">
+        <div class="side-btn">
           <i class="fas fa-share"></i>
           <span>17</span>
         </div>
-        <div class="side-item music-disc" id="musicDisc">
+        <div class="side-btn music-disc" id="musicDisc">
           <img src="https://picsum.photos/50/50" alt="">
         </div>
-        <div class="fullscreen-btn" id="fullscreenBtn">
-          <i class="fas fa-expand" id="fullscreenIcon"></i>
-        </div>
       </div>
-      
-      <!-- แถบล่าง หน้าแรก -->
-      <div class="bottom-nav">
-        <div class="nav-item active" id="navHome"><i class="fas fa-home"></i><span>หน้าหลัก</span></div>
-        <div class="nav-item" id="navShop"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></div>
-        <div class="upload-plus" id="uploadBtn">+</div>
-        <div class="nav-item" id="navInbox"><i class="fas fa-inbox"></i><span>กล่องขาเข้า</span></div>
-        <div class="nav-item" id="navProfile"><i class="fas fa-user"></i><span>โปรไฟล์</span></div>
+
+      <!-- ปุ่มเต็มจอ — FIX มุมขวาล่าง bottom:90px right:16px -->
+      <div class="fullscreen-btn" id="fullscreenBtn">
+        <i class="fas fa-expand" id="fullscreenIcon"></i>
       </div>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ — ตรง TikTok เป๊ะ! ===== -->
+    <!-- แถบล่าง — FIX ชิดล่างสุด height:60px -->
+    <div class="bottom-nav">
+      <div class="nav-item active" id="navHome"><i class="fas fa-home"></i><span>หน้าหลัก</span></div>
+      <div class="nav-item" id="navShop"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></div>
+      <div class="upload-plus" id="uploadBtn">+</div>
+      <div class="nav-item" id="navInbox"><i class="fas fa-inbox"></i><span>กล่องขาเข้า</span></div>
+      <div class="nav-item" id="navProfile"><i class="fas fa-user"></i><span>โปรไฟล์</span></div>
+    </div>
+
+    <!-- ===== หน้าโปรไฟล์ — FIX ตำแหน่งไว้แล้ว ===== -->
     <div class="profile-screen" id="profileScreen">
-      <!-- แถบด้านบน -->
       <div class="profile-top-bar">
         <div class="top-left-actions">
           <div class="profile-avatar-sm" id="topAvatarBtn">
@@ -298,8 +296,6 @@
           <i class="fas fa-ellipsis-v"></i>
         </div>
       </div>
-
-      <!-- ส่วนหัวโปรไฟล์ -->
       <div class="profile-header">
         <div class="avatar-wrap" id="avatarWrap">
           <div class="avatar-lg">
@@ -314,8 +310,6 @@
           <i class="fas fa-pencil-alt edit-pen" id="editProfileBtn"></i>
         </div>
         <p class="profile-handle">@<span id="profileHandleDisplay">podee.office.cancel</span></p>
-        
-        <!-- ตัวเลขสถิติ -->
         <div class="stats-row">
           <div class="stat-item">
             <div class="stat-num" id="followingCount">3,270</div>
@@ -330,31 +324,19 @@
             <div class="stat-label">ถูกใจ</div>
           </div>
         </div>
-        
-        <!-- คำบรรยาย -->
         <p class="bio" id="profileBio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรกลทุกชนิด</p>
-        
-        <!-- ปุ่ม อีเมล + คำสั่งซื้อ -->
         <div class="profile-buttons">
           <div class="btn-outline"><i class="fas fa-envelope"></i> อีเมล</div>
           <div class="btn-outline"><i class="fas fa-shopping-cart"></i> คำสั่งซื้อของคุณ</div>
         </div>
       </div>
-
-      <!-- แถบแท็บ -->
       <div class="profile-tabs">
         <div class="tab-item active"><i class="fas fa-th"></i></div>
         <div class="tab-item"><i class="fas fa-lock"></i></div>
         <div class="tab-item"><i class="fas fa-bookmark"></i></div>
         <div class="tab-item"><i class="fas fa-heart"></i></div>
       </div>
-
-      <!-- ตารางวิดีโอ 3 คอลัมน์ -->
-      <div class="videos-grid" id="videosGrid">
-        <!-- วิดีโอจะแสดงที่นี่ -->
-      </div>
-
-      <!-- แถบล่าง โปรไฟล์ -->
+      <div class="videos-grid" id="videosGrid"></div>
       <div class="profile-bottom-nav">
         <div class="p-nav-item" id="pNavHome"><i class="fas fa-home"></i><span>หน้าหลัก</span></div>
         <div class="p-nav-item" id="pNavShop"><i class="fas fa-shopping-bag"></i><span>ร้านค้า</span></div>
@@ -364,24 +346,20 @@
       </div>
     </div>
 
-    <!-- ซ่อน input -->
     <input type="file" id="fileInput" accept="video/*,image/*" style="display:none;">
     <input type="file" id="avatarInput" accept="image/*" style="display:none;">
-    <input type="file" id="avatarInputSmall" accept="image/*" style="display:none;">
   </div>
 
   <script>
     const $=id=>document.getElementById(id);
-    // ===== ตัวแปร =====
-    const mainScreen=$('mainScreen'), profileScreen=$('profileScreen');
-    const vid=$('vid'), pic=$('pic'), hint=$('hint'), fileInput=$('fileInput');
+    const videoContainer=$('videoContainer'), vid=$('vid'), pic=$('pic'), hint=$('hint'), fileInput=$('fileInput');
     const caption=$('caption'), capUser=$('capUser'), capDesc=$('capDesc'), capMeta=$('capMeta');
     const likeBtn=$('likeBtn'), likeCount=$('likeCount'), musicDisc=$('musicDisc');
     const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon');
     const uploadBtn=$('uploadBtn');
     const navHome=$('navHome'), navShop=$('navShop'), navInbox=$('navInbox'), navProfile=$('navProfile');
-    const pNavHome=$('pNavHome'), pNavShop=$('pNavShop'), pNavInbox=$('pNavInbox'), pNavProfile=$('pNavProfile');
-    const avatarInput=$('avatarInput'), avatarInputSmall=$('avatarInputSmall');
+    const profileScreen=$('profileScreen');
+    const avatarInput=$('avatarInput');
     const profileAvatar=$('profileAvatar'), profileAvatarPlace=$('profileAvatarPlace');
     const mainAvatar=$('mainAvatar'), mainAvatarPlaceholder=$('mainAvatarPlaceholder');
     const topAvatarImg=$('topAvatarImg'), topAvatarPlace=$('topAvatarPlace');
@@ -389,31 +367,27 @@
     
     let posts=[], isVideo=false, liked=false, countLikes=0, isFullscreen=false;
 
-    // ===== ป้องกันย้อนกลับหลุด =====
     history.pushState(null, '', location.href);
     window.addEventListener('popstate', ()=>{
       history.pushState(null, '', location.href);
       closeProfile();
     });
 
-    // ===== เปิด-ปิด โปรไฟล์ =====
     function openProfile(){
-      mainScreen.style.display='none';
+      videoContainer.parentElement.style.display='none';
       profileScreen.style.display='block';
       renderProfileVideos();
     }
     function closeProfile(){
       profileScreen.style.display='none';
-      mainScreen.style.display='flex';
+      videoContainer.parentElement.style.display='flex';
       resetNav();
       navHome.classList.add('active');
     }
     function resetNav(){
       [navHome,navShop,navInbox,navProfile].forEach(n=>n.classList.remove('active'));
-      [pNavHome,pNavShop,pNavInbox,pNavProfile].forEach(n=>n.classList.remove('active'));
     }
 
-    // ===== อัปโหลดวิดีโอ/รูป =====
     hint.addEventListener('click', ()=>fileInput.click());
     uploadBtn.addEventListener('click', ()=>fileInput.click());
 
@@ -440,8 +414,7 @@
       posts.unshift({type:isVideo?'video':'image',url,views:Math.floor(Math.random()*200)});
     });
 
-    // ===== เล่น/หยุด + จานเพลงหมุน =====
-    document.querySelector('.video-area').addEventListener('click', e=>{
+    videoContainer.addEventListener('click', e=>{
       if([hint,uploadBtn,fullscreenBtn].includes(e.target)) return;
       if(isVideo && vid.src){
         if(vid.paused){
@@ -454,7 +427,6 @@
       }
     });
 
-    // ===== ไลค์ =====
     likeBtn.addEventListener('click', ()=>{
       liked=!liked;
       countLikes+=liked?1:-1;
@@ -462,7 +434,6 @@
       likeBtn.querySelector('i').className=liked?'fas fa-heart text-red-500':'far fa-heart';
     });
 
-    // ===== เปลี่ยนรูปโปรไฟล์ — ทุกจุด เปลี่ยนพร้อมกัน =====
     document.getElementById('avatarWrap').addEventListener('click', ()=>avatarInput.click());
     document.getElementById('topAvatarBtn').addEventListener('click', ()=>avatarInput.click());
     document.getElementById('avatarBtnMain').addEventListener('click', ()=>avatarInput.click());
@@ -471,13 +442,11 @@
       const f=e.target.files[0];
       if(!f) return;
       const url=URL.createObjectURL(f);
-      // อัปเดตทุกจุดพร้อมกัน
       profileAvatar.src=url; profileAvatar.style.display='block'; profileAvatarPlace.style.display='none';
       mainAvatar.src=url; mainAvatar.style.display='block'; mainAvatarPlaceholder.style.display='none';
       topAvatarImg.src=url; topAvatarImg.style.display='block'; topAvatarPlace.style.display='none';
     });
 
-    // ===== เต็มจอ =====
     fullscreenBtn.addEventListener('click', e=>{
       e.stopPropagation();
       isFullscreen=!isFullscreen;
@@ -490,12 +459,9 @@
       }
     });
 
-    // ===== เมนูนำทาง =====
     navProfile.addEventListener('click', openProfile);
-    pNavHome.addEventListener('click', closeProfile);
-    pNavProfile.addEventListener('click', e=>e.preventDefault());
+    document.getElementById('pNavHome').addEventListener('click', closeProfile);
 
-    // ===== แสดงวิดีโอในหน้าโปรไฟล์ =====
     function renderProfileVideos(){
       if(posts.length===0){
         videosGrid.innerHTML='<div class="col-span-3 text-center py-10 text-gray-400">ยังไม่มีวิดีโอ</div>';
