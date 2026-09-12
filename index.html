@@ -10,11 +10,36 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%;width:100%;overflow:hidden;background:#000;color:#fff;font-family:sans-serif}
     .app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
-    .main{flex:1;position:relative;width:100%;overflow:hidden;background:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 0 60px 0}
-    video,.img{max-width:100%;max-height:calc(100vh - 120px);width:auto;height:auto;object-fit:contain;background:#000}
+    .main{
+      flex:1;
+      position:relative;
+      width:100%;
+      overflow:hidden;
+      background:#000;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 0 60px 0
+    }
+    video,.img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      background:#000
+    }
     .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#aaa;z-index:6;cursor:pointer}
     .hint i{font-size:48px;margin-bottom:12px}
-    .side{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;z-index:10}
+    .side{
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+      z-index:10
+    }
     .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
     .side-item i{font-size:28px}
     .bottom{height:60px;min-height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);z-index:20}
@@ -26,7 +51,11 @@
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:20px}
     .cell{aspect-ratio:9/16;background:#222;border-radius:4px;overflow:hidden}
     .fullscreen-mode .main{padding-bottom:0}
-    .fullscreen-mode video, .fullscreen-mode .img{max-height:100vh}
+    .fullscreen-mode video, .fullscreen-mode .img{
+      width:100%;
+      height:100%;
+      object-fit:cover
+    }
     .fullscreen-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#888;font-size:20px}
     .fullscreen-btn.active{color:#fff}
   </style>
@@ -86,17 +115,14 @@
     const fullscreenBtn=$('fullscreenBtn'), fullscreenIcon=$('fullscreenIcon'), app=$('app');
     let posts=[], isVid=false, liked=false, likeCount=0, isFullscreen=false;
 
-    // ✅ ป้องกันปุ่มย้อนกลับของเบราว์เซอร์ — ไม่ให้หลุดออกจากแอป
     history.pushState(null, '', location.href);
     window.addEventListener('popstate', ()=>{
       history.pushState(null, '', location.href);
-      // ถ้ามีหน้าเปิดอยู่ → ปิดหน้านั้น แทนที่จะย้อนกลับออก
       if(profScr.style.display==='block'){
         profScr.style.display='none';
         nProf.classList.remove('active');
         return;
       }
-      // ถ้าอยู่ที่หน้าแรกแล้ว → ไม่ออกไปไหน
       closeAll();
       nHome.classList.add('active');
     });
