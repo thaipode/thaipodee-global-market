@@ -43,7 +43,7 @@
   <div id="feedScreen" class="fixed inset-0 z-0">
     <div id="videoFeed" class="h-full overflow-y-auto scroll-snap-full no-scrollbar">
       <div class="h-screen w-full snap-start relative flex items-center justify-center">
-        <video id="videoPlayer" class="video-full" playsinline controls loop>
+        <video id="videoPlayer" class="video-full" playsinline controls loop muted>
           <source src="" type="video/mp4">
           เบราว์เซอร์ไม่รองรับวิดีโอ
         </video>
@@ -52,7 +52,7 @@
           <!-- เมนูบน -->
           <div class="flex justify-between items-center">
             <div class="text-xl font-bold">
-              <span class="text-white">ไทยโพดี</span>
+              <span class="text-white">Thaipodee</span>
               <span class="text-primary">Market</span>
             </div>
             <div class="flex gap-5 text-xl">
@@ -177,10 +177,10 @@
   </div>
 
   <script>
-    // ========== ตัวแปรหลัก — แก้ปัญหา 403 โดยใช้ API Key ตรง ๆ ==========
+    // ========== ตัวแปรหลัก — ต้องสร้าง Preset ชื่อ thaipodee_upload ใน Cloudinary! ==========
     const CLOUD_NAME = 'orjpnytt';
-    const API_KEY = '583622848327282'; // ✅ API Key จากบัญชีจริง
-    const CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
+    const UPLOAD_PRESET = 'thaipodee_upload'; // ✅ ต้องสร้างใน Cloudinary!
+    const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
     // ข้อมูลโปรไฟล์ — บันทึกในเครื่อง ไม่หาย
     let profileData = {
@@ -188,6 +188,9 @@
       picture: 'https://picsum.photos/seed/thaipodee/40/40',
       videos: []
     };
+
+    // ช่วยลัด
+    const $ = id => document.getElementById(id);
 
     // โหลด/บันทึก โปรไฟล์
     function loadProfile() {
@@ -200,30 +203,27 @@
       updateAllProfileViews();
     }
     function updateAllProfileViews() {
-      document.getElementById('profileNameDisplay').textContent = profileData.name;
-      document.getElementById('profilePicDisplay').src = profileData.picture;
-      document.getElementById('sideProfilePic').src = profileData.picture;
-      document.getElementById('bottomProfilePic').src = profileData.picture;
-      document.getElementById('profilePageName').textContent = profileData.name;
-      document.getElementById('profilePagePic').src = profileData.picture;
+      $('profileNameDisplay').textContent = profileData.name;
+      $('profilePicDisplay').src = profileData.picture;
+      $('sideProfilePic').src = profileData.picture;
+      $('bottomProfilePic').src = profileData.picture;
+      $('profilePageName').textContent = profileData.name;
+      $('profilePagePic').src = profileData.picture;
       renderMyVideos();
     }
 
     // ========== เปิด-ปิด หน้าจอ ==========
-    const uploadScreen = document.getElementById('uploadScreen');
-    const profileScreen = document.getElementById('profileScreen');
+    $('btnUploadOpen').addEventListener('click', () => $('uploadScreen').classList.remove('hidden'));
+    $('btnUploadClose').addEventListener('click', () => { $('uploadScreen').classList.add('hidden'); resetUploadForm(); });
+    $('btnCancel').addEventListener('click', () => { $('uploadScreen').classList.add('hidden'); resetUploadForm(); });
 
-    document.getElementById('btnUploadOpen').addEventListener('click', () => uploadScreen.classList.remove('hidden'));
-    document.getElementById('btnUploadClose').addEventListener('click', () => { uploadScreen.classList.add('hidden'); resetUploadForm(); });
-    document.getElementById('btnCancel').addEventListener('click', () => { uploadScreen.classList.add('hidden'); resetUploadForm(); });
-
-    document.getElementById('btnProfile').addEventListener('click', () => profileScreen.classList.remove('hidden'));
-    document.getElementById('btnProfileBottom').addEventListener('click', () => profileScreen.classList.remove('hidden'));
-    document.getElementById('btnProfileBack').addEventListener('click', () => profileScreen.classList.add('hidden'));
+    $('btnProfile').addEventListener('click', () => $('profileScreen').classList.remove('hidden'));
+    $('btnProfileBottom').addEventListener('click', () => $('profileScreen').classList.remove('hidden'));
+    $('btnProfileBack').addEventListener('click', () => $('profileScreen').classList.add('hidden'));
 
     // เปลี่ยนรูปโปรไฟล์
-    document.getElementById('btnChangePic').addEventListener('click', () => document.getElementById('profilePicInput').click());
-    document.getElementById('profilePicInput').addEventListener('change', (e) => {
+    $('btnChangePic').addEventListener('click', () => $('profilePicInput').click());
+    $('profilePicInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -232,97 +232,85 @@
     });
 
     // แก้ไขชื่อ
-    document.getElementById('btnEditProfile').addEventListener('click', () => {
+    $('btnEditProfile').addEventListener('click', () => {
       const newName = prompt('ใส่ชื่อโปรไฟล์:', profileData.name);
       if (newName && newName.trim()) { profileData.name = newName.trim(); saveProfile(); }
     });
 
     // ========== เลือกไฟล์วิดีโอ ==========
-    const uploadArea = document.getElementById('uploadArea');
-    const videoInput = document.getElementById('videoInput');
-    const previewVid = document.getElementById('previewVid');
-    const fileInfo = document.getElementById('fileInfo');
-    const fileName = document.getElementById('fileName');
-    const descInput = document.getElementById('descInput');
-    const btnUpload = document.getElementById('btnUpload');
-    const statusMsg = document.getElementById('statusMsg');
-
-    uploadArea.addEventListener('click', () => videoInput.click());
-    videoInput.addEventListener('change', (e) => e.target.files[0] && handleFile(e.target.files[0]));
+    $('uploadArea').addEventListener('click', () => $('videoInput').click());
+    $('videoInput').addEventListener('change', (e) => e.target.files[0] && handleFile(e.target.files[0]));
 
     function handleFile(file) {
       if (!file.type.startsWith('video/')) {
         showStatus('กรุณาเลือกไฟล์วิดีโอเท่านั้น', 'error');
         return;
       }
-      fileName.textContent = file.name;
-      fileInfo.classList.remove('hidden');
+      $('fileName').textContent = file.name;
+      $('fileInfo').classList.remove('hidden');
       
       const url = URL.createObjectURL(file);
-      previewVid.src = url;
-      previewVid.classList.remove('hidden');
+      $('previewVid').src = url;
+      $('previewVid').classList.remove('hidden');
       
-      btnUpload.disabled = false;
-      btnUpload.classList.remove('opacity-50');
+      $('btnUpload').disabled = false;
+      $('btnUpload').classList.remove('opacity-50');
       window.selectedVideoFile = file;
     }
 
     function resetUploadForm() {
-      videoInput.value = '';
-      previewVid.src = '';
-      previewVid.classList.add('hidden');
-      fileInfo.classList.add('hidden');
-      descInput.value = '';
-      statusMsg.classList.add('hidden');
-      btnUpload.disabled = true;
-      btnUpload.classList.add('opacity-50');
+      $('videoInput').value = '';
+      $('previewVid').src = '';
+      $('previewVid').classList.add('hidden');
+      $('fileInfo').classList.add('hidden');
+      $('descInput').value = '';
+      $('statusMsg').classList.add('hidden');
+      $('btnUpload').disabled = true;
+      $('btnUpload').classList.add('opacity-50');
       delete window.selectedVideoFile;
     }
 
     function showStatus(text, type = 'info') {
-      statusMsg.textContent = text;
-      statusMsg.className = 'mt-4 text-center text-sm block';
-      if (type === 'success') statusMsg.classList.add('text-green-400');
-      if (type === 'error') statusMsg.classList.add('text-red-400');
-      if (type === 'info') statusMsg.classList.add('text-blue-400');
-      statusMsg.classList.remove('hidden');
+      $('statusMsg').textContent = text;
+      $('statusMsg').classList.remove('hidden', 'text-green-400', 'text-red-400', 'text-blue-400');
+      $('statusMsg').classList.add(type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400');
     }
 
-    // ========== อัปโหลดวิดีโอ — ใช้ API Key โดยตรง ไม่ต้อง Preset! แก้ 403 แล้ว! ==========
-    btnUpload.addEventListener('click', async () => {
+    // ========== อัปโหลดวิดีโอ — ใช้ Preset thaipodee_upload ==========
+    $('btnUpload').addEventListener('click', async () => {
       if (!window.selectedVideoFile) {
         showStatus('กรุณาเลือกไฟล์วิดีโอก่อน', 'error');
         return;
       }
       
-      btnUpload.disabled = true;
-      btnUpload.textContent = 'กำลังอัปโหลด...';
+      $('btnUpload').disabled = true;
+      $('btnUpload').textContent = 'กำลังอัปโหลด...';
       showStatus('กำลังอัปโหลดวิดีโอไปยังเซิร์ฟเวอร์...', 'info');
 
       try {
         const formData = new FormData();
         formData.append('file', window.selectedVideoFile);
-        formData.append('api_key', API_KEY); // ✅ ใช้ API Key โดยตรง — ไม่ต้อง Preset!
+        formData.append('upload_preset', UPLOAD_PRESET); // ✅ ต้องสร้างใน Cloudinary!
         formData.append('folder', 'thaipodee_videos');
-        formData.append('timestamp', Math.floor(Date.now() / 1000));
-        if (descInput.value) formData.append('context', `alt=${encodeURIComponent(descInput.value)}`);
+        if ($('descInput').value) formData.append('context', `alt=${encodeURIComponent($('descInput').value)}`);
 
-        const res = await fetch(CLOUD_URL, {
+        const res = await fetch(UPLOAD_URL, {
           method: 'POST',
           body: formData
         });
 
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
         const data = await res.json();
         
-        if (data.error) throw new Error(data.error.message);
+        if (!res.ok || data.error) {
+          throw new Error(data.error?.message || `Server error: ${res.status}`);
+        }
 
         // บันทึกวิดีโอลงโปรไฟล์
         const newVideo = {
           id: data.public_id,
           url: data.secure_url,
           thumbnail: data.thumbnail_url || data.secure_url,
-          description: descInput.value || '',
+          description: $('descInput').value || '',
           createdAt: new Date().toISOString()
         };
         profileData.videos.unshift(newVideo);
@@ -331,28 +319,28 @@
         showStatus('✅ อัปโหลดวิดีโอสำเร็จ!', 'success');
         
         // แสดงวิดีโอที่หน้าแรก + เปิดเสียง
-        document.getElementById('videoPlayer').src = data.secure_url;
-        document.getElementById('videoPlayer').muted = false;
-        document.getElementById('videoPlayer').volume = 1;
-        document.getElementById('videoPlayer').play().catch(() => {});
+        $('videoPlayer').src = data.secure_url;
+        $('videoPlayer').muted = false;
+        $('videoPlayer').volume = 1;
+        $('videoPlayer').play().catch(() => {});
 
         setTimeout(() => {
-          uploadScreen.classList.add('hidden');
+          $('uploadScreen').classList.add('hidden');
           resetUploadForm();
         }, 1500);
 
       } catch (err) {
         console.error('Upload error:', err);
-        showStatus('❌ ไม่สามารถอัปโหลดได้: ' + err.message, 'error');
-        btnUpload.disabled = false;
+        showStatus('❌ ไม่สำเร็จ: ' + err.message + ' — โปรดสร้าง Upload Preset ชื่อ thaipodee_upload ใน Cloudinary!', 'error');
+        $('btnUpload').disabled = false;
       }
       
-      btnUpload.textContent = 'โพสต์วิดีโอ';
+      $('btnUpload').textContent = 'โพสต์วิดีโอ';
     });
 
     // ========== แสดงวิดีโอของฉัน ==========
     function renderMyVideos() {
-      const grid = document.getElementById('myVideosGrid');
+      const grid = $('myVideosGrid');
       if (!profileData.videos.length) {
         grid.innerHTML = `<div class="aspect-square bg-gray-800/50 flex items-center justify-center text-gray-500 col-span-3 py-8">ยังไม่มีวิดีโอที่โพสต์</div>`;
         return;
@@ -370,16 +358,12 @@
     // ========== เริ่มทำงาน ==========
     document.addEventListener('DOMContentLoaded', () => {
       loadProfile();
-      btnUpload.disabled = true;
-      btnUpload.classList.add('opacity-50');
       
       // กดวิดีโอ = เปิด/ปิดเสียง
-      const mainVideo = document.getElementById('videoPlayer');
-      mainVideo.addEventListener('click', () => {
-        mainVideo.muted = !mainVideo.muted;
-        if (!mainVideo.muted) mainVideo.volume = 1;
-        if (mainVideo.paused) mainVideo.play();
-        else mainVideo.pause();
+      $('videoPlayer').addEventListener('click', () => {
+        $('videoPlayer').muted = !$('videoPlayer').muted;
+        if ($('videoPlayer').muted) $('videoPlayer').pause();
+        else { $('videoPlayer').volume = 1; $('videoPlayer').play(); }
       });
     });
   </script>
