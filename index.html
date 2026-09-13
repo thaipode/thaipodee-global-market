@@ -7,25 +7,38 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
-    body { position: fixed; width: 100%; height: 100%; }
-    .app { width: 100%; height: 100vh; height: 100dvh; max-width: 430px; margin: 0 auto; position: relative; background: #000; overflow: hidden; }
-
-    /* ===== พื้นที่วิดีโอ เต็มจอ ===== */
-    .video-area {
-      width: 100%; height: 100%;
-      background: #000;
-      position: relative;
+    body { position: fixed; inset: 0; }
+    .app {
+      width: 100%; height: 100vh; height: 100dvh;
+      max-width: 430px; margin: 0 auto;
+      position: relative; background: #000;
       overflow: hidden;
     }
-    video {
-      width: 100%; height: 100%;
-      object-fit: cover;
+
+    /* ===== วิดีโอ — อยู่ตรงกลางจอ เต็มจอ พอดีเป๊ะ ===== */
+    .video-area {
       position: absolute;
-      top: 0; left: 0;
+      inset: 0; /* กินพื้นที่ทั้งจอ ตรงกลางพอดี */
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .video-area video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* เต็มจอ ไม่บิดรูป อยู่ตรงกลาง */
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%); /* จัดกึ่งกลางพอดี */
     }
     .video-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
       color: #666; font-size: 16px;
     }
@@ -86,7 +99,7 @@
     }
     .progress-done { width: 0%; height: 100%; background: #fff; border-radius: 0 2px 2px 0; transition: width 0.1s linear; }
 
-    /* ===== เมนูล่าง — แสดงชัดเจน ไม่หาย ===== */
+    /* ===== เมนูล่าง — แสดงชัดเจน ===== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
       padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -114,7 +127,7 @@
       padding: 1px 5px; border-radius: 10px;
     }
 
-    /* ===== แผงอัปโหลดวิดีโอ ===== */
+    /* ===== แผงอัปโหลด ===== */
     .upload-panel {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #121212; border-radius: 20px 20px 0 0;
@@ -148,7 +161,7 @@
 </head>
 <body>
   <div class="app">
-    <!-- พื้นที่วิดีโอ -->
+    <!-- พื้นที่วิดีโอ — ตรงกลางจอ พอดีเป๊ะ -->
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
@@ -200,7 +213,7 @@
       <div class="progress-done" id="progressFill"></div>
     </div>
 
-    <!-- เมนูล่าง — แสดงแน่นอน ไม่หาย -->
+    <!-- เมนูล่าง -->
     <div class="bottom-bar">
       <div class="b-nav active">
         <div class="b-icon">🏠</div>
@@ -223,7 +236,7 @@
       </div>
     </div>
 
-    <!-- แผงอัปโหลดวิดีโอ -->
+    <!-- แผงอัปโหลด -->
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="upload-title">อัปโหลดวิดีโอ</div>
@@ -244,7 +257,6 @@
     </div>
   </div>
 
-  <!-- ===== การทำงานจริง — อัปโหลด + เล่นวิดีโอ ===== -->
   <script>
     // สลับแท็บ
     const t1 = document.getElementById('tab1'), t2 = document.getElementById('tab2');
@@ -261,7 +273,7 @@
       likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
     });
 
-    // ===== ปุ่ม + เปิดแผงอัปโหลด =====
+    // เปิด-ปิด แผงอัปโหลด
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -271,7 +283,7 @@
       resetUpload();
     });
 
-    // ===== เลือกไฟล์วิดีโอ + แสดงตัวอย่าง =====
+    // เลือกวิดีโอ + แสดงตัวอย่าง
     const fileWrapper = document.getElementById('fileWrapper');
     const videoInput = document.getElementById('videoInput');
     const previewContainer = document.getElementById('previewContainer');
@@ -288,7 +300,6 @@
     videoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      
       const url = URL.createObjectURL(file);
       videoPreview.src = url;
       previewContainer.style.display = 'block';
@@ -296,23 +307,19 @@
       confirmBtn.style.display = 'block';
     });
 
-    // ===== ยืนยันโพสต์ — แสดงวิดีโอจริงที่หน้าจอ =====
+    // โพสต์วิดีโอ — แสดงตรงกลางจอ
     confirmBtn.addEventListener('click', () => {
       const caption = captionInput.value || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
-      // ลบข้อความแจ้งเตือน
       videoPlaceholder.style.display = 'none';
+      // แทนที่ด้วยวิดีโอจริง — อยู่ตรงกลางอัตโนมัติ
+      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></video>`;
       
-      // สร้างแท็กวิดีโอแสดงผล
-      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline></video>`;
-      
-      // แสดงข้อมูลโพสต์
       videoCaption.textContent = caption;
       postInfo.style.display = 'block';
       progressBar.style.display = 'block';
       
-      // ปิดแผงอัปโหลด
       uploadPanel.classList.remove('show');
       resetUpload();
     });
@@ -326,7 +333,7 @@
       captionInput.value = '';
     }
 
-    // ===== แถบความคืบหน้าวิดีโอ =====
+    // แถบความคืบหน้า
     let progress = 0;
     setInterval(() => {
       const fill = document.getElementById('progressFill');
