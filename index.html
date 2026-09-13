@@ -9,7 +9,9 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; }
     body { position: fixed; inset: 0; }
 
-    /* ===== SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ===== */
+    /* ================================================= */
+    /* ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ===== */
+    /* ================================================= */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -21,9 +23,10 @@
       z-index: 9999;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
     }
-    .splash-screen.fade-out {
+    /* ===== ซ่อนทันทีเมื่อพร้อม — ไม่รออะไรเลย ===== */
+    .splash-screen.hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -62,7 +65,9 @@
       letter-spacing: 1px;
     }
 
-    /* ===== แอปหลัก — ล็อกโครงสร้างไว้ ไม่แก้ ===== */
+    /* ================================================= */
+    /* ===== แอปหลัก — ล็อกโครงสร้างไว้ ===== */
+    /* ================================================= */
     .app {
       width: 100%;
       height: 100vh;
@@ -71,11 +76,11 @@
       background: #000;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
     }
-    .app.show { opacity: 1; }
+    .app.visible { opacity: 1; }
 
-    /* ===== วิดีโอพื้นที่ — เต็มจอ ไม่มีขอบดำ ===== */
+    /* ===== วิดีโอเต็มจอ ไม่มีขอบดำ ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -99,31 +104,27 @@
       line-height: 1.8;
     }
 
-    /* ===== ปุ่มหยุดเล่น วิดีโอ — เพิ่มใหม่ ===== */
-    .play-pause-btn {
+    /* ===== ปุ่มเล่น-หยุด วิดีโอ ===== */
+    .play-pause-indicator {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: rgba(0,0,0,.5);
+      font-size: 64px;
       color: #fff;
-      font-size: 36px;
+      background: rgba(0,0,0,.5);
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      z-index: 10;
       opacity: 0;
-      transition: opacity 0.2s;
       pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
     }
-    .play-pause-btn.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .play-pause-indicator.show { opacity: 1; }
 
     /* ===== แถบความคืบหน้า ===== */
     .progress-line {
@@ -143,7 +144,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูขวา — ล็อกตำแหน่ง 6 ไอคอน ===== */
+    /* ===== เมนูขวา — 6 ไอคอน ล็อกตำแหน่ง ===== */
     .right-menu {
       position: absolute;
       right: 8px;
@@ -207,6 +208,7 @@
       right: 85px;
       bottom: calc(110px + env(safe-area-inset-bottom, 0px));
       z-index: 12;
+      display: none;
     }
     .username {
       font-size: 16px;
@@ -261,7 +263,27 @@
       z-index: 15;
     }
 
-    /* ===== แถบล่าง — ล็อก 4 ปุ่ม + กลางเป็น + ===== */
+    /* ===== ปุ่มเสียง ===== */
+    .sound-toggle {
+      position: absolute;
+      right: 12px;
+      bottom: calc(235px + env(safe-area-inset-bottom, 0px));
+      z-index: 13;
+      cursor: pointer;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+    .sound-toggle svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* ===== แถบล่าง — 4 ปุ่ม + กลางเป็น + ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -303,7 +325,7 @@
       border: none;
     }
 
-    /* ===== หน้าโปรไฟล์ — ล็อกโครงสร้าง ===== */
+    /* ===== หน้าโปรไฟล์ ===== */
     .profile-page {
       position: absolute;
       inset: 0;
@@ -665,30 +687,10 @@
       color: #999;
       font-size: 14px;
     }
-
-    /* ===== ปุ่มเสียง ===== */
-    .sound-toggle {
-      position: absolute;
-      right: 12px;
-      bottom: calc(235px + env(safe-area-inset-bottom, 0px));
-      z-index: 13;
-      cursor: pointer;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 4px;
-    }
-    .sound-toggle svg {
-      width: 24px;
-      height: 24px;
-      stroke-width: 2;
-      stroke: currentColor;
-      fill: none;
-    }
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ===== -->
+  <!-- ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
@@ -700,7 +702,7 @@
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
       <video id="mainVideo" playsinline muted loop style="display:none;"></video>
-      <div class="play-pause-btn" id="playPauseBtn">⏸</div>
+      <div class="play-pause-indicator" id="playPauseBtn">▶</div>
     </div>
 
     <div class="progress-line" id="progressBar">
@@ -746,7 +748,7 @@
       </div>
     </div>
 
-    <div class="info-left" id="postInfo" style="display:none;">
+    <div class="info-left" id="postInfo">
       <div class="username" id="profileNameBtn">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
@@ -864,42 +866,47 @@
   </div>
 
   <script>
-    // ===== ค่าคงที่เก็บข้อมูล — ล็อกไม่แก้ =====
+    // ===== ค่าคงที่เก็บข้อมูล =====
     const STORAGE = {
-      AVATAR: 'thaipodee_avatar_v2',
-      USERNAME: 'thaipodee_username_v2',
-      VIDEOS: 'thaipodee_videos_v2'
+      AVATAR: 'thaipodee_avatar_v3',
+      USERNAME: 'thaipodee_username_v3',
+      VIDEOS: 'thaipodee_videos_v3'
     };
     const DEFAULT_AVATAR = 'https://picsum.photos/200/200';
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
 
     // ===== ตัวแปรสถานะ =====
     let uploadedVideos = [];
-    let currentVideoIndex = 0;
     let isMuted = true;
     let commentCount = 0;
 
-    // ===== 1. SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ทำงานแน่นอน 100% =====
+    // =====================================================
+    // ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ทำงานแน่นอน =====
+    // =====================================================
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
-    function hideSplash() {
+    function showApp() {
       if (!splash || !app) return;
-      splash.classList.add('fade-out');
-      app.classList.add('show');
-      // โหลดข้อมูลทันทีหลังเข้าแอป
+      // ซ่อนหน้าเริ่มต้น แสดงแอปทันที
+      splash.classList.add('hidden');
+      app.classList.add('visible');
+      // โหลดข้อมูล
       loadUserData();
       loadSavedVideos();
     }
 
-    // เรียกหลายช่องทาง — มั่นใจว่าทำงานแน่นอน
-    document.addEventListener('DOMContentLoaded', hideSplash);
-    window.addEventListener('load', hideSplash);
-    setTimeout(hideSplash, 600);   // ทันทีเมื่อโหลด
-    setTimeout(hideSplash, 1200);  // สำรอง
-    setTimeout(hideSplash, 2000);  // เผื่อช้ามาก
+    // ===== ทำงานทันที — ไม่รออะไรหลายช่องทาง มั่นใจ 100% =====
+    // 1. ทันทีที่สคริปต์รัน — เร็วที่สุด
+    setTimeout(showApp, 800);
+    // 2. เมื่อ DOM โหลดเสร็จ
+    document.addEventListener('DOMContentLoaded', () => setTimeout(showApp, 500));
+    // 3. เมื่อหน้าโหลดเสร็จทั้งหมด
+    window.addEventListener('load', () => setTimeout(showApp, 300));
+    // 4. สำรอง สุดท้ายเผื่อทุกอย่างช้ามาก
+    setTimeout(showApp, 2000);
 
-    // ===== 2. จัดการข้อมูลผู้ใช้ — เปลี่ยนรูป+ชื่อ ทุกจุดพร้อมกัน =====
+    // ===== โหลดข้อมูลผู้ใช้ =====
     function loadUserData() {
       const avatar = localStorage.getItem(STORAGE.AVATAR) || DEFAULT_AVATAR;
       const name = localStorage.getItem(STORAGE.USERNAME) || DEFAULT_NAME;
@@ -976,7 +983,7 @@
       });
     }
 
-    // ===== 3. หน้าโปรไฟล์ =====
+    // ===== หน้าโปรไฟล์ =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
@@ -990,7 +997,7 @@
     if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
     if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== 4. อัปโหลดวิดีโอ — บันทึกถาวร ไม่หาย =====
+    // ===== อัปโหลดวิดีโอ — บันทึกถาวร =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1046,9 +1053,8 @@
       });
     }
 
-    // บันทึกวิดีโอลง LocalStorage
+    // บันทึกวิดีโอ
     function saveVideoToStorage(videoUrl, caption) {
-      // แปลงเป็น base64 เพื่อเก็บถาวร
       const newVideo = {
         id: Date.now(),
         url: videoUrl,
@@ -1072,7 +1078,7 @@
       renderProfileVideos();
     }
 
-    // แสดงวิดีโอหลัก
+    // แสดงวิดีโอ
     function showVideo(url, captionText) {
       mainVideo.src = url;
       mainVideo.style.display = 'block';
@@ -1083,7 +1089,6 @@
       
       mainVideo.play().catch(() => {});
       
-      // อัปเดตแถบความคืบหน้า
       mainVideo.ontimeupdate = () => {
         if (mainVideo.duration) {
           const percent = (mainVideo.currentTime / mainVideo.duration) * 100;
@@ -1106,8 +1111,8 @@
           mainVideo.pause();
           playPauseBtn.textContent = '▶';
         }
-        playPauseBtn.classList.add('visible');
-        setTimeout(() => playPauseBtn.classList.remove('visible'), 1500);
+        playPauseBtn.classList.add('show');
+        setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
       });
     }
 
@@ -1123,7 +1128,7 @@
       });
     }
 
-    // แสดงวิดีโอในหน้าโปรไฟล์
+    // แสดงวิดีโอในโปรไฟล์
     function renderProfileVideos() {
       if (!profileVideosGrid) return;
       
@@ -1137,7 +1142,6 @@
         </div>
       `).join('');
       
-      // กดเพื่อเล่น
       profileVideosGrid.querySelectorAll('.profile-video-item').forEach(item => {
         item.addEventListener('click', () => {
           const url = item.dataset.url;
@@ -1158,7 +1162,7 @@
       if (captionInput) captionInput.value = '';
     }
 
-    // ===== 5. ถูกใจ =====
+    // ===== ถูกใจ =====
     const likeBtn = document.getElementById('likeBtn');
     const likeCount = document.getElementById('likeCount');
     let isLiked = false, likeNum = 0;
@@ -1167,4 +1171,25 @@
         isLiked = !isLiked;
         likeNum += isLiked ? 1 : -1;
         likeCount.textContent = likeNum;
-        like
+        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
+      });
+    }
+
+    // ===== ความคิดเห็น =====
+    const commentBtn = document.getElementById('commentBtn');
+    const commentsPanel = document.getElementById('commentsPanel');
+    const commentsClose = document.getElementById('commentsClose');
+    const commentInput = document.getElementById('commentInput');
+    const commentSendBtn = document.getElementById('commentSendBtn');
+    const commentsList = document.getElementById('commentsList');
+    const commentsHeaderCount = document.getElementById('commentsHeaderCount');
+
+    if (commentBtn) commentBtn.addEventListener('click', () => commentsPanel.classList.add('show'));
+    if (commentsClose) commentsClose.addEventListener('click', () => commentsPanel.classList.remove('show'));
+
+    function addComment(text) {
+      const empty = commentsList.querySelector('.no-comments');
+      if (empty) empty.remove();
+      commentCount++;
+      document.getElementById('commentCount').textContent = commentCount;
+      commentsHeaderCount.textContent =
