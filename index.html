@@ -2,45 +2,58 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Thaipodee</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
-    .app { width: 100%; height: 100vh; max-width: 430px; margin: 0 auto; position: relative; background: #000; }
+    body { position: fixed; width: 100%; height: 100%; }
+    .app { width: 100%; height: 100vh; height: 100dvh; max-width: 430px; margin: 0 auto; position: relative; background: #000; overflow: hidden; }
 
     /* ===== พื้นที่วิดีโอ เต็มจอ ===== */
     .video-area {
       width: 100%; height: 100%;
       background: #000;
       position: relative;
+      overflow: hidden;
+    }
+    video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .video-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+      color: #666; font-size: 16px;
     }
 
     /* ===== แถบบน ===== */
     .top-bar {
-      position: absolute; top: 48px; left: 0; width: 100%;
+      position: absolute; top: env(safe-area-inset-top, 20px); left: 0; width: 100%;
       display: flex; justify-content: center; align-items: center;
-      z-index: 10;
+      z-index: 10; padding-top: 28px;
     }
     .tab { font-size: 16px; color: rgba(255,255,255,.6); cursor: pointer; padding: 0 12px; }
     .tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 3px; }
-    .search-btn { position: absolute; right: 16px; top: 48px; font-size: 22px; cursor: pointer; }
+    .search-btn { position: absolute; right: 16px; top: env(safe-area-inset-top, 20px); font-size: 22px; cursor: pointer; z-index: 10; padding-top: 28px; }
 
     /* ===== ปุ่มด้านขวา ===== */
     .right-menu {
-      position: absolute; right: 12px; bottom: 125px;
+      position: absolute; right: 12px; bottom: 140px;
       display: flex; flex-direction: column; align-items: center; gap: 24px;
       z-index: 10;
     }
     .r-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
     .r-icon { font-size: 28px; }
-    .r-text { font-size: 11px; opacity: .8; }
     .r-num { font-size: 12px; margin-top: 2px; }
 
     .prof-box { position: relative; }
     .prof-img {
       width: 48px; height: 48px; border-radius: 50%;
-      border: 2px solid #fff; background: #333;
+      border: 2px solid #fff;
       background: url('https://picsum.photos/100/100') center/cover;
     }
     .follow-add {
@@ -58,26 +71,27 @@
 
     /* ===== ข้อมูลล่างซ้าย ===== */
     .info-left {
-      position: absolute; left: 16px; right: 90px; bottom: 125px;
+      position: absolute; left: 16px; right: 90px; bottom: 140px;
       z-index: 10;
     }
     .username { font-size: 16px; font-weight: 700; margin-bottom: 8px; cursor: pointer; }
     .caption { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
-    .ai-tag { font-size: 11px; opacity: .5; margin-bottom: 8px; display: none; }
+    .ai-tag { font-size: 11px; opacity: .5; margin-bottom: 8px; display: block; }
     .sound-name { font-size: 13px; display: flex; align-items: center; gap: 6px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ===== แถบความคืบหน้า ===== */
     .progress-line {
-      position: absolute; bottom: 100px; left: 0; right: 0; height: 2px;
+      position: absolute; bottom: 115px; left: 0; right: 0; height: 2px;
       background: rgba(255,255,255,.2); z-index: 10;
     }
-    .progress-done { width: 30%; height: 100%; background: #fff; border-radius: 0 2px 2px 0; }
+    .progress-done { width: 0%; height: 100%; background: #fff; border-radius: 0 2px 2px 0; transition: width 0.1s linear; }
 
-    /* ===== เมนูล่าง ===== */
+    /* ===== เมนูล่าง — แสดงชัดเจน ไม่หาย ===== */
     .bottom-bar {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 80px;
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       background: #000; display: flex; justify-content: space-around; align-items: center;
-      border-top: 1px solid #222; z-index: 10; padding-bottom: env(safe-area-inset-bottom);
+      border-top: 1px solid #222; z-index: 10;
     }
     .b-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; color: #fff; font-size: 11px; opacity: .6; }
     .b-nav.active { opacity: 1; }
@@ -87,6 +101,7 @@
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 22px; font-weight: bold; color: #000; cursor: pointer;
+      border: none;
     }
     .dot-badge { position: relative; }
     .dot-red {
@@ -98,12 +113,45 @@
       background: #ff0050; color: #fff; font-size: 10px;
       padding: 1px 5px; border-radius: 10px;
     }
+
+    /* ===== แผงอัปโหลดวิดีโอ ===== */
+    .upload-panel {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #121212; border-radius: 20px 20px 0 0;
+      padding: 24px; z-index: 30;
+      transform: translateY(100%); transition: transform 0.3s ease;
+      max-height: 80vh; overflow-y: auto;
+    }
+    .upload-panel.show { transform: translateY(0); }
+    .panel-close { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 20px; }
+    .upload-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+    .file-input-wrapper {
+      border: 2px dashed #555; border-radius: 12px; padding: 40px 20px;
+      text-align: center; cursor: pointer; margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+    .file-input-wrapper:hover { border-color: #fe28ea; }
+    .file-input-wrapper p { margin-top: 10px; color: #aaa; font-size: 14px; }
+    input[type="file"] { display: none; }
+    .preview-container { width: 100%; border-radius: 12px; margin-bottom: 16px; display: none; }
+    .preview-container video { width: 100%; border-radius: 12px; }
+    .input-field {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
+      background: #222; color: #fff; margin-bottom: 12px; font-size: 14px;
+    }
+    .upload-btn {
+      width: 100%; padding: 14px; border-radius: 8px; border: none;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      color: #000; font-size: 16px; font-weight: 600; cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <!-- พื้นที่วิดีโอ -->
-    <div class="video-area"></div>
+    <div class="video-area" id="videoArea">
+      <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
+    </div>
 
     <!-- แถบบน -->
     <div class="top-bar">
@@ -140,19 +188,19 @@
     </div>
 
     <!-- ข้อมูลล่างซ้าย -->
-    <div class="info-left">
+    <div class="info-left" id="postInfo" style="display: none;">
       <div class="username">@soundcraftrguy</div>
-      <div class="caption">"ปกป้องประเทศไทย" "Protect Thailand"</div>
-      <div class="ai-tag" id="aiLabel">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
+      <div class="caption" id="videoCaption"></div>
+      <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — soundcraftrguy</div>
     </div>
 
     <!-- แถบความคืบหน้า -->
-    <div class="progress-line">
-      <div class="progress-done"></div>
+    <div class="progress-line" id="progressBar" style="display: none;">
+      <div class="progress-done" id="progressFill"></div>
     </div>
 
-    <!-- เมนูล่าง -->
+    <!-- เมนูล่าง — แสดงแน่นอน ไม่หาย -->
     <div class="bottom-bar">
       <div class="b-nav active">
         <div class="b-icon">🏠</div>
@@ -163,7 +211,7 @@
         <div>ร้านค้า</div>
         <div class="dot-red"></div>
       </div>
-      <div class="create-box">+</div>
+      <button class="create-box" id="createBtn">+</button>
       <div class="b-nav dot-badge">
         <div class="b-icon">💬</div>
         <div>ข้อความ</div>
@@ -174,9 +222,29 @@
         <div>โปรไฟล์</div>
       </div>
     </div>
+
+    <!-- แผงอัปโหลดวิดีโอ -->
+    <div class="upload-panel" id="uploadPanel">
+      <div class="panel-close" id="closeUpload">✕</div>
+      <div class="upload-title">อัปโหลดวิดีโอ</div>
+      
+      <div class="file-input-wrapper" id="fileWrapper">
+        <div style="font-size: 32px;">📹</div>
+        <p>กดเพื่อเลือกวิดีโอ<br>รองรับ MP4, MOV</p>
+        <input type="file" id="videoInput" accept="video/*" />
+      </div>
+
+      <div class="preview-container" id="previewContainer">
+        <video id="videoPreview" controls muted></video>
+      </div>
+
+      <input type="text" class="input-field" id="captionInput" placeholder="เขียนคำบรรยายวิดีโอ..." />
+      
+      <button class="upload-btn" id="confirmBtn" style="display: none;">โพสต์วิดีโอ</button>
+    </div>
   </div>
 
-  <!-- การทำงาน -->
+  <!-- ===== การทำงานจริง — อัปโหลด + เล่นวิดีโอ ===== -->
   <script>
     // สลับแท็บ
     const t1 = document.getElementById('tab1'), t2 = document.getElementById('tab2');
@@ -184,8 +252,7 @@
     t2.addEventListener('click', () => { t2.classList.add('active'); t1.classList.remove('active'); });
 
     // ปุ่มถูกใจ
-    const likeBtn = document.getElementById('likeBtn');
-    const likeCount = document.getElementById('likeCount');
+    const likeBtn = document.getElementById('likeBtn'), likeCount = document.getElementById('likeCount');
     let isLiked = false, count = 0;
     likeBtn.addEventListener('click', () => {
       isLiked = !isLiked;
@@ -194,10 +261,80 @@
       likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
     });
 
-    // ป้าย AI — แสดงเมื่อตรวจพบ
-    const aiLabel = document.getElementById('aiLabel');
-    const isAIContent = true; // ค่าจริงมาจากระบบ
-    if (isAIContent) aiLabel.style.display = 'block';
+    // ===== ปุ่ม + เปิดแผงอัปโหลด =====
+    const createBtn = document.getElementById('createBtn');
+    const uploadPanel = document.getElementById('uploadPanel');
+    const closeUpload = document.getElementById('closeUpload');
+    createBtn.addEventListener('click', () => uploadPanel.classList.add('show'));
+    closeUpload.addEventListener('click', () => {
+      uploadPanel.classList.remove('show');
+      resetUpload();
+    });
+
+    // ===== เลือกไฟล์วิดีโอ + แสดงตัวอย่าง =====
+    const fileWrapper = document.getElementById('fileWrapper');
+    const videoInput = document.getElementById('videoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const videoPreview = document.getElementById('videoPreview');
+    const captionInput = document.getElementById('captionInput');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const videoArea = document.getElementById('videoArea');
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const postInfo = document.getElementById('postInfo');
+    const videoCaption = document.getElementById('videoCaption');
+    const progressBar = document.getElementById('progressBar');
+
+    fileWrapper.addEventListener('click', () => videoInput.click());
+    videoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const url = URL.createObjectURL(file);
+      videoPreview.src = url;
+      previewContainer.style.display = 'block';
+      fileWrapper.style.display = 'none';
+      confirmBtn.style.display = 'block';
+    });
+
+    // ===== ยืนยันโพสต์ — แสดงวิดีโอจริงที่หน้าจอ =====
+    confirmBtn.addEventListener('click', () => {
+      const caption = captionInput.value || "วิดีโอใหม่";
+      const videoSrc = videoPreview.src;
+
+      // ลบข้อความแจ้งเตือน
+      videoPlaceholder.style.display = 'none';
+      
+      // สร้างแท็กวิดีโอแสดงผล
+      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline></video>`;
+      
+      // แสดงข้อมูลโพสต์
+      videoCaption.textContent = caption;
+      postInfo.style.display = 'block';
+      progressBar.style.display = 'block';
+      
+      // ปิดแผงอัปโหลด
+      uploadPanel.classList.remove('show');
+      resetUpload();
+    });
+
+    function resetUpload() {
+      videoInput.value = '';
+      videoPreview.src = '';
+      previewContainer.style.display = 'none';
+      fileWrapper.style.display = 'block';
+      confirmBtn.style.display = 'none';
+      captionInput.value = '';
+    }
+
+    // ===== แถบความคืบหน้าวิดีโอ =====
+    let progress = 0;
+    setInterval(() => {
+      const fill = document.getElementById('progressFill');
+      if (fill) {
+        progress = (progress + 0.5) % 100;
+        fill.style.width = progress + '%';
+      }
+    }, 500);
   </script>
 </body>
 </html>
