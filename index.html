@@ -88,12 +88,7 @@
     }
     .app.show { opacity: 1; }
 
-    /* =====================================================
-       ✅ กฎสำคัญที่สุด: สัดส่วนวิดีโอ = สัดส่วนไฟล์ 100%
-       - วิดีโอ 9:16 → แนวตั้งเสมอ แม้หมุนจอเป็นแนวนอน
-       - วิดีโอ 16:9 → แนวนอนเสมอ แม้หมุนจอเป็นแนวตั้ง
-       - ห้ามหมุน ห้ามยืด ห้ามบิด ห้ามเปลี่ยนอัตราส่วนเด็ดขาด
-       ===================================================== */
+    /* ===== วิดีโอ — รักษาสัดส่วนเดิมเป๊ะ! ห้ามเปลี่ยน ห้ามหมุน ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -110,11 +105,11 @@
       max-height: 100dvh;
       width: auto;
       height: auto;
-      object-fit: contain; /* ✅ รักษาสัดส่วนเดิม ไม่ยืด ไม่ตัด */
+      object-fit: contain;
       object-position: center center;
       background: #000;
-      transform: rotate(0deg) !important; /* ✅ ห้ามหมุนเด็ดขาด */
-      pointer-events: none; /* ✅ ป้องกันการหมุนอัตโนมัติจากเบราว์เซอร์ */
+      transform: rotate(0deg) !important;
+      pointer-events: none;
     }
 
     .video-placeholder {
@@ -124,7 +119,7 @@
       padding: 20px;
     }
 
-    /* ===== ป้ายบอกสัดส่วนชัดเจน ===== */
+    /* ===== ป้ายบอกสัดส่วน ===== */
     .aspect-ratio-badge {
       position: absolute;
       top: max(60px, env(safe-area-inset-top, 0px));
@@ -279,13 +274,13 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
-    .ai-tag { font-size: 11px; opacity: .5; margin-bottom: 8px; display: block; }
+    .ai-tag { font-size: 11px; opacity: 0.5; margin-bottom: 8px; display: block; }
     .sound-name {
       font-size: 13px;
       display: flex;
       align-items: center;
       gap: 6px;
-      opacity: .85;
+      opacity: 0.85;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -334,7 +329,7 @@
       cursor: pointer;
       color: #fff;
       font-size: 11px;
-      opacity: .6;
+      opacity: 0.6;
       transition: opacity 0.2s;
     }
     .b-nav:hover { opacity: 1; }
@@ -447,7 +442,7 @@
       font-size: 14px;
     }
 
-    /* ===== แผงอัปโหลด — บอกสัดส่วนให้เลือกก่อนตัดต่อ ===== */
+    /* ===== แผงอัปโหลด ===== */
     .upload-panel {
       position: absolute;
       bottom: 0;
@@ -477,16 +472,19 @@
       text-align: center;
     }
     .aspect-guide {
-      background: rgba(37,244,238,.1);
-      border: 1px solid #25f4ee;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
       border-radius: 8px;
-      padding: 14px;
+      padding: 12px;
       margin-bottom: 20px;
       font-size: 13px;
-      line-height: 1.8;
-      color: #c8f8f6;
+      line-height: 1.6;
+      color: #fff;
     }
-    .aspect-guide strong { color: #fff; }
+    .aspect-guide strong {
+      color: #fff;
+      font-weight: 700;
+    }
     .file-input-wrapper {
       border: 2px dashed #555;
       border-radius: 12px;
@@ -541,7 +539,7 @@
     }
     .upload-btn:active { transform: scale(0.98); }
 
-    /* ===== แนวนอน — วิดีโอยังเป็นแนวเดิม ไม่เปลี่ยน ไม่หมุน ===== */
+    /* ===== แนวนอน — วิดีโอยังเป็นแนวเดิม ===== */
     @media (orientation: landscape) {
       .app { max-width: 100%; max-height: 100vh; }
       .video-area video {
@@ -550,7 +548,7 @@
         width: auto;
         height: auto;
         object-fit: contain;
-        transform: rotate(0deg) !important; /* ✅ ห้ามหมุนแม้จะหมุนจอ */
+        transform: rotate(0deg) !important;
       }
       .right-menu { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); gap: 20px; }
       .info-left { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
@@ -574,7 +572,7 @@
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
-    <!-- ✅ ป้ายบอกสัดส่วนชัดเจน ก่อนโพสต์และขณะเล่น -->
+    <!-- ป้ายบอกสัดส่วน -->
     <div class="aspect-ratio-badge" id="aspectBadge"></div>
 
     <div class="sound-toggle" id="soundToggle" style="display:none;">🔊</div>
@@ -607,7 +605,7 @@
         <div class="r-num">0</div>
       </div>
       <div class="r-btn">
-        <div class="music-cover"></div>
+        <div class="music-cover">🎵</div>
       </div>
     </div>
 
@@ -644,18 +642,15 @@
       </div>
     </div>
 
-    <!-- ===== แผงอัปโหลด — บอกให้เลือกสัดส่วนถูกต้องก่อนตัดต่อ ===== -->
+    <!-- ===== แผงอัปโหลด ===== -->
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="upload-title">อัปโหลดวิดีโอ</div>
       
-      <!-- ✅ บอกชัดเจนก่อนตัดต่อว่าต้องเลือกอะไร -->
       <div class="aspect-guide">
-        <strong>📐 เลือกสัดส่วนให้ถูกต้องตอนตัดต่อ:</strong><br><br>
-        • <strong>แนวตั้ง → เลือก 9:16</strong> ✅ เหมือน TikTok เต็มจอสวยที่สุด<br>
-        • <strong>แนวนอน → เลือก 16:9</strong> ✅ เต็มความกว้าง ไม่ตัดภาพ<br>
-        • <strong>สำคัญ:</strong> วิดีโอจะคงสัดส่วนเดิมตลอด ไม่หมุน ไม่เปลี่ยน แม้หมุนจอ<br>
-        • ห้ามเลือกผิด! แนวตั้งห้ามตั้งเป็นแนวนอน แนวนอนห้ามตั้งเป็นแนวตั้ง
+        <strong>เลือกสัดส่วนให้ถูกต้องตอนตัดต่อ</strong><br><br>
+        • แนวตั้ง เลือก 9:16<br>
+        • แนวนอน เลือก 16:9
       </div>
       
       <div class="file-input-wrapper" id="fileWrapper">
@@ -718,10 +713,10 @@
           let label = '', type = '';
           
           if (Math.abs(ratio - 9/16) < 0.1) {
-            label = '✅ 9:16 แนวตั้ง';
+            label = '9:16 แนวตั้ง';
             type = 'tall';
           } else if (Math.abs(ratio - 16/9) < 0.15) {
-            label = '✅ 16:9 แนวนอน';
+            label = '16:9 แนวนอน';
             type = 'wide';
           } else if (ratio > 1) {
             label = `แนวนอน (${w}×${h})`;
@@ -735,7 +730,7 @@
       });
     }
 
-    // ===== 3 จุดโปรไฟล์ กดเข้าได้ทุกจุด =====
+    // ===== เปิด-ปิดโปรไฟล์ =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
@@ -777,7 +772,7 @@
       resetUpload();
     });
 
-    // ===== อัปโหลดวิดีโอ — รักษาสัดส่วนเดิม ห้ามหมุน ห้ามเปลี่ยน =====
+    // ===== อัปโหลดวิดีโอ =====
     const fileWrapper = document.getElementById('fileWrapper');
     const videoInput = document.getElementById('videoInput');
     const previewContainer = document.getElementById('previewContainer');
@@ -794,7 +789,6 @@
     const usernameDisplay = document.getElementById('profileNameBtn');
     const aspectBadge = document.getElementById('aspectBadge');
 
-    // ตั้งชื่อบัญชีตอนเริ่ม
     usernameDisplay.textContent = ACCOUNT_NAME;
 
     fileWrapper.addEventListener('click', () => videoInput.click());
@@ -806,7 +800,6 @@
       previewContainer.style.display = 'block';
       fileWrapper.style.display = 'none';
       
-      // ตรวจจับสัดส่วนก่อนโพสต์
       const { label } = await detectAspectRatio(videoPreview);
       console.log('สัดส่วนวิดีโอ:', label);
       
@@ -817,7 +810,6 @@
       const captionText = captionInput.value.trim() || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
-      // ตรวจจับสัดส่วนและแสดงป้าย
       const tempVid = document.createElement('video');
       tempVid.src = videoSrc;
       const { label, type } = await detectAspectRatio(tempVid);
@@ -827,7 +819,6 @@
 
       videoPlaceholder.style.display = 'none';
       
-      // ✅ วิดีโอ = สัดส่วนเดิม 100% ห้ามหมุน ห้ามเปลี่ยน
       videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop playsinline controls style="max-width:100vw;max-height:100dvh;width:auto;height:auto;object-fit:contain;object-position:center center;background:#000;transform:rotate(0deg)!important;pointer-events:none;"></video>`;
       
       usernameDisplay.textContent = ACCOUNT_NAME;
