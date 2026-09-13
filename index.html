@@ -116,10 +116,10 @@
       pointer-events: none;
     }
 
-    /* ===== ป้ายสัดส่วน ===== */
+    /* ===== ป้ายอัตราส่วน — ชิดขอบบนสุด + ตรวจจับอัตโนมัติ ===== */
     .aspect-ratio-badge {
       position: absolute;
-      top: max(60px, env(safe-area-inset-top, 0px));
+      top: env(safe-area-inset-top, 0px);
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0,0,0,.7);
@@ -729,6 +729,7 @@
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
+    <!-- ป้ายอัตราส่วน — แสดงเมื่อโหลดวิดีโอเสร็จ -->
     <div class="aspect-ratio-badge" id="aspectBadge"></div>
 
     <!-- ปุ่มเสียง -->
@@ -1008,7 +1009,6 @@
     function openProfile() { profilePage.style.display = 'flex'; }
     function closeProfile() { profilePage.style.display = 'none'; }
 
-    // ✅ กดชื่อผู้ใช้ที่มุมล่างซ้าย → เปิดหน้าโปรไฟล์
     profileNameBtn.addEventListener('click', openProfile);
     profileBtnTop.addEventListener('click', openProfile);
     profileBtnBottom.addEventListener('click', openProfile);
@@ -1041,7 +1041,7 @@
       resetUpload();
     });
 
-    // ===== ตรวจจับสัดส่วนวิดีโอ =====
+    // ===== ตรวจจับอัตราส่วนวิดีโอ — แสดง 9:16 แนวตั้ง / 16:9 แนวนอน อัตโนมัติ =====
     function detectAspectRatio(video) {
       return new Promise((resolve) => {
         video.addEventListener('loadedmetadata', function onReady() {
@@ -1051,19 +1051,15 @@
           const ratio = w / h;
           let label = '', type = '';
           
-          if (Math.abs(ratio - 9/16) < 0.1) {
+          // ตรวจจับอัตโนมัติ แนวตั้ง / แนวนอน
+          if (ratio < 1) {
             label = '9:16 แนวตั้ง';
             type = 'tall';
-          } else if (Math.abs(ratio - 16/9) < 0.15) {
+          } else {
             label = '16:9 แนวนอน';
             type = 'wide';
-          } else if (ratio > 1) {
-            label = `แนวนอน (${w}×${h})`;
-            type = 'wide';
-          } else {
-            label = `แนวตั้ง (${w}×${h})`;
-            type = 'tall';
           }
+          
           resolve({ label, type });
         });
       });
@@ -1100,6 +1096,7 @@
       const captionText = captionInput.value.trim() || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
+      // ตรวจจับอัตราส่วนและแสดงป้าย — ชิดขอบบนสุด
       const tempVid = document.createElement('video');
       tempVid.src = videoSrc;
       const { label, type } = await detectAspectRatio(tempVid);
