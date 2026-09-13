@@ -1,17 +1,191 @@
-{
-  "name": "Thaipodee Market",
-  "short_name": "Thaipodee",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "orientation": "portrait",
-    "icons": [
-    {
-      "src": "./thaipodee_logo_icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thaipodee Market Online V2026</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/du7z0r5q9/image/upload/v1726090000/thaipodee-logo.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #000; color: #fff; height: 100vh; height: 100dvh; overflow: hidden; }
+    
+    /* วิดีโอเต็มจอ */
+    .video-container { position: relative; width: 100%; height: 100%; }
+    video { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* แถบไอคอนด้านขวา — ปรับตำแหน่งแล้ว ไม่ทับซ้อน! */
+    .right-icons {
+      position: absolute;
+      right: 12px;
+      bottom: 120px; /* ✅ เลื่อนขึ้น ไม่ทับส่วนล่างสุด */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      z-index: 10; /* ✅ แสดงอยู่ด้านบนสุด ไม่ถูกบัง */
     }
-  ]
+    .icon-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .icon { font-size: 28px; cursor: pointer; text-shadow: 0 0 4px rgba(0,0,0,0.5); }
+    .icon-text { font-size: 11px; color: #fff; }
+    
+    /* ข้อมูลวิดีโอ ด้านล่างซ้าย */
+    .video-info {
+      position: absolute;
+      left: 16px;
+      bottom: 90px;
+      right: 80px;
+      z-index: 5;
+    }
+    .video-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .video-desc { font-size: 13px; opacity: 0.8; line-height: 1.4; }
+    
+    /* แถบเมนูด้านล่าง — ล็อกตำแหน่งแล้ว */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #333;
+      z-index: 10;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; }
+    .nav-add {
+      width: 44px; height: 30px;
+      background: #fff; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #000; font-weight: bold;
+    }
+    
+    /* ปุ่มอัปโหลด */
+    .upload-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; cursor: pointer; z-index: 5; }
+    .upload-icon { font-size: 48px; color: #888; margin-bottom: 12px; }
+    .upload-text { color: #888; font-size: 14px; }
+    #video-upload { display: none; }
+    
+    /* แถบความคืบหน้าวิดีโอ */
+    .progress-bar {
+      position: absolute;
+      bottom: 65px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.2);
+      z-index: 5;
+    }
+    .progress-fill { height: 100%; width: 0%; background: #fff; transition: width 0.1s linear; }
+  </style>
+</head>
+<body>
+  <div class="video-container" id="videoContainer">
+    <!-- ปุ่มอัปโหลด -->
+    <div class="upload-btn" id="uploadBtn">
+      <div class="upload-icon">+</div>
+      <div class="upload-text">แตะเพื่ออัปโหลดวิดีโอ</div>
+    </div>
+    <input type="file" id="video-upload" accept="video/*">
+    
+    <!-- วิดีโอ จะแสดงที่นี่ -->
+    <video id="videoPlayer" loop playsinline style="display:none;"></video>
+    
+    <!-- แถบความคืบหน้า -->
+    <div class="progress-bar" id="progressBar" style="display:none;">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- ข้อมูลวิดีโอ -->
+    <div class="video-info" id="videoInfo" style="display:none;">
+      <div class="video-title">@ThaipodeeMarket</div>
+      <div class="video-desc">ยินดีต้อนรับสู่ Thaipodee Market 🇹🇭 สร้างสรรค์และแชร์วิดีโอของคุณ</div>
+    </div>
+    
+    <!-- แถบไอคอนด้านขวา — ปรับตำแหน่งแล้ว ไม่ทับซ้อน! -->
+    <div class="right-icons" id="rightIcons" style="display:none;">
+      <div class="icon-group">
+        <div class="icon">👤</div>
+      </div>
+      <div class="icon-group">
+        <div class="icon">❤️</div>
+        <div class="icon-text">0</div>
+      </div>
+      <div class="icon-group">
+        <div class="icon">💬</div>
+        <div class="icon-text">0</div>
+      </div>
+      <div class="icon-group">
+        <div class="icon">🔖</div>
+        <div class="icon-text">0</div>
+      </div>
+      <div class="icon-group">
+        <div class="icon">↗</div>
+        <div class="icon-text">17</div>
+      </div>
+      <div class="icon-group">
+        <div class="icon">🎵</div>
+        <div class="icon-text">เสียงต้นฉบับ</div>
+      </div>
+    </div>
+    
+    <!-- แถบเมนูด้านล่าง -->
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
+      <div class="nav-item"><span class="nav-icon">🛒</span><span class="nav-label">ร้านค้า</span></div>
+      <div class="nav-item"><span class="nav-add">+</span></div>
+      <div class="nav-item"><span class="nav-icon">🚗</span><span class="nav-label">สินค้า</span></div>
+      <div class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
+    </div>
+  </div>
 
-}
+  <script>
+    // ===== ตัวแปร =====
+    const uploadBtn = document.getElementById('uploadBtn');
+    const videoUpload = document.getElementById('video-upload');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoInfo = document.getElementById('videoInfo');
+    const rightIcons = document.getElementById('rightIcons');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+
+    // ===== อัปโหลดวิดีโอ =====
+    uploadBtn.addEventListener('click', () => videoUpload.click());
+    videoUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const url = URL.createObjectURL(file);
+      videoPlayer.src = url;
+      
+      // แสดงองค์ประกอบทั้งหมด
+      uploadBtn.style.display = 'none';
+      videoPlayer.style.display = 'block';
+      videoInfo.style.display = 'block';
+      rightIcons.style.display = 'flex';
+      progressBar.style.display = 'block';
+      
+      // เล่นวิดีโอ
+      videoPlayer.play().catch(err => console.log('Autoplay blocked:', err));
+    });
+
+    // ===== แถบความคืบหน้า =====
+    videoPlayer.addEventListener('timeupdate', () => {
+      if (videoPlayer.duration) {
+        const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+        progressFill.style.width = percent + '%';
+      }
+    });
+
+    // ===== แตะเพื่อหยุด/เล่น =====
+    videoPlayer.addEventListener('click', () => {
+      if (videoPlayer.paused) videoPlayer.play();
+      else videoPlayer.pause();
+    });
+  </script>
+</body>
+</html>
