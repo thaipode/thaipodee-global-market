@@ -138,21 +138,31 @@
     .aspect-ratio-badge.tall { border-color: #25f4ee; color: #25f4ee; }
     .aspect-ratio-badge.wide { border-color: #fe28ea; color: #fe28ea; }
 
-    /* ===== ปุ่มเปิด/ปิดเสียง ===== */
+    /* ===== ปุ่มเปิด/ปิดเสียง — ไอคอนเล็กๆ ไม่มีพื้นหลัง แบบ TikTok ===== */
     .sound-toggle {
       position: absolute;
-      right: 8px;
-      bottom: calc(200px + env(safe-area-inset-bottom, 0px));
-      font-size: 26px;
+      right: 12px;
+      bottom: calc(235px + env(safe-area-inset-bottom, 0px));
+      font-size: 22px;
       z-index: 13;
       cursor: pointer;
-      background: rgba(0,0,0,.4);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+      color: #fff;
+      background: transparent;
+      width: auto;
+      height: auto;
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 4px;
+      line-height: 1;
+    }
+    .sound-toggle svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
     }
 
     /* ===== แถบบน ===== */
@@ -554,7 +564,9 @@
       .info-left { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
       .progress-line { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
       .bottom-bar { height: calc(60px + env(safe-area-inset-bottom, 0px)); }
-      .sound-toggle { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
+      .sound-toggle {
+        bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+      }
     }
   </style>
 </head>
@@ -575,7 +587,13 @@
     <!-- ป้ายบอกสัดส่วน -->
     <div class="aspect-ratio-badge" id="aspectBadge"></div>
 
-    <div class="sound-toggle" id="soundToggle" style="display:none;">🔊</div>
+    <!-- ปุ่มเปิด/ปิดเสียง — ไอคอนเล็กๆ แบบ TikTok ไม่มีพื้นหลัง -->
+    <div class="sound-toggle" id="soundToggle" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M19 7v10M23 11v2"></path>
+      </svg>
+    </div>
 
     <div class="top-bar">
       <span class="tab" id="tab1">กำลังติดตาม</span>
@@ -833,6 +851,32 @@
       resetUpload();
     });
 
+    // ===== ปุ่มเปิด/ปิดเสียง — เปลี่ยนไอคอน SVG =====
+    soundToggle.addEventListener('click', () => {
+      const vid = document.getElementById('mainVideo');
+      if (!vid) return;
+      vid.muted = !vid.muted;
+
+      if (vid.muted) {
+        // ปิดเสียง — ลำโพงขีด
+        soundToggle.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        `;
+      } else {
+        // เปิดเสียง — ลำโพงมีคลื่น
+        soundToggle.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19 7v10M23 11v2"></path>
+          </svg>
+        `;
+      }
+    });
+
     // ===== เพิ่มวิดีโอลงโปรไฟล์ =====
     function addVideoToProfile(src, caption) {
       const empty = profileVideosGrid.querySelector('.no-videos');
@@ -843,14 +887,6 @@
       item.innerHTML = `<video src="${src}" muted playsinline loop></video>`;
       profileVideosGrid.appendChild(item);
     }
-
-    // ===== ปุ่มเปิด/ปิดเสียง =====
-    soundToggle.addEventListener('click', () => {
-      const vid = document.getElementById('mainVideo');
-      if (!vid) return;
-      vid.muted = !vid.muted;
-      soundToggle.textContent = vid.muted ? '🔇' : '🔊';
-    });
 
     function resetUpload() {
       videoInput.value = '';
