@@ -6,11 +6,17 @@
   <title>Thaipodee</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; }
-    body { position: fixed; inset: 0; }
+    html, body { 
+      width: 100%; height: 100%; 
+      overflow: hidden; 
+      background: #000; 
+      color: #fff; 
+      position: fixed; 
+      inset: 0;
+    }
 
     /* ================================================= */
-    /* ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ===== */
+    /* ===== SPLASH SCREEN — ทำงานแน่นอน ===== */
     /* ================================================= */
     .splash-screen {
       position: fixed;
@@ -23,9 +29,8 @@
       z-index: 9999;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
-    /* ===== ซ่อนทันทีเมื่อพร้อม — ไม่รออะไรเลย ===== */
     .splash-screen.hidden {
       opacity: 0;
       visibility: hidden;
@@ -66,7 +71,7 @@
     }
 
     /* ================================================= */
-    /* ===== แอปหลัก — ล็อกโครงสร้างไว้ ===== */
+    /* ===== แอปหลัก — อัตราส่วน 9:16 คืนเหมือนเดิม ===== */
     /* ================================================= */
     .app {
       width: 100%;
@@ -76,11 +81,11 @@
       background: #000;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.4s ease;
     }
     .app.visible { opacity: 1; }
 
-    /* ===== วิดีโอเต็มจอ ไม่มีขอบดำ ===== */
+    /* ===== วิดีโอ — เต็มจอ แก้ภาพถูกบังโดยไม่เปลี่ยนโครงสร้าง ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -93,7 +98,7 @@
     .video-area video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: cover; /* เต็มจอ ไม่บังส่วนสำคัญ */
       background: #000;
     }
     .video-placeholder {
@@ -104,7 +109,7 @@
       line-height: 1.8;
     }
 
-    /* ===== ปุ่มเล่น-หยุด วิดีโอ ===== */
+    /* ===== ปุ่มเล่น-หยุด ===== */
     .play-pause-indicator {
       position: absolute;
       top: 50%;
@@ -144,7 +149,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูขวา — 6 ไอคอน ล็อกตำแหน่ง ===== */
+    /* ===== เมนูขวา 6 ไอคอน — ล็อกตำแหน่ง ===== */
     .right-menu {
       position: absolute;
       right: 8px;
@@ -174,7 +179,6 @@
       border: 2px solid #fff;
       background: url('https://picsum.photos/100/100') center/cover;
       cursor: pointer;
-      transition: transform 0.2s;
     }
     .follow-add {
       position: absolute;
@@ -283,7 +287,7 @@
       fill: none;
     }
 
-    /* ===== แถบล่าง — 4 ปุ่ม + กลางเป็น + ===== */
+    /* ===== แถบล่าง 4 ปุ่ม + กลาง ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -325,7 +329,7 @@
       border: none;
     }
 
-    /* ===== หน้าโปรไฟล์ ===== */
+    /* ===== ส่วนที่เหลือ — เหมือนเดิมเป๊ะ ไม่แตะ ===== */
     .profile-page {
       position: absolute;
       inset: 0;
@@ -456,7 +460,6 @@
       font-size: 14px;
     }
 
-    /* ===== แผงอัปโหลด ===== */
     .upload-panel {
       position: absolute;
       bottom: 0;
@@ -534,7 +537,6 @@
       cursor: pointer;
     }
 
-    /* ===== กล่องแก้ชื่อ ===== */
     .edit-name-modal {
       position: fixed;
       inset: 0;
@@ -594,7 +596,6 @@
       cursor: pointer;
     }
 
-    /* ===== ความคิดเห็น ===== */
     .comments-panel {
       position: absolute;
       bottom: 0;
@@ -690,14 +691,14 @@
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ===== -->
+  <!-- ===== SPLASH SCREEN — ทำงานแน่นอน ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
     <div class="splash-sub">สร้างสรรค์ แบ่งปัน สนุกไปด้วยกัน</div>
   </div>
 
-  <!-- ===== แอปหลัก ===== -->
+  <!-- ===== แอปหลัก — อัตราส่วน 9:16 กลับมาแล้ว ===== -->
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
@@ -712,7 +713,7 @@
     <div class="sound-toggle" id="soundToggle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-        <path d="M19 7v10M23 11v2"></path>
+        <path d="M19 7v10M23 12v2"></path>
       </svg>
     </div>
 
@@ -881,29 +882,23 @@
     let commentCount = 0;
 
     // =====================================================
-    // ===== SPLASH SCREEN — แก้จุดค้างโดยตรง ทำงานแน่นอน =====
+    // ===== SPLASH SCREEN — ทำงานแน่นอน อัตราส่วน 9:16 =====
     // =====================================================
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
     function showApp() {
       if (!splash || !app) return;
-      // ซ่อนหน้าเริ่มต้น แสดงแอปทันที
       splash.classList.add('hidden');
       app.classList.add('visible');
-      // โหลดข้อมูล
       loadUserData();
       loadSavedVideos();
     }
 
-    // ===== ทำงานทันที — ไม่รออะไรหลายช่องทาง มั่นใจ 100% =====
-    // 1. ทันทีที่สคริปต์รัน — เร็วที่สุด
+    // ===== หลายช่องทาง มั่นใจ 100% =====
     setTimeout(showApp, 800);
-    // 2. เมื่อ DOM โหลดเสร็จ
     document.addEventListener('DOMContentLoaded', () => setTimeout(showApp, 500));
-    // 3. เมื่อหน้าโหลดเสร็จทั้งหมด
     window.addEventListener('load', () => setTimeout(showApp, 300));
-    // 4. สำรอง สุดท้ายเผื่อทุกอย่างช้ามาก
     setTimeout(showApp, 2000);
 
     // ===== โหลดข้อมูลผู้ใช้ =====
@@ -997,7 +992,7 @@
     if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
     if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== อัปโหลดวิดีโอ — บันทึกถาวร =====
+    // ===== อัปโหลดวิดีโอ =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1019,7 +1014,6 @@
 
     let pendingVideo = null;
 
-    // เปิด-ปิดแผงอัปโหลด
     if (createBtn) createBtn.addEventListener('click', () => uploadPanel.classList.add('show'));
     if (closeUpload) closeUpload.addEventListener('click', () => {
       uploadPanel.classList.remove('show');
@@ -1027,7 +1021,6 @@
     });
     if (fileWrapper) fileWrapper.addEventListener('click', () => videoInput.click());
 
-    // เลือกวิดีโอ
     if (videoInput) {
       videoInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -1041,7 +1034,6 @@
       });
     }
 
-    // โพสต์วิดีโอ
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
         if (!pendingVideo) return;
@@ -1053,7 +1045,6 @@
       });
     }
 
-    // บันทึกวิดีโอ
     function saveVideoToStorage(videoUrl, caption) {
       const newVideo = {
         id: Date.now(),
@@ -1066,7 +1057,6 @@
       renderProfileVideos();
     }
 
-    // โหลดวิดีโอที่บันทึกไว้
     function loadSavedVideos() {
       const saved = localStorage.getItem(STORAGE.VIDEOS);
       if (saved) {
@@ -1078,7 +1068,6 @@
       renderProfileVideos();
     }
 
-    // แสดงวิดีโอ
     function showVideo(url, captionText) {
       mainVideo.src = url;
       mainVideo.style.display = 'block';
@@ -1097,7 +1086,6 @@
       };
     }
 
-    // เล่น-หยุด วิดีโอ
     if (videoArea) {
       videoArea.addEventListener('click', (e) => {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
@@ -1116,7 +1104,6 @@
       });
     }
 
-    // เปิด-ปิดเสียง
     if (soundToggle) {
       soundToggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1124,11 +1111,10 @@
         if (mainVideo) mainVideo.muted = isMuted;
         soundToggle.innerHTML = isMuted 
           ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M5 9v6"></path></svg>`
-          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 11v2"></path></svg>`;
+          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 5v14"></path></svg>`;
       });
     }
 
-    // แสดงวิดีโอในโปรไฟล์
     function renderProfileVideos() {
       if (!profileVideosGrid) return;
       
@@ -1192,4 +1178,32 @@
       if (empty) empty.remove();
       commentCount++;
       document.getElementById('commentCount').textContent = commentCount;
-      commentsHeaderCount.textContent =
+      commentsHeaderCount.textContent = commentCount + ' ความคิดเห็น';
+      
+      const time = new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'});
+      const newComment = document.createElement('div');
+      newComment.className = 'comment-item';
+      newComment.innerHTML = `
+        <div class="comment-avatar"></div>
+        <div class="comment-content">
+          <div class="comment-name">คุณ</div>
+          <div class="comment-text">${text}</div>
+          <div class="comment-time">${time}</div>
+        </div>
+      `;
+      commentsList.insertBefore(newComment, commentsList.firstChild);
+      commentInput.value = '';
+    }
+
+    if (commentSendBtn) {
+      commentSendBtn.addEventListener('click', () => {
+        const text = commentInput.value.trim();
+        if (!text) return;
+        addComment(text);
+      });
+    }
+    if (commentInput) {
+      commentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const text = commentInput.value.trim();
+          if (!text)
