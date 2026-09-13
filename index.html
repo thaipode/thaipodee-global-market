@@ -34,7 +34,7 @@
       z-index: 9999;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
     }
     .splash-screen.fade-out {
       opacity: 0;
@@ -86,7 +86,7 @@
       background: #000;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s ease;
     }
     .app.show { opacity: 1; }
 
@@ -108,14 +108,10 @@
       line-height: 1.8;
     }
     .video-area video {
-      max-width: 100vw;
-      max-height: 100vh;
-      max-height: 100dvh;
-      width: auto;
-      height: auto;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
       background: #000;
-      pointer-events: none;
     }
 
     /* ===== ป้ายอัตราส่วน ===== */
@@ -151,7 +147,6 @@
       justify-content: center;
       padding: 4px;
       line-height: 1;
-      display: none;
     }
     .sound-toggle svg {
       width: 24px;
@@ -808,7 +803,7 @@
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN — แก้ให้หายชัวร์ ===== -->
+  <!-- ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
@@ -920,7 +915,7 @@
         <video id="videoPreview" controls muted playsinline></video>
       </div>
       <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยายวิดีโอ..."></textarea>
-      <button class="upload-btn" id="confirmBtn" style="display: none;">โพสต์วิดีโอ</button>
+      <button class="upload-btn" id="confirmBtn">โพสต์วิดีโอ</button>
     </div>
 
     <div class="profile-page" id="profilePage">
@@ -938,19 +933,19 @@
           <div class="live-badge">LIVE</div>
         </div>
         <div class="profile-name-main" id="profileNamePage">ชื่อผู้ใช้</div>
-        <div class="profile-username">@por_supphachat4</div>
+        <div class="profile-username">@thaipodee</div>
         
         <div class="profile-stats-row">
           <div class="stat-col">
-            <div class="stat-num-big">10</div>
+            <div class="stat-num-big">0</div>
             <div class="stat-label-sm">กำลังติดตาม</div>
           </div>
           <div class="stat-col">
-            <div class="stat-num-big">6,832</div>
+            <div class="stat-num-big">0</div>
             <div class="stat-label-sm">ผู้ติดตาม</div>
           </div>
           <div class="stat-col">
-            <div class="stat-num-big">6,471</div>
+            <div class="stat-num-big">0</div>
             <div class="stat-label-sm">ถูกใจ</div>
           </div>
         </div>
@@ -962,13 +957,12 @@
         </div>
         
         <div class="profile-bio">
-          สินค้าทุกชิ้น ใช้งานจริงทุกชิ้น ✅<br>
-          ไม่อนุญาตให้ถูกคลิปไปใช้ เจอปรับ 200,000 ❌
+          สร้างสรรค์ แบ่งปัน สนุกไปด้วยกัน ✅
         </div>
         
         <div class="profile-tags">
-          <span class="tag-item">🛒 โชว์เคส</span>
-          <span class="tag-item">📡 LIVE</span>
+          <span class="tag-item">🎥 วิดีโอ</span>
+          <span class="tag-item">🎵 เพลง</span>
         </div>
       </div>
       
@@ -1000,7 +994,8 @@
     // ===== ข้อมูลผู้ใช้ =====
     const STORAGE_KEYS = {
       AVATAR: 'thaipodee_avatar',
-      USERNAME: 'thaipodee_username'
+      USERNAME: 'thaipodee_username',
+      VIDEOS: 'thaipodee_videos'
     };
     const DEFAULT_AVATAR = 'https://picsum.photos/200/200';
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
@@ -1020,12 +1015,13 @@
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
-    window.addEventListener('load', function() {
-      // รอโหลดหน้าเสร็จ + รอเวลา 2 วินาที แล้วค่อยหาย
+    // โหลดหน้าเสร็จแล้ว — รอ 2 วินาที แล้วซ่อนหน้าเริ่มต้น
+    document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         splash.classList.add('fade-out');
         app.classList.add('show');
         loadUserProfile();
+        loadSavedVideos();
       }, 2000);
     });
 
@@ -1138,7 +1134,7 @@
       likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
     });
 
-    // ===== ระบบความคิดเห็น — เปิดแผง =====
+    // ===== ระบบความคิดเห็น =====
     commentBtn.addEventListener('click', () => {
       commentsPanel.classList.add('show');
       setTimeout(() => commentInput.focus(), 200);
@@ -1149,7 +1145,6 @@
       commentInput.blur();
     });
 
-    // ===== ส่งความคิดเห็น =====
     function addComment(text) {
       const empty = commentsList.querySelector('.no-comments');
       if (empty) empty.remove();
@@ -1194,41 +1189,10 @@
       }
     });
 
-    // ===== เปิด-ปิดแผงอัปโหลด =====
+    // ===== ตัวแปรอัปโหลดวิดีโอ =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
-    createBtn.addEventListener('click', () => uploadPanel.classList.add('show'));
-    closeUpload.addEventListener('click', () => {
-      uploadPanel.classList.remove('show');
-      resetUpload();
-    });
-
-    // ===== ตรวจจับอัตราส่วนอัตโนมัติ =====
-    function detectAspectRatio(video) {
-      return new Promise((resolve) => {
-        video.addEventListener('loadedmetadata', function onReady() {
-          video.removeEventListener('loadedmetadata', onReady);
-          const w = video.videoWidth;
-          const h = video.videoHeight;
-          const ratio = w / h;
-          
-          let label = '', type = '';
-          
-          if (ratio < 1) {
-            label = '9:16';
-            type = 'tall';
-          } else {
-            label = '16:9';
-            type = 'wide';
-          }
-          
-          resolve({ label, type });
-        });
-      });
-    }
-
-    // ===== อัปโหลดวิดีโอ — ทำงานชัวร์ =====
     const fileWrapper = document.getElementById('fileWrapper');
     const videoInput = document.getElementById('videoInput');
     const previewContainer = document.getElementById('previewContainer');
@@ -1241,3 +1205,44 @@
     const videoCaption = document.getElementById('videoCaption');
     const progressBar = document.getElementById('progressBar');
     const soundToggle = document.getElementById('soundToggle');
+    const aspectBadge = document.getElementById('aspectBadge');
+    const profileVideosGrid = document.getElementById('profileVideosGrid');
+
+    let currentVideoData = null;
+    let uploadedVideos = [];
+
+    // ===== เปิด-ปิดแผงอัปโหลด =====
+    createBtn.addEventListener('click', () => {
+      uploadPanel.classList.add('show');
+    });
+
+    closeUpload.addEventListener('click', () => {
+      uploadPanel.classList.remove('show');
+      resetUpload();
+    });
+
+    fileWrapper.addEventListener('click', () => videoInput.click());
+
+    // ===== เลือกไฟล์วิดีโอ =====
+    videoInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const url = URL.createObjectURL(file);
+      videoPreview.src = url;
+      previewContainer.style.display = 'block';
+      confirmBtn.style.display = 'block';
+      fileWrapper.style.display = 'none';
+
+      // ตรวจจับอัตราส่วน
+      videoPreview.addEventListener('loadedmetadata', function onMeta() {
+        videoPreview.removeEventListener('loadedmetadata', onMeta);
+        const w = videoPreview.videoWidth;
+        const h = videoPreview.videoHeight;
+        const ratio = w / h;
+        
+        if (ratio < 1) {
+          aspectBadge.textContent = '9:16';
+          aspectBadge.className = 'aspect-ratio-badge tall';
+        } else {
+          aspectBadge.textContent
