@@ -8,56 +8,49 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
     body { position: fixed; inset: 0; }
+
+    /* ===== คอนเทนเนอร์หลัก — ล็อก ไม่เปลี่ยน ===== */
     .app {
       width: 100%; height: 100vh; height: 100dvh;
-      max-width: 430px; margin: 0 auto;
+      max-width: 480px;
+      margin: 0 auto;
       position: relative; background: #000;
       overflow: hidden;
     }
 
-    /* ===== วิดีโอ — อยู่ตรงกลางจอ เต็มจอ พอดีเป๊ะ ===== */
+    /* ===== วิดีโอ — ตรงกลาง เต็มจอ ล็อก ===== */
     .video-area {
-      position: absolute;
-      inset: 0; /* กินพื้นที่ทั้งจอ ตรงกลางพอดี */
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
       overflow: hidden;
+      background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
     }
     .video-area video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* เต็มจอ ไม่บิดรูป อยู่ตรงกลาง */
+      width: 100%; height: 100%;
+      object-fit: cover;
       position: absolute;
       top: 50%; left: 50%;
-      transform: translate(-50%, -50%); /* จัดกึ่งกลางพอดี */
+      transform: translate(-50%, -50%);
     }
-    .video-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-      color: #666; font-size: 16px;
-    }
+    .video-placeholder { color: #666; font-size: 16px; text-align: center; padding: 20px; }
 
-    /* ===== แถบบน ===== */
+    /* ===== แถบบน — ล็อก ===== */
     .top-bar {
-      position: absolute; top: env(safe-area-inset-top, 20px); left: 0; width: 100%;
+      position: absolute; top: max(20px, env(safe-area-inset-top, 0px));
+      left: 0; right: 0;
       display: flex; justify-content: center; align-items: center;
-      z-index: 10; padding-top: 28px;
+      z-index: 15;
     }
     .tab { font-size: 16px; color: rgba(255,255,255,.6); cursor: pointer; padding: 0 12px; }
     .tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 3px; }
-    .search-btn { position: absolute; right: 16px; top: env(safe-area-inset-top, 20px); font-size: 22px; cursor: pointer; z-index: 10; padding-top: 28px; }
+    .search-btn { position: absolute; right: 16px; top: max(20px, env(safe-area-inset-top, 0px)); font-size: 22px; cursor: pointer; z-index: 15; }
 
-    /* ===== ปุ่มด้านขวา ===== */
+    /* ===== เมนูขวา 6 ปุ่ม — ล็อก ครบ ===== */
     .right-menu {
-      position: absolute; right: 12px; bottom: 140px;
+      position: absolute; right: 12px;
+      bottom: calc(100px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center; gap: 24px;
-      z-index: 10;
+      z-index: 12;
     }
     .r-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
     .r-icon { font-size: 28px; }
@@ -68,6 +61,7 @@
       width: 48px; height: 48px; border-radius: 50%;
       border: 2px solid #fff;
       background: url('https://picsum.photos/100/100') center/cover;
+      cursor: pointer;
     }
     .follow-add {
       position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
@@ -82,29 +76,32 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== ข้อมูลล่างซ้าย ===== */
+    /* ===== ข้อมูลล่างซ้าย — ซ่อนไว้ก่อน ไม่โชว์ชื่อปลอม ===== */
     .info-left {
-      position: absolute; left: 16px; right: 90px; bottom: 140px;
-      z-index: 10;
+      position: absolute; left: 16px; right: 90px;
+      bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+      z-index: 12; display: none;
     }
-    .username { font-size: 16px; font-weight: 700; margin-bottom: 8px; cursor: pointer; }
+    .username { font-size: 16px; font-weight: 700; margin-bottom: 8px; cursor: pointer; color: #fff; }
     .caption { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
     .ai-tag { font-size: 11px; opacity: .5; margin-bottom: 8px; display: block; }
     .sound-name { font-size: 13px; display: flex; align-items: center; gap: 6px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ===== แถบความคืบหน้า ===== */
     .progress-line {
-      position: absolute; bottom: 115px; left: 0; right: 0; height: 2px;
-      background: rgba(255,255,255,.2); z-index: 10;
+      position: absolute; bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+      left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,.2); z-index: 12; display: none;
     }
     .progress-done { width: 0%; height: 100%; background: #fff; border-radius: 0 2px 2px 0; transition: width 0.1s linear; }
 
-    /* ===== เมนูล่าง — แสดงชัดเจน ===== */
+    /* ===== เมนูล่าง 5 ปุ่ม — ล็อก ครบ ===== */
     .bottom-bar {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
+      position: absolute; bottom: 0; left: 0; width: 100%;
+      height: calc(80px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: #000; display: flex; justify-content: space-around; align-items: center;
-      border-top: 1px solid #222; z-index: 10;
+      border-top: 1px solid #222; z-index: 12;
     }
     .b-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; color: #fff; font-size: 11px; opacity: .6; }
     .b-nav.active { opacity: 1; }
@@ -117,23 +114,17 @@
       border: none;
     }
     .dot-badge { position: relative; }
-    .dot-red {
-      position: absolute; top: -4px; right: -4px;
-      width: 8px; height: 8px; border-radius: 50%; background: #ff0050;
-    }
-    .num-badge {
-      position: absolute; top: -8px; right: -12px;
-      background: #ff0050; color: #fff; font-size: 10px;
-      padding: 1px 5px; border-radius: 10px;
-    }
+    .dot-red { position: absolute; top: -4px; right: -4px; width: 8px; height: 8px; border-radius: 50%; background: #ff0050; }
+    .num-badge { position: absolute; top: -8px; right: -12px; background: #ff0050; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; }
 
-    /* ===== แผงอัปโหลด ===== */
+    /* ===== แผงอัปโหลด — ทำงานได้ ไม่บังเมนู ===== */
     .upload-panel {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #121212; border-radius: 20px 20px 0 0;
-      padding: 24px; z-index: 30;
+      padding: 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+      z-index: 20;
       transform: translateY(100%); transition: transform 0.3s ease;
-      max-height: 80vh; overflow-y: auto;
+      max-height: 85vh; overflow-y: auto;
     }
     .upload-panel.show { transform: translateY(0); }
     .panel-close { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 20px; }
@@ -157,23 +148,30 @@
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       color: #000; font-size: 16px; font-weight: 600; cursor: pointer;
     }
+
+    /* ===== รองรับแนวนอน ===== */
+    @media (orientation: landscape) {
+      .app { max-width: 100%; max-height: 100vh; }
+      .right-menu { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); gap: 20px; }
+      .info-left { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <!-- พื้นที่วิดีโอ — ตรงกลางจอ พอดีเป๊ะ -->
+    <!-- วิดีโอ -- ล็อก -->
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
-    <!-- แถบบน -->
+    <!-- แถบบน -- ล็อก -->
     <div class="top-bar">
       <span class="tab" id="tab1">กำลังติดตาม</span>
       <span class="tab active" id="tab2">สำหรับคุณ</span>
     </div>
     <div class="search-btn">🔍</div>
 
-    <!-- ปุ่มด้านขวา -->
+    <!-- เมนูขวา 6 ปุ่ม -- ล็อก ครบ -->
     <div class="right-menu">
       <div class="r-btn prof-box">
         <div class="prof-img"></div>
@@ -200,20 +198,20 @@
       </div>
     </div>
 
-    <!-- ข้อมูลล่างซ้าย -->
-    <div class="info-left" id="postInfo" style="display: none;">
-      <div class="username">@soundcraftrguy</div>
+    <!-- ข้อมูลล่างซ้าย -- ซ่อนไว้ก่อน -->
+    <div class="info-left" id="postInfo">
+      <div class="username" id="postUsername"></div>
       <div class="caption" id="videoCaption"></div>
       <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
-      <div class="sound-name">🎵 เสียงต้นฉบับ — soundcraftrguy</div>
+      <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
 
     <!-- แถบความคืบหน้า -->
-    <div class="progress-line" id="progressBar" style="display: none;">
+    <div class="progress-line" id="progressBar">
       <div class="progress-done" id="progressFill"></div>
     </div>
 
-    <!-- เมนูล่าง -->
+    <!-- เมนูล่าง 5 ปุ่ม -- ล็อก ครบ -->
     <div class="bottom-bar">
       <div class="b-nav active">
         <div class="b-icon">🏠</div>
@@ -236,7 +234,7 @@
       </div>
     </div>
 
-    <!-- แผงอัปโหลด -->
+    <!-- แผงอัปโหลด -- ทำงานได้ -->
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="upload-title">อัปโหลดวิดีโอ</div>
@@ -307,13 +305,12 @@
       confirmBtn.style.display = 'block';
     });
 
-    // โพสต์วิดีโอ — แสดงตรงกลางจอ
+    // โพสต์วิดีโอ — แสดงข้อมูล ซ่อนชื่อจนกว่าจะมีระบบผู้ใช้
     confirmBtn.addEventListener('click', () => {
       const caption = captionInput.value || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
       videoPlaceholder.style.display = 'none';
-      // แทนที่ด้วยวิดีโอจริง — อยู่ตรงกลางอัตโนมัติ
       videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></video>`;
       
       videoCaption.textContent = caption;
