@@ -85,7 +85,7 @@
     }
     .app.visible { opacity: 1; }
 
-    /* ===== วิดีโอ — เต็มจอ object-fit: cover ไม่เปลี่ยนโครงสร้าง ===== */
+    /* ===== วิดีโอ — เต็มจอ object-fit: cover ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -882,30 +882,28 @@
     // =====================================================
     // ===== หน้าเริ่มต้น — แก้จุดนี้โดยเฉพาะ ทำงานแน่นอน =====
     // =====================================================
-    const splash = document.getElementById('splashScreen');
-    const app = document.getElementById('app');
-
-    function goToMain() {
-      console.log('✅ เข้าหน้าหลักแล้ว');
-      if (splash) splash.classList.add('hidden');
-      if (app) app.classList.add('visible');
-      if (typeof loadUserData === 'function') loadUserData();
-      if (typeof loadSavedVideos === 'function') loadSavedVideos();
-    }
-
-    // === 3 ช่องทางกันพลาด — เปลี่ยนหน้าเองอัตโนมัติ ===
-    window.addEventListener('load', () => {
-      setTimeout(goToMain, 1200);
-    });
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ DOM พร้อมแล้ว');
+      
+      const splash = document.getElementById('splashScreen');
+      const app = document.getElementById('app');
+      
+      function goToMain() {
+        console.log('➡️ เข้าหน้าหลัก...');
+        if (splash) splash.classList.add('hidden');
+        if (app) app.classList.add('visible');
+        if (typeof loadUserData === 'function') loadUserData();
+        if (typeof loadSavedVideos === 'function') loadSavedVideos();
+      }
+      
+      // รอ 1.5 วินาที แล้วเปลี่ยนหน้าเองอัตโนมัติ
       setTimeout(goToMain, 1500);
+      
+      // กดที่หน้าจอก็ข้ามได้ทันที
+      if (splash) {
+        splash.addEventListener('click', goToMain);
+      }
     });
-    setTimeout(goToMain, 2500);
-
-    // กดที่หน้าจอก็ข้ามได้ทันที
-    if (splash) {
-      splash.addEventListener('click', goToMain);
-    }
 
     // ===== โหลดข้อมูลผู้ใช้ =====
     function loadUserData() {
@@ -1219,4 +1217,8 @@
           if (!text) return;
           addComment(text);
         }
-     
+      });
+    }
+  </script>
+</body>
+</html>
