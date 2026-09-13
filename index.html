@@ -22,7 +22,7 @@
 
     body { position: fixed; inset: 0; }
 
-    /* ===== SPLASH SCREEN — โลโก้แอปโชว์ก่อนเข้าแอป ===== */
+    /* ===== SPLASH SCREEN — โลโก้แอป ===== */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -166,7 +166,7 @@
       z-index: 15;
     }
 
-    /* ===== เมนูขวา 6 ปุ่ม — รูปโปรไฟล์กดได้ ===== */
+    /* ===== เมนูขวา 6 ปุ่ม ===== */
     .right-menu {
       position: absolute;
       right: 12px;
@@ -223,7 +223,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== ข้อมูลล่างซ้าย — ชื่อโปรไฟล์กดได้ ===== */
+    /* ===== ข้อมูลล่างซ้าย — แยก ชื่อบัญชี กับ คำบรรยาย ===== */
     .info-left {
       position: absolute;
       left: 16px;
@@ -232,16 +232,23 @@
       z-index: 12;
       display: none;
     }
+    /* ===== ชื่อบัญชี — คงที่ ตั้งได้ครั้งเดียว ไม่เปลี่ยนตามคำบรรยาย ===== */
     .username {
       font-size: 16px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       cursor: pointer;
       color: #fff;
       transition: opacity 0.2s;
     }
     .username:hover { opacity: 0.8; }
-    .caption { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
+    /* ===== คำบรรยายวิดีโอ — แยกออกมาต่างหาก ===== */
+    .caption {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 6px;
+      color: #f0f0f0;
+    }
     .ai-tag { font-size: 11px; opacity: .5; margin-bottom: 8px; display: block; }
     .sound-name {
       font-size: 13px;
@@ -273,7 +280,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูล่าง 5 ปุ่ม — ปุ่มโปรไฟล์กดได้ ===== */
+    /* ===== เมนูล่าง 5 ปุ่ม ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -492,7 +499,7 @@
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN — โชว์ก่อนเข้าแอป ===== -->
+  <!-- ===== SPLASH SCREEN ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
@@ -505,7 +512,6 @@
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
-    <!-- ปุ่มเปิด/ปิดเสียง -->
     <div class="sound-toggle" id="soundToggle" style="display:none;">🔊</div>
 
     <div class="top-bar">
@@ -515,7 +521,6 @@
     <div class="search-btn">🔍</div>
 
     <div class="right-menu">
-      <!-- รูปโปรไฟล์ — กดเข้าโปรไฟล์ -->
       <div class="r-btn prof-box" id="profileBtnTop">
         <div class="prof-img"></div>
         <div class="follow-add">+</div>
@@ -542,8 +547,9 @@
     </div>
 
     <div class="info-left" id="postInfo">
-      <!-- ชื่อโปรไฟล์ — กดเข้าโปรไฟล์ -->
+      <!-- ✅ ชื่อบัญชี — คงที่ ไม่เปลี่ยนตามคำบรรยาย -->
       <div class="username" id="profileNameBtn">ชื่อผู้ใช้</div>
+      <!-- ✅ คำบรรยายวิดีโอ — แยกออกมาต่างหาก -->
       <div class="caption" id="videoCaption"></div>
       <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
@@ -569,7 +575,6 @@
         <div>ข้อความ</div>
         <div class="num-badge">99+</div>
       </div>
-      <!-- ปุ่มโปรไฟล์ล่างขวา — กดเข้าโปรไฟล์ -->
       <div class="b-nav" id="profileBtnBottom">
         <div class="b-icon">👤</div>
         <div>โปรไฟล์</div>
@@ -618,7 +623,7 @@
   </div>
 
   <script>
-    // ===== SPLASH SCREEN — โชว์ 2.5 วินาที แล้วหายไปเอง =====
+    // ===== SPLASH SCREEN =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
     setTimeout(() => {
@@ -626,19 +631,15 @@
       app.classList.add('show');
     }, 2500);
 
-    // ===== 3 จุดโปรไฟล์ กดเข้าหน้าโปรไฟล์ได้เหมือนกัน =====
+    // ===== 3 จุดโปรไฟล์ กดเข้าได้เหมือนกัน =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
     const profileNameBtn = document.getElementById('profileNameBtn');
     const profileBtnBottom = document.getElementById('profileBtnBottom');
 
-    function openProfile() {
-      profilePage.style.display = 'flex';
-    }
-    function closeProfile() {
-      profilePage.style.display = 'none';
-    }
+    function openProfile() { profilePage.style.display = 'flex'; }
+    function closeProfile() { profilePage.style.display = 'none'; }
 
     profileBtnTop.addEventListener('click', openProfile);
     profileNameBtn.addEventListener('click', openProfile);
@@ -662,7 +663,7 @@
       likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
     });
 
-    // ===== เปิด-ปิดแผงอัปโหลด =====
+    // ===== เปิด-ปิดอัปโหลด =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -672,7 +673,7 @@
       resetUpload();
     });
 
-    // ===== อัปโหลดวิดีโอ =====
+    // ===== อัปโหลดวิดีโอ — แยก ชื่อบัญชี กับ คำบรรยาย =====
     const fileWrapper = document.getElementById('fileWrapper');
     const videoInput = document.getElementById('videoInput');
     const previewContainer = document.getElementById('previewContainer');
@@ -686,6 +687,11 @@
     const progressBar = document.getElementById('progressBar');
     const soundToggle = document.getElementById('soundToggle');
     const profileVideosGrid = document.getElementById('profileVideosGrid');
+    const usernameDisplay = document.getElementById('profileNameBtn');
+
+    // ✅ ตั้งชื่อบัญชีคงที่ — ไม่เปลี่ยนตามคำบรรยาย
+    const ACCOUNT_NAME = "ชื่อผู้ใช้"; // เปลี่ยนชื่อตรงนี้ได้ตามต้องการ
+    usernameDisplay.textContent = ACCOUNT_NAME;
 
     fileWrapper.addEventListener('click', () => videoInput.click());
     videoInput.addEventListener('change', (e) => {
@@ -699,28 +705,30 @@
     });
 
     confirmBtn.addEventListener('click', () => {
-      const caption = captionInput.value || "วิดีโอใหม่";
+      // ✅ แยกกันชัดเจน — คำบรรยาย ไม่ไปทับชื่อบัญชี
+      const captionText = captionInput.value.trim() || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
       videoPlaceholder.style.display = 'none';
-      // ✅ ไม่ใส่ muted → มีเสียงออก
+      // ✅ วิดีโอมีเสียง ไม่ใส่ muted
       videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop playsinline controls style="width:100%;height:100%;object-fit:contain;object-position:center center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;"></video>`;
       
-      videoCaption.textContent = caption;
+      // ✅ ชื่อบัญชีคงที่ / คำบรรยายแยกบรรทัดล่าง
+      usernameDisplay.textContent = ACCOUNT_NAME; // คงที่
+      videoCaption.textContent = captionText; // คำบรรยาย
       postInfo.style.display = 'block';
       progressBar.style.display = 'block';
       soundToggle.style.display = 'flex';
 
-      // ✅ เพิ่มวิดีโอลงในหน้าโปรไฟล์ด้วย
-      addVideoToProfile(videoSrc, caption);
+      // เพิ่มลงโปรไฟล์
+      addVideoToProfile(videoSrc, captionText);
       
       uploadPanel.classList.remove('show');
       resetUpload();
     });
 
-    // ===== เพิ่มวิดีโอลงรายการโปรไฟล์ =====
+    // ===== เพิ่มวิดีโอลงโปรไฟล์ =====
     function addVideoToProfile(src, caption) {
-      // ลบข้อความว่างเปล่าถ้ามี
       const empty = profileVideosGrid.querySelector('.no-videos');
       if (empty) empty.remove();
       
