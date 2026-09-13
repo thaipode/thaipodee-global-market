@@ -22,7 +22,7 @@
 
     body { position: fixed; inset: 0; }
 
-    /* ===== SPLASH SCREEN — แก้ให้หายชัวร์ ===== */
+    /* ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% ===== */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -34,7 +34,7 @@
       z-index: 9999;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     .splash-screen.fade-out {
       opacity: 0;
@@ -86,7 +86,7 @@
       background: #000;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
     .app.show { opacity: 1; }
 
@@ -1011,19 +1011,24 @@
     const commentsClose = document.getElementById('commentsClose');
     const commentBtn = document.getElementById('commentBtn');
 
-    // ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% =====
+    // ===== SPLASH SCREEN — แก้ให้หายชัวร์ที่สุด =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
-    // โหลดหน้าเสร็จแล้ว — รอ 2 วินาที แล้วซ่อนหน้าเริ่มต้น
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(() => {
-        splash.classList.add('fade-out');
-        app.classList.add('show');
-        loadUserProfile();
-        loadSavedVideos();
-      }, 2000);
-    });
+    // ทำงานทันที ไม่รออะไร — ชัวร์ที่สุด
+    function hideSplashScreen() {
+      if (splash) splash.classList.add('fade-out');
+      if (app) app.classList.add('show');
+      // โหลดข้อมูลต่อ
+      loadUserProfile();
+      loadSavedVideos();
+    }
+
+    // เรียกซ้ำหลายช่องทาง เพื่อให้แน่นอนว่าทำงาน
+    window.addEventListener('load', hideSplashScreen);
+    setTimeout(hideSplashScreen, 800);   // ถ้า load ช้า อันนี้ทำงาน
+    setTimeout(hideSplashScreen, 1500);  // สำรองอีกครั้ง
+    setTimeout(hideSplashScreen, 2500);  // เผื่อช้ามาก
 
     // ===== โหลดข้อมูลโปรไฟล์ =====
     function loadUserProfile() {
@@ -1223,26 +1228,11 @@
 
     fileWrapper.addEventListener('click', () => videoInput.click());
 
-    // ===== เลือกไฟล์วิดีโอ =====
-    videoInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const url = URL.createObjectURL(file);
-      videoPreview.src = url;
-      previewContainer.style.display = 'block';
-      confirmBtn.style.display = 'block';
-      fileWrapper.style.display = 'none';
-
-      // ตรวจจับอัตราส่วน
-      videoPreview.addEventListener('loadedmetadata', function onMeta() {
-        videoPreview.removeEventListener('loadedmetadata', onMeta);
-        const w = videoPreview.videoWidth;
-        const h = videoPreview.videoHeight;
-        const ratio = w / h;
-        
-        if (ratio < 1) {
-          aspectBadge.textContent = '9:16';
-          aspectBadge.className = 'aspect-ratio-badge tall';
-        } else {
-          aspectBadge.textContent
+    // ===== รีเซ็ตฟอร์มอัปโหลด =====
+    function resetUpload() {
+      videoInput.value = '';
+      videoPreview.src = '';
+      previewContainer.style.display = 'none';
+      confirmBtn.style.display = 'none';
+      fileWrapper.style.display = 'block';
+      captionInput.value = '';
