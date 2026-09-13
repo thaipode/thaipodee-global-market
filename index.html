@@ -7,7 +7,9 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { 
-      width: 100%; height: 100%; 
+      width: 100%; 
+      height: 100%; 
+      height: 100dvh;
       overflow: hidden; 
       background: #000; 
       color: #fff; 
@@ -16,7 +18,7 @@
     }
 
     /* ================================================= */
-    /* ===== SPLASH SCREEN — แก้แล้ว ทำงานแน่นอน ===== */
+    /* ===== SPLASH SCREEN ===== */
     /* ================================================= */
     .splash-screen {
       position: fixed;
@@ -71,7 +73,7 @@
     }
 
     /* ================================================= */
-    /* ===== แอปหลัก — อัตราส่วน 9:16 เหมือนเดิม ===== */
+    /* ===== แอปหลัก — พอดีจอ ไม่ล้น ===== */
     /* ================================================= */
     .app {
       width: 100%;
@@ -85,10 +87,12 @@
     }
     .app.visible { opacity: 1; }
 
-    /* ===== วิดีโอ — เต็มจอ object-fit: cover ===== */
+    /* ===== วิดีโอ — เต็มจอ พอดี ไม่ล้น ===== */
     .video-area {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -99,6 +103,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       background: #000;
     }
     .video-placeholder {
@@ -149,7 +154,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูขวา 6 ไอคอน — ล็อกตำแหน่ง ===== */
+    /* ===== เมนูขวา 6 ไอคอน — ล็อกตำแหน่ง ไม่ล้น ===== */
     .right-menu {
       position: absolute;
       right: 8px;
@@ -287,7 +292,7 @@
       fill: none;
     }
 
-    /* ===== แถบล่าง 4 ปุ่ม + กลาง ===== */
+    /* ===== แถบล่าง 4 ปุ่ม + กลาง — พอดีจอ ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -339,6 +344,7 @@
       display: none;
       flex-direction: column;
       overflow-y: auto;
+      overscroll-behavior: contain;
     }
     .profile-top-bar {
       position: sticky;
@@ -473,8 +479,9 @@
       z-index: 20;
       transform: translateY(100%);
       transition: transform 0.3s ease;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
+      overscroll-behavior: contain;
       color: #000;
     }
     .upload-panel.show { transform: translateY(0); }
@@ -613,6 +620,7 @@
       display: flex;
       flex-direction: column;
       color: #000;
+      overscroll-behavior: contain;
     }
     .comments-panel.show { transform: translateY(0); }
     .comments-header {
@@ -880,7 +888,7 @@
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
 
     // =====================================================
-    // ===== หน้าเริ่มต้น — แก้จุดนี้โดยเฉพาะ ทำงานแน่นอน =====
+    // ===== หน้าเริ่มต้น — ทำงานแน่นอน =====
     // =====================================================
     document.addEventListener('DOMContentLoaded', function() {
       console.log('✅ DOM พร้อมแล้ว');
@@ -896,13 +904,8 @@
         if (typeof loadSavedVideos === 'function') loadSavedVideos();
       }
       
-      // รอ 1.5 วินาที แล้วเปลี่ยนหน้าเองอัตโนมัติ
       setTimeout(goToMain, 1500);
-      
-      // กดที่หน้าจอก็ข้ามได้ทันที
-      if (splash) {
-        splash.addEventListener('click', goToMain);
-      }
+      if (splash) splash.addEventListener('click', goToMain);
     });
 
     // ===== โหลดข้อมูลผู้ใช้ =====
