@@ -22,7 +22,6 @@
 
     body { position: fixed; inset: 0; }
 
-    /* ===== คอนเทนเนอร์หลัก ===== */
     .app {
       width: 100%;
       height: 100vh;
@@ -34,7 +33,7 @@
       overflow: hidden;
     }
 
-    /* ===== วิดีโอ — กำหนดอัตราส่วนชัดเจน 9:16 / 16:9 ===== */
+    /* ===== วิดีโอ — 9:16 ตรงกลาง ไม่ล้น ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -45,7 +44,6 @@
       overflow: hidden;
     }
 
-    /* แนวตั้ง = 9:16 */
     .video-area video {
       width: 100%;
       height: 100%;
@@ -59,6 +57,23 @@
       font-size: 16px;
       text-align: center;
       padding: 20px;
+    }
+
+    /* ===== ปุ่มเปิด/ปิดเสียง ===== */
+    .sound-toggle {
+      position: absolute;
+      right: 12px;
+      bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+      font-size: 26px;
+      z-index: 13;
+      cursor: pointer;
+      background: rgba(0,0,0,.4);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* ===== แถบบน ===== */
@@ -334,24 +349,14 @@
       cursor: pointer;
     }
 
-    /* ===== แนวนอน = 16:9 ===== */
+    /* ===== แนวนอน 16:9 ===== */
     @media (orientation: landscape) {
-      .app {
-        max-width: 100%;
-        max-height: 100vh;
-      }
-      .video-area video {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      .right-menu {
-        bottom: calc(75px + env(safe-area-inset-bottom, 0px));
-        gap: 20px;
-      }
+      .app { max-width: 100%; max-height: 100vh; }
+      .right-menu { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); gap: 20px; }
       .info-left { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
       .progress-line { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
       .bottom-bar { height: calc(60px + env(safe-area-inset-bottom, 0px)); }
+      .sound-toggle { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
     }
   </style>
 </head>
@@ -360,6 +365,9 @@
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
+
+    <!-- ปุ่มเปิด/ปิดเสียง -->
+    <div class="sound-toggle" id="soundToggle" style="display:none;">🔊</div>
 
     <div class="top-bar">
       <span class="tab" id="tab1">กำลังติดตาม</span>
@@ -482,6 +490,7 @@
     const postInfo = document.getElementById('postInfo');
     const videoCaption = document.getElementById('videoCaption');
     const progressBar = document.getElementById('progressBar');
+    const soundToggle = document.getElementById('soundToggle');
 
     fileWrapper.addEventListener('click', () => videoInput.click());
     videoInput.addEventListener('change', (e) => {
@@ -499,14 +508,24 @@
       const videoSrc = videoPreview.src;
 
       videoPlaceholder.style.display = 'none';
-      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;object-position:center center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;"></video>`;
+      // ✅ สำคัญ: ไม่ใส่ muted, เพิ่ม controls, เปิดเสียง
+      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop playsinline controls style="width:100%;height:100%;object-fit:contain;object-position:center center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;"></video>`;
       
       videoCaption.textContent = caption;
       postInfo.style.display = 'block';
       progressBar.style.display = 'block';
+      soundToggle.style.display = 'flex'; // แสดงปุ่มเสียง
       
       uploadPanel.classList.remove('show');
       resetUpload();
+    });
+
+    // ปุ่มเปิด/ปิดเสียง
+    soundToggle.addEventListener('click', () => {
+      const vid = document.getElementById('mainVideo');
+      if (!vid) return;
+      vid.muted = !vid.muted;
+      soundToggle.textContent = vid.muted ? '🔇' : '🔊';
     });
 
     function resetUpload() {
