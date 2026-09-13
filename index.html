@@ -116,21 +116,21 @@
       pointer-events: none;
     }
 
-    /* ===== ป้ายอัตราส่วน — ชิดขอบบนสุด + ตรวจจับอัตโนมัติ ===== */
+    /* ===== ป้ายอัตราส่วน — ชิดขอบบนสุด + แสดงแค่ 9:16 หรือ 16:9 อันเดียว ===== */
     .aspect-ratio-badge {
       position: absolute;
       top: env(safe-area-inset-top, 0px);
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,.7);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
+      background: rgba(0,0,0,.75);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 700;
       color: #fff;
       z-index: 14;
       display: none;
-      border: 1px solid rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.3);
     }
     .aspect-ratio-badge.tall { border-color: #25f4ee; color: #25f4ee; }
     .aspect-ratio-badge.wide { border-color: #fe28ea; color: #fe28ea; }
@@ -248,7 +248,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== ข้อมูลซ้ายล่าง — ชื่อผู้ใช้ กดได้! ===== */
+    /* ===== ข้อมูลซ้ายล่าง ===== */
     .info-left {
       position: absolute;
       left: 12px;
@@ -362,7 +362,7 @@
       border-radius: 10px;
     }
 
-    /* ===== หน้าโปรไฟล์ — แบบเต็มตามตัวอย่าง ===== */
+    /* ===== หน้าโปรไฟล์ ===== */
     .profile-page {
       position: absolute;
       inset: 0;
@@ -621,7 +621,7 @@
       cursor: pointer;
     }
 
-    /* ===== แผงอัปโหลด ===== */
+    /* ===== แผงอัปโหลด — ปรับไม่ให้หลุดจอ ===== */
     .upload-panel {
       position: absolute;
       bottom: 0;
@@ -629,12 +629,12 @@
       right: 0;
       background: #fff;
       border-radius: 20px 20px 0 0;
-      padding: 24px;
+      padding: 20px 24px;
       padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
       z-index: 20;
       transform: translateY(100%);
       transition: transform 0.3s ease;
-      max-height: 90vh;
+      max-height: 80vh;
       overflow-y: auto;
       color: #000;
     }
@@ -646,47 +646,43 @@
       margin-bottom: 12px;
       color: #000;
     }
-    .aspect-guide {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #666;
-    }
-    .aspect-guide span {
-      display: inline-block;
-      background: #f0f0f0;
-      border-radius: 20px;
-      padding: 4px 12px;
-      margin: 0 6px;
-    }
     .file-input-wrapper {
       border: 2px dashed #ccc;
       border-radius: 12px;
-      padding: 30px 20px;
+      padding: 24px 20px;
       text-align: center;
       cursor: pointer;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .file-input-wrapper:hover { border-color: #fe28ea; }
     .file-input-wrapper p { margin-top: 10px; color: #666; font-size: 14px; }
     input[type="file"] { display: none; }
     .preview-container {
       width: 100%;
+      max-height: 40vh;
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       display: none;
       background: #000;
+      overflow: hidden;
     }
-    .preview-container video { width: 100%; border-radius: 12px; display: block; }
+    .preview-container video { 
+      width: 100%; 
+      height: 100%;
+      max-height: 40vh;
+      object-fit: contain;
+      border-radius: 12px; 
+      display: block; 
+    }
     .caption-input {
       width: 100%;
-      min-height: 50px;
-      padding: 14px 16px;
+      min-height: 44px;
+      padding: 12px 16px;
       border-radius: 10px;
       border: 1px solid #ddd;
       background: #f9f9f9;
       color: #000;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 15px;
       line-height: 1.5;
       resize: none;
@@ -695,7 +691,7 @@
     .caption-input:focus { border-color: #fe28ea; }
     .upload-btn {
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       border-radius: 10px;
       border: none;
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
@@ -712,6 +708,8 @@
       .progress-line { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
       .bottom-bar { height: calc(60px + env(safe-area-inset-bottom, 0px)); }
       .sound-toggle { bottom: calc(200px + env(safe-area-inset-bottom, 0px)); }
+      .upload-panel { max-height: 75vh; }
+      .preview-container { max-height: 35vh; }
     }
   </style>
 </head>
@@ -729,7 +727,7 @@
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
-    <!-- ป้ายอัตราส่วน — แสดงเมื่อโหลดวิดีโอเสร็จ -->
+    <!-- ป้ายอัตราส่วน — แสดงแค่ 9:16 หรือ 16:9 ตามจริงของวิดีโอ + ชิดขอบบนสุด -->
     <div class="aspect-ratio-badge" id="aspectBadge"></div>
 
     <!-- ปุ่มเสียง -->
@@ -772,7 +770,7 @@
       </div>
     </div>
 
-    <!-- ===== ชื่อผู้ใช้ที่มุมล่างซ้าย — กดได้! ===== -->
+    <!-- ===== ชื่อผู้ใช้ที่มุมล่างซ้าย ===== -->
     <div class="info-left" id="postInfo">
       <div class="username" id="profileNameBtn">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
@@ -806,13 +804,9 @@
       </div>
     </div>
 
-    <!-- แผงอัปโหลด -->
+    <!-- แผงอัปโหลด — ปรับไม่ให้หลุดจอ -->
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
-      <div class="aspect-guide">
-        <span>9:16 แนวตั้ง</span>
-        <span>16:9 แนวนอน</span>
-      </div>
       <div class="file-input-wrapper" id="fileWrapper">
         <div style="font-size: 36px; margin-bottom: 8px;">📹</div>
         <p>กดเพื่อเลือกวิดีโอ<br>รองรับ MP4, MOV</p>
@@ -825,7 +819,7 @@
       <button class="upload-btn" id="confirmBtn" style="display: none;">โพสต์วิดีโอ</button>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ — แบบเต็มตามตัวอย่าง ===== -->
+    <!-- ===== หน้าโปรไฟล์ ===== -->
     <div class="profile-page" id="profilePage">
       <div class="profile-top-bar">
         <div class="profile-back" id="profileClose">←</div>
@@ -1000,7 +994,7 @@
       if (e.target === editNameModal) closeNameEditor();
     });
 
-    // ===== เปิด-ปิดโปรไฟล์ — กดชื่อผู้ใช้ด้านล่างซ้ายก็ได้! =====
+    // ===== เปิด-ปิดโปรไฟล์ =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
@@ -1041,7 +1035,7 @@
       resetUpload();
     });
 
-    // ===== ตรวจจับอัตราส่วนวิดีโอ — แสดง 9:16 แนวตั้ง / 16:9 แนวนอน อัตโนมัติ =====
+    // ===== ตรวจจับอัตราส่วนอัตโนมัติ — แสดงแค่ 9:16 หรือ 16:9 =====
     function detectAspectRatio(video) {
       return new Promise((resolve) => {
         video.addEventListener('loadedmetadata', function onReady() {
@@ -1049,14 +1043,15 @@
           const w = video.videoWidth;
           const h = video.videoHeight;
           const ratio = w / h;
+          
           let label = '', type = '';
           
-          // ตรวจจับอัตโนมัติ แนวตั้ง / แนวนอน
+          // ตรวจจับอัตโนมัติ: สูงกว้าง = แนวตั้ง 9:16 / กว้างสูง = แนวนอน 16:9
           if (ratio < 1) {
-            label = '9:16 แนวตั้ง';
+            label = '9:16';
             type = 'tall';
           } else {
-            label = '16:9 แนวนอน';
+            label = '16:9';
             type = 'wide';
           }
           
@@ -1096,7 +1091,7 @@
       const captionText = captionInput.value.trim() || "วิดีโอใหม่";
       const videoSrc = videoPreview.src;
 
-      // ตรวจจับอัตราส่วนและแสดงป้าย — ชิดขอบบนสุด
+      // ตรวจจับอัตราส่วนและแสดงป้าย — ชิดขอบบนสุด + แสดงแค่ตัวเลข
       const tempVid = document.createElement('video');
       tempVid.src = videoSrc;
       const { label, type } = await detectAspectRatio(tempVid);
