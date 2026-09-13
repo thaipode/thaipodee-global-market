@@ -34,25 +34,24 @@
       overflow: hidden;
     }
 
-    /* ===== วิดีโอ — พอดีจอ ไม่ล้น ไม่ตัดขอบ ===== */
+    /* ===== วิดีโอ — กำหนดอัตราส่วนชัดเจน 9:16 / 16:9 ===== */
     .video-area {
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
       background: #000;
+      overflow: hidden;
     }
 
+    /* แนวตั้ง = 9:16 */
     .video-area video {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* ✅ สำคัญที่สุด — ไม่ตัดขอบ ไม่ล้นจอ */
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      object-fit: contain;
+      object-position: center center;
+      background: #000;
     }
 
     .video-placeholder {
@@ -97,7 +96,7 @@
       z-index: 15;
     }
 
-    /* ===== เมนูขวา 6 ปุ่ม — ครบ ไม่หลุดจอ ===== */
+    /* ===== เมนูขวา 6 ปุ่ม ===== */
     .right-menu {
       position: absolute;
       right: 12px;
@@ -202,7 +201,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูล่าง 5 ปุ่ม — ครบ ติดขอบล่าง ===== */
+    /* ===== เมนูล่าง 5 ปุ่ม ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -335,9 +334,17 @@
       cursor: pointer;
     }
 
-    /* ===== รองรับแนวนอน ===== */
+    /* ===== แนวนอน = 16:9 ===== */
     @media (orientation: landscape) {
-      .app { max-width: 100%; max-height: 100vh; }
+      .app {
+        max-width: 100%;
+        max-height: 100vh;
+      }
+      .video-area video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
       .right-menu {
         bottom: calc(75px + env(safe-area-inset-bottom, 0px));
         gap: 20px;
@@ -492,7 +499,7 @@
       const videoSrc = videoPreview.src;
 
       videoPlaceholder.style.display = 'none';
-      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;"></video>`;
+      videoArea.innerHTML = `<video id="mainVideo" src="${videoSrc}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;object-position:center center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;"></video>`;
       
       videoCaption.textContent = caption;
       postInfo.style.display = 'block';
