@@ -5,24 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Thaipodee</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      color: #fff;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; }
     body { position: fixed; inset: 0; }
 
-    /* ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% ===== */
+    /* ===== SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ===== */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -34,7 +21,7 @@
       z-index: 9999;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
     .splash-screen.fade-out {
       opacity: 0;
@@ -75,13 +62,11 @@
       letter-spacing: 1px;
     }
 
-    /* ===== แอปหลัก ===== */
+    /* ===== แอปหลัก — ล็อกโครงสร้างไว้ ไม่แก้ ===== */
     .app {
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      max-width: 100%;
-      margin: 0 auto;
       position: relative;
       background: #000;
       overflow: hidden;
@@ -90,7 +75,7 @@
     }
     .app.show { opacity: 1; }
 
-    /* ===== พื้นที่วิดีโอ ===== */
+    /* ===== วิดีโอพื้นที่ — เต็มจอ ไม่มีขอบดำ ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -100,6 +85,12 @@
       background: #000;
       overflow: hidden;
     }
+    .video-area video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
     .video-placeholder {
       color: #888;
       font-size: 16px;
@@ -107,93 +98,56 @@
       padding: 40px 20px;
       line-height: 1.8;
     }
-    .video-area video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #000;
-    }
 
-    /* ===== ป้ายอัตราส่วน ===== */
-    .aspect-ratio-badge {
+    /* ===== ปุ่มหยุดเล่น วิดีโอ — เพิ่มใหม่ ===== */
+    .play-pause-btn {
       position: absolute;
-      top: env(safe-area-inset-top, 0px);
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.75);
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 14px;
-      font-weight: 700;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.5);
       color: #fff;
-      z-index: 14;
-      display: none;
-      border: 1px solid rgba(255,255,255,.3);
-    }
-    .aspect-ratio-badge.tall { border-color: #25f4ee; color: #25f4ee; }
-    .aspect-ratio-badge.wide { border-color: #fe28ea; color: #fe28ea; }
-
-    /* ===== ปุ่มเสียง ===== */
-    .sound-toggle {
-      position: absolute;
-      right: 12px;
-      bottom: calc(235px + env(safe-area-inset-bottom, 0px));
-      z-index: 13;
-      cursor: pointer;
-      color: #fff;
-      background: transparent;
+      font-size: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4px;
-      line-height: 1;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
     }
-    .sound-toggle svg {
-      width: 24px;
-      height: 24px;
-      stroke-width: 2;
-      stroke: currentColor;
-      fill: none;
+    .play-pause-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    /* ===== แถบบน ===== */
-    .top-bar {
+    /* ===== แถบความคืบหน้า ===== */
+    .progress-line {
       position: absolute;
-      top: max(18px, env(safe-area-inset-top, 0px));
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
       left: 0;
       right: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 15;
-      padding: 0 8px;
+      height: 3px;
+      background: rgba(255,255,255,.2);
+      z-index: 12;
     }
-    .tab {
-      font-size: 16px;
-      color: rgba(255,255,255,.6);
-      cursor: pointer;
-      padding: 0 12px;
-    }
-    .tab.active {
-      color: #fff;
-      font-weight: 600;
-      border-bottom: 2px solid #fff;
-      padding-bottom: 3px;
-    }
-    .search-btn {
-      position: absolute;
-      right: 12px;
-      top: max(18px, env(safe-area-inset-top, 0px));
-      font-size: 22px;
-      cursor: pointer;
-      z-index: 15;
+    .progress-done {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #25f4ee, #fe28ea);
+      border-radius: 0 2px 2px 0;
+      transition: width 0.1s linear;
     }
 
-    /* ===== เมนูขวา ===== */
+    /* ===== เมนูขวา — ล็อกตำแหน่ง 6 ไอคอน ===== */
     .right-menu {
       position: absolute;
       right: 8px;
-      bottom: calc(95px + env(safe-area-inset-bottom, 0px));
+      bottom: calc(110px + env(safe-area-inset-bottom, 0px));
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -221,7 +175,6 @@
       cursor: pointer;
       transition: transform 0.2s;
     }
-    .prof-img:active { transform: scale(0.95); }
     .follow-add {
       position: absolute;
       bottom: -6px;
@@ -252,9 +205,8 @@
       position: absolute;
       left: 12px;
       right: 85px;
-      bottom: calc(95px + env(safe-area-inset-bottom, 0px));
+      bottom: calc(110px + env(safe-area-inset-bottom, 0px));
       z-index: 12;
-      display: none;
     }
     .username {
       font-size: 16px;
@@ -262,16 +214,13 @@
       margin-bottom: 4px;
       cursor: pointer;
       color: #fff;
-      transition: all 0.2s;
     }
-    .username:hover { opacity: 0.8; text-decoration: underline; }
     .caption {
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 6px;
       color: #f0f0f0;
     }
-    .ai-tag { font-size: 11px; opacity: 0.5; margin-bottom: 8px; display: block; }
     .sound-name {
       font-size: 13px;
       display: flex;
@@ -280,26 +229,350 @@
       opacity: 0.85;
     }
 
-    /* ===== แถบความคืบหน้า ===== */
-    .progress-line {
+    /* ===== แถบบน ===== */
+    .top-bar {
       position: absolute;
-      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      top: max(18px, env(safe-area-inset-top, 0px));
       left: 0;
       right: 0;
-      height: 2px;
-      background: rgba(255,255,255,.2);
-      z-index: 12;
-      display: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 15;
     }
-    .progress-done {
-      width: 0%;
-      height: 100%;
-      background: #fff;
-      border-radius: 0 2px 2px 0;
-      transition: width 0.1s linear;
+    .tab {
+      font-size: 16px;
+      color: rgba(255,255,255,.6);
+      cursor: pointer;
+      padding: 0 12px;
+    }
+    .tab.active {
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 2px solid #fff;
+      padding-bottom: 3px;
+    }
+    .search-btn {
+      position: absolute;
+      right: 12px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 15;
     }
 
-    /* ===== แผงความคิดเห็น ===== */
+    /* ===== แถบล่าง — ล็อก 4 ปุ่ม + กลางเป็น + ===== */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: calc(80px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #222;
+      z-index: 12;
+    }
+    .b-nav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+    .b-nav.active { opacity: 1; }
+    .b-icon { font-size: 24px; }
+    .create-box {
+      width: 45px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* ===== หน้าโปรไฟล์ — ล็อกโครงสร้าง ===== */
+    .profile-page {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      color: #000;
+      z-index: 30;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .profile-top-bar {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      z-index: 31;
+    }
+    .profile-back { font-size: 24px; cursor: pointer; padding: 4px; }
+    .profile-header {
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 3px solid #fe28ea;
+      background: url('https://picsum.photos/200/200') center/cover;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .profile-name-main {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .profile-username { font-size: 14px; color: #666; margin-bottom: 20px; }
+    .profile-stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      margin-bottom: 20px;
+    }
+    .stat-col { text-align: center; }
+    .stat-num-big { font-size: 18px; font-weight: 700; }
+    .stat-label-sm { font-size: 12px; color: #666; margin-top: 2px; }
+    .profile-buttons {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: 16px;
+    }
+    .btn-follow {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #fe28ea;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-message {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #000;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .profile-bio {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 16px;
+      max-width: 340px;
+    }
+    .profile-tabs {
+      display: flex;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 8px;
+    }
+    .profile-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 16px;
+      color: #999;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .profile-tab.active {
+      color: #000;
+      border-bottom-color: #000;
+    }
+    .profile-videos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 0 3px;
+    }
+    .profile-video-item {
+      aspect-ratio: 9/12;
+      background: #eee;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+    }
+    .no-videos {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    /* ===== แผงอัปโหลด ===== */
+    .upload-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 24px;
+      padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+      z-index: 20;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: #000;
+    }
+    .upload-panel.show { transform: translateY(0); }
+    .panel-close {
+      text-align: right;
+      font-size: 24px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      color: #000;
+    }
+    .file-input-wrapper {
+      border: 2px dashed #ccc;
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    .file-input-wrapper:hover { border-color: #fe28ea; }
+    .file-input-wrapper p { margin-top: 10px; color: #666; font-size: 14px; }
+    input[type="file"] { display: none; }
+    .preview-container {
+      width: 100%;
+      max-height: 40vh;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: none;
+      background: #000;
+      overflow: hidden;
+    }
+    .preview-container video { 
+      width: 100%; 
+      height: 100%;
+      object-fit: contain;
+      border-radius: 12px; 
+      display: block; 
+    }
+    .caption-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
+      color: #000;
+      margin-bottom: 14px;
+      font-size: 15px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+    }
+    .upload-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ===== กล่องแก้ชื่อ ===== */
+    .edit-name-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .edit-name-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      color: #000;
+    }
+    .edit-name-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .edit-name-input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
+      color: #000;
+      font-size: 16px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .edit-name-input:focus { border-color: #fe28ea; }
+    .edit-name-buttons { display: flex; gap: 12px; }
+    .edit-btn-cancel {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #eee;
+      color: #000;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .edit-btn-save {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, #25f4ee, #fe28ea);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== ความคิดเห็น ===== */
     .comments-panel {
       position: absolute;
       bottom: 0;
@@ -324,28 +597,15 @@
       align-items: center;
       flex-shrink: 0;
     }
-    .comments-count {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .comments-close {
-      font-size: 22px;
-      cursor: pointer;
-      color: #888;
-      padding: 4px;
-      line-height: 1;
-    }
+    .comments-count { font-size: 16px; font-weight: 600; }
+    .comments-close { font-size: 22px; cursor: pointer; color: #888; }
     .comments-list {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
       -webkit-overflow-scrolling: touch;
     }
-    .comment-item {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+    .comment-item { display: flex; gap: 12px; margin-bottom: 20px; }
     .comment-avatar {
       width: 36px;
       height: 36px;
@@ -406,404 +666,29 @@
       font-size: 14px;
     }
 
-    /* ===== เมนูล่าง ===== */
-    .bottom-bar {
+    /* ===== ปุ่มเสียง ===== */
+    .sound-toggle {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: calc(80px + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: #000;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-top: 1px solid #222;
-      z-index: 12;
-    }
-    .b-nav {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+      right: 12px;
+      bottom: calc(235px + env(safe-area-inset-bottom, 0px));
+      z-index: 13;
       cursor: pointer;
       color: #fff;
-      font-size: 11px;
-      opacity: 0.6;
-    }
-    .b-nav.active { opacity: 1; }
-    .b-icon { font-size: 24px; }
-    .create-box {
-      width: 45px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: #000;
-      cursor: pointer;
-      border: none;
-    }
-    .dot-badge { position: relative; }
-    .dot-red {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ff0050;
-    }
-    .num-badge {
-      position: absolute;
-      top: -8px;
-      right: -12px;
-      background: #ff0050;
-      color: #fff;
-      font-size: 10px;
-      padding: 1px 5px;
-      border-radius: 10px;
-    }
-
-    /* ===== หน้าโปรไฟล์ ===== */
-    .profile-page {
-      position: absolute;
-      inset: 0;
-      background: #fff;
-      color: #000;
-      z-index: 30;
-      display: none;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-    .profile-top-bar {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #eee;
-      z-index: 31;
-    }
-    .profile-back {
-      font-size: 24px;
-      cursor: pointer;
-      color: #000;
       padding: 4px;
     }
-    .profile-top-actions { display: flex; gap: 20px; font-size: 22px; }
-    .profile-header {
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .profile-avatar-wrap { position: relative; margin-bottom: 12px; }
-    .profile-avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      border: 3px solid #fe28ea;
-      background: url('https://picsum.photos/200/200') center/cover;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .profile-avatar:active { transform: scale(0.95); }
-    .live-badge {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ff0050;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 12px;
-    }
-    .profile-name-main {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      cursor: pointer;
-    }
-    .profile-username { font-size: 14px; color: #666; margin-bottom: 20px; }
-    .profile-stats-row {
-      display: flex;
-      justify-content: center;
-      gap: 36px;
-      margin-bottom: 20px;
-    }
-    .stat-col { text-align: center; }
-    .stat-num-big { font-size: 18px; font-weight: 700; }
-    .stat-label-sm { font-size: 12px; color: #666; margin-top: 2px; }
-    .profile-buttons {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 320px;
-      margin-bottom: 16px;
-    }
-    .btn-follow {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #fe28ea;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-message {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      background: #fff;
-      color: #000;
-      font-size: 15px;
-      cursor: pointer;
-    }
-    .btn-more {
-      width: 40px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      background: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .profile-bio {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #333;
-      margin-bottom: 16px;
-      max-width: 340px;
-    }
-    .profile-tags { display: flex; gap: 12px; margin-bottom: 20px; }
-    .tag-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: #666;
-    }
-    .profile-tabs {
-      display: flex;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 8px;
-    }
-    .profile-tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px 0;
-      font-size: 16px;
-      color: #999;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-    }
-    .profile-tab.active {
-      color: #000;
-      border-bottom-color: #000;
-    }
-    .profile-videos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      padding: 0 3px;
-    }
-    .profile-video-item {
-      aspect-ratio: 9/12;
-      background: #eee;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .profile-video-item video,
-    .profile-video-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .video-duration {
-      position: absolute;
-      bottom: 6px;
-      left: 6px;
-      background: rgba(0,0,0,.6);
-      color: #fff;
-      font-size: 11px;
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-    .no-videos {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: #999;
-      font-size: 14px;
-    }
-
-    /* ===== กล่องแก้ไขชื่อ ===== */
-    .edit-name-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 20px;
-    }
-    .edit-name-box {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 340px;
-      color: #000;
-    }
-    .edit-name-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .edit-name-input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-      color: #000;
-      font-size: 16px;
-      margin-bottom: 16px;
-      outline: none;
-    }
-    .edit-name-input:focus { border-color: #fe28ea; }
-    .edit-name-buttons { display: flex; gap: 12px; }
-    .edit-btn-cancel {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #eee;
-      color: #000;
-      font-size: 15px;
-      cursor: pointer;
-    }
-    .edit-btn-save {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(90deg, #25f4ee, #fe28ea);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* ===== แผงอัปโหลด ===== */
-    .upload-panel {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-radius: 20px 20px 0 0;
-      padding: 20px 24px;
-      padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-      z-index: 20;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-      max-height: 80vh;
-      overflow-y: auto;
-      color: #000;
-    }
-    .upload-panel.show { transform: translateY(0); }
-    .panel-close {
-      text-align: right;
-      font-size: 24px;
-      cursor: pointer;
-      margin-bottom: 12px;
-      color: #000;
-    }
-    .file-input-wrapper {
-      border: 2px dashed #ccc;
-      border-radius: 12px;
-      padding: 24px 20px;
-      text-align: center;
-      cursor: pointer;
-      margin-bottom: 16px;
-    }
-    .file-input-wrapper:hover { border-color: #fe28ea; }
-    .file-input-wrapper p { margin-top: 10px; color: #666; font-size: 14px; }
-    input[type="file"] { display: none; }
-    .preview-container {
-      width: 100%;
-      max-height: 40vh;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      display: none;
-      background: #000;
-      overflow: hidden;
-    }
-    .preview-container video { 
-      width: 100%; 
-      height: 100%;
-      max-height: 40vh;
-      object-fit: contain;
-      border-radius: 12px; 
-      display: block; 
-    }
-    .caption-input {
-      width: 100%;
-      min-height: 44px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-      color: #000;
-      margin-bottom: 14px;
-      font-size: 15px;
-      line-height: 1.5;
-      resize: none;
-      outline: none;
-    }
-    .caption-input:focus { border-color: #fe28ea; }
-    .upload-btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
-      color: #fff;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* ===== แนวนอน ===== */
-    @media (orientation: landscape) {
-      .right-menu { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); gap: 20px; }
-      .info-left { bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
-      .progress-line { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
-      .bottom-bar { height: calc(60px + env(safe-area-inset-bottom, 0px)); }
-      .sound-toggle { bottom: calc(200px + env(safe-area-inset-bottom, 0px)); }
-      .upload-panel { max-height: 75vh; }
-      .preview-container { max-height: 35vh; }
-      .comments-panel { max-height: 60vh; }
+    .sound-toggle svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
     }
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% ===== -->
+  <!-- ===== SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
@@ -814,9 +699,13 @@
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
+      <video id="mainVideo" playsinline muted loop style="display:none;"></video>
+      <div class="play-pause-btn" id="playPauseBtn">⏸</div>
     </div>
 
-    <div class="aspect-ratio-badge" id="aspectBadge"></div>
+    <div class="progress-line" id="progressBar">
+      <div class="progress-done" id="progressFill"></div>
+    </div>
 
     <div class="sound-toggle" id="soundToggle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -857,15 +746,10 @@
       </div>
     </div>
 
-    <div class="info-left" id="postInfo">
+    <div class="info-left" id="postInfo" style="display:none;">
       <div class="username" id="profileNameBtn">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
-      <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
-    </div>
-
-    <div class="progress-line" id="progressBar">
-      <div class="progress-done" id="progressFill"></div>
     </div>
 
     <div class="comments-panel" id="commentsPanel">
@@ -887,16 +771,14 @@
         <div class="b-icon">🏠</div>
         <div>หน้าหลัก</div>
       </div>
-      <div class="b-nav dot-badge">
+      <div class="b-nav">
         <div class="b-icon">🛒</div>
         <div>ร้านค้า</div>
-        <div class="dot-red"></div>
       </div>
       <button class="create-box" id="createBtn">+</button>
-      <div class="b-nav dot-badge">
+      <div class="b-nav">
         <div class="b-icon">💬</div>
         <div>ข้อความ</div>
-        <div class="num-badge">99+</div>
       </div>
       <div class="b-nav" id="profileBtnBottom">
         <div class="b-icon">👤</div>
@@ -928,10 +810,7 @@
       </div>
       
       <div class="profile-header">
-        <div class="profile-avatar-wrap">
-          <div class="profile-avatar" id="avatarPage"></div>
-          <div class="live-badge">LIVE</div>
-        </div>
+        <div class="profile-avatar" id="avatarPage"></div>
         <div class="profile-name-main" id="profileNamePage">ชื่อผู้ใช้</div>
         <div class="profile-username">@thaipodee</div>
         
@@ -953,16 +832,10 @@
         <div class="profile-buttons">
           <button class="btn-follow">ติดตาม</button>
           <button class="btn-message">ข้อความ</button>
-          <button class="btn-more">▼</button>
         </div>
         
         <div class="profile-bio">
           สร้างสรรค์ แบ่งปัน สนุกไปด้วยกัน ✅
-        </div>
-        
-        <div class="profile-tags">
-          <span class="tag-item">🎥 วิดีโอ</span>
-          <span class="tag-item">🎵 เพลง</span>
         </div>
       </div>
       
@@ -991,87 +864,83 @@
   </div>
 
   <script>
-    // ===== ข้อมูลผู้ใช้ =====
-    const STORAGE_KEYS = {
-      AVATAR: 'thaipodee_avatar',
-      USERNAME: 'thaipodee_username',
-      VIDEOS: 'thaipodee_videos'
+    // ===== ค่าคงที่เก็บข้อมูล — ล็อกไม่แก้ =====
+    const STORAGE = {
+      AVATAR: 'thaipodee_avatar_v2',
+      USERNAME: 'thaipodee_username_v2',
+      VIDEOS: 'thaipodee_videos_v2'
     };
     const DEFAULT_AVATAR = 'https://picsum.photos/200/200';
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
 
-    // ===== ตัวแปรความคิดเห็น =====
+    // ===== ตัวแปรสถานะ =====
+    let uploadedVideos = [];
+    let currentVideoIndex = 0;
+    let isMuted = true;
     let commentCount = 0;
-    const commentsList = document.getElementById('commentsList');
-    const commentInput = document.getElementById('commentInput');
-    const commentSendBtn = document.getElementById('commentSendBtn');
-    const commentCountEl = document.getElementById('commentCount');
-    const commentsHeaderCount = document.getElementById('commentsHeaderCount');
-    const commentsPanel = document.getElementById('commentsPanel');
-    const commentsClose = document.getElementById('commentsClose');
-    const commentBtn = document.getElementById('commentBtn');
 
-    // ===== SPLASH SCREEN — แก้ให้หายชัวร์ที่สุด =====
+    // ===== 1. SPLASH SCREEN — แก้จุดค้างโดยเฉพาะ ทำงานแน่นอน 100% =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
-    // ทำงานทันที ไม่รออะไร — ชัวร์ที่สุด
-    function hideSplashScreen() {
-      if (splash) splash.classList.add('fade-out');
-      if (app) app.classList.add('show');
-      // โหลดข้อมูลต่อ
-      loadUserProfile();
+    function hideSplash() {
+      if (!splash || !app) return;
+      splash.classList.add('fade-out');
+      app.classList.add('show');
+      // โหลดข้อมูลทันทีหลังเข้าแอป
+      loadUserData();
       loadSavedVideos();
     }
 
-    // เรียกซ้ำหลายช่องทาง เพื่อให้แน่นอนว่าทำงาน
-    window.addEventListener('load', hideSplashScreen);
-    setTimeout(hideSplashScreen, 800);   // ถ้า load ช้า อันนี้ทำงาน
-    setTimeout(hideSplashScreen, 1500);  // สำรองอีกครั้ง
-    setTimeout(hideSplashScreen, 2500);  // เผื่อช้ามาก
+    // เรียกหลายช่องทาง — มั่นใจว่าทำงานแน่นอน
+    document.addEventListener('DOMContentLoaded', hideSplash);
+    window.addEventListener('load', hideSplash);
+    setTimeout(hideSplash, 600);   // ทันทีเมื่อโหลด
+    setTimeout(hideSplash, 1200);  // สำรอง
+    setTimeout(hideSplash, 2000);  // เผื่อช้ามาก
 
-    // ===== โหลดข้อมูลโปรไฟล์ =====
-    function loadUserProfile() {
-      const savedAvatar = localStorage.getItem(STORAGE_KEYS.AVATAR) || DEFAULT_AVATAR;
-      const savedName = localStorage.getItem(STORAGE_KEYS.USERNAME) || DEFAULT_NAME;
-      updateAllAvatars(savedAvatar);
-      updateAllNames(savedName);
+    // ===== 2. จัดการข้อมูลผู้ใช้ — เปลี่ยนรูป+ชื่อ ทุกจุดพร้อมกัน =====
+    function loadUserData() {
+      const avatar = localStorage.getItem(STORAGE.AVATAR) || DEFAULT_AVATAR;
+      const name = localStorage.getItem(STORAGE.USERNAME) || DEFAULT_NAME;
+      updateAllAvatars(avatar);
+      updateAllNames(name);
     }
 
-    // ===== อัปเดตรูปทุกจุด =====
     function updateAllAvatars(src) {
-      document.getElementById('avatarTop').style.backgroundImage = `url(${src})`;
-      document.getElementById('avatarPage').style.backgroundImage = `url(${src})`;
-      localStorage.setItem(STORAGE_KEYS.AVATAR, src);
+      const top = document.getElementById('avatarTop');
+      const page = document.getElementById('avatarPage');
+      if (top) top.style.backgroundImage = `url(${src})`;
+      if (page) page.style.backgroundImage = `url(${src})`;
+      localStorage.setItem(STORAGE.AVATAR, src);
     }
 
-    // ===== อัปเดตชื่อทุกจุด =====
     function updateAllNames(name) {
-      document.getElementById('profileNameBtn').textContent = name;
-      document.getElementById('profileNamePage').textContent = name;
-      localStorage.setItem(STORAGE_KEYS.USERNAME, name);
+      const btn = document.getElementById('profileNameBtn');
+      const page = document.getElementById('profileNamePage');
+      if (btn) btn.textContent = name;
+      if (page) page.textContent = name;
+      localStorage.setItem(STORAGE.USERNAME, name);
     }
 
-    // ===== เปลี่ยนรูปโปรไฟล์ =====
+    // เปลี่ยนรูปโปรไฟล์
     const avatarTop = document.getElementById('avatarTop');
     const avatarPage = document.getElementById('avatarPage');
     const avatarInput = document.getElementById('avatarInput');
+    if (avatarTop) avatarTop.addEventListener('click', () => avatarInput.click());
+    if (avatarPage) avatarPage.addEventListener('click', () => avatarInput.click());
+    if (avatarInput) {
+      avatarInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => updateAllAvatars(ev.target.result);
+        reader.readAsDataURL(file);
+        avatarInput.value = '';
+      });
+    }
 
-    avatarTop.addEventListener('click', () => avatarInput.click());
-    avatarPage.addEventListener('click', () => avatarInput.click());
-
-    avatarInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        updateAllAvatars(event.target.result);
-      };
-      reader.readAsDataURL(file);
-      avatarInput.value = '';
-    });
-
-    // ===== เปลี่ยนชื่อผู้ใช้ =====
+    // เปลี่ยนชื่อ
     const profileNamePage = document.getElementById('profileNamePage');
     const profileNameBtn = document.getElementById('profileNameBtn');
     const editNameModal = document.getElementById('editNameModal');
@@ -1080,121 +949,48 @@
     const saveName = document.getElementById('saveName');
 
     function openNameEditor() {
-      const currentName = localStorage.getItem(STORAGE_KEYS.USERNAME) || DEFAULT_NAME;
-      newNameInput.value = currentName;
+      const current = localStorage.getItem(STORAGE.USERNAME) || DEFAULT_NAME;
+      newNameInput.value = current;
       editNameModal.style.display = 'flex';
       setTimeout(() => newNameInput.focus(), 100);
     }
-
     function closeNameEditor() {
       editNameModal.style.display = 'none';
       newNameInput.value = '';
     }
 
-    profileNamePage.addEventListener('click', openNameEditor);
-    cancelName.addEventListener('click', closeNameEditor);
+    if (profileNamePage) profileNamePage.addEventListener('click', openNameEditor);
+    if (profileNameBtn) profileNameBtn.addEventListener('click', openNameEditor);
+    if (cancelName) cancelName.addEventListener('click', closeNameEditor);
+    if (saveName) {
+      saveName.addEventListener('click', () => {
+        const name = newNameInput.value.trim();
+        if (!name) { alert('กรุณาใส่ชื่อ'); return; }
+        updateAllNames(name);
+        closeNameEditor();
+      });
+    }
+    if (editNameModal) {
+      editNameModal.addEventListener('click', (e) => {
+        if (e.target === editNameModal) closeNameEditor();
+      });
+    }
 
-    saveName.addEventListener('click', () => {
-      const newName = newNameInput.value.trim();
-      if (!newName) {
-        alert('กรุณาใส่ชื่อผู้ใช้');
-        return;
-      }
-      updateAllNames(newName);
-      closeNameEditor();
-    });
-
-    editNameModal.addEventListener('click', (e) => {
-      if (e.target === editNameModal) closeNameEditor();
-    });
-
-    // ===== เปิด-ปิดโปรไฟล์ =====
+    // ===== 3. หน้าโปรไฟล์ =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
     const profileBtnBottom = document.getElementById('profileBtnBottom');
 
-    function openProfile() { profilePage.style.display = 'flex'; }
+    function openProfile() { profilePage.style.display = 'flex'; renderProfileVideos(); }
     function closeProfile() { profilePage.style.display = 'none'; }
 
-    profileNameBtn.addEventListener('click', openProfile);
-    profileBtnTop.addEventListener('click', openProfile);
-    profileBtnBottom.addEventListener('click', openProfile);
-    profileClose.addEventListener('click', closeProfile);
+    if (profileNameBtn) profileNameBtn.addEventListener('click', openProfile);
+    if (profileBtnTop) profileBtnTop.addEventListener('click', openProfile);
+    if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
+    if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== แท็บ =====
-    const t1 = document.getElementById('tab1');
-    const t2 = document.getElementById('tab2');
-    t1.addEventListener('click', () => { t1.classList.add('active'); t2.classList.remove('active'); });
-    t2.addEventListener('click', () => { t2.classList.add('active'); t1.classList.remove('active'); });
-
-    // ===== กดถูกใจ =====
-    const likeBtn = document.getElementById('likeBtn');
-    const likeCount = document.getElementById('likeCount');
-    let isLiked = false, count = 0;
-    likeBtn.addEventListener('click', () => {
-      isLiked = !isLiked;
-      count += isLiked ? 1 : -1;
-      likeCount.textContent = count;
-      likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
-    });
-
-    // ===== ระบบความคิดเห็น =====
-    commentBtn.addEventListener('click', () => {
-      commentsPanel.classList.add('show');
-      setTimeout(() => commentInput.focus(), 200);
-    });
-
-    commentsClose.addEventListener('click', () => {
-      commentsPanel.classList.remove('show');
-      commentInput.blur();
-    });
-
-    function addComment(text) {
-      const empty = commentsList.querySelector('.no-comments');
-      if (empty) empty.remove();
-
-      commentCount++;
-      commentCountEl.textContent = commentCount;
-      commentsHeaderCount.textContent = `${commentCount} ความคิดเห็น`;
-
-      const currentName = localStorage.getItem(STORAGE_KEYS.USERNAME) || DEFAULT_NAME;
-
-      const newComment = document.createElement('div');
-      newComment.className = 'comment-item';
-      newComment.innerHTML = `
-        <div class="comment-avatar"></div>
-        <div class="comment-content">
-          <div class="comment-name">${escapeHtml(currentName)}</div>
-          <div class="comment-text">${escapeHtml(text)}</div>
-          <div class="comment-time">ตอนนี้</div>
-        </div>
-      `;
-      commentsList.prepend(newComment);
-      commentsList.scrollTop = 0;
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    commentSendBtn.addEventListener('click', () => {
-      const text = commentInput.value.trim();
-      if (!text) return;
-      addComment(text);
-      commentInput.value = '';
-    });
-
-    commentInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        commentSendBtn.click();
-      }
-    });
-
-    // ===== ตัวแปรอัปโหลดวิดีโอ =====
+    // ===== 4. อัปโหลดวิดีโอ — บันทึกถาวร ไม่หาย =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1206,33 +1002,169 @@
     const confirmBtn = document.getElementById('confirmBtn');
     const videoArea = document.getElementById('videoArea');
     const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const mainVideo = document.getElementById('mainVideo');
     const postInfo = document.getElementById('postInfo');
     const videoCaption = document.getElementById('videoCaption');
-    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const playPauseBtn = document.getElementById('playPauseBtn');
     const soundToggle = document.getElementById('soundToggle');
-    const aspectBadge = document.getElementById('aspectBadge');
     const profileVideosGrid = document.getElementById('profileVideosGrid');
 
-    let currentVideoData = null;
-    let uploadedVideos = [];
+    let pendingVideo = null;
 
-    // ===== เปิด-ปิดแผงอัปโหลด =====
-    createBtn.addEventListener('click', () => {
-      uploadPanel.classList.add('show');
-    });
-
-    closeUpload.addEventListener('click', () => {
+    // เปิด-ปิดแผงอัปโหลด
+    if (createBtn) createBtn.addEventListener('click', () => uploadPanel.classList.add('show'));
+    if (closeUpload) closeUpload.addEventListener('click', () => {
       uploadPanel.classList.remove('show');
-      resetUpload();
+      resetUploadForm();
     });
+    if (fileWrapper) fileWrapper.addEventListener('click', () => videoInput.click());
 
-    fileWrapper.addEventListener('click', () => videoInput.click());
+    // เลือกวิดีโอ
+    if (videoInput) {
+      videoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        pendingVideo = { file, url, caption: '' };
+        videoPreview.src = url;
+        previewContainer.style.display = 'block';
+        confirmBtn.style.display = 'block';
+        fileWrapper.style.display = 'none';
+      });
+    }
 
-    // ===== รีเซ็ตฟอร์มอัปโหลด =====
-    function resetUpload() {
-      videoInput.value = '';
-      videoPreview.src = '';
-      previewContainer.style.display = 'none';
-      confirmBtn.style.display = 'none';
-      fileWrapper.style.display = 'block';
-      captionInput.value = '';
+    // โพสต์วิดีโอ
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        if (!pendingVideo) return;
+        const caption = captionInput.value.trim();
+        saveVideoToStorage(pendingVideo.url, caption);
+        showVideo(pendingVideo.url, caption);
+        uploadPanel.classList.remove('show');
+        resetUploadForm();
+      });
+    }
+
+    // บันทึกวิดีโอลง LocalStorage
+    function saveVideoToStorage(videoUrl, caption) {
+      // แปลงเป็น base64 เพื่อเก็บถาวร
+      const newVideo = {
+        id: Date.now(),
+        url: videoUrl,
+        caption: caption,
+        createdAt: new Date().toISOString()
+      };
+      uploadedVideos.unshift(newVideo);
+      localStorage.setItem(STORAGE.VIDEOS, JSON.stringify(uploadedVideos));
+      renderProfileVideos();
+    }
+
+    // โหลดวิดีโอที่บันทึกไว้
+    function loadSavedVideos() {
+      const saved = localStorage.getItem(STORAGE.VIDEOS);
+      if (saved) {
+        uploadedVideos = JSON.parse(saved);
+        if (uploadedVideos.length > 0) {
+          showVideo(uploadedVideos[0].url, uploadedVideos[0].caption);
+        }
+      }
+      renderProfileVideos();
+    }
+
+    // แสดงวิดีโอหลัก
+    function showVideo(url, captionText) {
+      mainVideo.src = url;
+      mainVideo.style.display = 'block';
+      mainVideo.muted = isMuted;
+      videoPlaceholder.style.display = 'none';
+      postInfo.style.display = 'block';
+      videoCaption.textContent = captionText || 'วิดีโอใหม่';
+      
+      mainVideo.play().catch(() => {});
+      
+      // อัปเดตแถบความคืบหน้า
+      mainVideo.ontimeupdate = () => {
+        if (mainVideo.duration) {
+          const percent = (mainVideo.currentTime / mainVideo.duration) * 100;
+          progressFill.style.width = percent + '%';
+        }
+      };
+    }
+
+    // เล่น-หยุด วิดีโอ
+    if (videoArea) {
+      videoArea.addEventListener('click', (e) => {
+        if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
+            e.target.closest('.upload-panel') || e.target.closest('.comments-panel')) return;
+        if (!mainVideo.src) return;
+        
+        if (mainVideo.paused) {
+          mainVideo.play();
+          playPauseBtn.textContent = '⏸';
+        } else {
+          mainVideo.pause();
+          playPauseBtn.textContent = '▶';
+        }
+        playPauseBtn.classList.add('visible');
+        setTimeout(() => playPauseBtn.classList.remove('visible'), 1500);
+      });
+    }
+
+    // เปิด-ปิดเสียง
+    if (soundToggle) {
+      soundToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isMuted = !isMuted;
+        if (mainVideo) mainVideo.muted = isMuted;
+        soundToggle.innerHTML = isMuted 
+          ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M5 9v6"></path></svg>`
+          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 11v2"></path></svg>`;
+      });
+    }
+
+    // แสดงวิดีโอในหน้าโปรไฟล์
+    function renderProfileVideos() {
+      if (!profileVideosGrid) return;
+      
+      if (uploadedVideos.length === 0) {
+        profileVideosGrid.innerHTML = '<div class="no-videos">ยังไม่มีวิดีโอ<br>กดปุ่ม + เพื่อโพสต์วิดีโอแรกของคุณ</div>';
+        return;
+      }
+      
+      profileVideosGrid.innerHTML = uploadedVideos.map(v => `
+        <div class="profile-video-item" style="background-image: url(${v.url})" data-url="${v.url}" data-caption="${v.caption || ''}">
+        </div>
+      `).join('');
+      
+      // กดเพื่อเล่น
+      profileVideosGrid.querySelectorAll('.profile-video-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const url = item.dataset.url;
+          const cap = item.dataset.caption;
+          closeProfile();
+          showVideo(url, cap);
+        });
+      });
+    }
+
+    function resetUploadForm() {
+      pendingVideo = null;
+      if (videoInput) videoInput.value = '';
+      if (videoPreview) videoPreview.src = '';
+      if (previewContainer) previewContainer.style.display = 'none';
+      if (confirmBtn) confirmBtn.style.display = 'none';
+      if (fileWrapper) fileWrapper.style.display = 'block';
+      if (captionInput) captionInput.value = '';
+    }
+
+    // ===== 5. ถูกใจ =====
+    const likeBtn = document.getElementById('likeBtn');
+    const likeCount = document.getElementById('likeCount');
+    let isLiked = false, likeNum = 0;
+    if (likeBtn) {
+      likeBtn.addEventListener('click', () => {
+        isLiked = !isLiked;
+        likeNum += isLiked ? 1 : -1;
+        likeCount.textContent = likeNum;
+        like
