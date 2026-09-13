@@ -22,7 +22,7 @@
 
     body { position: fixed; inset: 0; }
 
-    /* ===== SPLASH SCREEN ===== */
+    /* ===== SPLASH SCREEN — แก้ให้หายชัวร์ ===== */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -32,11 +32,13 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.6s ease, transform 0.5s ease;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     .splash-screen.fade-out {
       opacity: 0;
-      transform: scale(1.05);
+      visibility: hidden;
       pointer-events: none;
     }
     .splash-logo {
@@ -116,7 +118,7 @@
       pointer-events: none;
     }
 
-    /* ===== ป้ายอัตราส่วน — ชิดขอบบนสุด + แสดงแค่ 9:16 หรือ 16:9 อันเดียว ===== */
+    /* ===== ป้ายอัตราส่วน ===== */
     .aspect-ratio-badge {
       position: absolute;
       top: env(safe-area-inset-top, 0px);
@@ -302,7 +304,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== แผงความคิดเห็น — เพิ่มใหม่ ===== */
+    /* ===== แผงความคิดเห็น ===== */
     .comments-panel {
       position: absolute;
       bottom: 0;
@@ -359,9 +361,7 @@
       background-size: cover;
       background-position: center;
     }
-    .comment-content {
-      flex: 1;
-    }
+    .comment-content { flex: 1; }
     .comment-name {
       font-size: 14px;
       font-weight: 600;
@@ -374,10 +374,7 @@
       color: #111;
       margin-bottom: 6px;
     }
-    .comment-time {
-      font-size: 12px;
-      color: #999;
-    }
+    .comment-time { font-size: 12px; color: #999; }
     .comment-input-area {
       display: flex;
       gap: 10px;
@@ -504,11 +501,7 @@
       color: #000;
       padding: 4px;
     }
-    .profile-top-actions {
-      display: flex;
-      gap: 20px;
-      font-size: 22px;
-    }
+    .profile-top-actions { display: flex; gap: 20px; font-size: 22px; }
     .profile-header {
       padding: 20px 16px;
       display: flex;
@@ -516,10 +509,7 @@
       align-items: center;
       text-align: center;
     }
-    .profile-avatar-wrap {
-      position: relative;
-      margin-bottom: 12px;
-    }
+    .profile-avatar-wrap { position: relative; margin-bottom: 12px; }
     .profile-avatar {
       width: 96px;
       height: 96px;
@@ -548,11 +538,7 @@
       margin-bottom: 4px;
       cursor: pointer;
     }
-    .profile-username {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 20px;
-    }
+    .profile-username { font-size: 14px; color: #666; margin-bottom: 20px; }
     .profile-stats-row {
       display: flex;
       justify-content: center;
@@ -605,11 +591,7 @@
       margin-bottom: 16px;
       max-width: 340px;
     }
-    .profile-tags {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+    .profile-tags { display: flex; gap: 12px; margin-bottom: 20px; }
     .tag-item {
       display: flex;
       align-items: center;
@@ -709,10 +691,7 @@
       outline: none;
     }
     .edit-name-input:focus { border-color: #fe28ea; }
-    .edit-name-buttons {
-      display: flex;
-      gap: 12px;
-    }
+    .edit-name-buttons { display: flex; gap: 12px; }
     .edit-btn-cancel {
       flex: 1;
       padding: 12px;
@@ -735,7 +714,7 @@
       cursor: pointer;
     }
 
-    /* ===== แผงอัปโหลด — ปรับไม่ให้หลุดจอ ===== */
+    /* ===== แผงอัปโหลด ===== */
     .upload-panel {
       position: absolute;
       bottom: 0;
@@ -829,7 +808,7 @@
   </style>
 </head>
 <body>
-  <!-- ===== SPLASH SCREEN ===== -->
+  <!-- ===== SPLASH SCREEN — แก้ให้หายชัวร์ ===== -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo">ท</div>
     <div class="splash-name">Thaipodee</div>
@@ -842,10 +821,8 @@
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
     </div>
 
-    <!-- ป้ายอัตราส่วน — แสดงแค่ 9:16 หรือ 16:9 ตามจริงของวิดีโอ + ชิดขอบบนสุด -->
     <div class="aspect-ratio-badge" id="aspectBadge"></div>
 
-    <!-- ปุ่มเสียง -->
     <div class="sound-toggle" id="soundToggle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -868,7 +845,6 @@
         <div class="r-icon">❤️</div>
         <div class="r-num" id="likeCount">0</div>
       </div>
-      <!-- ===== ปุ่มความคิดเห็น — ทำงานจริง ===== -->
       <div class="r-btn" id="commentBtn">
         <div class="r-icon">💬</div>
         <div class="r-num" id="commentCount">0</div>
@@ -886,7 +862,6 @@
       </div>
     </div>
 
-    <!-- ===== ชื่อผู้ใช้ที่มุมล่างซ้าย ===== -->
     <div class="info-left" id="postInfo">
       <div class="username" id="profileNameBtn">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
@@ -898,7 +873,6 @@
       <div class="progress-done" id="progressFill"></div>
     </div>
 
-    <!-- ===== แผงความคิดเห็น — เพิ่มเต็มระบบ ===== -->
     <div class="comments-panel" id="commentsPanel">
       <div class="comments-header">
         <div class="comments-count" id="commentsHeaderCount">0 ความคิดเห็น</div>
@@ -935,7 +909,6 @@
       </div>
     </div>
 
-    <!-- แผงอัปโหลด — ปรับไม่ให้หลุดจอ -->
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="file-input-wrapper" id="fileWrapper">
@@ -950,7 +923,6 @@
       <button class="upload-btn" id="confirmBtn" style="display: none;">โพสต์วิดีโอ</button>
     </div>
 
-    <!-- ===== หน้าโปรไฟล์ ===== -->
     <div class="profile-page" id="profilePage">
       <div class="profile-top-bar">
         <div class="profile-back" id="profileClose">←</div>
@@ -1009,11 +981,9 @@
         <div class="no-videos">ยังไม่มีวิดีโอ<br>กดปุ่ม + เพื่อโพสต์วิดีโอแรกของคุณ</div>
       </div>
       
-      <!-- ซ่อน input เปลี่ยนรูป -->
       <input type="file" id="avatarInput" accept="image/*" style="display: none;" />
     </div>
 
-    <!-- กล่องแก้ไขชื่อ -->
     <div class="edit-name-modal" id="editNameModal">
       <div class="edit-name-box">
         <div class="edit-name-title">แก้ไขชื่อผู้ใช้</div>
@@ -1027,7 +997,7 @@
   </div>
 
   <script>
-    // ===== ข้อมูลผู้ใช้ — บันทึกลงเครื่อง =====
+    // ===== ข้อมูลผู้ใช้ =====
     const STORAGE_KEYS = {
       AVATAR: 'thaipodee_avatar',
       USERNAME: 'thaipodee_username'
@@ -1046,11 +1016,12 @@
     const commentsClose = document.getElementById('commentsClose');
     const commentBtn = document.getElementById('commentBtn');
 
-    // ===== SPLASH SCREEN =====
+    // ===== SPLASH SCREEN — แก้ให้หายชัวร์ 100% =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
     window.addEventListener('load', function() {
+      // รอโหลดหน้าเสร็จ + รอเวลา 2 วินาที แล้วค่อยหาย
       setTimeout(() => {
         splash.classList.add('fade-out');
         app.classList.add('show');
@@ -1180,7 +1151,6 @@
 
     // ===== ส่งความคิดเห็น =====
     function addComment(text) {
-      // ลบข้อความ "ยังไม่มีความคิดเห็น"
       const empty = commentsList.querySelector('.no-comments');
       if (empty) empty.remove();
 
@@ -1189,14 +1159,13 @@
       commentsHeaderCount.textContent = `${commentCount} ความคิดเห็น`;
 
       const currentName = localStorage.getItem(STORAGE_KEYS.USERNAME) || DEFAULT_NAME;
-      const timeNow = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
       const newComment = document.createElement('div');
       newComment.className = 'comment-item';
       newComment.innerHTML = `
         <div class="comment-avatar"></div>
         <div class="comment-content">
-          <div class="comment-name">${currentName}</div>
+          <div class="comment-name">${escapeHtml(currentName)}</div>
           <div class="comment-text">${escapeHtml(text)}</div>
           <div class="comment-time">ตอนนี้</div>
         </div>
@@ -1235,9 +1204,40 @@
       resetUpload();
     });
 
-    // ===== ตรวจจับอัตราส่วนอัตโนมัติ — แสดงแค่ 9:16 หรือ 16:9 =====
+    // ===== ตรวจจับอัตราส่วนอัตโนมัติ =====
     function detectAspectRatio(video) {
       return new Promise((resolve) => {
         video.addEventListener('loadedmetadata', function onReady() {
           video.removeEventListener('loadedmetadata', onReady);
-          const w = video.videoWidth
+          const w = video.videoWidth;
+          const h = video.videoHeight;
+          const ratio = w / h;
+          
+          let label = '', type = '';
+          
+          if (ratio < 1) {
+            label = '9:16';
+            type = 'tall';
+          } else {
+            label = '16:9';
+            type = 'wide';
+          }
+          
+          resolve({ label, type });
+        });
+      });
+    }
+
+    // ===== อัปโหลดวิดีโอ — ทำงานชัวร์ =====
+    const fileWrapper = document.getElementById('fileWrapper');
+    const videoInput = document.getElementById('videoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const videoPreview = document.getElementById('videoPreview');
+    const captionInput = document.getElementById('captionInput');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const videoArea = document.getElementById('videoArea');
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const postInfo = document.getElementById('postInfo');
+    const videoCaption = document.getElementById('videoCaption');
+    const progressBar = document.getElementById('progressBar');
+    const soundToggle = document.getElementById('soundToggle');
