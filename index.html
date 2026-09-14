@@ -19,6 +19,7 @@
       position: absolute; inset: 0; width: 100%; height: 100%;
       background: #000; overflow: hidden; z-index: 1;
       display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
     }
     .video-area video {
       position: absolute; inset: 0; width: 100%; height: 100%;
@@ -52,18 +53,18 @@
       border-radius: 0 2px 2px 0; transition: width 0.1s linear;
     }
 
-    /* ===== เมนูด้านขวา — จัดระเบียบ ห่างกันชัดเจน ไม่ซ้อนกัน ===== */
+    /* ===== เมนูด้านขวา — ครบ 5 ปุ่ม เรียงชัด ไม่ซ้อน ไม่หาย ===== */
     .right-menu {
-      position: absolute; right: 12px;
+      position: absolute; right: 14px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
-      gap: 22px; /* ห่างกันพอดี ไม่ซ้อน */
-      z-index: 20; /* ไม่โดนบัง */
+      gap: 22px;
+      z-index: 20;
     }
     .r-btn {
       display: flex; flex-direction: column; align-items: center;
       gap: 2px; cursor: pointer; 
-      width: 56px; height: 56px; /* พื้นที่กดชัดเจน */
+      width: 56px; height: 56px;
       justify-content: center;
       pointer-events: auto;
       transition: transform 0.15s ease;
@@ -90,11 +91,13 @@
       width: 44px; height: 44px; border-radius: 50%;
       background: #222; border: 2px solid #fff;
       animation: spin 4s linear infinite;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .info-left {
-      position: absolute; left: 12px; right: 85px;
+      position: absolute; left: 14px; right: 85px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       z-index: 12; display: none;
     }
@@ -125,50 +128,38 @@
       border-bottom: 2px solid #fff; padding-bottom: 3px;
     }
     .search-btn {
-      position: absolute; right: 12px;
+      position: absolute; right: 14px;
       top: max(18px, env(safe-area-inset-top, 0px));
       font-size: 22px; cursor: pointer; z-index: 15;
     }
 
     .view-toggle {
-      position: absolute; left: 12px;
+      position: absolute; left: 14px;
       top: max(18px, env(safe-area-inset-top, 0px));
       z-index: 15; cursor: pointer;
       background: rgba(0,0,0,.5); border-radius: 50%;
       width: 40px; height: 40px; display: flex;
       align-items: center; justify-content: center;
       font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
+      pointer-events: auto;
     }
     .view-toggle:active { transform: scale(0.9); }
 
-    .sound-toggle {
-      position: absolute; right: 12px;
-      bottom: calc(320px + env(safe-area-inset-bottom, 0px)); /* ขยับขึ้นมา ไม่ซ้อนปุ่มอื่น */
-      z-index: 15; cursor: pointer; color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.5); border-radius: 50%;
-      width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.3);
-    }
-    .sound-toggle svg {
-      width: 22px; height: 22px; stroke-width: 2;
-      stroke: currentColor; fill: none;
-    }
-
-    /* ===== เมนูด้านล่าง — ล็อกตำแหน่ง กดได้แน่นอน ===== */
+    /* ===== เมนูด้านล่าง — ทุกปุ่มกดได้แน่นอน ===== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
       height: calc(80px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(0,0,0,.8); display: flex;
       justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; z-index: 30; /* z-index สูงสุด — กดได้แน่นอน */
+      border-top: 1px solid #333; z-index: 30;
     }
     .b-nav {
       display: flex; flex-direction: column; align-items: center;
       gap: 4px; cursor: pointer; color: #fff;
       font-size: 11px; opacity: 0.6;
       pointer-events: auto;
-      padding: 8px 12px; /* พื้นที่กดกว้างขึ้น */
+      padding: 8px 12px;
     }
     .b-nav.active { opacity: 1; }
     .b-nav:active { opacity: 0.8; }
@@ -231,20 +222,12 @@
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
-      <video id="mainVideo" playsinline muted loop style="display:none;" preload="auto" webkit-playsinline></video>
+      <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline></video>
       <div class="play-pause-indicator" id="playPauseBtn">▶</div>
     </div>
     <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
     
     <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
-    
-    <!-- ปุ่มเปิดปิดเสียง — ขยับตำแหน่ง ไม่ซ้อนปุ่มอื่น -->
-    <div class="sound-toggle" id="soundToggle" title="เปิด/ปิดเสียง">
-      <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-        <path d="M19 7v10M23 10v4"></path>
-      </svg>
-    </div>
     
     <div class="top-bar">
       <span class="tab" id="tab1">กำลังติดตาม</span>
@@ -252,7 +235,7 @@
     </div>
     <div class="search-btn">🔍</div>
     
-    <!-- เมนูด้านขวา — เรียงลำดับ ห่างกันชัดเจน ไม่ซ้อนกัน -->
+    <!-- เมนูด้านขวา — ครบ 5 ปุ่ม ไม่มีปุ่มเสียงแล้ว -->
     <div class="right-menu">
       <div class="r-btn prof-box">
         <div class="prof-img"></div>
@@ -267,7 +250,7 @@
         <span class="r-num">0</span>
       </div>
       <div class="r-btn" id="shareBtn">
-        <span class="r-icon">⬜</span>
+        <span class="r-icon">↗️</span>
         <span class="r-num">0</span>
       </div>
       <div class="r-btn" id="musicBtn">
@@ -281,7 +264,7 @@
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
     
-    <!-- เมนูด้านล่าง — กดได้แน่นอน -->
+    <!-- เมนูด้านล่าง — ทุกปุ่มกดได้ -->
     <div class="bottom-bar">
       <div class="b-nav active"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
       <div class="b-nav"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
@@ -298,7 +281,7 @@
         <input type="file" id="videoInput" accept="video/*" />
       </div>
       <div class="preview-container" id="previewContainer">
-        <video id="videoPreview" controls muted playsinline preload="auto" webkit-playsinline></video>
+        <video id="videoPreview" controls playsinline preload="auto" webkit-playsinline></video>
       </div>
       <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยายวิดีโอ..."></textarea>
       <button class="upload-btn" id="confirmBtn">โพสต์วิดีโอ</button>
@@ -307,7 +290,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — ปุ่มห่างกัน ไม่ซ้อน กดได้ทุกปุ่ม');
+      console.log('✅ โหลดเสร็จ — ไม่มีปุ่มเสียง แตะจอควบคุมเล่น/หยุด+เสียงเอง');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -330,15 +313,13 @@
       const shareBtn = document.getElementById('shareBtn');
       const commentBtn = document.getElementById('commentBtn');
       const musicBtn = document.getElementById('musicBtn');
-      const soundToggle = document.getElementById('soundToggle');
-      const soundIcon = document.getElementById('soundIcon');
       const viewToggle = document.getElementById('viewToggle');
 
-      let isMuted = true;
       let pendingVideo = null;
       let isLiked = false, likeNum = 0;
+      let fitMode = false;
 
-      // ✅ ปุ่ม + อัปโหลด — ล็อก
+      // ✅ ปุ่ม + อัปโหลด
       if (createBtn) createBtn.addEventListener('click', e => { 
         e.preventDefault(); e.stopPropagation(); 
         uploadPanel.classList.add('show'); 
@@ -385,7 +366,7 @@
       function showVideo(url, captionText) {
         mainVideo.src = url;
         mainVideo.style.display = 'block';
-        mainVideo.muted = isMuted;
+        mainVideo.muted = false; // เริ่มต้นมีเสียงเลย
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'วิดีโอใหม่';
@@ -393,23 +374,35 @@
         mainVideo.ontimeupdate = () => {
           if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
         };
-        mainVideo.play().catch(() => {});
+        mainVideo.play().catch(() => {
+          mainVideo.muted = false;
+          mainVideo.play();
+        });
       }
 
-      // ✅ ปุ่มเปิด/ปิดเสียง — ทำงานจริง
-      if (soundToggle) {
-        soundToggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-          isMuted = !isMuted;
-          if (mainVideo.src) mainVideo.muted = isMuted;
-          soundIcon.innerHTML = isMuted 
-            ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>'
-            : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path>';
+      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียงเปิด-ปิดอัตโนมัติ
+      if (videoArea) {
+        videoArea.addEventListener('click', function(e) {
+          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
+              e.target.closest('.upload-panel') || e.target.closest('.view-toggle')) return;
+          if (!mainVideo.src) return;
+          
+          if (mainVideo.paused) {
+            // เล่น → เปิดเสียงด้วย
+            mainVideo.muted = false;
+            mainVideo.play();
+            playPauseBtn.textContent = '⏸';
+          } else {
+            // หยุด → ปิดเสียงด้วย
+            mainVideo.pause();
+            playPauseBtn.textContent = '▶';
+          }
+          playPauseBtn.classList.add('show');
+          setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
         });
       }
 
       // ✅ ปุ่มสลับจอ
-      let fitMode = false;
       if (viewToggle) {
         viewToggle.addEventListener('click', e => {
           e.stopPropagation();
@@ -419,26 +412,7 @@
         });
       }
 
-      // ✅ กดวิดีโอ เล่น/หยุด
-      if (videoArea) {
-        videoArea.addEventListener('click', function(e) {
-          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
-              e.target.closest('.upload-panel') || e.target.closest('.sound-toggle') || 
-              e.target.closest('.view-toggle')) return;
-          if (!mainVideo.src) return;
-          if (mainVideo.paused) {
-            mainVideo.play();
-            playPauseBtn.textContent = '⏸';
-          } else {
-            mainVideo.pause();
-            playPauseBtn.textContent = '▶';
-          }
-          playPauseBtn.classList.add('show');
-          setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
-        });
-      }
-
-      // ✅ ปุ่มหัวใจ — กดได้
+      // ✅ ปุ่มหัวใจ
       if (likeBtn) {
         likeBtn.addEventListener('click', e => {
           e.stopPropagation();
@@ -449,7 +423,7 @@
         });
       }
 
-      // ✅ ปุ่มแชร์ — กดได้
+      // ✅ ปุ่มแชร์
       if (shareBtn) {
         shareBtn.addEventListener('click', e => {
           e.stopPropagation();
@@ -457,7 +431,7 @@
         });
       }
 
-      // ✅ ปุ่มคอมเมนต์ — กดได้
+      // ✅ ปุ่มคอมเมนต์
       if (commentBtn) {
         commentBtn.addEventListener('click', e => {
           e.stopPropagation();
@@ -465,7 +439,7 @@
         });
       }
 
-      // ✅ ปุ่มเพลง — กดได้
+      // ✅ ปุ่มเพลง
       if (musicBtn) {
         musicBtn.addEventListener('click', e => {
           e.stopPropagation();
@@ -473,7 +447,18 @@
         });
       }
 
-      console.log('✅ ทุกปุ่มทำงาน — ไม่ซ้อนกัน กดได้ทุกจุด!');
+      // ✅ เมนูล่าง — ทุกปุ่มกดได้
+      document.querySelectorAll('.b-nav').forEach((nav, idx) => {
+        nav.addEventListener('click', e => {
+          e.stopPropagation();
+          document.querySelectorAll('.b-nav').forEach(n => n.classList.remove('active'));
+          nav.classList.add('active');
+          const names = ['หน้าหลัก', 'ร้านค้า', '', 'ข้อความ', 'โปรไฟล์'];
+          if (names[idx]) alert('ไปที่: ' + names[idx]);
+        });
+      });
+
+      console.log('✅ เสร็จ — ไม่มีปุ่มเสียง! แตะจอควบคุมเอง เล่น=มีเสียง หยุด=หยุดเสียง');
     });
   </script>
 </body>
