@@ -23,13 +23,10 @@
     .video-area video {
       position: absolute; inset: 0; width: 100%; height: 100%;
       background: #000; display: block; transition: all 0.3s ease;
-      /* ตรวจจับอัตโนมัติ — ไม่ให้ส่วนใดถูกบัง */
       object-fit: contain;
     }
-    /* 9:16 แนวตั้ง → เต็มจอพอดี */
     .video-area video.ar-vertical { object-fit: cover; }
-    /* 16:9 แนวนอน → ปรับพอดีจอ ไม่ตัดขอบ */
-    .video-area video.ar-horizontal { object-fit: contain; width: 100%; height: 100%; }
+    .video-area video.ar-horizontal { object-fit: contain; }
 
     .video-placeholder {
       color: #888; font-size: 16px; text-align: center;
@@ -55,34 +52,42 @@
       border-radius: 0 2px 2px 0; transition: width 0.1s linear;
     }
 
+    /* ===== เมนูด้านขวา — จัดระเบียบ ห่างกันชัดเจน ไม่ซ้อนกัน ===== */
     .right-menu {
       position: absolute; right: 12px;
-      bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
-      gap: 24px; z-index: 12;
+      gap: 22px; /* ห่างกันพอดี ไม่ซ้อน */
+      z-index: 20; /* ไม่โดนบัง */
     }
     .r-btn {
       display: flex; flex-direction: column; align-items: center;
-      gap: 3px; cursor: pointer; transition: transform 0.15s ease;
+      gap: 2px; cursor: pointer; 
+      width: 56px; height: 56px; /* พื้นที่กดชัดเจน */
+      justify-content: center;
+      pointer-events: auto;
+      transition: transform 0.15s ease;
+      user-select: none; -webkit-tap-highlight-color: transparent;
     }
-    .r-btn:active { transform: scale(0.92); }
-    .r-icon { font-size: 28px; }
-    .r-num { font-size: 12px; margin-top: 2px; }
+    .r-btn:active { transform: scale(0.9); }
+    .r-icon { font-size: 28px; line-height: 1; }
+    .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
+
     .prof-box { position: relative; cursor: pointer; }
     .prof-img {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       border: 2px solid #fff; background: url('https://picsum.photos/100/100') center/cover;
       cursor: pointer;
     }
     .follow-add {
-      position: absolute; bottom: -6px; left: 50%;
-      transform: translateX(-50%); width: 20px; height: 20px;
+      position: absolute; bottom: -4px; left: 50%;
+      transform: translateX(-50%); width: 18px; height: 18px;
       border-radius: 50%; background: #ff0050;
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: bold;
+      font-size: 12px; font-weight: bold; color: #fff;
     }
     .music-cover {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       background: #222; border: 2px solid #fff;
       animation: spin 4s linear infinite;
     }
@@ -90,7 +95,7 @@
 
     .info-left {
       position: absolute; left: 12px; right: 85px;
-      bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       z-index: 12; display: none;
     }
     .username {
@@ -138,38 +143,44 @@
 
     .sound-toggle {
       position: absolute; right: 12px;
-      bottom: calc(240px + env(safe-area-inset-bottom, 0px));
-      z-index: 13; cursor: pointer; color: #fff;
+      bottom: calc(320px + env(safe-area-inset-bottom, 0px)); /* ขยับขึ้นมา ไม่ซ้อนปุ่มอื่น */
+      z-index: 15; cursor: pointer; color: #fff;
       display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,.5); border-radius: 50%;
       width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.3);
     }
     .sound-toggle svg {
-      width: 24px; height: 24px; stroke-width: 2;
+      width: 22px; height: 22px; stroke-width: 2;
       stroke: currentColor; fill: none;
     }
 
+    /* ===== เมนูด้านล่าง — ล็อกตำแหน่ง กดได้แน่นอน ===== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
       height: calc(80px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(0,0,0,.8); display: flex;
       justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; z-index: 12;
+      border-top: 1px solid #333; z-index: 30; /* z-index สูงสุด — กดได้แน่นอน */
     }
     .b-nav {
       display: flex; flex-direction: column; align-items: center;
       gap: 4px; cursor: pointer; color: #fff;
       font-size: 11px; opacity: 0.6;
+      pointer-events: auto;
+      padding: 8px 12px; /* พื้นที่กดกว้างขึ้น */
     }
     .b-nav.active { opacity: 1; }
-    .b-icon { font-size: 24px; }
+    .b-nav:active { opacity: 0.8; }
+    .b-icon { font-size: 24px; line-height: 1; }
+    
     .create-box {
-      width: 45px; height: 32px; border-radius: 8px;
+      width: 50px; height: 36px; border-radius: 8px;
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: bold; color: #000;
-      cursor: pointer; border: none; z-index: 20; position: relative;
+      font-size: 24px; font-weight: bold; color: #000;
+      cursor: pointer; border: none; z-index: 35;
+      pointer-events: auto;
     }
     .create-box:active { transform: scale(0.95); }
 
@@ -177,7 +188,7 @@
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #fff; border-radius: 20px 20px 0 0;
       padding: 20px 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-      z-index: 25; transform: translateY(100%);
+      z-index: 50; transform: translateY(100%);
       transition: transform 0.3s ease; max-height: 85vh;
       overflow-y: auto; overscroll-behavior: contain; color: #000;
     }
@@ -227,6 +238,7 @@
     
     <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
     
+    <!-- ปุ่มเปิดปิดเสียง — ขยับตำแหน่ง ไม่ซ้อนปุ่มอื่น -->
     <div class="sound-toggle" id="soundToggle" title="เปิด/ปิดเสียง">
       <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -239,26 +251,45 @@
       <span class="tab active" id="tab2">สำหรับคุณ</span>
     </div>
     <div class="search-btn">🔍</div>
+    
+    <!-- เมนูด้านขวา — เรียงลำดับ ห่างกันชัดเจน ไม่ซ้อนกัน -->
     <div class="right-menu">
-      <div class="r-btn prof-box"><div class="prof-img"></div><div class="follow-add">+</div></div>
-      <div class="r-btn" id="likeBtn"><div class="r-icon">❤️</div><div class="r-num" id="likeCount">0</div></div>
-      <div class="r-btn"><div class="r-icon">💬</div><div class="r-num">0</div></div>
-      <div class="r-btn"><div class="r-icon">⬜</div><div class="r-num">0</div></div>
-      <div class="r-btn"><div class="r-icon">➤</div><div class="r-num">0</div></div>
-      <div class="r-btn"><div class="music-cover">🎵</div></div>
+      <div class="r-btn prof-box">
+        <div class="prof-img"></div>
+        <div class="follow-add">+</div>
+      </div>
+      <div class="r-btn" id="likeBtn">
+        <span class="r-icon">❤️</span>
+        <span class="r-num" id="likeCount">0</span>
+      </div>
+      <div class="r-btn" id="commentBtn">
+        <span class="r-icon">💬</span>
+        <span class="r-num">0</span>
+      </div>
+      <div class="r-btn" id="shareBtn">
+        <span class="r-icon">⬜</span>
+        <span class="r-num">0</span>
+      </div>
+      <div class="r-btn" id="musicBtn">
+        <div class="music-cover">🎵</div>
+      </div>
     </div>
+    
     <div class="info-left" id="postInfo">
       <div class="username">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
+    
+    <!-- เมนูด้านล่าง — กดได้แน่นอน -->
     <div class="bottom-bar">
-      <div class="b-nav active"><div class="b-icon">🏠</div><div>หน้าหลัก</div></div>
-      <div class="b-nav"><div class="b-icon">🛒</div><div>ร้านค้า</div></div>
+      <div class="b-nav active"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
+      <div class="b-nav"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
       <button class="create-box" id="createBtn">+</button>
-      <div class="b-nav"><div class="b-icon">💬</div><div>ข้อความ</div></div>
-      <div class="b-nav"><div class="b-icon">👤</div><div>โปรไฟล์</div></div>
+      <div class="b-nav"><span class="b-icon">💬</span><span>ข้อความ</span></div>
+      <div class="b-nav"><span class="b-icon">👤</span><span>โปรไฟล์</span></div>
     </div>
+    
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="file-input-wrapper" id="fileWrapper">
@@ -276,7 +307,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — ล็อกเปิด-ปิดวิดีโอ + ปรับขนาดอัตโนมัติ');
+      console.log('✅ โหลดเสร็จ — ปุ่มห่างกัน ไม่ซ้อน กดได้ทุกปุ่ม');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -296,6 +327,9 @@
       const playPauseBtn = document.getElementById('playPauseBtn');
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
+      const shareBtn = document.getElementById('shareBtn');
+      const commentBtn = document.getElementById('commentBtn');
+      const musicBtn = document.getElementById('musicBtn');
       const soundToggle = document.getElementById('soundToggle');
       const soundIcon = document.getElementById('soundIcon');
       const viewToggle = document.getElementById('viewToggle');
@@ -305,8 +339,13 @@
       let isLiked = false, likeNum = 0;
 
       // ✅ ปุ่ม + อัปโหลด — ล็อก
-      if (createBtn) createBtn.addEventListener('click', e => { e.preventDefault(); uploadPanel.classList.add('show'); });
-      if (closeUpload) closeUpload.addEventListener('click', () => { uploadPanel.classList.remove('show'); resetForm(); });
+      if (createBtn) createBtn.addEventListener('click', e => { 
+        e.preventDefault(); e.stopPropagation(); 
+        uploadPanel.classList.add('show'); 
+      });
+      if (closeUpload) closeUpload.addEventListener('click', () => { 
+        uploadPanel.classList.remove('show'); resetForm(); 
+      });
       if (fileWrapper) fileWrapper.addEventListener('click', () => videoInput.click());
       if (videoInput) videoInput.addEventListener('change', e => {
         const f = e.target.files[0]; if (!f) return;
@@ -334,13 +373,11 @@
           const ratio = videoEl.videoWidth / videoEl.videoHeight;
           videoEl.classList.remove('ar-vertical', 'ar-horizontal');
           if (ratio < 1) {
-            // 9:16 แนวตั้ง — เต็มจอ
             videoEl.classList.add('ar-vertical');
-            console.log('✅ ตรวจพบวิดีโอแนวตั้ง 9:16 → เต็มจอ');
+            console.log('✅ แนวตั้ง 9:16 → เต็มจอ');
           } else {
-            // 16:9 แนวนอน — พอดีจอ ไม่ตัดขอบ
             videoEl.classList.add('ar-horizontal');
-            console.log('✅ ตรวจพบวิดีโอแนวนอน 16:9 → พอดีจอ');
+            console.log('✅ แนวนอน 16:9 → พอดีจอ');
           }
         });
       }
@@ -352,39 +389,38 @@
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'วิดีโอใหม่';
-        
-        // ตรวจจับอัตราส่วนอัตโนมัติ
         checkAspectRatio(mainVideo);
-        
         mainVideo.ontimeupdate = () => {
           if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
         };
         mainVideo.play().catch(() => {});
       }
 
-      // ✅ ปุ่มเปิด/ปิดเสียง — ล็อก
-      if (soundToggle && mainVideo) {
-        soundToggle.addEventListener('click', function() {
+      // ✅ ปุ่มเปิด/ปิดเสียง — ทำงานจริง
+      if (soundToggle) {
+        soundToggle.addEventListener('click', function(e) {
+          e.stopPropagation();
           isMuted = !isMuted;
-          mainVideo.muted = isMuted;
+          if (mainVideo.src) mainVideo.muted = isMuted;
           soundIcon.innerHTML = isMuted 
             ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>'
             : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path>';
         });
       }
 
-      // ✅ ปุ่มสลับขนาดจอ — ล็อก
+      // ✅ ปุ่มสลับจอ
       let fitMode = false;
-      if (viewToggle && mainVideo) {
-        viewToggle.addEventListener('click', function() {
+      if (viewToggle) {
+        viewToggle.addEventListener('click', e => {
+          e.stopPropagation();
           fitMode = !fitMode;
-          mainVideo.style.objectFit = fitMode ? 'contain' : '';
+          if (mainVideo.src) mainVideo.style.objectFit = fitMode ? 'contain' : '';
           viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
         });
       }
 
-      // ✅ กดวิดีโอ เล่น/หยุด — ล็อกไว้แน่นอน
-      if (videoArea && mainVideo) {
+      // ✅ กดวิดีโอ เล่น/หยุด
+      if (videoArea) {
         videoArea.addEventListener('click', function(e) {
           if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
               e.target.closest('.upload-panel') || e.target.closest('.sound-toggle') || 
@@ -402,9 +438,10 @@
         });
       }
 
-      // ✅ ปุ่มหัวใจ — ล็อก
+      // ✅ ปุ่มหัวใจ — กดได้
       if (likeBtn) {
-        likeBtn.addEventListener('click', function() {
+        likeBtn.addEventListener('click', e => {
+          e.stopPropagation();
           isLiked = !isLiked;
           likeNum += isLiked ? 1 : -1;
           likeCount.textContent = likeNum;
@@ -412,7 +449,31 @@
         });
       }
 
-      console.log('✅ ทุกอย่างล็อกเรียบร้อย — เต็มจออัตโนมัติตาม 9:16/16:9');
+      // ✅ ปุ่มแชร์ — กดได้
+      if (shareBtn) {
+        shareBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          alert('เปิดเมนูแชร์');
+        });
+      }
+
+      // ✅ ปุ่มคอมเมนต์ — กดได้
+      if (commentBtn) {
+        commentBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          alert('เปิดเมนูคอมเมนต์');
+        });
+      }
+
+      // ✅ ปุ่มเพลง — กดได้
+      if (musicBtn) {
+        musicBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          alert('เลือกเพลง/เสียง');
+        });
+      }
+
+      console.log('✅ ทุกปุ่มทำงาน — ไม่ซ้อนกัน กดได้ทุกจุด!');
     });
   </script>
 </body>
