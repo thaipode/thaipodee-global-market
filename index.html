@@ -2,817 +2,203 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Thaipodee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>คำสั่งซื้อทั้งหมด — ThaiPodee</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    html, body { 
-      width: 100%; height: 100%; height: 100dvh;
-      overflow: hidden; background: #000; color: #fff;
-      position: fixed; inset: 0; overscroll-behavior: none;
+    body { background: #f5f5f7; color: #1d1d1f; font-size: 15px; line-height: 1.5; padding-bottom: 20px; }
+    
+    /* === แถบด้านบน === */
+    .header-top {
+      background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+      position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e5e5e7;
     }
-    .app { width: 100%; height: 100%; height: 100dvh; position: relative; background: #000; overflow: hidden; }
-
-    .video-area {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      background: #000; overflow: hidden; z-index: 1;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
+    .back-btn { font-size: 22px; color: #007aff; cursor: pointer; }
+    .search-bar {
+      flex: 1; background: #f2f2f7; border-radius: 10px; padding: 10px 14px; font-size: 15px; border: none; outline: none;
     }
-    .video-area video, .video-area .post-image {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      background: #000; display: block; object-fit: contain;
-    }
-    .video-area video.ar-vertical { object-fit: cover; }
-    .video-area video.ar-horizontal { object-fit: contain; }
-
-    .video-placeholder {
-      color: #888; font-size: 16px; text-align: center;
-      padding: 40px 20px; line-height: 1.8; z-index: 2;
-    }
-
-    .play-pause-indicator {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); font-size: 64px; color: #fff;
-      background: rgba(0,0,0,.5); width: 90px; height: 90px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; z-index: 10;
-    }
-    .play-pause-indicator.show { opacity: 1; }
-
-    .music-hint {
-      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,.8); color: #25f4ee; padding: 12px 24px;
-      border-radius: 25px; font-size: 14px; z-index: 20; display: none;
-      border: 1px solid #25f4ee; font-weight: 600;
-    }
-    .music-hint.show { display: block; }
-    .music-hint.error { color: #ff6b6b; border-color: #ff6b6b; }
-    .music-hint.success { color: #4ade80; border-color: #4ade80; }
-    .music-hint.saved { color: #fbbf24; border-color: #fbbf24; }
-
-    .progress-line {
-      position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-      left: 0; right: 0; height: 3px; background: rgba(255,255,255,.2); z-index: 12;
-      display: none;
-    }
-    .progress-line.show { display: block; }
-    .progress-done {
-      width: 0%; height: 100%;
-      background: linear-gradient(90deg, #25f4ee, #fe28ea);
-      border-radius: 0 2px 2px 0;
-    }
-
-    .view-toggle {
-      position: absolute; left: 14px;
-      top: max(18px, env(safe-area-inset-top, 0px));
-      z-index: 50; cursor: pointer;
-      background: rgba(0,0,0,.5); border-radius: 50%;
-      width: 40px; height: 40px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
-      pointer-events: auto;
-    }
-    .view-toggle:active { transform: scale(0.9); }
-
-    .top-bar {
-      position: absolute; top: max(18px, env(safe-area-inset-top, 0px));
-      left: 0; right: 0; display: flex; justify-content: center;
-      align-items: center; z-index: 40;
+    .menu-btn { font-size: 22px; color: #1d1d1f; cursor: pointer; }
+    
+    /* === แถบหมวดหมู่สถานะ === */
+    .tabs {
+      background: #fff; display: flex; border-bottom: 1px solid #e5e5e7; overflow-x: auto; -webkit-overflow-scrolling: touch;
     }
     .tab {
-      font-size: 16px; color: rgba(255,255,255,.6);
-      cursor: pointer; padding: 0 12px;
-      pointer-events: auto;
+      padding: 12px 16px; font-size: 15px; color: #86868b; white-space: nowrap; cursor: pointer; position: relative;
     }
-    .tab.active {
-      color: #fff; font-weight: 600;
-      border-bottom: 2px solid #fff; padding-bottom: 3px;
+    .tab.active { color: #fe28ea; font-weight: 500; }
+    .tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 3px; background: linear-gradient(90deg, #25f4ee, #fe28ea); border-radius: 2px;
     }
-    .search-btn {
-      position: absolute; right: 14px;
-      top: max(18px, env(safe-area-inset-top, 0px));
-      font-size: 22px; cursor: pointer; z-index: 41;
-      pointer-events: auto;
-    }
-
-    .right-menu {
-      position: absolute; right: 14px;
-      bottom: calc(180px + env(safe-area-inset-bottom, 0px));
-      display: flex; flex-direction: column; align-items: center;
-      gap: 22px; z-index: 30;
-    }
-    .r-btn {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 2px; cursor: pointer; 
-      width: 56px; height: 56px; justify-content: center;
-      pointer-events: auto !important;
-      transition: transform 0.15s ease;
-      position: relative; z-index: 31;
-    }
-    .r-btn:active { transform: scale(0.9); }
-    .r-icon { font-size: 28px; line-height: 1; }
-    .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
-
-    .prof-box { 
-      position: relative; cursor: pointer; 
-      z-index: 35 !important; pointer-events: auto !important;
-      width: 56px; height: 56px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .prof-img {
-      width: 48px; height: 48px; border-radius: 50%;
-      border: 2px solid #fff; 
-      background: url('https://picsum.photos/100/100') center/cover;
-      cursor: pointer; pointer-events: auto;
-      transition: all 0.2s ease;
-    }
-    .prof-box:active .prof-img {
-      transform: scale(0.95);
-      border-color: #fe28ea;
-    }
-    .follow-add {
-      position: absolute; bottom: -4px; left: 50%;
-      transform: translateX(-50%); width: 20px; height: 20px;
-      border-radius: 50%; background: #ff0050;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: bold; color: #fff;
-      pointer-events: none;
-    }
-
-    .music-cover {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(45deg, #25f4ee, #fe28ea);
-      border: 2px solid #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-    }
-    .music-cover.playing { animation: spin 3s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .info-left {
-      position: absolute; left: 14px; right: 85px;
-      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
-      z-index: 12; display: none;
-    }
-    .username {
-      font-size: 16px; font-weight: 700; margin-bottom: 4px;
-      cursor: pointer; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5);
-    }
-    .caption {
-      font-size: 14px; line-height: 1.5; margin-bottom: 6px;
-      color: #f0f0f0; text-shadow: 0 1px 3px rgba(0,0,0,.5);
-    }
-    .sound-name {
-      font-size: 13px; display: flex; align-items: center; gap: 6px;
-      opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,.5);
-      cursor: pointer; font-weight: 500;
-      max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
-    }
-
-    .music-modal {
-      position: absolute; inset: 0; background: rgba(0,0,0,.85);
-      z-index: 200; display: none; align-items: flex-end; justify-content: center;
-      padding: 0;
-    }
-    .music-modal.show { display: flex; }
-    .music-sheet {
-      background: #1c1c1e; width: 100%; max-height: 80vh;
-      border-radius: 20px 20px 0 0; padding: 20px 20px 40px;
-      overflow-y: auto; color: #fff;
-    }
-    .music-sheet-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding-bottom: 15px;
-      border-bottom: 1px solid #333;
-    }
-    .music-sheet-title { font-size: 18px; font-weight: 700; }
-    .music-sheet-close { font-size: 24px; cursor: pointer; color: #888; }
     
-    .music-upload-box {
-      border: 2px dashed #25f4ee; border-radius: 12px;
-      padding: 30px 20px; text-align: center;
-      cursor: pointer; margin-bottom: 20px;
-      transition: all 0.2s;
+    /* === แบนเนอร์ === */
+    .banner {
+      background: linear-gradient(90deg, #fef2f2, #fff7ed); margin: 12px; border-radius: 12px; padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; cursor: pointer;
     }
-    .music-upload-box:hover {
-      border-color: #fe28ea; background: rgba(254,40,234,.1);
-    }
-    .music-upload-icon { font-size: 40px; margin-bottom: 10px; }
-    .music-upload-text { font-size: 15px; color: #ccc; margin-bottom: 5px; }
-    .music-upload-hint { font-size: 12px; color: #888; }
-    input[type="file"]#musicFileInput { display: none; }
-
-    .music-selected {
-      background: linear-gradient(90deg, rgba(74,222,128,.2), rgba(37,244,238,.2));
-      border: 1px solid #4ade80; border-radius: 10px;
-      padding: 14px; margin-bottom: 15px; display: none;
-    }
-    .music-selected.show { display: block; }
-    .music-selected-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
-    .music-selected-actions { display: flex; gap: 10px; }
-    .music-action-btn {
-      flex: 1; padding: 10px 12px; border-radius: 8px; border: none;
-      font-size: 14px; cursor: pointer; font-weight: 500;
-    }
-    .btn-play { background: #25f4ee; color: #000; }
-    .btn-remove { background: #ff4757; color: #fff; }
+    .banner-text { font-size: 14px; color: #c2410c; font-weight: 500; }
+    .banner-arrow { color: #c2410c; font-size: 14px; }
     
-    .no-music-option {
-      padding: 14px 12px; border-radius: 10px; cursor: pointer;
-      border: 1px solid transparent; transition: all 0.2s;
-      display: flex; align-items: center; gap: 12px;
+    /* === การ์ดคำสั่งซื้อ === */
+    .order-card {
+      background: #fff; margin: 0 12px 12px; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
     }
-    .no-music-option:hover, .no-music-option.selected {
-      background: rgba(255,255,255,.1); border-color: #666;
+    .shop-header {
+      padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #f2f2f7; cursor: pointer;
     }
-
-    .bottom-bar {
-      position: absolute; bottom: 0; left: 0; width: 100%;
-      height: calc(80px + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: rgba(0,0,0,.9); display: flex;
-      justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; z-index: 55;
-    }
-    .b-nav {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 4px; cursor: pointer; color: #fff;
-      font-size: 11px; opacity: 0.6;
-      pointer-events: auto !important;
-      padding: 12px 20px; min-width: 60px;
-      z-index: 56; position: relative;
-    }
-    .b-nav.active { opacity: 1; }
-    .b-nav:active { opacity: 0.8; transform: scale(0.95); }
-    .b-icon { font-size: 24px; line-height: 1; }
+    .shop-left { display: flex; align-items: center; gap: 8px; }
+    .shop-badge { background: #ffcc00; color: #000; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    .shop-name { font-size: 15px; font-weight: 500; }
+    .order-status { font-size: 14px; font-weight: 600; color: #1d1d1f; }
     
-    .create-box {
-      width: 50px; height: 36px; border-radius: 8px;
-      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; font-weight: bold; color: #000;
-      cursor: pointer; border: none; z-index: 57;
-      pointer-events: auto !important; position: relative;
+    .delivery-info {
+      padding: 10px 16px; font-size: 13px; color: #515154; display: flex; align-items: center; gap: 6px;
     }
-    .create-box:active { transform: scale(0.95); }
-
-    .upload-panel {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: #fff; border-radius: 20px 20px 0 0;
-      padding: 20px 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-      z-index: 60; transform: translateY(100%);
-      transition: transform 0.3s ease; max-height: 90vh;
-      overflow-y: auto; overscroll-behavior: contain; color: #000;
+    .delivery-icon { font-size: 14px; }
+    .delivery-date { color: #007aff; font-weight: 500; }
+    
+    .product-item {
+      padding: 12px 16px; display: flex; gap: 12px; border-bottom: 1px solid #f2f2f7; cursor: pointer;
     }
-    .upload-panel.show { transform: translateY(0); }
-    .panel-close {
-      text-align: right; font-size: 24px;
-      cursor: pointer; margin-bottom: 12px; color: #000;
+    .product-img { width: 70px; height: 70px; border-radius: 8px; background: #f5f5f7; object-fit: cover; }
+    .product-info { flex: 1; }
+    .product-name { font-size: 14px; line-height: 1.5; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .product-price { font-weight: 600; color: #fe28ea; font-size: 15px; }
+    .product-qty { font-size: 13px; color: #86868b; }
+    
+    .order-footer {
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
     }
-    .file-input-wrapper {
-      border: 2px dashed #ccc; border-radius: 12px;
-      padding: 24px 20px; text-align: center;
-      cursor: pointer; margin-bottom: 16px;
+    .total-text { font-size: 14px; color: #86868b; }
+    .total-price { font-size: 15px; font-weight: 600; }
+    .order-btn {
+      padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; border: 1px solid #d1d1d6;
+      background: #fff; color: #1d1d1f; cursor: pointer;
     }
-    .file-input-wrapper:hover { border-color: #fe28ea; }
-    .file-input-wrapper p { margin-top: 10px; color: #666; font-size: 14px; }
-    input[type="file"] { display: none; }
-    .preview-container {
-      width: 100%; max-height: 40vh; border-radius: 12px;
-      margin-bottom: 16px; display: none; background: #000; overflow: hidden;
+    .order-btn.cancel { border-color: #ff3b30; color: #ff3b30; }
+    
+    /* === สถานะยกเลิกแล้ว === */
+    .cancelled .shop-header { opacity: 0.7; }
+    .cancelled .product-item { opacity: 0.6; }
+    .cancel-note {
+      padding: 10px 16px; font-size: 13px; color: #86868b; background: #f9f9f9;
+      border-bottom: 1px solid #f2f2f7;
     }
-    .preview-container img, .preview-container video { 
-      width: 100%; height: 100%; object-fit: contain;
-      border-radius: 12px; display: block; 
-    }
-    .caption-input {
-      width: 100%; min-height: 44px; padding: 12px 16px;
-      border-radius: 10px; border: 1px solid #ddd;
-      background: #f9f9f9; color: #000; margin-bottom: 14px;
-      font-size: 15px; line-height: 1.5; resize: none; outline: none;
-    }
-    .upload-btn {
-      width: 100%; padding: 14px; border-radius: 10px;
-      border: none; background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
-      color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
-    }
-    .upload-btn:active { opacity: 0.9; }
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <div class="video-area" id="videoArea">
-      <div class="music-hint" id="musicHint">🎵 แตะหน้าจอเพื่อเล่นเสียง</div>
-      <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
-      <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
-      <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline muted></video>
-      <div class="play-pause-indicator" id="playPauseBtn">▶</div>
-    </div>
-    <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
-    
-    <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
-    
-    <div class="top-bar">
-      <span class="tab" id="tab1">ติดตาม</span>
-      <span class="tab active" id="tab2">สำหรับคุณ</span>
-    </div>
-    <div class="search-btn">🔍</div>
-    
-    <div class="right-menu">
-      <div class="r-btn prof-box" id="profileBtn">
-        <div class="prof-img" id="profileAvatarBtn"></div>
-        <div class="follow-add">+</div>
-      </div>
-      <div class="r-btn" id="likeBtn">
-        <span class="r-icon">❤️</span>
-        <span class="r-num" id="likeCount">1</span>
-      </div>
-      <div class="r-btn" id="commentBtn">
-        <span class="r-icon">💬</span>
-        <span class="r-num">0</span>
-      </div>
-      <div class="r-btn" id="shareBtn">
-        <span class="r-icon">↗️</span>
-        <span class="r-num">0</span>
-      </div>
-      <div class="r-btn" id="musicBtn" title="เลือกไฟล์เสียงจากมือถือ">
-        <div class="music-cover" id="musicCoverIcon">🎵</div>
-      </div>
-    </div>
-    
-    <div class="info-left" id="postInfo">
-      <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
-      <div class="caption" id="videoCaption"></div>
-      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">แตะเพื่อเลือกไฟล์เสียง</span></div>
-    </div>
-    
-    <div class="music-modal" id="musicModal">
-      <div class="music-sheet">
-        <div class="music-sheet-header">
-          <span class="music-sheet-title">🎵 เลือกไฟล์เสียงจากมือถือ</span>
-          <span class="music-sheet-close" id="closeMusicSheet">✕</span>
-        </div>
-        
-        <div class="music-upload-box" id="musicUploadBox">
-          <div class="music-upload-icon">📁</div>
-          <div class="music-upload-text">แตะเพื่อเปิดคลังเสียงในมือถือ</div>
-          <div class="music-upload-hint">รองรับ MP3, M4A, WAV, OGG, FLAC<br>เพลง ดนตรี เสียงพูด ทุกไฟล์เสียง</div>
-          <input type="file" id="musicFileInput" accept="audio/*" />
-        </div>
-        
-        <div class="music-selected" id="musicSelectedBox">
-          <div class="music-selected-name" id="selectedMusicName">ชื่อไฟล์เสียง</div>
-          <div class="music-selected-actions">
-            <button class="music-action-btn btn-play" id="previewMusicBtn">▶ ฟังตัวอย่าง</button>
-            <button class="music-action-btn btn-remove" id="removeMusicBtn">🗑️ ลบ</button>
-          </div>
-        </div>
-        
-        <div class="no-music-option" id="noMusicOption">
-          <span style="font-size:24px;">🔇</span>
-          <div>
-            <div style="font-weight:600;">ไม่ใช้เสียง</div>
-            <div style="font-size:12px; color:#888;">ปิดเสียงทั้งหมด</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="upload-panel" id="uploadPanel">
-      <div class="panel-close" id="closeUpload">✕</div>
-      <div class="file-input-wrapper" id="fileWrapper">
-        <div style="font-size: 36px; margin-bottom: 8px;">📷</div>
-        <p>กดเพื่อเลือกไฟล์<br>รองรับ รูปภาพ (JPG, PNG) | วิดีโอ (MP4, MOV)</p>
-        <input type="file" id="fileInput" accept="image/*,video/*" />
-      </div>
-      <div class="preview-container" id="previewContainer">
-        <img id="previewImage" style="display:none;" alt="ตัวอย่างรูป" />
-        <video id="previewVideo" controls playsinline preload="auto" webkit-playsinline style="display:none;"></video>
-      </div>
-      <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยาย..."></textarea>
-      <button class="upload-btn" id="confirmBtn">โพสต์</button>
-    </div>
-    
-    <div class="bottom-bar">
-      <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าแรก</span></div>
-      <div class="b-nav" data-page="discover"><span class="b-icon">🔍</span><span>ค้นพบ</span></div>
-      <div class="b-nav create-box" id="createBtn">+</div>
-      <div class="b-nav" data-page="inbox"><span class="b-icon">💬</span><span>ข้อความ</span></div>
-      <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>ฉัน</span></div>
-    </div>
 
-    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+  <!-- === แถบด้านบน === -->
+  <div class="header-top">
+    <span class="back-btn">←</span>
+    <input type="text" class="search-bar" placeholder="ค้นหาคำสั่งซื้อของคุณ" />
+    <span class="menu-btn">☰</span>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — บันทึกถาวรอัตโนมัติ!');
+  <!-- === แถบสถานะ === -->
+  <div class="tabs">
+    <div class="tab active">ทั้งหมด</div>
+    <div class="tab">รับ</div>
+    <div class="tab">รอชำระเงิน</div>
+    <div class="tab">ที่ต้องจัดส่ง</div>
+    <div class="tab">รอรับ</div>
+  </div>
 
-      const createBtn = document.getElementById('createBtn');
-      const uploadPanel = document.getElementById('uploadPanel');
-      const closeUpload = document.getElementById('closeUpload');
-      const fileWrapper = document.getElementById('fileWrapper');
-      const fileInput = document.getElementById('fileInput');
-      const previewContainer = document.getElementById('previewContainer');
-      const previewImage = document.getElementById('previewImage');
-      const previewVideo = document.getElementById('previewVideo');
-      const captionInput = document.getElementById('captionInput');
-      const confirmBtn = document.getElementById('confirmBtn');
-      const videoArea = document.getElementById('videoArea');
-      const videoPlaceholder = document.getElementById('videoPlaceholder');
-      const mainVideo = document.getElementById('mainVideo');
-      const postImage = document.getElementById('postImage');
-      const postInfo = document.getElementById('postInfo');
-      const videoCaption = document.getElementById('videoCaption');
-      const progressFill = document.getElementById('progressFill');
-      const progressBar = document.getElementById('progressBar');
-      const playPauseBtn = document.getElementById('playPauseBtn');
-      const musicHint = document.getElementById('musicHint');
-      const musicBtn = document.getElementById('musicBtn');
-      const openMusicSheetBtn = document.getElementById('openMusicSheetBtn');
-      const musicModal = document.getElementById('musicModal');
-      const closeMusicSheet = document.getElementById('closeMusicSheet');
-      const soundName = document.getElementById('soundName');
-      const musicCoverIcon = document.getElementById('musicCoverIcon');
-      const viewToggle = document.getElementById('viewToggle');
-      const bgMusic = document.getElementById('bgMusic');
-      const likeBtn = document.getElementById('likeBtn');
-      const likeCount = document.getElementById('likeCount');
-      
-      const musicUploadBox = document.getElementById('musicUploadBox');
-      const musicFileInput = document.getElementById('musicFileInput');
-      const musicSelectedBox = document.getElementById('musicSelectedBox');
-      const selectedMusicName = document.getElementById('selectedMusicName');
-      const previewMusicBtn = document.getElementById('previewMusicBtn');
-      const removeMusicBtn = document.getElementById('removeMusicBtn');
-      const noMusicOption = document.getElementById('noMusicOption');
+  <!-- === แบนเนอร์คืนสินค้า === -->
+  <div class="banner">
+    <span class="banner-text">🎁 คืนสินค้าฟรี ไม่ง้อค่าธรรมเนียม</span>
+    <span class="banner-arrow">→</span>
+  </div>
 
-      let pendingFile = null;
-      let selectedMusicFile = null;
-      let selectedMusicUrl = null;
-      let selectedMusicNameText = null;
-      let isMusicPlaying = false;
-      let isLiked = false, likeNum = 1;
-      let fitMode = false;
-      let postType = null;
-      let postDataUrl = null;
-      let postCaption = '';
-      let hasUserInteracted = false;
+  <!-- === คำสั่งซื้อที่ 1: TopChoice === -->
+  <div class="order-card">
+    <div class="shop-header">
+      <div class="shop-left">
+        <span class="shop-badge">TopChoice</span>
+        <span class="shop-name">ภิญโญช้อปปิ้ง</span>
+      </div>
+      <div class="order-status">สั่งซื้อแล้ว</div>
+    </div>
+    <div class="delivery-info">
+      <span class="delivery-icon">🚚</span>
+      <span>วันที่จัดส่งถึงโดยประมาณ: <span class="delivery-date">16 ก.ย. - 17 ก.ย.</span></span>
+    </div>
+    <div class="product-item">
+      <img class="product-img" src="https://picsum.photos/70/70?random=1" alt="สินค้า" />
+      <div class="product-info">
+        <div class="product-name">โคมไฟโซล่าเซลล์ เปิดปิดไฟอัตโนมัติ ไฟโซล่าเซลล์ตั้งโต๊ะ ไฟโซล่าเซลล์สวน 2in1 ขาว-อร์มิ</div>
+        <div class="product-bottom">
+          <span class="product-price">฿167.40</span>
+          <span class="product-qty">x4</span>
+        </div>
+      </div>
+    </div>
+    <div class="order-footer">
+      <div>
+        <span class="total-text">ยอดรวม: </span>
+        <span class="total-price">฿569.60</span>
+      </div>
+      <button class="order-btn cancel">ยกเลิกคำสั่งซื้อ</button>
+    </div>
+  </div>
 
-      // === บันทึกข้อมูลลงเครื่องถาวร ===
-      function saveToStorage() {
-        try {
-          const data = {
-            postType: postType,
-            postDataUrl: postDataUrl,
-            postCaption: postCaption,
-            musicName: selectedMusicNameText,
-            musicUrl: selectedMusicUrl,
-            hasMusic: !!(selectedMusicUrl && selectedMusicUrl !== '')
-          };
-          localStorage.setItem('thaipodee_post_data', JSON.stringify(data));
-          console.log('✅ บันทึกข้อมูลเรียบร้อย');
-        } catch (e) {
-          console.log('⚠️ ไม่สามารถบันทึกได้:', e);
-        }
-      }
+  <!-- === คำสั่งซื้อที่ 2: QQ8shop === -->
+  <div class="order-card">
+    <div class="shop-header">
+      <div class="shop-left">
+        <span class="shop-name">QQ8shop <span style="font-size:12px;background:#e5e5e7;padding:2px 6px;border-radius:4px;">฿51</span></span>
+      </div>
+      <div class="order-status">สั่งซื้อแล้ว</div>
+    </div>
+    <div class="delivery-info">
+      <span class="delivery-icon">🚚</span>
+      <span>วันที่จัดส่งถึงโดยประมาณ: <span class="delivery-date">16 ก.ย. - 17 ก.ย.</span></span>
+    </div>
+    <div class="product-item">
+      <img class="product-img" src="https://picsum.photos/70/70?random=2" alt="สินค้า" />
+      <div class="product-info">
+        <div class="product-name">1ชิ้นแบมพาวเวอร์ซัมได้ นำไฟหน้า ยูเอสบี ชาร์จกัน น้ำท่วมไฟสว่างขึ้นในแบต...</div>
+        <div class="product-bottom">
+          <span class="product-price">฿130.00</span>
+          <span class="product-qty">x2</span>
+        </div>
+      </div>
+    </div>
+    <div class="order-footer">
+      <div>
+        <span class="total-text">ยอดรวม: </span>
+        <span class="total-price">฿259.00</span>
+      </div>
+      <button class="order-btn cancel">ยกเลิกคำสั่งซื้อ</button>
+    </div>
+  </div>
 
-      // === โหลดข้อมูลที่บันทึกไว้เมื่อเปิดแอป ===
-      function loadFromStorage() {
-        try {
-          const saved = localStorage.getItem('thaipodee_post_data');
-          if (!saved) return false;
-          
-          const data = JSON.parse(saved);
-          if (!data.postDataUrl) return false;
-          
-          postType = data.postType;
-          postDataUrl = data.postDataUrl;
-          postCaption = data.postCaption || '';
-          selectedMusicNameText = data.musicName;
-          
-          // แสดงภาพ/วิดีโอ
-          videoPlaceholder.style.display = 'none';
-          postInfo.style.display = 'block';
-          videoCaption.textContent = postCaption || 'โพสต์ใหม่';
-          
-          if (postType === 'image') {
-            mainVideo.style.display = 'none';
-            postImage.src = postDataUrl;
-            postImage.style.display = 'block';
-            progressBar.classList.remove('show');
-            playPauseBtn.style.display = 'none';
-          } else {
-            postImage.style.display = 'none';
-            mainVideo.src = postDataUrl;
-            mainVideo.style.display = 'block';
-            mainVideo.muted = false;
-            mainVideo.loop = true;
-            progressBar.classList.add('show');
-            playPauseBtn.style.display = 'flex';
-          }
-          
-          // ถ้ามีเพลงที่บันทึกไว้
-          if (data.hasMusic && data.musicUrl) {
-            selectedMusicUrl = data.musicUrl;
-            soundName.textContent = '🎵 ' + (selectedMusicNameText || 'เพลงที่บันทึกไว้');
-            musicSelectedBox.classList.add('show');
-            musicUploadBox.style.display = 'none';
-            selectedMusicName.textContent = '🎵 ' + (selectedMusicNameText || 'เพลงที่บันทึกไว้');
-            noMusicOption.classList.remove('selected');
-            bgMusic.src = selectedMusicUrl;
-          }
-          
-          musicHint.textContent = '✅ โหลดข้อมูลที่บันทึกไว้แล้ว';
-          musicHint.classList.add('show', 'saved');
-          setTimeout(() => musicHint.classList.remove('show', 'saved'), 3000);
-          console.log('✅ โหลดข้อมูลที่บันทึกไว้สำเร็จ');
-          return true;
-        } catch (e) {
-          console.log('⚠️ โหลดข้อมูลไม่สำเร็จ:', e);
-          localStorage.removeItem('thaipodee_post_data');
-          return false;
-        }
-      }
+  <!-- === คำสั่งซื้อที่ 3: ยกเลิกสำเร็จแล้ว === -->
+  <div class="order-card cancelled">
+    <div class="shop-header">
+      <div class="shop-left">
+        <span class="shop-name">QQ8shop <span style="font-size:12px;background:#e5e5e7;padding:2px 6px;border-radius:4px;">฿51</span></span>
+      </div>
+      <div class="order-status" style="color:#86868b;">ยกเลิกสำเร็จแล้ว</div>
+    </div>
+    <div class="cancel-note">
+      19:17 น. ยกเลิกการจัดส่งแล้ว — การจัดส่งพัสดุของคุณถูกยกเลิก
+    </div>
+    <div class="product-item">
+      <img class="product-img" src="https://picsum.photos/70/70?random=3" alt="สินค้า" />
+      <div class="product-info">
+        <div class="product-name">1ชิ้นแบมพาวเวอร์ซัมได้ นำไฟหน้า ยูเอสบี ชาร์จกัน น้ำท่วมไฟสว่างขึ้นในแบต...</div>
+        <div class="product-bottom">
+          <span class="product-price">฿130.00</span>
+          <span class="product-qty">x1</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      // === ลบข้อมูลทั้งหมด ===
-      function clearStorage() {
-        localStorage.removeItem('thaipodee_post_data');
-        console.log('🗑️ ลบข้อมูลที่บันทึกไว้แล้ว');
-      }
-
-      // === เปิด-ปิดเมนูเพลง ===
-      function openMusicSheet() { musicModal.classList.add('show'); }
-      function closeMusicSheetFn() { musicModal.classList.remove('show'); }
-      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
-      if (openMusicSheetBtn) openMusicSheetBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
-      if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
-      if (musicModal) musicModal.addEventListener('click', e => { if (e.target === musicModal) closeMusicSheetFn(); });
-
-      // === เลือกไฟล์เสียง ===
-      if (musicUploadBox) musicUploadBox.addEventListener('click', () => {
-        musicFileInput.click();
-      });
-
-      if (musicFileInput) musicFileInput.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        if (!file.type.startsWith('audio/')) {
-          musicHint.textContent = '❌ กรุณาเลือกไฟล์เสียง';
-          musicHint.classList.add('show', 'error');
-          setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
-          return;
-        }
-
-        selectedMusicFile = file;
-        selectedMusicUrl = URL.createObjectURL(file);
-        
-        let displayName = file.name;
-        if (displayName.length > 28) {
-          displayName = displayName.substring(0, 25) + '...';
-        }
-        selectedMusicNameText = displayName;
-        selectedMusicName.textContent = '🎵 ' + displayName;
-        
-        musicUploadBox.style.display = 'none';
-        musicSelectedBox.classList.add('show');
-        noMusicOption.classList.remove('selected');
-        soundName.textContent = '🎵 ' + displayName;
-        
-        bgMusic.src = selectedMusicUrl;
-        
-        musicHint.textContent = '✅ เลือกเสียงแล้ว — บันทึกอัตโนมัติ';
-        musicHint.classList.add('show', 'success');
-        setTimeout(() => musicHint.classList.remove('show', 'success'), 2500);
-        
-        // บันทึกทันทีที่เลือกเพลง
-        saveToStorage();
-        closeMusicSheetFn();
-      });
-
-      // === ฟังตัวอย่างเสียง ===
-      if (previewMusicBtn) previewMusicBtn.addEventListener('click', async e => {
-        e.stopPropagation();
-        if (!selectedMusicUrl) return;
-        
-        hasUserInteracted = true;
-        
-        if (bgMusic.paused) {
-          bgMusic.src = selectedMusicUrl;
-          bgMusic.volume = 0.8;
-          try {
-            await bgMusic.play();
-            previewMusicBtn.textContent = '⏸ หยุด';
-            musicCoverIcon.classList.add('playing');
-            isMusicPlaying = true;
-          } catch (err) {
-            musicHint.textContent = '❌ ไม่สามารถเล่นไฟล์นี้ได้';
-            musicHint.classList.add('show', 'error');
-            setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
-          }
-        } else {
-          bgMusic.pause();
-          previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
-          musicCoverIcon.classList.remove('playing');
-          isMusicPlaying = false;
-        }
-      });
-
-      // === ลบไฟล์เสียง ===
-      if (removeMusicBtn) removeMusicBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        bgMusic.pause();
-        bgMusic.src = '';
-        selectedMusicFile = null;
-        selectedMusicUrl = null;
-        selectedMusicNameText = null;
-        isMusicPlaying = false;
-        
-        musicUploadBox.style.display = 'block';
-        musicSelectedBox.classList.remove('show');
-        musicCoverIcon.classList.remove('playing');
-        previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
-        soundName.textContent = 'แตะเพื่อเลือกไฟล์เสียง';
-        musicFileInput.value = '';
-        
-        // อัปเดตการบันทึก
-        saveToStorage();
-      });
-
-      // === ไม่ใช้เสียง ===
-      if (noMusicOption) noMusicOption.addEventListener('click', () => {
-        bgMusic.pause();
-        bgMusic.src = '';
-        selectedMusicFile = null;
-        selectedMusicUrl = null;
-        selectedMusicNameText = null;
-        isMusicPlaying = false;
-        
-        musicUploadBox.style.display = 'block';
-        musicSelectedBox.classList.remove('show');
-        musicCoverIcon.classList.remove('playing');
-        noMusicOption.classList.add('selected');
-        soundName.textContent = '🔇 ไม่ใช้เสียง';
-        musicFileInput.value = '';
-        
-        // อัปเดตการบันทึก
-        saveToStorage();
-        closeMusicSheetFn();
-      });
-
-      // === อัปโหลดรูป/วิดีโอ ===
-      if (createBtn) createBtn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); uploadPanel.classList.add('show'); });
-      if (closeUpload) closeUpload.addEventListener('click', () => { uploadPanel.classList.remove('show'); resetForm(); });
-      if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
-      if (fileInput) fileInput.addEventListener('change', e => {
-        const f = e.target.files[0]; if (!f) return;
-        const isImage = f.type.startsWith('image/');
-        pendingFile = { file: f, url: URL.createObjectURL(f), type: isImage ? 'image' : 'video' };
-        fileWrapper.style.display = 'none';
-        confirmBtn.style.display = 'block';
-        previewContainer.style.display = 'block';
-        if (pendingFile.type === 'image') {
-          previewImage.src = pendingFile.url;
-          previewImage.style.display = 'block';
-          previewVideo.style.display = 'none';
-        } else {
-          previewVideo.src = pendingFile.url;
-          previewVideo.style.display = 'block';
-          previewImage.style.display = 'none';
-        }
-      });
-
-      if (confirmBtn) confirmBtn.addEventListener('click', () => {
-        if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        postCaption = captionInput.value.trim();
-        showContent(pendingFile.url, pendingFile.type, postCaption);
-        uploadPanel.classList.remove('show');
-        resetForm();
-      });
-
-      function resetForm() {
-        pendingFile = null;
-        fileInput.value = ''; previewImage.src = ''; previewImage.style.display = 'none';
-        previewVideo.src = ''; previewVideo.style.display = 'none';
-        previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
-        fileWrapper.style.display = 'block'; captionInput.value = '';
-      }
-
-      // === แสดงภาพ/วิดีโอ + บันทึกอัตโนมัติ ===
-      function showContent(url, type, captionText) {
-        postType = type;
-        postDataUrl = url;
-        postCaption = captionText;
-        
-        videoPlaceholder.style.display = 'none';
-        postInfo.style.display = 'block';
-        videoCaption.textContent = captionText || 'โพสต์ใหม่';
-        
-        if (selectedMusicUrl) {
-          bgMusic.src = selectedMusicUrl;
-          bgMusic.volume = 0.8;
-        }
-
-        if (type === 'image') {
-          mainVideo.style.display = 'none';
-          postImage.src = url;
-          postImage.style.display = 'block';
-          progressBar.classList.remove('show');
-          playPauseBtn.style.display = 'none';
-        } else {
-          postImage.style.display = 'none';
-          mainVideo.src = url;
-          mainVideo.style.display = 'block';
-          mainVideo.muted = false;
-          mainVideo.loop = true;
-          progressBar.classList.add('show');
-          playPauseBtn.style.display = 'flex';
-          mainVideo.play().catch(() => {});
-        }
-        
-        // บันทึกทันทีที่โพสต์
-        saveToStorage();
-      }
-
-      // === แตะหน้าจอ — เล่น/หยุดเสียง ===
-      if (videoArea) videoArea.addEventListener('click', async function(e) {
-        if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
-            e.target.closest('.upload-panel') || e.target.closest('.music-modal') || 
-            e.target.closest('.view-toggle')) return;
-        
-        hasUserInteracted = true;
-        
-        // ภาพนิ่ง + เสียง
-        if (postType === 'image' && selectedMusicUrl) {
-          if (bgMusic.paused || bgMusic.currentTime <= 0) {
-            try {
-              await bgMusic.play();
-              isMusicPlaying = true;
-              musicCoverIcon.classList.add('playing');
-              previewMusicBtn.textContent = '⏸ หยุด';
-              musicHint.textContent = '🎵 กำลังเล่นเสียง';
-              musicHint.classList.add('show');
-              setTimeout(() => musicHint.classList.remove('show'), 2000);
-            } catch (err) {
-              musicHint.textContent = '❌ ไม่สามารถเล่นเสียงได้';
-              musicHint.classList.add('show', 'error');
-              setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
-            }
-          } else {
-            bgMusic.pause();
-            isMusicPlaying = false;
-            musicCoverIcon.classList.remove('playing');
-            previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
-            musicHint.textContent = '⏸ หยุดเสียงแล้ว';
-            musicHint.classList.add('show');
-            setTimeout(() => musicHint.classList.remove('show'), 2000);
-          }
-          return;
-        }
-
-        // วิดีโอ
-        if (postType === 'video') {
-          if (mainVideo.paused) {
-            mainVideo.muted = false;
-            await mainVideo.play();
-            if (selectedMusicUrl && bgMusic.src) bgMusic.play();
-            playPauseBtn.textContent = '⏸';
-          } else {
-            mainVideo.pause();
-            bgMusic.pause();
-            playPauseBtn.textContent = '▶';
-          }
-          playPauseBtn.classList.add('show');
-          setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
-        }
-      });
-
-      // === ปุ่มไลก์ ===
-      if (likeBtn) likeBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        isLiked = !isLiked;
-        likeNum += isLiked ? 1 : -1;
-        likeCount.textContent = likeNum;
-        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
-      });
-
-      // === ปุ่มสลับเต็มจอ ===
-      if (viewToggle) viewToggle.addEventListener('click', e => {
-        e.stopPropagation();
-        fitMode = !fitMode;
-        if (postType === 'video' && mainVideo.src) {
-          mainVideo.style.objectFit = fitMode ? 'contain' : 'cover';
-        }
-        viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
-      });
-
-      // === โหลดข้อมูลที่บันทึกไว้เมื่อเปิดแอป ===
-      setTimeout(() => {
-        loadFromStorage();
-      }, 300);
-    });
-  </script>
 </body>
 </html>
