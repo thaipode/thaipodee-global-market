@@ -42,8 +42,9 @@
 
     .music-hint {
       position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,.6); color: #25f4ee; padding: 8px 16px;
-      border-radius: 20px; font-size: 13px; z-index: 15; display: none;
+      background: rgba(0,0,0,.7); color: #25f4ee; padding: 10px 20px;
+      border-radius: 25px; font-size: 14px; z-index: 15; display: none;
+      border: 1px solid #25f4ee;
     }
     .music-hint.show { display: block; }
 
@@ -161,6 +162,7 @@
     .sound-name {
       font-size: 13px; display: flex; align-items: center; gap: 6px;
       opacity: 0.85; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      cursor: pointer;
     }
 
     .bottom-bar {
@@ -193,6 +195,48 @@
     }
     .create-box:active { transform: scale(0.95); }
 
+    /* === เมนูรายการเพลง === */
+    .music-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,.85);
+      z-index: 200; display: none; align-items: flex-end; justify-content: center;
+      padding: 0;
+    }
+    .music-modal.show { display: flex; }
+    .music-sheet {
+      background: #1c1c1e; width: 100%; max-height: 70vh;
+      border-radius: 20px 20px 0 0; padding: 20px 20px 40px;
+      overflow-y: auto; color: #fff;
+    }
+    .music-sheet-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding-bottom: 15px;
+      border-bottom: 1px solid #333;
+    }
+    .music-sheet-title { font-size: 18px; font-weight: 700; }
+    .music-sheet-close { font-size: 24px; cursor: pointer; color: #888; }
+    .music-search {
+      width: 100%; padding: 12px 16px; border-radius: 10px;
+      border: none; background: #333; color: #fff;
+      font-size: 15px; margin-bottom: 16px; outline: none;
+    }
+    .music-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 12px; border-radius: 10px;
+      margin-bottom: 8px; cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid transparent;
+    }
+    .music-item:hover, .music-item.selected {
+      background: linear-gradient(90deg, rgba(37,244,238,.2), rgba(254,40,234,.2));
+      border-color: #fe28ea;
+    }
+    .music-item-icon { font-size: 24px; }
+    .music-item-info { flex: 1; }
+    .music-item-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+    .music-item-desc { font-size: 12px; color: #888; }
+    .music-item-check { color: #fe28ea; font-size: 20px; opacity: 0; }
+    .music-item.selected .music-item-check { opacity: 1; }
+
     .upload-panel {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #fff; border-radius: 20px 20px 0 0;
@@ -221,28 +265,6 @@
     .preview-container img, .preview-container video { 
       width: 100%; height: 100%; object-fit: contain;
       border-radius: 12px; display: block; 
-    }
-    .music-selector {
-      border: 1px solid #ddd; border-radius: 12px;
-      padding: 16px; margin-bottom: 16px;
-    }
-    .music-title {
-      font-weight: 600; margin-bottom: 10px;
-      display: flex; justify-content: space-between;
-      align-items: center;
-    }
-    .music-option {
-      padding: 10px 12px; border-radius: 8px;
-      background: #f5f5f5; margin-bottom: 8px;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .music-option:hover, .music-option.selected {
-      background: linear-gradient(90deg, #25f4ee, #fe28ea);
-      color: #fff;
-    }
-    .custom-music {
-      margin-top: 12px; padding-top: 12px;
-      border-top: 1px dashed #ddd;
     }
     .caption-input {
       width: 100%; min-height: 44px; padding: 12px 16px;
@@ -335,7 +357,7 @@
         <span class="r-icon">↗️</span>
         <span class="r-num">0</span>
       </div>
-      <div class="r-btn" id="musicBtn">
+      <div class="r-btn" id="musicBtn" title="เลือกเพลง">
         <div class="music-cover">🎵</div>
       </div>
     </div>
@@ -343,7 +365,68 @@
     <div class="info-left" id="postInfo">
       <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
-      <div class="sound-name">🎵 <span id="soundName">เสียงต้นฉบับ — Thaipodee</span></div>
+      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">กดเลือกเพลงประกอบ</span></div>
+    </div>
+    
+    <!-- === เมนูรายการเพลง === -->
+    <div class="music-modal" id="musicModal">
+      <div class="music-sheet">
+        <div class="music-sheet-header">
+          <span class="music-sheet-title">🎵 เลือกเพลงประกอบ</span>
+          <span class="music-sheet-close" id="closeMusicSheet">✕</span>
+        </div>
+        <input type="text" class="music-search" id="musicSearch" placeholder="ค้นหาเพลง..." />
+        <div id="musicList">
+          <div class="music-item selected" data-music="none">
+            <span class="music-item-icon">🔇</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ไม่ใช้เพลง</div>
+              <div class="music-item-desc">ปิดเสียง</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="upbeat">
+            <span class="music-item-icon">🎵</span>
+            <div class="music-item-info">
+              <div class="music-item-name">จังหวะสนุก</div>
+              <div class="music-item-desc">เหมาะสำหรับโฆษณาสินค้า</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="chill">
+            <span class="music-item-icon">🎶</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ผ่อนคลาย</div>
+              <div class="music-item-desc">บรรยากาศสบาย ๆ</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="energetic">
+            <span class="music-item-icon">🎸</span>
+            <div class="music-item-info">
+              <div class="music-item-name">เร้าใจ</div>
+              <div class="music-item-desc">พลังงานเต็มที่</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="happy">
+            <span class="music-item-icon">🎹</span>
+            <div class="music-item-info">
+              <div class="music-item-name">สดใส มีความสุข</div>
+              <div class="music-item-desc">เหมาะสินค้าแฟชั่น</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="acoustic">
+            <span class="music-item-icon">🎻</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ดนตรีสด เบา ๆ</div>
+              <div class="music-item-desc">เปียโน กีตาร์</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div class="profile-modal" id="profileModal">
@@ -379,22 +462,6 @@
         <img id="previewImage" style="display:none;" alt="ตัวอย่างรูป" />
         <video id="previewVideo" controls playsinline preload="auto" webkit-playsinline style="display:none;"></video>
       </div>
-      
-      <div class="music-selector">
-        <div class="music-title">
-          🎵 เลือกเพลงประกอบ
-          <span style="font-size:12px; color:#888;">ฟรี ไม่มีลิขสิทธิ์</span>
-        </div>
-        <div class="music-option selected" data-music="none">🔇 ไม่ใช้เพลง</div>
-        <div class="music-option" data-music="upbeat">🎵 เพลงจังหวะสนุก (เหมาะสินค้า)</div>
-        <div class="music-option" data-music="chill">🎵 เพลงผ่อนคลาย</div>
-        <div class="music-option" data-music="energetic">🎵 เพลงเร้าใจ</div>
-        <div class="custom-music">
-          <div style="font-size:13px; color:#666; margin-bottom:8px;">หรือใส่ลิงก์เพลงเอง (MP3):</div>
-          <input type="text" id="customMusicUrl" placeholder="วางลิงก์ไฟล์เพลง MP3 ที่นี่" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; outline:none;" />
-        </div>
-      </div>
-      
       <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยาย..."></textarea>
       <button class="upload-btn" id="confirmBtn">โพสต์</button>
     </div>
@@ -404,7 +471,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — แก้ไขปัญหาเสียงเพลงแล้ว!');
+      console.log('✅ โหลดเสร็จ — มีเมนูเพลงให้เลือกแล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -426,60 +493,99 @@
       const progressBar = document.getElementById('progressBar');
       const playPauseBtn = document.getElementById('playPauseBtn');
       const musicHint = document.getElementById('musicHint');
-      const profileBtn = document.getElementById('profileBtn');
-      const profileModal = document.getElementById('profileModal');
-      const closeProfile = document.getElementById('closeProfile');
-      const profileAvatarBtn = document.getElementById('profileAvatarBtn');
-      const editAvatar = document.getElementById('editAvatar');
-      const changeAvatarBtn = document.getElementById('changeAvatarBtn');
-      const avatarInput = document.getElementById('avatarInput');
-      const editNameInput = document.getElementById('editNameInput');
-      const saveProfileBtn = document.getElementById('saveProfileBtn');
-      const displayUsername = document.getElementById('displayUsername');
-      const likeBtn = document.getElementById('likeBtn');
-      const likeCount = document.getElementById('likeCount');
-      const shareBtn = document.getElementById('shareBtn');
-      const commentBtn = document.getElementById('commentBtn');
       const musicBtn = document.getElementById('musicBtn');
+      const openMusicSheetBtn = document.getElementById('openMusicSheetBtn');
+      const musicModal = document.getElementById('musicModal');
+      const closeMusicSheet = document.getElementById('closeMusicSheet');
+      const musicItems = document.querySelectorAll('.music-item');
+      const soundName = document.getElementById('soundName');
       const viewToggle = document.getElementById('viewToggle');
       const bgMusic = document.getElementById('bgMusic');
-      const soundName = document.getElementById('soundName');
-      const musicOptions = document.querySelectorAll('.music-option');
-      const customMusicUrl = document.getElementById('customMusicUrl');
 
       let pendingFile = null;
       let selectedMusic = 'none';
+      let selectedMusicUrl = null;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let currentAvatar = 'https://picsum.photos/100/100';
       let currentName = 'ชื่อผู้ใช้';
       let postType = null;
-      let musicUrlToPlay = null;
       let hasUserInteracted = false;
 
-      // === เพลงฟรี — ใช้ลิงก์ที่เชื่อถือได้ ===
+      // === เพลงฟรี ไม่มีลิขสิทธิ์ — จาก Pixabay ===
       const musicLibrary = {
         upbeat: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9614d06d3b.mp3?filename=upbeat-112.mp3',
         chill: 'https://cdn.pixabay.com/download/audio/2022/08/23/audio_270164b67e.mp3?filename=chill-folk-112.mp3',
-        energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3'
+        energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3',
+        happy: 'https://cdn.pixabay.com/download/audio/2024/02/13/audio_98d03690b3.mp3?filename=happy-ukulele-123.mp3',
+        acoustic: 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_80b364747c.mp3?filename=acoustic-breeze-112.mp3'
+      };
+      const musicNames = {
+        none: 'ไม่ใช้เพลง',
+        upbeat: 'จังหวะสนุก',
+        chill: 'ผ่อนคลาย',
+        energetic: 'เร้าใจ',
+        happy: 'สดใส มีความสุข',
+        acoustic: 'ดนตรีสด เบา ๆ'
       };
 
-      // === เลือกเพลง ===
-      musicOptions.forEach(opt => {
-        opt.addEventListener('click', () => {
-          musicOptions.forEach(o => o.classList.remove('selected'));
-          opt.classList.add('selected');
-          selectedMusic = opt.dataset.music;
+      // === เปิดเมนูเพลง ===
+      function openMusicSheet() {
+        musicModal.classList.add('show');
+      }
+      function closeMusicSheetFn() {
+        musicModal.classList.remove('show');
+      }
+      if (musicBtn) musicBtn.addEventListener('click', e => {
+        e.stopPropagation(); openMusicSheet();
+      });
+      if (openMusicSheetBtn) openMusicSheetBtn.addEventListener('click', e => {
+        e.stopPropagation(); openMusicSheet();
+      });
+      if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
+      if (musicModal) musicModal.addEventListener('click', e => {
+        if (e.target === musicModal) closeMusicSheetFn();
+      });
+
+      // === เลือกเพลงจากรายการ ===
+      musicItems.forEach(item => {
+        item.addEventListener('click', () => {
+          musicItems.forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          selectedMusic = item.dataset.music;
+          selectedMusicUrl = musicLibrary[selectedMusic] || null;
+          
+          // อัปเดตชื่อเพลงที่แสดง
+          soundName.textContent = selectedMusic === 'none' 
+            ? 'กดเลือกเพลงประกอบ' 
+            : musicNames[selectedMusic];
+          
+          closeMusicSheetFn();
+          
+          // ถ้ามีโพสต์อยู่แล้ว ให้เปลี่ยนเพลงทันที
+          if (postType) {
+            if (selectedMusicUrl) {
+              bgMusic.src = selectedMusicUrl;
+              bgMusic.volume = 0.6;
+              soundName.textContent = '🎵 ' + musicNames[selectedMusic];
+              musicHint.textContent = '🎵 แตะหน้าจอเพื่อเล่นเพลง';
+              musicHint.classList.add('show');
+              setTimeout(() => musicHint.classList.remove('show'), 3000);
+            } else {
+              bgMusic.pause();
+              bgMusic.src = '';
+              soundName.textContent = 'เสียงต้นฉบับ — Thaipodee';
+            }
+          }
         });
       });
 
-      // === บันทึกว่าผู้ใช้แตะหน้าจอแล้ว (สำคัญมากสำหรับเสียง!) ===
+      // === บันทึกว่าผู้ใช้แตะหน้าจอแล้ว ===
       document.addEventListener('click', function markInteraction() {
         hasUserInteracted = true;
-        document.removeEventListener('click', markInteraction);
       }, { once: true });
 
-      // === เลือกไฟล์ รูป/วิดีโอ ===
+      // === อัปโหลดไฟล์ ===
       if (createBtn) createBtn.addEventListener('click', e => {
         e.preventDefault(); e.stopPropagation();
         uploadPanel.classList.add('show');
@@ -513,31 +619,21 @@
       // === กดโพสต์ ===
       if (confirmBtn) confirmBtn.addEventListener('click', () => {
         if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        musicUrlToPlay = null;
-        if (selectedMusic === 'custom' && customMusicUrl.value.trim()) {
-          musicUrlToPlay = customMusicUrl.value.trim();
-        } else if (selectedMusic !== 'none' && musicLibrary[selectedMusic]) {
-          musicUrlToPlay = musicLibrary[selectedMusic];
-        }
-        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), musicUrlToPlay);
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), selectedMusicUrl);
         uploadPanel.classList.remove('show');
         resetForm();
       });
 
       function resetForm() {
-        pendingFile = null; postType = null; selectedMusic = 'none'; musicUrlToPlay = null;
-        fileInput.value = ''; customMusicUrl.value = '';
-        musicOptions.forEach(o => o.classList.remove('selected'));
-        document.querySelector('[data-music="none"]').classList.add('selected');
+        pendingFile = null; postType = null;
+        fileInput.value = '';
         previewImage.src = ''; previewImage.style.display = 'none';
         previewVideo.src = ''; previewVideo.style.display = 'none';
         previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
         fileWrapper.style.display = 'block'; captionInput.value = '';
-        bgMusic.pause(); bgMusic.src = '';
-        musicHint.classList.remove('show');
       }
 
-      // === แสดงเนื้อหา + เตรียมเพลง ===
+      // === แสดงเนื้อหา + เพลง ===
       function showContent(url, type, captionText, musicUrl) {
         postType = type;
         videoPlaceholder.style.display = 'none';
@@ -547,14 +643,14 @@
         if (musicUrl) {
           bgMusic.src = musicUrl;
           bgMusic.volume = 0.6;
-          soundName.textContent = '🎵 เพลงประกอบ — ฟรีไม่มีลิขสิทธิ์';
-          // แจ้งให้แตะหน้าจอเพื่อเล่นเพลง
+          soundName.textContent = '🎵 ' + musicNames[selectedMusic];
+          musicHint.textContent = '🎵 แตะหน้าจอเพื่อเล่นเพลง';
           musicHint.classList.add('show');
           setTimeout(() => musicHint.classList.remove('show'), 3000);
         } else {
           bgMusic.pause();
           bgMusic.src = '';
-          soundName.textContent = 'เสียงต้นฉบับ — Thaipodee';
+          soundName.textContent = 'กดเลือกเพลงประกอบ';
           musicHint.classList.remove('show');
         }
 
@@ -578,8 +674,7 @@
           mainVideo.ontimeupdate = () => {
             if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
           };
-          // พยายามเล่นวิดีโอ (อาจต้องแตะก่อน)
-          mainVideo.play().catch(e => console.log('ต้องแตะหน้าจอก่อนถึงจะเล่น'));
+          mainVideo.play().catch(() => {});
         }
       }
 
@@ -591,25 +686,23 @@
         });
       }
 
-      // === แตะหน้าจอ — เล่น/หยุด ทั้งรูปและวิดีโอ + เพลง ===
+      // === แตะหน้าจอ — เล่น/หยุดเพลง ===
       if (videoArea) videoArea.addEventListener('click', function(e) {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
             e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
-            e.target.closest('.profile-modal')) return;
+            e.target.closest('.music-modal') || e.target.closest('.profile-modal')) return;
         
-        hasUserInteracted = true; // ยืนยันว่ามีการโต้ตอบ → เปิดเสียงได้แล้ว!
+        hasUserInteracted = true;
         
         if (postType === 'image') {
           if (!bgMusic.src) return;
           if (bgMusic.paused) {
             bgMusic.play().then(() => {
-              console.log('🎵 เพลงเล่นแล้ว!');
               musicHint.textContent = '🎵 กำลังเล่นเพลง... แตะเพื่อหยุด';
               musicHint.classList.add('show');
               setTimeout(() => musicHint.classList.remove('show'), 2000);
             }).catch(err => {
-              console.log('❌ เล่นเพลงไม่ได้:', err);
-              alert('ไม่สามารถเล่นเพลงได้ ลองเลือกเพลงอื่นหรือแตะหน้าจออีกครั้ง');
+              alert('ไม่สามารถเล่นเพลงได้ ลองแตะอีกครั้ง');
             });
           } else {
             bgMusic.pause();
@@ -645,7 +738,6 @@
       });
       if (shareBtn) shareBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเมนูแชร์'); });
       if (commentBtn) commentBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดคอมเมนต์'); });
-      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเลือกเพลง'); });
       if (viewToggle) viewToggle.addEventListener('click', e => {
         e.stopPropagation();
         fitMode = !fitMode;
@@ -656,30 +748,22 @@
       });
 
       // === โปรไฟล์ ===
+      const profileBtn = document.getElementById('profileBtn');
+      const profileModal = document.getElementById('profileModal');
+      const closeProfile = document.getElementById('closeProfile');
+      const saveProfileBtn = document.getElementById('saveProfileBtn');
+      const displayUsername = document.getElementById('displayUsername');
       if (profileBtn) profileBtn.addEventListener('click', e => {
         e.stopPropagation();
-        editNameInput.value = currentName;
+        document.getElementById('editNameInput').value = currentName;
         profileModal.classList.add('show');
       });
       if (closeProfile) closeProfile.addEventListener('click', () => profileModal.classList.remove('show'));
       if (profileModal) profileModal.addEventListener('click', e => {
         if (e.target === profileModal) profileModal.classList.remove('show');
       });
-      if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', e => {
-        e.stopPropagation(); avatarInput.click();
-      });
-      if (avatarInput) avatarInput.addEventListener('change', e => {
-        const f = e.target.files[0]; if (!f) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-          currentAvatar = ev.target.result;
-          profileAvatarBtn.style.background = `url(${currentAvatar}) center/cover`;
-          editAvatar.style.background = `url(${currentAvatar}) center/cover`;
-        };
-        reader.readAsDataURL(f);
-      });
       if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
-        const newName = editNameInput.value.trim();
+        const newName = document.getElementById('editNameInput').value.trim();
         if (newName) {
           currentName = newName;
           displayUsername.textContent = currentName;
