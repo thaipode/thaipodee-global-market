@@ -1,7 +1,3 @@
-<!-- ======================================================
-✅✅✅ ทุกส่วนที่มีป้าย ✅ ล็อกแล้ว ห้ามแก้เด็ดขาด ✅✅✅
-🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบน — แก้เท่านั้น
-====================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -9,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Thaipodee</title>
   <style>
-/* ======================================================
-✅ [ล็อก] RESET & BASE — ห้ามแก้
-====================================================== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { 
       width: 100%; height: 100%; height: 100dvh;
@@ -20,16 +13,13 @@
     }
     .app { width: 100%; height: 100%; height: 100dvh; position: relative; background: #000; overflow: hidden; }
 
-/* ======================================================
-✅ [ล็อก] วิดีโอ & ปุ่มอื่น ๆ — ห้ามแก้
-====================================================== */
     .video-area {
       position: absolute; inset: 0; width: 100%; height: 100%;
       background: #000; overflow: hidden; z-index: 1;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
-    .video-area video {
+    .video-area video, .video-area .post-image {
       position: absolute; inset: 0; width: 100%; height: 100%;
       background: #000; display: block; object-fit: contain;
     }
@@ -53,7 +43,9 @@
     .progress-line {
       position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
       left: 0; right: 0; height: 3px; background: rgba(255,255,255,.2); z-index: 12;
+      display: none;
     }
+    .progress-line.show { display: block; }
     .progress-done {
       width: 0%; height: 100%;
       background: linear-gradient(90deg, #25f4ee, #fe28ea);
@@ -93,9 +85,6 @@
       pointer-events: auto;
     }
 
-/* ======================================================
-🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบน — แก้ตรงนี้
-====================================================== */
     .right-menu {
       position: absolute; right: 14px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
@@ -114,7 +103,6 @@
     .r-icon { font-size: 28px; line-height: 1; }
     .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
 
-    /* 🔵 ปุ่มโปรไฟล์ด้านขวาบนสุด — กดได้ + เปลี่ยนรูปได้ */
     .prof-box { 
       position: relative; cursor: pointer; 
       z-index: 35 !important; pointer-events: auto !important;
@@ -141,7 +129,6 @@
       pointer-events: none;
     }
 
-    /* 🔵 หน้าแก้ไขโปรไฟล์ — เปิดเมื่อกดรูป */
     .profile-modal {
       position: absolute; inset: 0; background: rgba(0,0,0,.85);
       z-index: 100; display: none; align-items: center; justify-content: center;
@@ -265,7 +252,7 @@
       width: 100%; max-height: 40vh; border-radius: 12px;
       margin-bottom: 16px; display: none; background: #000; overflow: hidden;
     }
-    .preview-container video { 
+    .preview-container img, .preview-container video { 
       width: 100%; height: 100%; object-fit: contain;
       border-radius: 12px; display: block; 
     }
@@ -285,7 +272,8 @@
 <body>
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
-      <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
+      <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
+      <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
       <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline></video>
       <div class="play-pause-indicator" id="playPauseBtn">▶</div>
     </div>
@@ -299,7 +287,6 @@
     </div>
     <div class="search-btn">🔍</div>
     
-    <!-- 🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบนสุด → กดเปิดหน้าแก้ไข -->
     <div class="right-menu">
       <div class="r-btn prof-box" id="profileBtn">
         <div class="prof-img" id="profileAvatarBtn"></div>
@@ -328,7 +315,6 @@
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
     
-    <!-- 🔵 หน้าแก้ไขโปรไฟล์ — เปิดเมื่อกดรูป -->
     <div class="profile-modal" id="profileModal">
       <div class="profile-card">
         <div class="profile-close" id="closeProfile">✕</div>
@@ -354,49 +340,42 @@
     <div class="upload-panel" id="uploadPanel">
       <div class="panel-close" id="closeUpload">✕</div>
       <div class="file-input-wrapper" id="fileWrapper">
-        <div style="font-size: 36px; margin-bottom: 8px;">📹</div>
-        <p>กดเพื่อเลือกวิดีโอ<br>รองรับ MP4, MOV</p>
-        <input type="file" id="videoInput" accept="video/*" />
+        <div style="font-size: 36px; margin-bottom: 8px;">📷</div>
+        <p>กดเพื่อเลือกไฟล์<br>รองรับ รูปภาพ (JPG, PNG) | วิดีโอ (MP4, MOV)</p>
+        <input type="file" id="fileInput" accept="image/*,video/*" />
       </div>
       <div class="preview-container" id="previewContainer">
-        <video id="videoPreview" controls playsinline preload="auto" webkit-playsinline></video>
+        <img id="previewImage" style="display:none;" alt="ตัวอย่างรูป" />
+        <video id="previewVideo" controls playsinline preload="auto" webkit-playsinline style="display:none;"></video>
       </div>
-      <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยายวิดีโอ..."></textarea>
-      <button class="upload-btn" id="confirmBtn">โพสต์วิดีโอ</button>
+      <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยาย..."></textarea>
+      <button class="upload-btn" id="confirmBtn">โพสต์</button>
     </div>
   </div>
 
   <script>
-/* ======================================================
-✅ [ล็อก] JAVASCRIPT — ส่วนอื่น ๆ ห้ามแก้
-====================================================== */
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ ตัวที่ 1 — ปุ่มโปรไฟล์ เปลี่ยนรูป+ชื่อได้แล้ว!');
+      console.log('✅ โหลดเสร็จ — อัปโหลดรูป+วิดีโอได้แล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
       const closeUpload = document.getElementById('closeUpload');
       const fileWrapper = document.getElementById('fileWrapper');
-      const videoInput = document.getElementById('videoInput');
+      const fileInput = document.getElementById('fileInput');
       const previewContainer = document.getElementById('previewContainer');
-      const videoPreview = document.getElementById('videoPreview');
+      const previewImage = document.getElementById('previewImage');
+      const previewVideo = document.getElementById('previewVideo');
       const captionInput = document.getElementById('captionInput');
       const confirmBtn = document.getElementById('confirmBtn');
       const videoArea = document.getElementById('videoArea');
       const videoPlaceholder = document.getElementById('videoPlaceholder');
       const mainVideo = document.getElementById('mainVideo');
+      const postImage = document.getElementById('postImage');
       const postInfo = document.getElementById('postInfo');
       const videoCaption = document.getElementById('videoCaption');
       const progressFill = document.getElementById('progressFill');
+      const progressBar = document.getElementById('progressBar');
       const playPauseBtn = document.getElementById('playPauseBtn');
-      const likeBtn = document.getElementById('likeBtn');
-      const likeCount = document.getElementById('likeCount');
-      const shareBtn = document.getElementById('shareBtn');
-      const commentBtn = document.getElementById('commentBtn');
-      const musicBtn = document.getElementById('musicBtn');
-      const viewToggle = document.getElementById('viewToggle');
-
-      // 🔵 ตัวที่ 1 — ตัวแปรโปรไฟล์
       const profileBtn = document.getElementById('profileBtn');
       const profileModal = document.getElementById('profileModal');
       const closeProfile = document.getElementById('closeProfile');
@@ -407,46 +386,43 @@
       const editNameInput = document.getElementById('editNameInput');
       const saveProfileBtn = document.getElementById('saveProfileBtn');
       const displayUsername = document.getElementById('displayUsername');
+      const likeBtn = document.getElementById('likeBtn');
+      const likeCount = document.getElementById('likeCount');
+      const shareBtn = document.getElementById('shareBtn');
+      const commentBtn = document.getElementById('commentBtn');
+      const musicBtn = document.getElementById('musicBtn');
+      const viewToggle = document.getElementById('viewToggle');
 
-      let pendingVideo = null;
+      let pendingFile = null;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let currentAvatar = 'https://picsum.photos/100/100';
       let currentName = 'ชื่อผู้ใช้';
+      let postType = null;
 
-      // 🔵 ตัวที่ 1 — กดรูปโปรไฟล์ → เปิดหน้าแก้ไข
+      // === โปรไฟล์ ===
       if (profileBtn) profileBtn.addEventListener('click', e => {
         e.stopPropagation();
         editNameInput.value = currentName;
         profileModal.classList.add('show');
       });
-
-      // 🔵 ปิดหน้าโปรไฟล์
-      if (closeProfile) closeProfile.addEventListener('click', () => {
-        profileModal.classList.remove('show');
-      });
+      if (closeProfile) closeProfile.addEventListener('click', () => profileModal.classList.remove('show'));
       if (profileModal) profileModal.addEventListener('click', e => {
         if (e.target === profileModal) profileModal.classList.remove('show');
       });
-
-      // 🔵 เปลี่ยนรูปโปรไฟล์ — กดปุ่มดินสอ
       if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        avatarInput.click();
+        e.stopPropagation(); avatarInput.click();
       });
       if (avatarInput) avatarInput.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(event) {
-          currentAvatar = event.target.result;
+        reader.onload = ev => {
+          currentAvatar = ev.target.result;
           profileAvatarBtn.style.background = `url(${currentAvatar}) center/cover`;
           editAvatar.style.background = `url(${currentAvatar}) center/cover`;
         };
         reader.readAsDataURL(file);
       });
-
-      // 🔵 บันทึกชื่อ + รูป
       if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
         const newName = editNameInput.value.trim();
         if (newName) {
@@ -457,7 +433,7 @@
         alert('บันทึกเรียบร้อย!');
       });
 
-      // ✅ ปุ่ม + อัปโหลด
+      // === อัปโหลดรูป+วิดีโอ ===
       if (createBtn) createBtn.addEventListener('click', e => { 
         e.preventDefault(); e.stopPropagation(); 
         uploadPanel.classList.add('show'); 
@@ -465,63 +441,98 @@
       if (closeUpload) closeUpload.addEventListener('click', () => { 
         uploadPanel.classList.remove('show'); resetForm(); 
       });
-      if (fileWrapper) fileWrapper.addEventListener('click', () => videoInput.click());
-      if (videoInput) videoInput.addEventListener('change', e => {
+      if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
+      if (fileInput) fileInput.addEventListener('change', e => {
         const f = e.target.files[0]; if (!f) return;
-        pendingVideo = { file: f, url: URL.createObjectURL(f) };
-        videoPreview.src = pendingVideo.url;
-        previewContainer.style.display = 'block';
-        confirmBtn.style.display = 'block';
+        const isImage = f.type.startsWith('image/');
+        pendingFile = { 
+          file: f, 
+          url: URL.createObjectURL(f), 
+          type: isImage ? 'image' : 'video' 
+        };
+        
         fileWrapper.style.display = 'none';
+        confirmBtn.style.display = 'block';
+        previewContainer.style.display = 'block';
+        
+        if (pendingFile.type === 'image') {
+          previewImage.src = pendingFile.url;
+          previewImage.style.display = 'block';
+          previewVideo.style.display = 'none';
+        } else {
+          previewVideo.src = pendingFile.url;
+          previewVideo.style.display = 'block';
+          previewImage.style.display = 'none';
+        }
       });
       if (confirmBtn) confirmBtn.addEventListener('click', () => {
-        if (!pendingVideo) return alert('กรุณาเลือกวิดีโอก่อน');
-        showVideo(pendingVideo.url, captionInput.value.trim());
+        if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim());
         uploadPanel.classList.remove('show');
         resetForm();
       });
       function resetForm() {
-        pendingVideo = null; videoInput.value = ''; videoPreview.src = '';
-        previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
-        fileWrapper.style.display = 'block'; captionInput.value = '';
+        pendingFile = null; postType = null;
+        fileInput.value = ''; 
+        previewImage.src = ''; previewImage.style.display = 'none';
+        previewVideo.src = ''; previewVideo.style.display = 'none';
+        previewContainer.style.display = 'none'; 
+        confirmBtn.style.display = 'none';
+        fileWrapper.style.display = 'block'; 
+        captionInput.value = '';
       }
 
-      // ✅ ตรวจจับอัตราส่วน
+      // === แสดงเนื้อหา — แยกรูป/วิดีโอ ===
+      function showContent(url, type, captionText) {
+        postType = type;
+        videoPlaceholder.style.display = 'none';
+        postInfo.style.display = 'block';
+        videoCaption.textContent = captionText || 'โพสต์ใหม่';
+        
+        if (type === 'image') {
+          mainVideo.style.display = 'none';
+          mainVideo.pause && mainVideo.pause();
+          postImage.src = url;
+          postImage.style.display = 'block';
+          progressBar.classList.remove('show');
+          playPauseBtn.style.display = 'none';
+        } else {
+          postImage.style.display = 'none';
+          postImage.src = '';
+          mainVideo.src = url;
+          mainVideo.style.display = 'block';
+          mainVideo.muted = false;
+          progressBar.classList.add('show');
+          playPauseBtn.style.display = 'flex';
+          
+          checkAspectRatio(mainVideo);
+          mainVideo.ontimeupdate = () => {
+            if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
+          };
+          mainVideo.play().catch(() => {
+            mainVideo.muted = false;
+            mainVideo.play();
+          });
+        }
+      }
+
+      // === ตรวจอัตราส่วนวิดีโอ ===
       function checkAspectRatio(videoEl) {
         videoEl.addEventListener('loadedmetadata', function() {
           const ratio = videoEl.videoWidth / videoEl.videoHeight;
           videoEl.classList.remove('ar-vertical', 'ar-horizontal');
-          if (ratio < 1) {
-            videoEl.classList.add('ar-vertical');
-          } else {
-            videoEl.classList.add('ar-horizontal');
-          }
+          videoEl.classList.add(ratio < 1 ? 'ar-vertical' : 'ar-horizontal');
         });
       }
 
-      function showVideo(url, captionText) {
-        mainVideo.src = url;
-        mainVideo.style.display = 'block';
-        mainVideo.muted = false;
-        videoPlaceholder.style.display = 'none';
-        postInfo.style.display = 'block';
-        videoCaption.textContent = captionText || 'วิดีโอใหม่';
-        checkAspectRatio(mainVideo);
-        mainVideo.ontimeupdate = () => {
-          if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
-        };
-        mainVideo.play().catch(() => {
-          mainVideo.muted = false;
-          mainVideo.play();
-        });
-      }
-
-      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียง
+      // === แตะหน้าจอ — เล่น/หยุด เฉพาะวิดีโอ ===
       if (videoArea) {
         videoArea.addEventListener('click', function(e) {
           if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
               e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
               e.target.closest('.profile-modal')) return;
+          
+          if (postType === 'image') return; // รูปไม่ต้องกดเล่น
           if (!mainVideo.src) return;
           
           if (mainVideo.paused) {
@@ -537,63 +548,39 @@
         });
       }
 
-      // ✅ ปุ่มสลับจอ
+      // === ปุ่มสลับจอ ===
       if (viewToggle) {
         viewToggle.addEventListener('click', e => {
           e.stopPropagation();
           fitMode = !fitMode;
-          if (mainVideo.src) mainVideo.style.objectFit = fitMode ? 'contain' : '';
+          if (postType === 'video' && mainVideo.src) {
+            mainVideo.style.objectFit = fitMode ? 'contain' : '';
+          }
           viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
         });
       }
 
-      // ✅ ปุ่มหัวใจ
-      if (likeBtn) {
-        likeBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          isLiked = !isLiked;
-          likeNum += isLiked ? 1 : -1;
-          likeCount.textContent = likeNum;
-          likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
-        });
-      }
+      // === ปุ่มกดทั้งหมด ===
+      if (likeBtn) likeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        isLiked = !isLiked;
+        likeNum += isLiked ? 1 : -1;
+        likeCount.textContent = likeNum;
+        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
+      });
+      if (shareBtn) shareBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเมนูแชร์'); });
+      if (commentBtn) commentBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดคอมเมนต์'); });
+      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); alert('เลือกเพลง/เสียง'); });
 
-      // ✅ ปุ่มแชร์
-      if (shareBtn) {
-        shareBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          alert('เปิดเมนูแชร์');
-        });
-      }
-
-      // ✅ ปุ่มคอมเมนต์
-      if (commentBtn) {
-        commentBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          alert('เปิดเมนูคอมเมนต์');
-        });
-      }
-
-      // ✅ ปุ่มเพลง
-      if (musicBtn) {
-        musicBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          alert('เลือกเพลง/เสียง');
-        });
-      }
-
-      // ✅ เมนูล่าง — ทุกปุ่มกดได้
-      document.querySelectorAll('.b-nav').forEach((nav) => {
+      // === เมนูล่าง ===
+      document.querySelectorAll('.b-nav').forEach(nav => {
         nav.addEventListener('click', e => {
           e.preventDefault(); e.stopPropagation();
           document.querySelectorAll('.b-nav').forEach(n => n.classList.remove('active'));
           nav.classList.add('active');
           const page = nav.getAttribute('data-page');
-          const pageNames = {
-            home: 'หน้าหลัก', shop: 'ร้านค้า',
-            message: 'ข้อความ', profile: 'โปรไฟล์'
-          };
-          alert('ไปที่: ' + (pageNames[page] || 'หน้าใหม่'));
+          const names = { home:'หน้าหลัก', shop:'ร้านค้า', message:'ข้อความ', profile:'โปรไฟล์' };
+          alert('ไปที่: ' + (names[page] || 'หน้าใหม่'));
         });
       });
     });
