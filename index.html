@@ -21,22 +21,16 @@
       display: flex; align-items: center; justify-content: center;
     }
     .video-area video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      inset: 0;
-      background: #000;
-      display: block;
-      transition: all 0.3s ease;
-    }
-    .video-area video.contain-mode {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      background: #000; display: block; transition: all 0.3s ease;
+      /* ตรวจจับอัตโนมัติ — ไม่ให้ส่วนใดถูกบัง */
       object-fit: contain;
-      width: 94%;
-      height: 94%;
-      left: 3%;
-      top: 3%;
     }
+    /* 9:16 แนวตั้ง → เต็มจอพอดี */
+    .video-area video.ar-vertical { object-fit: cover; }
+    /* 16:9 แนวนอน → ปรับพอดีจอ ไม่ตัดขอบ */
+    .video-area video.ar-horizontal { object-fit: contain; width: 100%; height: 100%; }
+
     .video-placeholder {
       color: #888; font-size: 16px; text-align: center;
       padding: 40px 20px; line-height: 1.8; z-index: 2;
@@ -146,9 +140,9 @@
       position: absolute; right: 12px;
       bottom: calc(240px + env(safe-area-inset-bottom, 0px));
       z-index: 13; cursor: pointer; color: #fff;
-      display: flex; align-items: center; padding: 4px;
+      display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,.5); border-radius: 50%;
-      width: 40px; height: 40px; justify-content: center;
+      width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.3);
     }
     .sound-toggle svg {
       width: 24px; height: 24px; stroke-width: 2;
@@ -231,10 +225,8 @@
     </div>
     <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
     
-    <!-- ปุ่มสลับขนาดจอ -->
     <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
     
-    <!-- ปุ่มเปิดปิดเสียง ทำงานจริง -->
     <div class="sound-toggle" id="soundToggle" title="เปิด/ปิดเสียง">
       <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -284,7 +276,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ แอปโหลดเสร็จ — ทุกส่วนล็อกและทำงานแล้ว');
+      console.log('✅ โหลดเสร็จ — ล็อกเปิด-ปิดวิดีโอ + ปรับขนาดอัตโนมัติ');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -308,57 +300,51 @@
       const soundIcon = document.getElementById('soundIcon');
       const viewToggle = document.getElementById('viewToggle');
 
-      let isMuted = true; // เริ่มต้นปิดเสียง
-      let isContainMode = false; // เริ่มต้นเต็มจอ
+      let isMuted = true;
       let pendingVideo = null;
       let isLiked = false, likeNum = 0;
 
-      // ✅ ปุ่ม + เปิดอัปโหลด — ล็อกไว้
-      if (createBtn) {
-        createBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          uploadPanel.classList.add('show');
+      // ✅ ปุ่ม + อัปโหลด — ล็อก
+      if (createBtn) createBtn.addEventListener('click', e => { e.preventDefault(); uploadPanel.classList.add('show'); });
+      if (closeUpload) closeUpload.addEventListener('click', () => { uploadPanel.classList.remove('show'); resetForm(); });
+      if (fileWrapper) fileWrapper.addEventListener('click', () => videoInput.click());
+      if (videoInput) videoInput.addEventListener('change', e => {
+        const f = e.target.files[0]; if (!f) return;
+        pendingVideo = { file: f, url: URL.createObjectURL(f) };
+        videoPreview.src = pendingVideo.url;
+        previewContainer.style.display = 'block';
+        confirmBtn.style.display = 'block';
+        fileWrapper.style.display = 'none';
+      });
+      if (confirmBtn) confirmBtn.addEventListener('click', () => {
+        if (!pendingVideo) return alert('กรุณาเลือกวิดีโอก่อน');
+        showVideo(pendingVideo.url, captionInput.value.trim());
+        uploadPanel.classList.remove('show');
+        resetForm();
+      });
+      function resetForm() {
+        pendingVideo = null; videoInput.value = ''; videoPreview.src = '';
+        previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
+        fileWrapper.style.display = 'block'; captionInput.value = '';
+      }
+
+      // ✅ ตรวจจับอัตราส่วน 9:16 / 16:9 อัตโนมัติ
+      function checkAspectRatio(videoEl) {
+        videoEl.addEventListener('loadedmetadata', function() {
+          const ratio = videoEl.videoWidth / videoEl.videoHeight;
+          videoEl.classList.remove('ar-vertical', 'ar-horizontal');
+          if (ratio < 1) {
+            // 9:16 แนวตั้ง — เต็มจอ
+            videoEl.classList.add('ar-vertical');
+            console.log('✅ ตรวจพบวิดีโอแนวตั้ง 9:16 → เต็มจอ');
+          } else {
+            // 16:9 แนวนอน — พอดีจอ ไม่ตัดขอบ
+            videoEl.classList.add('ar-horizontal');
+            console.log('✅ ตรวจพบวิดีโอแนวนอน 16:9 → พอดีจอ');
+          }
         });
       }
-      if (closeUpload) {
-        closeUpload.addEventListener('click', function() {
-          uploadPanel.classList.remove('show');
-          resetUploadForm();
-        });
-      }
-      if (fileWrapper) {
-        fileWrapper.addEventListener('click', () => videoInput.click());
-      }
-      if (videoInput) {
-        videoInput.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const url = URL.createObjectURL(file);
-          pendingVideo = { file, url };
-          videoPreview.src = url;
-          previewContainer.style.display = 'block';
-          confirmBtn.style.display = 'block';
-          fileWrapper.style.display = 'none';
-        });
-      }
-      if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
-          if (!pendingVideo) return alert('กรุณาเลือกวิดีโอก่อน');
-          showVideo(pendingVideo.url, captionInput.value.trim());
-          uploadPanel.classList.remove('show');
-          resetUploadForm();
-        });
-      }
-      function resetUploadForm() {
-        pendingVideo = null;
-        videoInput.value = '';
-        videoPreview.src = '';
-        previewContainer.style.display = 'none';
-        confirmBtn.style.display = 'none';
-        fileWrapper.style.display = 'block';
-        captionInput.value = '';
-      }
+
       function showVideo(url, captionText) {
         mainVideo.src = url;
         mainVideo.style.display = 'block';
@@ -366,48 +352,43 @@
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'วิดีโอใหม่';
+        
+        // ตรวจจับอัตราส่วนอัตโนมัติ
+        checkAspectRatio(mainVideo);
+        
         mainVideo.ontimeupdate = () => {
-          if (mainVideo.duration) {
-            progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
-          }
+          if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
         };
         mainVideo.play().catch(() => {});
       }
 
-      // ✅ ปุ่มเปิด/ปิดเสียง — ทำงานจริง ล็อกไว้
+      // ✅ ปุ่มเปิด/ปิดเสียง — ล็อก
       if (soundToggle && mainVideo) {
         soundToggle.addEventListener('click', function() {
           isMuted = !isMuted;
           mainVideo.muted = isMuted;
-          // เปลี่ยนไอคอนตามสถานะ
-          if (isMuted) {
-            soundIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
-          } else {
-            soundIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path>';
-          }
+          soundIcon.innerHTML = isMuted 
+            ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>'
+            : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path>';
         });
       }
 
-      // ✅ ปุ่มสลับขนาดจอ — เต็มจอ / พอดีจอ
+      // ✅ ปุ่มสลับขนาดจอ — ล็อก
+      let fitMode = false;
       if (viewToggle && mainVideo) {
         viewToggle.addEventListener('click', function() {
-          isContainMode = !isContainMode;
-          if (isContainMode) {
-            mainVideo.classList.add('contain-mode');
-            viewToggle.textContent = '⛶';
-            viewToggle.title = 'กลับเต็มจอ';
-          } else {
-            mainVideo.classList.remove('contain-mode');
-            viewToggle.textContent = '⛶';
-            viewToggle.title = 'สลับพอดีจอ';
-          }
+          fitMode = !fitMode;
+          mainVideo.style.objectFit = fitMode ? 'contain' : '';
+          viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
         });
       }
 
-      // ✅ กดวิดีโอ เล่น/หยุด — ล็อกไว้
+      // ✅ กดวิดีโอ เล่น/หยุด — ล็อกไว้แน่นอน
       if (videoArea && mainVideo) {
         videoArea.addEventListener('click', function(e) {
-          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || e.target.closest('.upload-panel') || e.target.closest('.sound-toggle') || e.target.closest('.view-toggle')) return;
+          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
+              e.target.closest('.upload-panel') || e.target.closest('.sound-toggle') || 
+              e.target.closest('.view-toggle')) return;
           if (!mainVideo.src) return;
           if (mainVideo.paused) {
             mainVideo.play();
@@ -421,7 +402,7 @@
         });
       }
 
-      // ✅ ปุ่มหัวใจ — ล็อกไว้
+      // ✅ ปุ่มหัวใจ — ล็อก
       if (likeBtn) {
         likeBtn.addEventListener('click', function() {
           isLiked = !isLiked;
@@ -431,7 +412,7 @@
         });
       }
 
-      console.log('✅ ทุกฟังก์ชันพร้อม — ล็อกเรียบร้อย ไม่แก้อีกแล้ว!');
+      console.log('✅ ทุกอย่างล็อกเรียบร้อย — เต็มจออัตโนมัติตาม 9:16/16:9');
     });
   </script>
 </body>
