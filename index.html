@@ -49,6 +49,7 @@
     .music-hint.show { display: block; }
     .music-hint.error { color: #ff6b6b; border-color: #ff6b6b; }
     .music-hint.success { color: #4ade80; border-color: #4ade80; }
+    .music-hint.saved { color: #fbbf24; border-color: #fbbf24; }
 
     .progress-line {
       position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
@@ -406,7 +407,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ พร้อมใช้งาน — เลือกไฟล์เสียงจากมือถือได้แล้ว!');
+      console.log('✅ โหลดเสร็จ — บันทึกถาวรอัตโนมัติ!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -450,12 +451,98 @@
       let pendingFile = null;
       let selectedMusicFile = null;
       let selectedMusicUrl = null;
+      let selectedMusicNameText = null;
       let isMusicPlaying = false;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let postType = null;
+      let postDataUrl = null;
+      let postCaption = '';
       let hasUserInteracted = false;
 
+      // === บันทึกข้อมูลลงเครื่องถาวร ===
+      function saveToStorage() {
+        try {
+          const data = {
+            postType: postType,
+            postDataUrl: postDataUrl,
+            postCaption: postCaption,
+            musicName: selectedMusicNameText,
+            musicUrl: selectedMusicUrl,
+            hasMusic: !!(selectedMusicUrl && selectedMusicUrl !== '')
+          };
+          localStorage.setItem('thaipodee_post_data', JSON.stringify(data));
+          console.log('✅ บันทึกข้อมูลเรียบร้อย');
+        } catch (e) {
+          console.log('⚠️ ไม่สามารถบันทึกได้:', e);
+        }
+      }
+
+      // === โหลดข้อมูลที่บันทึกไว้เมื่อเปิดแอป ===
+      function loadFromStorage() {
+        try {
+          const saved = localStorage.getItem('thaipodee_post_data');
+          if (!saved) return false;
+          
+          const data = JSON.parse(saved);
+          if (!data.postDataUrl) return false;
+          
+          postType = data.postType;
+          postDataUrl = data.postDataUrl;
+          postCaption = data.postCaption || '';
+          selectedMusicNameText = data.musicName;
+          
+          // แสดงภาพ/วิดีโอ
+          videoPlaceholder.style.display = 'none';
+          postInfo.style.display = 'block';
+          videoCaption.textContent = postCaption || 'โพสต์ใหม่';
+          
+          if (postType === 'image') {
+            mainVideo.style.display = 'none';
+            postImage.src = postDataUrl;
+            postImage.style.display = 'block';
+            progressBar.classList.remove('show');
+            playPauseBtn.style.display = 'none';
+          } else {
+            postImage.style.display = 'none';
+            mainVideo.src = postDataUrl;
+            mainVideo.style.display = 'block';
+            mainVideo.muted = false;
+            mainVideo.loop = true;
+            progressBar.classList.add('show');
+            playPauseBtn.style.display = 'flex';
+          }
+          
+          // ถ้ามีเพลงที่บันทึกไว้
+          if (data.hasMusic && data.musicUrl) {
+            selectedMusicUrl = data.musicUrl;
+            soundName.textContent = '🎵 ' + (selectedMusicNameText || 'เพลงที่บันทึกไว้');
+            musicSelectedBox.classList.add('show');
+            musicUploadBox.style.display = 'none';
+            selectedMusicName.textContent = '🎵 ' + (selectedMusicNameText || 'เพลงที่บันทึกไว้');
+            noMusicOption.classList.remove('selected');
+            bgMusic.src = selectedMusicUrl;
+          }
+          
+          musicHint.textContent = '✅ โหลดข้อมูลที่บันทึกไว้แล้ว';
+          musicHint.classList.add('show', 'saved');
+          setTimeout(() => musicHint.classList.remove('show', 'saved'), 3000);
+          console.log('✅ โหลดข้อมูลที่บันทึกไว้สำเร็จ');
+          return true;
+        } catch (e) {
+          console.log('⚠️ โหลดข้อมูลไม่สำเร็จ:', e);
+          localStorage.removeItem('thaipodee_post_data');
+          return false;
+        }
+      }
+
+      // === ลบข้อมูลทั้งหมด ===
+      function clearStorage() {
+        localStorage.removeItem('thaipodee_post_data');
+        console.log('🗑️ ลบข้อมูลที่บันทึกไว้แล้ว');
+      }
+
+      // === เปิด-ปิดเมนูเพลง ===
       function openMusicSheet() { musicModal.classList.add('show'); }
       function closeMusicSheetFn() { musicModal.classList.remove('show'); }
       if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
@@ -463,12 +550,11 @@
       if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
       if (musicModal) musicModal.addEventListener('click', e => { if (e.target === musicModal) closeMusicSheetFn(); });
 
-      // === เปิดคลังไฟล์เสียงในมือถือโดยตรง ===
+      // === เลือกไฟล์เสียง ===
       if (musicUploadBox) musicUploadBox.addEventListener('click', () => {
         musicFileInput.click();
       });
 
-      // === เมื่อเลือกไฟล์เสียงจากคลัง ===
       if (musicFileInput) musicFileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         if (!file) return;
@@ -487,6 +573,7 @@
         if (displayName.length > 28) {
           displayName = displayName.substring(0, 25) + '...';
         }
+        selectedMusicNameText = displayName;
         selectedMusicName.textContent = '🎵 ' + displayName;
         
         musicUploadBox.style.display = 'none';
@@ -494,10 +581,14 @@
         noMusicOption.classList.remove('selected');
         soundName.textContent = '🎵 ' + displayName;
         
-        musicHint.textContent = '✅ เลือกเสียงแล้ว — แตะหน้าจอเพื่อเล่น';
+        bgMusic.src = selectedMusicUrl;
+        
+        musicHint.textContent = '✅ เลือกเสียงแล้ว — บันทึกอัตโนมัติ';
         musicHint.classList.add('show', 'success');
         setTimeout(() => musicHint.classList.remove('show', 'success'), 2500);
         
+        // บันทึกทันทีที่เลือกเพลง
+        saveToStorage();
         closeMusicSheetFn();
       });
 
@@ -536,6 +627,7 @@
         bgMusic.src = '';
         selectedMusicFile = null;
         selectedMusicUrl = null;
+        selectedMusicNameText = null;
         isMusicPlaying = false;
         
         musicUploadBox.style.display = 'block';
@@ -544,6 +636,9 @@
         previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
         soundName.textContent = 'แตะเพื่อเลือกไฟล์เสียง';
         musicFileInput.value = '';
+        
+        // อัปเดตการบันทึก
+        saveToStorage();
       });
 
       // === ไม่ใช้เสียง ===
@@ -552,6 +647,7 @@
         bgMusic.src = '';
         selectedMusicFile = null;
         selectedMusicUrl = null;
+        selectedMusicNameText = null;
         isMusicPlaying = false;
         
         musicUploadBox.style.display = 'block';
@@ -561,6 +657,8 @@
         soundName.textContent = '🔇 ไม่ใช้เสียง';
         musicFileInput.value = '';
         
+        // อัปเดตการบันทึก
+        saveToStorage();
         closeMusicSheetFn();
       });
 
@@ -588,22 +686,26 @@
 
       if (confirmBtn) confirmBtn.addEventListener('click', () => {
         if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim());
+        postCaption = captionInput.value.trim();
+        showContent(pendingFile.url, pendingFile.type, postCaption);
         uploadPanel.classList.remove('show');
         resetForm();
       });
 
       function resetForm() {
-        pendingFile = null; postType = null;
+        pendingFile = null;
         fileInput.value = ''; previewImage.src = ''; previewImage.style.display = 'none';
         previewVideo.src = ''; previewVideo.style.display = 'none';
         previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
         fileWrapper.style.display = 'block'; captionInput.value = '';
       }
 
-      // === แสดงภาพ/วิดีโอ พร้อมเสียงประกอบ ===
+      // === แสดงภาพ/วิดีโอ + บันทึกอัตโนมัติ ===
       function showContent(url, type, captionText) {
         postType = type;
+        postDataUrl = url;
+        postCaption = captionText;
+        
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'โพสต์ใหม่';
@@ -629,9 +731,12 @@
           playPauseBtn.style.display = 'flex';
           mainVideo.play().catch(() => {});
         }
+        
+        // บันทึกทันทีที่โพสต์
+        saveToStorage();
       }
 
-      // === แตะหน้าจอ — เล่น/หยุดเสียงประกอบภาพนิ่ง ===
+      // === แตะหน้าจอ — เล่น/หยุดเสียง ===
       if (videoArea) videoArea.addEventListener('click', async function(e) {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
             e.target.closest('.upload-panel') || e.target.closest('.music-modal') || 
@@ -639,7 +744,7 @@
         
         hasUserInteracted = true;
         
-        // === ภาพนิ่ง + เสียงประกอบ ===
+        // ภาพนิ่ง + เสียง
         if (postType === 'image' && selectedMusicUrl) {
           if (bgMusic.paused || bgMusic.currentTime <= 0) {
             try {
@@ -667,7 +772,7 @@
           return;
         }
 
-        // === วิดีโอ ===
+        // วิดีโอ
         if (postType === 'video') {
           if (mainVideo.paused) {
             mainVideo.muted = false;
@@ -684,6 +789,7 @@
         }
       });
 
+      // === ปุ่มไลก์ ===
       if (likeBtn) likeBtn.addEventListener('click', e => {
         e.stopPropagation();
         isLiked = !isLiked;
@@ -692,6 +798,7 @@
         likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
       });
 
+      // === ปุ่มสลับเต็มจอ ===
       if (viewToggle) viewToggle.addEventListener('click', e => {
         e.stopPropagation();
         fitMode = !fitMode;
@@ -700,6 +807,11 @@
         }
         viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
       });
+
+      // === โหลดข้อมูลที่บันทึกไว้เมื่อเปิดแอป ===
+      setTimeout(() => {
+        loadFromStorage();
+      }, 300);
     });
   </script>
 </body>
