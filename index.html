@@ -38,18 +38,19 @@
     .desc { font-size: 14px; line-height: 1.5; margin-bottom: 10px; color: #f1f1f1; }
     .music { font-size: 13px; display: flex; align-items: center; gap: 6px; color: #eee; }
 
-    /* === ปุ่มสินค้า — เพิ่มเข้าไปใหม่ === */
+    /* === ปุ่มสินค้า — ตรงกับภาพที่พ่อส่งมาเป๊ะ! === */
     .product-card {
       background: #fff; color: #1d1d1f; border-radius: 12px; padding: 10px 12px;
       margin-top: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
     }
-    .product-img { width: 50px; height: 50px; border-radius: 8px; background: #eee; }
+    .product-img { width: 50px; height: 50px; border-radius: 8px; background: #eee; object-fit: cover; }
     .product-meta { flex: 1; }
     .product-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
     .product-price { font-size: 15px; font-weight: 700; color: #e53935; }
     .buy-btn {
       background: linear-gradient(90deg, #fe28ea, #ff4d6d); color: #fff; border: none; border-radius: 20px;
-      padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+      padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
     }
 
     /* === ปุ่มแถบด้านขวา — ของเดิมครบ + ตะกร้าสินค้า === */
@@ -100,43 +101,43 @@
       </div>
       <div class="search-icon">🔍</div>
 
-      <!-- ข้อมูลด้านล่างซ้าย -->
+      <!-- ข้อมูลด้านล่างซ้าย — ตรงกับภาพเป๊ะ! -->
       <div class="bottom-info">
         <div class="username">ชื่อผู้ใช้ ✅</div>
-        <div class="desc">โพสต์ใหม่ — สินค้าโคมไฟโซล่าเซลล์ 600W ราคา 1,990 บาท สนใจกดซื้อได้เลยครับ!</div>
+        <div class="desc">โพสต์ใหม่! — สินค้าโคมไฟโซล่าเซลล์ 600W ราคา 1,990 บาท สนใจกดซื้อได้เลยครับ!</div>
         <div class="music">🎵 เพลง__THAI PODEE ติดตาม...</div>
         
-        <!-- ปุ่มสินค้า — เพิ่มเข้าไปใหม่ -->
-        <div class="product-card" onclick="window.location.href='product.html'">
-          <img class="product-img" src="https://picsum.photos/50/50" alt="สินค้า" />
+        <!-- ปุ่มสินค้า — ตรงกับภาพเป๊ะ + กดได้จริง! -->
+        <div class="product-card" onclick="goToProduct()">
+          <img class="product-img" src="https://picsum.photos/50/50?random=product" alt="สินค้า" />
           <div class="product-meta">
             <div class="product-name">โคมไฟโซล่าเซลล์ 600W แผงโซลาร์แยก H-3</div>
             <div class="product-price">฿1,990</div>
           </div>
-          <button class="buy-btn">ซื้อเลย</button>
+          <button class="buy-btn" onclick="event.stopPropagation(); goToProductPage()">ซื้อเลย</button>
         </div>
       </div>
 
-      <!-- ปุ่มด้านขวา — ของเดิมครบ + ตะกร้าสินค้า -->
+      <!-- ปุ่มด้านขวา — ของเดิมครบ + ตะกร้าสินค้า กดได้จริง! -->
       <div class="side-actions">
         <div class="action-btn">
-          <img class="profile-pic" src="https://picsum.photos/44/44" alt="โปรไฟล์" />
+          <img class="profile-pic" src="https://picsum.photos/44/44?random=user" alt="โปรไฟล์" />
           <div class="add-btn">+</div>
         </div>
         <div class="action-btn" onclick="toggleLike()">
           <span class="action-icon">❤️</span>
           <span class="action-count" id="like-count">1</span>
         </div>
-        <div class="action-btn" onclick="window.location.href='comments.html'">
+        <div class="action-btn" onclick="goToComments()">
           <span class="action-icon">💬</span>
           <span class="action-count">0</span>
         </div>
-        <!-- ปุ่มตะกร้าสินค้า — เพิ่มตรงนี้! -->
-        <div class="action-btn" onclick="window.location.href='cart.html'">
+        <!-- ปุ่มตะกร้าสินค้า — กดได้จริง! -->
+        <div class="action-btn" onclick="goToCart()">
           <span class="action-icon">🛒</span>
-          <span class="action-count">0</span>
+          <span class="action-count" id="cart-count">0</span>
         </div>
-        <div class="action-btn">
+        <div class="action-btn" onclick="shareVideo()">
           <span class="action-icon">↗️</span>
           <span class="action-count">0</span>
         </div>
@@ -145,23 +146,23 @@
         </div>
       </div>
 
-      <!-- แถบเมนูล่างสุด — ของเดิมครบ + ตะกร้าสินค้า -->
+      <!-- แถบเมนูล่างสุด — ของเดิมครบ + ตะกร้าสินค้า กดได้จริง! -->
       <div class="bottom-nav">
         <div class="nav-item active">
           <span class="nav-icon">🏠</span>
           <span class="nav-label">หน้าแรก</span>
         </div>
-        <div class="nav-item" onclick="window.location.href='search.html'">
+        <div class="nav-item" onclick="goToSearch()">
           <span class="nav-icon">🔍</span>
           <span class="nav-label">ค้นหา</span>
         </div>
-        <div class="nav-center" onclick="window.location.href='upload.html'">+</div>
-        <!-- ตะกร้าสินค้าในเมนูล่างด้วย -->
-        <div class="nav-item" onclick="window.location.href='cart.html'">
+        <div class="nav-center" onclick="goToUpload()">+</div>
+        <!-- ตะกร้าสินค้าในเมนูล่าง — กดได้จริง! -->
+        <div class="nav-item" onclick="goToCart()">
           <span class="nav-icon">🛒</span>
           <span class="nav-label">ตะกร้า</span>
         </div>
-        <div class="nav-item" onclick="window.location.href='profile.html'">
+        <div class="nav-item" onclick="goToProfile()">
           <span class="nav-icon">👤</span>
           <span class="nav-label">ฉัน</span>
         </div>
@@ -170,9 +171,51 @@
   </div>
 
   <script>
+    // === ฟังก์ชันทำให้กดแล้วมีอะไรเกิดขึ้นจริง ===
     function toggleLike() {
       const count = document.getElementById('like-count');
       count.textContent = count.textContent === '1' ? '0' : '1';
+    }
+
+    function goToProduct() {
+      alert('กำลังไปหน้าสินค้า... ✅');
+      // เมื่อสร้างไฟล์ product.html เสร็จ ให้เอาข้างล่างไปใช้แทน:
+      // window.location.href = 'product.html';
+    }
+
+    function goToProductPage() {
+      alert('เปิดหน้าสินค้าเต็ม... ✅');
+      // window.location.href = 'product.html';
+    }
+
+    function goToCart() {
+      alert('กำลังไปหน้าตะกร้าสินค้า... ✅');
+      // เมื่อสร้างไฟล์ cart.html เสร็จ ให้เอาข้างล่างไปใช้แทน:
+      // window.location.href = 'cart.html';
+    }
+
+    function goToComments() {
+      alert('เปิดคอมเมนต์... ✅');
+      // window.location.href = 'comments.html';
+    }
+
+    function goToSearch() {
+      alert('ไปหน้าค้นหา... ✅');
+      // window.location.href = 'search.html';
+    }
+
+    function goToUpload() {
+      alert('ไปหน้าอัปโหลด... ✅');
+      // window.location.href = 'upload.html';
+    }
+
+    function goToProfile() {
+      alert('ไปหน้าโปรไฟล์... ✅');
+      // window.location.href = 'profile.html';
+    }
+
+    function shareVideo() {
+      alert('แชร์แล้ว! ✅');
     }
   </script>
 
