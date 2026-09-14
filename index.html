@@ -21,16 +21,21 @@
       display: flex; align-items: center; justify-content: center;
     }
     .video-area video {
-      width: 88%;
-      height: 88%;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      inset: 0;
       background: #000;
       display: block;
-      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .video-area video.contain-mode {
+      object-fit: contain;
+      width: 94%;
+      height: 94%;
+      left: 3%;
+      top: 3%;
     }
     .video-placeholder {
       color: #888; font-size: 16px; text-align: center;
@@ -126,11 +131,24 @@
       font-size: 22px; cursor: pointer; z-index: 15;
     }
 
+    .view-toggle {
+      position: absolute; left: 12px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      z-index: 15; cursor: pointer;
+      background: rgba(0,0,0,.5); border-radius: 50%;
+      width: 40px; height: 40px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
+    }
+    .view-toggle:active { transform: scale(0.9); }
+
     .sound-toggle {
       position: absolute; right: 12px;
       bottom: calc(240px + env(safe-area-inset-bottom, 0px));
       z-index: 13; cursor: pointer; color: #fff;
       display: flex; align-items: center; padding: 4px;
+      background: rgba(0,0,0,.5); border-radius: 50%;
+      width: 40px; height: 40px; justify-content: center;
     }
     .sound-toggle svg {
       width: 24px; height: 24px; stroke-width: 2;
@@ -212,12 +230,18 @@
       <div class="play-pause-indicator" id="playPauseBtn">▶</div>
     </div>
     <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
-    <div class="sound-toggle" id="soundToggle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    
+    <!-- ปุ่มสลับขนาดจอ -->
+    <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
+    
+    <!-- ปุ่มเปิดปิดเสียง ทำงานจริง -->
+    <div class="sound-toggle" id="soundToggle" title="เปิด/ปิดเสียง">
+      <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
         <path d="M19 7v10M23 10v4"></path>
       </svg>
     </div>
+    
     <div class="top-bar">
       <span class="tab" id="tab1">กำลังติดตาม</span>
       <span class="tab active" id="tab2">สำหรับคุณ</span>
@@ -260,7 +284,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ แอปโหลดเสร็จ — กำลังเตรียมปุ่ม...');
+      console.log('✅ แอปโหลดเสร็จ — ทุกส่วนล็อกและทำงานแล้ว');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -280,99 +304,111 @@
       const playPauseBtn = document.getElementById('playPauseBtn');
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
+      const soundToggle = document.getElementById('soundToggle');
+      const soundIcon = document.getElementById('soundIcon');
+      const viewToggle = document.getElementById('viewToggle');
 
-      let uploadedVideos = [];
-      let isMuted = true;
+      let isMuted = true; // เริ่มต้นปิดเสียง
+      let isContainMode = false; // เริ่มต้นเต็มจอ
       let pendingVideo = null;
       let isLiked = false, likeNum = 0;
 
+      // ✅ ปุ่ม + เปิดอัปโหลด — ล็อกไว้
       if (createBtn) {
         createBtn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           uploadPanel.classList.add('show');
-          console.log('✅ ปุ่ม + กดแล้ว — เปิดเมนูอัปโหลด');
         });
-      } else {
-        console.error('❌ หาปุ่ม + ไม่เจอ!');
       }
-
       if (closeUpload) {
         closeUpload.addEventListener('click', function() {
           uploadPanel.classList.remove('show');
           resetUploadForm();
         });
       }
-
       if (fileWrapper) {
-        fileWrapper.addEventListener('click', function() {
-          videoInput.click();
-        });
+        fileWrapper.addEventListener('click', () => videoInput.click());
       }
-
       if (videoInput) {
         videoInput.addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (!file) return;
           const url = URL.createObjectURL(file);
-          pendingVideo = { file, url, caption: '' };
+          pendingVideo = { file, url };
           videoPreview.src = url;
           previewContainer.style.display = 'block';
           confirmBtn.style.display = 'block';
           fileWrapper.style.display = 'none';
-          console.log('✅ เลือกวิดีโอแล้ว:', file.name);
         });
       }
-
       if (confirmBtn) {
         confirmBtn.addEventListener('click', function() {
-          if (!pendingVideo) {
-            alert('กรุณาเลือกวิดีโอก่อนครับ');
-            return;
-          }
-          const caption = captionInput.value.trim();
-          showVideo(pendingVideo.url, caption);
+          if (!pendingVideo) return alert('กรุณาเลือกวิดีโอก่อน');
+          showVideo(pendingVideo.url, captionInput.value.trim());
           uploadPanel.classList.remove('show');
           resetUploadForm();
-          console.log('✅ โพสต์สำเร็จ!');
         });
       }
-
+      function resetUploadForm() {
+        pendingVideo = null;
+        videoInput.value = '';
+        videoPreview.src = '';
+        previewContainer.style.display = 'none';
+        confirmBtn.style.display = 'none';
+        fileWrapper.style.display = 'block';
+        captionInput.value = '';
+      }
       function showVideo(url, captionText) {
         mainVideo.src = url;
         mainVideo.style.display = 'block';
         mainVideo.muted = isMuted;
-        if (videoPlaceholder) videoPlaceholder.style.display = 'none';
-        if (postInfo) postInfo.style.display = 'block';
-        if (videoCaption) videoCaption.textContent = captionText || 'วิดีโอใหม่';
-        
-        mainVideo.ontimeupdate = function() {
+        videoPlaceholder.style.display = 'none';
+        postInfo.style.display = 'block';
+        videoCaption.textContent = captionText || 'วิดีโอใหม่';
+        mainVideo.ontimeupdate = () => {
           if (mainVideo.duration) {
-            const percent = (mainVideo.currentTime / mainVideo.duration) * 100;
-            progressFill.style.width = percent + '%';
+            progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
           }
         };
+        mainVideo.play().catch(() => {});
+      }
 
-        mainVideo.play().catch(function() {
-          console.log('⚠️ เล่นอัตโนมัติไม่ได้ — กดเพื่อเล่น');
+      // ✅ ปุ่มเปิด/ปิดเสียง — ทำงานจริง ล็อกไว้
+      if (soundToggle && mainVideo) {
+        soundToggle.addEventListener('click', function() {
+          isMuted = !isMuted;
+          mainVideo.muted = isMuted;
+          // เปลี่ยนไอคอนตามสถานะ
+          if (isMuted) {
+            soundIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+          } else {
+            soundIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path>';
+          }
         });
       }
 
-      function resetUploadForm() {
-        pendingVideo = null;
-        if (videoInput) videoInput.value = '';
-        if (videoPreview) videoPreview.src = '';
-        if (previewContainer) previewContainer.style.display = 'none';
-        if (confirmBtn) confirmBtn.style.display = 'none';
-        if (fileWrapper) fileWrapper.style.display = 'block';
-        if (captionInput) captionInput.value = '';
+      // ✅ ปุ่มสลับขนาดจอ — เต็มจอ / พอดีจอ
+      if (viewToggle && mainVideo) {
+        viewToggle.addEventListener('click', function() {
+          isContainMode = !isContainMode;
+          if (isContainMode) {
+            mainVideo.classList.add('contain-mode');
+            viewToggle.textContent = '⛶';
+            viewToggle.title = 'กลับเต็มจอ';
+          } else {
+            mainVideo.classList.remove('contain-mode');
+            viewToggle.textContent = '⛶';
+            viewToggle.title = 'สลับพอดีจอ';
+          }
+        });
       }
 
-      if (videoArea) {
+      // ✅ กดวิดีโอ เล่น/หยุด — ล็อกไว้
+      if (videoArea && mainVideo) {
         videoArea.addEventListener('click', function(e) {
-          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || e.target.closest('.upload-panel')) return;
+          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || e.target.closest('.upload-panel') || e.target.closest('.sound-toggle') || e.target.closest('.view-toggle')) return;
           if (!mainVideo.src) return;
-          
           if (mainVideo.paused) {
             mainVideo.play();
             playPauseBtn.textContent = '⏸';
@@ -385,6 +421,7 @@
         });
       }
 
+      // ✅ ปุ่มหัวใจ — ล็อกไว้
       if (likeBtn) {
         likeBtn.addEventListener('click', function() {
           isLiked = !isLiked;
@@ -394,7 +431,7 @@
         });
       }
 
-      console.log('✅ ปุ่มทั้งหมดพร้อมใช้งาน!');
+      console.log('✅ ทุกฟังก์ชันพร้อม — ล็อกเรียบร้อย ไม่แก้อีกแล้ว!');
     });
   </script>
 </body>
