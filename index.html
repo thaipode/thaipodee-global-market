@@ -17,7 +17,7 @@
       inset: 0;
     }
 
-    /* ===== SPLASH SCREEN ===== */
+    /* ===== SPLASH SCREEN — แก้ให้หายแน่นอน ===== */
     .splash-screen {
       position: fixed;
       inset: 0;
@@ -27,13 +27,13 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .splash-screen.hidden {
       opacity: 0 !important;
       visibility: hidden !important;
       pointer-events: none !important;
-      display: none !important;
+      z-index: -1 !important;
     }
     .splash-logo {
       width: 120px;
@@ -78,7 +78,7 @@
       background: #000;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
       pointer-events: none;
     }
     .app.visible { 
@@ -889,7 +889,7 @@
     const DEFAULT_AVATAR = 'https://picsum.photos/200/200';
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
 
-    // ===== SPLASH → MAIN — ทำงานแน่นอน =====
+    // ===== SPLASH → MAIN — แก้ให้หายแน่นอน! =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
@@ -900,11 +900,12 @@
       loadSavedVideos();
     }
 
-    // โหลดเสร็จ → เข้าเอง 0.8 วินาที
-    window.addEventListener('load', function() {
-      setTimeout(goToMain, 800);
-      // แตะที่ไหนก็ได้ → เข้าทันที
+    // ✅ โหลดเสร็จ → เข้าทันที 0.5 วินาที — ไม่รอช้า!
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(goToMain, 500);
+      // แตะที่ไหนก็ได้ → เข้าทันทีเลย
       document.addEventListener('click', goToMain, { once: true });
+      document.addEventListener('touchstart', goToMain, { once: true });
     });
 
     // ===== USER DATA =====
@@ -998,7 +999,7 @@
     if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
     if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== UPLOAD VIDEO — แก้จุดโพสต์แล้วไม่ขึ้น =====
+    // ===== UPLOAD VIDEO — กดโพสต์ → เล่นทันที! =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1042,7 +1043,7 @@
       });
     }
 
-    // ✅ แก้แล้ว — กดโพสต์ → แสดงทันที
+    // ✅ กดโพสต์ → เล่นทันที ไม่กลับไปหน้าโลโก้!
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
         if (!pendingVideo) {
@@ -1055,7 +1056,7 @@
         saveVideoToStorage(pendingVideo.url, caption);
         showVideo(pendingVideo.url, caption);
         
-        // ปิดหน้าต่าง
+        // ปิดหน้าต่างอัปโหลด
         uploadPanel.classList.remove('show');
         resetUploadForm();
         
@@ -1223,11 +1224,4 @@
         const text = commentInput.value.trim();
         if (!text) return;
         addComment(text);
-      });
-    }
-    if (commentInput) {
-      commentInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const text = commentInput.value.trim();
-          if (!text
+     
