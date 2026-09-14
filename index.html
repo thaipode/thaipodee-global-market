@@ -87,7 +87,7 @@
 
     .right-menu {
       position: absolute; right: 14px;
-      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+      bottom: calc(180px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
       gap: 22px; z-index: 30;
     }
@@ -128,47 +128,6 @@
       font-size: 14px; font-weight: bold; color: #fff;
       pointer-events: none;
     }
-
-    .profile-modal {
-      position: absolute; inset: 0; background: rgba(0,0,0,.85);
-      z-index: 100; display: none; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .profile-modal.show { display: flex; }
-    .profile-card {
-      background: #fff; border-radius: 20px; width: 100%; max-width: 360px;
-      padding: 24px; color: #000; max-height: 85vh; overflow-y: auto;
-    }
-    .profile-close {
-      text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 16px;
-    }
-    .profile-avatar-wrap {
-      text-align: center; margin-bottom: 20px; position: relative;
-    }
-    .profile-avatar {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: 3px solid #fe28ea; background: url('https://picsum.photos/100/100') center/cover;
-      margin: 0 auto; cursor: pointer;
-    }
-    .avatar-edit-btn {
-      position: absolute; bottom: 0; left: 50%; transform: translateX(50%);
-      background: #fe28ea; color: #fff; border: none; border-radius: 50%;
-      width: 32px; height: 32px; font-size: 18px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .profile-label {
-      font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333;
-    }
-    .profile-input {
-      width: 100%; padding: 12px 14px; border-radius: 10px;
-      border: 1px solid #ddd; font-size: 15px; margin-bottom: 16px; outline: none;
-    }
-    .profile-save-btn {
-      width: 100%; padding: 14px; border-radius: 10px; border: none;
-      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
-      color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
-    }
-    input[type="file"]#avatarInput { display: none; }
 
     .music-cover {
       width: 44px; height: 44px; border-radius: 50%;
@@ -232,7 +191,7 @@
       background: #fff; border-radius: 20px 20px 0 0;
       padding: 20px 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
       z-index: 60; transform: translateY(100%);
-      transition: transform 0.3s ease; max-height: 85vh;
+      transition: transform 0.3s ease; max-height: 90vh;
       overflow-y: auto; overscroll-behavior: contain; color: #000;
     }
     .upload-panel.show { transform: translateY(0); }
@@ -256,6 +215,28 @@
       width: 100%; height: 100%; object-fit: contain;
       border-radius: 12px; display: block; 
     }
+    .music-selector {
+      border: 1px solid #ddd; border-radius: 12px;
+      padding: 16px; margin-bottom: 16px;
+    }
+    .music-title {
+      font-weight: 600; margin-bottom: 10px;
+      display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .music-option {
+      padding: 10px 12px; border-radius: 8px;
+      background: #f5f5f5; margin-bottom: 8px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .music-option:hover, .music-option.selected {
+      background: linear-gradient(90deg, #25f4ee, #fe28ea);
+      color: #fff;
+    }
+    .custom-music {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px dashed #ddd;
+    }
     .caption-input {
       width: 100%; min-height: 44px; padding: 12px 16px;
       border-radius: 10px; border: 1px solid #ddd;
@@ -267,6 +248,48 @@
       border: none; background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
     }
+    .upload-btn:active { opacity: 0.9; }
+
+    .profile-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,.85);
+      z-index: 100; display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .profile-modal.show { display: flex; }
+    .profile-card {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 360px;
+      padding: 24px; color: #000; max-height: 85vh; overflow-y: auto;
+    }
+    .profile-close {
+      text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 16px;
+    }
+    .profile-avatar-wrap {
+      text-align: center; margin-bottom: 20px; position: relative;
+    }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 3px solid #fe28ea; background: url('https://picsum.photos/100/100') center/cover;
+      margin: 0 auto; cursor: pointer;
+    }
+    .avatar-edit-btn {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(50%);
+      background: #fe28ea; color: #fff; border: none; border-radius: 50%;
+      width: 32px; height: 32px; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .profile-label {
+      font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333;
+    }
+    .profile-input {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid #ddd; font-size: 15px; margin-bottom: 16px; outline: none;
+    }
+    .profile-save-btn {
+      width: 100%; padding: 14px; border-radius: 10px; border: none;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
+    }
+    input[type="file"]#avatarInput { display: none; }
   </style>
 </head>
 <body>
@@ -274,7 +297,7 @@
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
       <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
-      <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline></video>
+      <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline muted></video>
       <div class="play-pause-indicator" id="playPauseBtn">▶</div>
     </div>
     <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
@@ -282,7 +305,7 @@
     <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
     
     <div class="top-bar">
-      <span class="tab" id="tab1">กำลังติดตาม</span>
+      <span class="tab" id="tab1">ติดตาม</span>
       <span class="tab active" id="tab2">สำหรับคุณ</span>
     </div>
     <div class="search-btn">🔍</div>
@@ -312,7 +335,7 @@
     <div class="info-left" id="postInfo">
       <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
-      <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
+      <div class="sound-name">🎵 <span id="soundName">เสียงต้นฉบับ — Thaipodee</span></div>
     </div>
     
     <div class="profile-modal" id="profileModal">
@@ -330,11 +353,11 @@
     </div>
     
     <div class="bottom-bar">
-      <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
-      <div class="b-nav" data-page="shop"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
+      <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าแรก</span></div>
+      <div class="b-nav" data-page="discover"><span class="b-icon">🔍</span><span>ค้นพบ</span></div>
       <button class="create-box" id="createBtn">+</button>
-      <div class="b-nav" data-page="message"><span class="b-icon">💬</span><span>ข้อความ</span></div>
-      <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>โปรไฟล์</span></div>
+      <div class="b-nav" data-page="inbox"><span class="b-icon">💬</span><span>ข้อความ</span></div>
+      <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>ฉัน</span></div>
     </div>
     
     <div class="upload-panel" id="uploadPanel">
@@ -348,14 +371,32 @@
         <img id="previewImage" style="display:none;" alt="ตัวอย่างรูป" />
         <video id="previewVideo" controls playsinline preload="auto" webkit-playsinline style="display:none;"></video>
       </div>
+      
+      <div class="music-selector">
+        <div class="music-title">
+          🎵 เลือกเพลงประกอบ
+          <span style="font-size:12px; color:#888;">เพลงฟรี ไม่มีลิขสิทธิ์</span>
+        </div>
+        <div class="music-option selected" data-music="none">🔇 ไม่ใช้เพลง</div>
+        <div class="music-option" data-music="upbeat">🎵 เพลงจังหวะสนุก (เหมาะสินค้า)</div>
+        <div class="music-option" data-music="chill">🎵 เพลงผ่อนคลาย</div>
+        <div class="music-option" data-music="energetic">🎵 เพลงเร้าใจ</div>
+        <div class="custom-music">
+          <div style="font-size:13px; color:#666; margin-bottom:8px;">หรือใส่ลิงก์เพลงเอง (MP3):</div>
+          <input type="text" id="customMusicUrl" placeholder="วางลิงก์ไฟล์เพลง MP3 ที่นี่" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; outline:none;" />
+        </div>
+      </div>
+      
       <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยาย..."></textarea>
       <button class="upload-btn" id="confirmBtn">โพสต์</button>
     </div>
+
+    <audio id="bgMusic" loop style="display:none;">
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — อัปโหลดรูป+วิดีโอได้แล้ว!');
+      console.log('✅ โหลดเสร็จ — รูป+วิดีโอ+เพลงครบ!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -392,13 +433,186 @@
       const commentBtn = document.getElementById('commentBtn');
       const musicBtn = document.getElementById('musicBtn');
       const viewToggle = document.getElementById('viewToggle');
+      const bgMusic = document.getElementById('bgMusic');
+      const soundName = document.getElementById('soundName');
+      const musicOptions = document.querySelectorAll('.music-option');
+      const customMusicUrl = document.getElementById('customMusicUrl');
 
       let pendingFile = null;
+      let selectedMusic = 'none';
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let currentAvatar = 'https://picsum.photos/100/100';
       let currentName = 'ชื่อผู้ใช้';
       let postType = null;
+
+      // === ตัวอย่างเพลงฟรี ไม่มีลิขสิทธิ์ ===
+      const musicLibrary = {
+        upbeat: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        chill: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        energetic: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+      };
+
+      // === เลือกเพลง ===
+      musicOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+          musicOptions.forEach(o => o.classList.remove('selected'));
+          opt.classList.add('selected');
+          selectedMusic = opt.dataset.music;
+        });
+      });
+
+      // === เลือกไฟล์ รูป/วิดีโอ ===
+      if (createBtn) createBtn.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        uploadPanel.classList.add('show');
+      });
+      if (closeUpload) closeUpload.addEventListener('click', () => {
+        uploadPanel.classList.remove('show'); resetForm();
+      });
+      if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
+      if (fileInput) fileInput.addEventListener('change', e => {
+        const f = e.target.files[0]; if (!f) return;
+        const isImage = f.type.startsWith('image/');
+        pendingFile = { 
+          file: f, 
+          url: URL.createObjectURL(f), 
+          type: isImage ? 'image' : 'video' 
+        };
+        fileWrapper.style.display = 'none';
+        confirmBtn.style.display = 'block';
+        previewContainer.style.display = 'block';
+        if (pendingFile.type === 'image') {
+          previewImage.src = pendingFile.url;
+          previewImage.style.display = 'block';
+          previewVideo.style.display = 'none';
+        } else {
+          previewVideo.src = pendingFile.url;
+          previewVideo.style.display = 'block';
+          previewImage.style.display = 'none';
+        }
+      });
+
+      // === กดโพสต์ ===
+      if (confirmBtn) confirmBtn.addEventListener('click', () => {
+        if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
+        let musicUrl = null;
+        if (selectedMusic === 'custom' && customMusicUrl.value.trim()) {
+          musicUrl = customMusicUrl.value.trim();
+        } else if (selectedMusic !== 'none' && musicLibrary[selectedMusic]) {
+          musicUrl = musicLibrary[selectedMusic];
+        }
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), musicUrl);
+        uploadPanel.classList.remove('show');
+        resetForm();
+      });
+
+      function resetForm() {
+        pendingFile = null; postType = null; selectedMusic = 'none';
+        fileInput.value = ''; customMusicUrl.value = '';
+        musicOptions.forEach(o => o.classList.remove('selected'));
+        document.querySelector('[data-music="none"]').classList.add('selected');
+        previewImage.src = ''; previewImage.style.display = 'none';
+        previewVideo.src = ''; previewVideo.style.display = 'none';
+        previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
+        fileWrapper.style.display = 'block'; captionInput.value = '';
+        bgMusic.pause(); bgMusic.src = '';
+      }
+
+      // === แสดงเนื้อหา + เล่นเพลง ===
+      function showContent(url, type, captionText, musicUrl) {
+        postType = type;
+        videoPlaceholder.style.display = 'none';
+        postInfo.style.display = 'block';
+        videoCaption.textContent = captionText || 'โพสต์ใหม่';
+        
+        if (musicUrl) {
+          bgMusic.src = musicUrl;
+          bgMusic.volume = 0.5;
+          bgMusic.play().catch(e => console.log('Autoplay blocked'));
+          soundName.textContent = 'เพลงประกอบ — ฟรีไม่มีลิขสิทธิ์';
+        } else {
+          bgMusic.pause();
+          bgMusic.src = '';
+          soundName.textContent = 'เสียงต้นฉบับ — Thaipodee';
+        }
+
+        if (type === 'image') {
+          mainVideo.style.display = 'none';
+          mainVideo.pause && mainVideo.pause();
+          postImage.src = url;
+          postImage.style.display = 'block';
+          progressBar.classList.remove('show');
+          playPauseBtn.style.display = 'none';
+        } else {
+          postImage.style.display = 'none';
+          postImage.src = '';
+          mainVideo.src = url;
+          mainVideo.style.display = 'block';
+          mainVideo.muted = false;
+          mainVideo.loop = true;
+          progressBar.classList.add('show');
+          playPauseBtn.style.display = 'flex';
+          checkAspectRatio(mainVideo);
+          mainVideo.ontimeupdate = () => {
+            if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
+          };
+          mainVideo.play().catch(e => console.log('Video autoplay blocked'));
+        }
+      }
+
+      function checkAspectRatio(videoEl) {
+        videoEl.addEventListener('loadedmetadata', function() {
+          const ratio = videoEl.videoWidth / videoEl.videoHeight;
+          videoEl.classList.remove('ar-vertical', 'ar-horizontal');
+          videoEl.classList.add(ratio < 1 ? 'ar-vertical' : 'ar-horizontal');
+        });
+      }
+
+      // === แตะหน้าจอ เล่น/หยุด + เสียงเพลง ===
+      if (videoArea) videoArea.addEventListener('click', function(e) {
+        if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
+            e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
+            e.target.closest('.profile-modal')) return;
+        
+        if (postType === 'image') {
+          if (bgMusic.paused) bgMusic.play();
+          else bgMusic.pause();
+          return;
+        }
+        if (!mainVideo.src) return;
+        if (mainVideo.paused) {
+          mainVideo.play();
+          if (bgMusic.src) bgMusic.play();
+          playPauseBtn.textContent = '⏸';
+        } else {
+          mainVideo.pause();
+          bgMusic.pause();
+          playPauseBtn.textContent = '▶';
+        }
+        playPauseBtn.classList.add('show');
+        setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
+      });
+
+      // === ปุ่มอื่นๆ ===
+      if (likeBtn) likeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        isLiked = !isLiked;
+        likeNum += isLiked ? 1 : -1;
+        likeCount.textContent = likeNum;
+        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
+      });
+      if (shareBtn) shareBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเมนูแชร์'); });
+      if (commentBtn) commentBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดคอมเมนต์'); });
+      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเลือกเพลง'); });
+      if (viewToggle) viewToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        fitMode = !fitMode;
+        if (postType === 'video' && mainVideo.src) {
+          mainVideo.style.objectFit = fitMode ? 'contain' : '';
+        }
+        viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
+      });
 
       // === โปรไฟล์ ===
       if (profileBtn) profileBtn.addEventListener('click', e => {
@@ -414,14 +628,14 @@
         e.stopPropagation(); avatarInput.click();
       });
       if (avatarInput) avatarInput.addEventListener('change', e => {
-        const file = e.target.files[0]; if (!file) return;
+        const f = e.target.files[0]; if (!f) return;
         const reader = new FileReader();
         reader.onload = ev => {
           currentAvatar = ev.target.result;
           profileAvatarBtn.style.background = `url(${currentAvatar}) center/cover`;
           editAvatar.style.background = `url(${currentAvatar}) center/cover`;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(f);
       });
       if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
         const newName = editNameInput.value.trim();
@@ -433,145 +647,6 @@
         alert('บันทึกเรียบร้อย!');
       });
 
-      // === อัปโหลดรูป+วิดีโอ ===
-      if (createBtn) createBtn.addEventListener('click', e => { 
-        e.preventDefault(); e.stopPropagation(); 
-        uploadPanel.classList.add('show'); 
-      });
-      if (closeUpload) closeUpload.addEventListener('click', () => { 
-        uploadPanel.classList.remove('show'); resetForm(); 
-      });
-      if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
-      if (fileInput) fileInput.addEventListener('change', e => {
-        const f = e.target.files[0]; if (!f) return;
-        const isImage = f.type.startsWith('image/');
-        pendingFile = { 
-          file: f, 
-          url: URL.createObjectURL(f), 
-          type: isImage ? 'image' : 'video' 
-        };
-        
-        fileWrapper.style.display = 'none';
-        confirmBtn.style.display = 'block';
-        previewContainer.style.display = 'block';
-        
-        if (pendingFile.type === 'image') {
-          previewImage.src = pendingFile.url;
-          previewImage.style.display = 'block';
-          previewVideo.style.display = 'none';
-        } else {
-          previewVideo.src = pendingFile.url;
-          previewVideo.style.display = 'block';
-          previewImage.style.display = 'none';
-        }
-      });
-      if (confirmBtn) confirmBtn.addEventListener('click', () => {
-        if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim());
-        uploadPanel.classList.remove('show');
-        resetForm();
-      });
-      function resetForm() {
-        pendingFile = null; postType = null;
-        fileInput.value = ''; 
-        previewImage.src = ''; previewImage.style.display = 'none';
-        previewVideo.src = ''; previewVideo.style.display = 'none';
-        previewContainer.style.display = 'none'; 
-        confirmBtn.style.display = 'none';
-        fileWrapper.style.display = 'block'; 
-        captionInput.value = '';
-      }
-
-      // === แสดงเนื้อหา — แยกรูป/วิดีโอ ===
-      function showContent(url, type, captionText) {
-        postType = type;
-        videoPlaceholder.style.display = 'none';
-        postInfo.style.display = 'block';
-        videoCaption.textContent = captionText || 'โพสต์ใหม่';
-        
-        if (type === 'image') {
-          mainVideo.style.display = 'none';
-          mainVideo.pause && mainVideo.pause();
-          postImage.src = url;
-          postImage.style.display = 'block';
-          progressBar.classList.remove('show');
-          playPauseBtn.style.display = 'none';
-        } else {
-          postImage.style.display = 'none';
-          postImage.src = '';
-          mainVideo.src = url;
-          mainVideo.style.display = 'block';
-          mainVideo.muted = false;
-          progressBar.classList.add('show');
-          playPauseBtn.style.display = 'flex';
-          
-          checkAspectRatio(mainVideo);
-          mainVideo.ontimeupdate = () => {
-            if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
-          };
-          mainVideo.play().catch(() => {
-            mainVideo.muted = false;
-            mainVideo.play();
-          });
-        }
-      }
-
-      // === ตรวจอัตราส่วนวิดีโอ ===
-      function checkAspectRatio(videoEl) {
-        videoEl.addEventListener('loadedmetadata', function() {
-          const ratio = videoEl.videoWidth / videoEl.videoHeight;
-          videoEl.classList.remove('ar-vertical', 'ar-horizontal');
-          videoEl.classList.add(ratio < 1 ? 'ar-vertical' : 'ar-horizontal');
-        });
-      }
-
-      // === แตะหน้าจอ — เล่น/หยุด เฉพาะวิดีโอ ===
-      if (videoArea) {
-        videoArea.addEventListener('click', function(e) {
-          if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
-              e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
-              e.target.closest('.profile-modal')) return;
-          
-          if (postType === 'image') return; // รูปไม่ต้องกดเล่น
-          if (!mainVideo.src) return;
-          
-          if (mainVideo.paused) {
-            mainVideo.muted = false;
-            mainVideo.play();
-            playPauseBtn.textContent = '⏸';
-          } else {
-            mainVideo.pause();
-            playPauseBtn.textContent = '▶';
-          }
-          playPauseBtn.classList.add('show');
-          setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
-        });
-      }
-
-      // === ปุ่มสลับจอ ===
-      if (viewToggle) {
-        viewToggle.addEventListener('click', e => {
-          e.stopPropagation();
-          fitMode = !fitMode;
-          if (postType === 'video' && mainVideo.src) {
-            mainVideo.style.objectFit = fitMode ? 'contain' : '';
-          }
-          viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
-        });
-      }
-
-      // === ปุ่มกดทั้งหมด ===
-      if (likeBtn) likeBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        isLiked = !isLiked;
-        likeNum += isLiked ? 1 : -1;
-        likeCount.textContent = likeNum;
-        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
-      });
-      if (shareBtn) shareBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดเมนูแชร์'); });
-      if (commentBtn) commentBtn.addEventListener('click', e => { e.stopPropagation(); alert('เปิดคอมเมนต์'); });
-      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); alert('เลือกเพลง/เสียง'); });
-
       // === เมนูล่าง ===
       document.querySelectorAll('.b-nav').forEach(nav => {
         nav.addEventListener('click', e => {
@@ -579,7 +654,7 @@
           document.querySelectorAll('.b-nav').forEach(n => n.classList.remove('active'));
           nav.classList.add('active');
           const page = nav.getAttribute('data-page');
-          const names = { home:'หน้าหลัก', shop:'ร้านค้า', message:'ข้อความ', profile:'โปรไฟล์' };
+          const names = { home:'หน้าแรก', discover:'ค้นพบ', inbox:'ข้อความ', profile:'ฉัน' };
           alert('ไปที่: ' + (names[page] || 'หน้าใหม่'));
         });
       });
