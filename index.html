@@ -1,107 +1,652 @@
-// === แก้ไขรายการเพลง — ใช้ลิงก์ที่ทำงานได้จริง ===
-const musicLibrary = {
-  none: null,
-  upbeat: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9614d06d3b.mp3?filename=upbeat-112.mp3',
-  chill: 'https://cdn.pixabay.com/download/audio/2022/08/23/audio_270164b67e.mp3?filename=chill-folk-112.mp3',
-  energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3',
-  happy: 'https://cdn.pixabay.com/download/audio/2024/02/13/audio_98d03690b3.mp3?filename=happy-ukulele-123.mp3',
-  acoustic: 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_80b364747c.mp3?filename=acoustic-breeze-112.mp3'
-};
-const musicNames = {
-  none: 'ไม่ใช้เพลง',
-  upbeat: 'จังหวะสนุก',
-  chill: 'ผ่อนคลาย',
-  energetic: 'เร้าใจ',
-  happy: 'สดใส มีความสุข',
-  acoustic: 'ดนตรีสด เบา ๆ'
-};
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Thaipodee</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    html, body { 
+      width: 100%; height: 100%; height: 100dvh;
+      overflow: hidden; background: #000; color: #fff;
+      position: fixed; inset: 0; overscroll-behavior: none;
+    }
+    .app { width: 100%; height: 100%; height: 100dvh; position: relative; background: #000; overflow: hidden; }
 
-// === แก้ไขฟังก์ชันเลือกเพลง ===
-musicItems.forEach(item => {
-  item.addEventListener('click', async () => {
-    musicItems.forEach(i => i.classList.remove('selected'));
-    item.classList.add('selected');
-    selectedMusic = item.dataset.music;
-    selectedMusicUrl = musicLibrary[selectedMusic];
+    .video-area {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      background: #000; overflow: hidden; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .video-area video, .video-area .post-image {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      background: #000; display: block; object-fit: contain;
+    }
+    .video-area video.ar-vertical { object-fit: cover; }
+    .video-area video.ar-horizontal { object-fit: contain; }
+
+    .video-placeholder {
+      color: #888; font-size: 16px; text-align: center;
+      padding: 40px 20px; line-height: 1.8; z-index: 2;
+    }
+
+    .play-pause-indicator {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); font-size: 64px; color: #fff;
+      background: rgba(0,0,0,.5); width: 90px; height: 90px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; z-index: 10;
+    }
+    .play-pause-indicator.show { opacity: 1; }
+
+    .music-hint {
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.8); color: #25f4ee; padding: 12px 24px;
+      border-radius: 25px; font-size: 14px; z-index: 20; display: none;
+      border: 1px solid #25f4ee; font-weight: 600;
+    }
+    .music-hint.show { display: block; }
+    .music-hint.error { color: #ff6b6b; border-color: #ff6b6b; }
+    .music-hint.loading { color: #ffd700; border-color: #ffd700; }
+
+    .progress-line {
+      position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      left: 0; right: 0; height: 3px; background: rgba(255,255,255,.2); z-index: 12;
+      display: none;
+    }
+    .progress-line.show { display: block; }
+    .progress-done {
+      width: 0%; height: 100%;
+      background: linear-gradient(90deg, #25f4ee, #fe28ea);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .view-toggle {
+      position: absolute; left: 14px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      z-index: 50; cursor: pointer;
+      background: rgba(0,0,0,.5); border-radius: 50%;
+      width: 40px; height: 40px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
+      pointer-events: auto;
+    }
+    .view-toggle:active { transform: scale(0.9); }
+
+    .top-bar {
+      position: absolute; top: max(18px, env(safe-area-inset-top, 0px));
+      left: 0; right: 0; display: flex; justify-content: center;
+      align-items: center; z-index: 40;
+    }
+    .tab {
+      font-size: 16px; color: rgba(255,255,255,.6);
+      cursor: pointer; padding: 0 12px;
+      pointer-events: auto;
+    }
+    .tab.active {
+      color: #fff; font-weight: 600;
+      border-bottom: 2px solid #fff; padding-bottom: 3px;
+    }
+    .search-btn {
+      position: absolute; right: 14px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      font-size: 22px; cursor: pointer; z-index: 41;
+      pointer-events: auto;
+    }
+
+    .right-menu {
+      position: absolute; right: 14px;
+      bottom: calc(180px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column; align-items: center;
+      gap: 22px; z-index: 30;
+    }
+    .r-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px; cursor: pointer; 
+      width: 56px; height: 56px; justify-content: center;
+      pointer-events: auto !important;
+      transition: transform 0.15s ease;
+      position: relative; z-index: 31;
+    }
+    .r-btn:active { transform: scale(0.9); }
+    .r-icon { font-size: 28px; line-height: 1; }
+    .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
+
+    .prof-box { 
+      position: relative; cursor: pointer; 
+      z-index: 35 !important; pointer-events: auto !important;
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .prof-img {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 2px solid #fff; 
+      background: url('https://picsum.photos/100/100') center/cover;
+      cursor: pointer; pointer-events: auto;
+      transition: all 0.2s ease;
+    }
+    .prof-box:active .prof-img {
+      transform: scale(0.95);
+      border-color: #fe28ea;
+    }
+    .follow-add {
+      position: absolute; bottom: -4px; left: 50%;
+      transform: translateX(-50%); width: 20px; height: 20px;
+      border-radius: 50%; background: #ff0050;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: bold; color: #fff;
+      pointer-events: none;
+    }
+
+    .music-cover {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #222; border: 2px solid #fff;
+      animation: spin 4s linear infinite;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .info-left {
+      position: absolute; left: 14px; right: 85px;
+      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+      z-index: 12; display: none;
+    }
+    .username {
+      font-size: 16px; font-weight: 700; margin-bottom: 4px;
+      cursor: pointer; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+    .caption {
+      font-size: 14px; line-height: 1.5; margin-bottom: 6px;
+      color: #f0f0f0; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+    .sound-name {
+      font-size: 13px; display: flex; align-items: center; gap: 6px;
+      opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      cursor: pointer; font-weight: 500;
+    }
+
+    .music-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,.85);
+      z-index: 200; display: none; align-items: flex-end; justify-content: center;
+      padding: 0;
+    }
+    .music-modal.show { display: flex; }
+    .music-sheet {
+      background: #1c1c1e; width: 100%; max-height: 70vh;
+      border-radius: 20px 20px 0 0; padding: 20px 20px 40px;
+      overflow-y: auto; color: #fff;
+    }
+    .music-sheet-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding-bottom: 15px;
+      border-bottom: 1px solid #333;
+    }
+    .music-sheet-title { font-size: 18px; font-weight: 700; }
+    .music-sheet-close { font-size: 24px; cursor: pointer; color: #888; }
+    .music-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 12px; border-radius: 10px;
+      margin-bottom: 8px; cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .music-item:hover, .music-item.selected {
+      background: linear-gradient(90deg, rgba(37,244,238,.2), rgba(254,40,234,.2));
+      border-color: #fe28ea;
+    }
+    .music-item-icon { font-size: 24px; }
+    .music-item-info { flex: 1; }
+    .music-item-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+    .music-item-desc { font-size: 12px; color: #888; }
+    .music-item-check { color: #fe28ea; font-size: 20px; opacity: 0; }
+    .music-item.selected .music-item-check { opacity: 1; }
+
+    .bottom-bar {
+      position: absolute; bottom: 0; left: 0; width: 100%;
+      height: calc(80px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: rgba(0,0,0,.9); display: flex;
+      justify-content: space-around; align-items: center;
+      border-top: 1px solid #333; z-index: 55;
+    }
+    .b-nav {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; cursor: pointer; color: #fff;
+      font-size: 11px; opacity: 0.6;
+      pointer-events: auto !important;
+      padding: 12px 20px; min-width: 60px;
+      z-index: 56; position: relative;
+    }
+    .b-nav.active { opacity: 1; }
+    .b-nav:active { opacity: 0.8; transform: scale(0.95); }
+    .b-icon { font-size: 24px; line-height: 1; }
     
-    soundName.textContent = selectedMusic === 'none' 
-      ? 'กดเลือกเพลงประกอบ' 
-      : '🎵 ' + musicNames[selectedMusic];
+    .create-box {
+      width: 50px; height: 36px; border-radius: 8px;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: bold; color: #000;
+      cursor: pointer; border: none; z-index: 57;
+      pointer-events: auto !important; position: relative;
+    }
+    .create-box:active { transform: scale(0.95); }
+
+    .upload-panel {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #fff; border-radius: 20px 20px 0 0;
+      padding: 20px 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+      z-index: 60; transform: translateY(100%);
+      transition: transform 0.3s ease; max-height: 90vh;
+      overflow-y: auto; overscroll-behavior: contain; color: #000;
+    }
+    .upload-panel.show { transform: translateY(0); }
+    .panel-close {
+      text-align: right; font-size: 24px;
+      cursor: pointer; margin-bottom: 12px; color: #000;
+    }
+    .file-input-wrapper {
+      border: 2px dashed #ccc; border-radius: 12px;
+      padding: 24px 20px; text-align: center;
+      cursor: pointer; margin-bottom: 16px;
+    }
+    .file-input-wrapper:hover { border-color: #fe28ea; }
+    .file-input-wrapper p { margin-top: 10px; color: #666; font-size: 14px; }
+    input[type="file"] { display: none; }
+    .preview-container {
+      width: 100%; max-height: 40vh; border-radius: 12px;
+      margin-bottom: 16px; display: none; background: #000; overflow: hidden;
+    }
+    .preview-container img, .preview-container video { 
+      width: 100%; height: 100%; object-fit: contain;
+      border-radius: 12px; display: block; 
+    }
+    .caption-input {
+      width: 100%; min-height: 44px; padding: 12px 16px;
+      border-radius: 10px; border: 1px solid #ddd;
+      background: #f9f9f9; color: #000; margin-bottom: 14px;
+      font-size: 15px; line-height: 1.5; resize: none; outline: none;
+    }
+    .upload-btn {
+      width: 100%; padding: 14px; border-radius: 10px;
+      border: none; background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
+    }
+    .upload-btn:active { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="video-area" id="videoArea">
+      <div class="music-hint" id="musicHint">🎵 แตะหน้าจอเพื่อเล่นเพลง</div>
+      <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
+      <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
+      <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline muted></video>
+      <div class="play-pause-indicator" id="playPauseBtn">▶</div>
+    </div>
+    <div class="progress-line" id="progressBar"><div class="progress-done" id="progressFill"></div></div>
     
-    closeMusicSheetFn();
+    <div class="view-toggle" id="viewToggle" title="สลับเต็มจอ/พอดีจอ">⛶</div>
     
-    // ถ้ามีโพสต์อยู่แล้ว ให้โหลดและเล่นเพลงทันที
-    if (postType) {
-      if (selectedMusicUrl) {
-        musicHint.textContent = '⏳ กำลังโหลดเพลง...';
-        musicHint.classList.add('show', 'loading');
-        
-        bgMusic.src = selectedMusicUrl;
-        bgMusic.volume = 0.5;
-        
-        try {
-          await bgMusic.play();
-          musicHint.textContent = '🎵 กำลังเล่น: ' + musicNames[selectedMusic];
-          musicHint.classList.remove('loading', 'error');
-          musicHint.classList.add('show');
-          setTimeout(() => musicHint.classList.remove('show'), 3000);
-        } catch (err) {
-          console.log('ต้องแตะหน้าจอก่อนถึงจะเล่นเพลงได้');
-          musicHint.textContent = '✅ เลือกแล้ว — แตะหน้าจอเพื่อเล่นเสียง';
-          musicHint.classList.remove('loading', 'error');
-          musicHint.classList.add('show');
-          setTimeout(() => musicHint.classList.remove('show'), 3000);
+    <div class="top-bar">
+      <span class="tab" id="tab1">ติดตาม</span>
+      <span class="tab active" id="tab2">สำหรับคุณ</span>
+    </div>
+    <div class="search-btn">🔍</div>
+    
+    <div class="right-menu">
+      <div class="r-btn prof-box" id="profileBtn">
+        <div class="prof-img" id="profileAvatarBtn"></div>
+        <div class="follow-add">+</div>
+      </div>
+      <div class="r-btn" id="likeBtn">
+        <span class="r-icon">❤️</span>
+        <span class="r-num" id="likeCount">1</span>
+      </div>
+      <div class="r-btn" id="commentBtn">
+        <span class="r-icon">💬</span>
+        <span class="r-num">0</span>
+      </div>
+      <div class="r-btn" id="shareBtn">
+        <span class="r-icon">↗️</span>
+        <span class="r-num">0</span>
+      </div>
+      <div class="r-btn" id="musicBtn" title="เลือกเพลง">
+        <div class="music-cover">🎵</div>
+      </div>
+    </div>
+    
+    <div class="info-left" id="postInfo">
+      <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
+      <div class="caption" id="videoCaption"></div>
+      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">กดเลือกเพลงประกอบ</span></div>
+    </div>
+    
+    <div class="music-modal" id="musicModal">
+      <div class="music-sheet">
+        <div class="music-sheet-header">
+          <span class="music-sheet-title">🎵 เลือกเพลงประกอบ</span>
+          <span class="music-sheet-close" id="closeMusicSheet">✕</span>
+        </div>
+        <div id="musicList">
+          <div class="music-item selected" data-music="none">
+            <span class="music-item-icon">🔇</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ไม่ใช้เพลง</div>
+              <div class="music-item-desc">ปิดเสียง</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="upbeat">
+            <span class="music-item-icon">🎵</span>
+            <div class="music-item-info">
+              <div class="music-item-name">จังหวะสนุก</div>
+              <div class="music-item-desc">เหมาะสำหรับโฆษณาสินค้า</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="chill">
+            <span class="music-item-icon">🎶</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ผ่อนคลาย</div>
+              <div class="music-item-desc">บรรยากาศสบาย ๆ</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="energetic">
+            <span class="music-item-icon">🎸</span>
+            <div class="music-item-info">
+              <div class="music-item-name">เร้าใจ</div>
+              <div class="music-item-desc">พลังงานเต็มที่</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="happy">
+            <span class="music-item-icon">🎹</span>
+            <div class="music-item-info">
+              <div class="music-item-name">สดใส มีความสุข</div>
+              <div class="music-item-desc">เหมาะสินค้าแฟชั่น</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+          <div class="music-item" data-music="acoustic">
+            <span class="music-item-icon">🎻</span>
+            <div class="music-item-info">
+              <div class="music-item-name">ดนตรีสด เบา ๆ</div>
+              <div class="music-item-desc">เปียโน กีตาร์</div>
+            </div>
+            <span class="music-item-check">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="upload-panel" id="uploadPanel">
+      <div class="panel-close" id="closeUpload">✕</div>
+      <div class="file-input-wrapper" id="fileWrapper">
+        <div style="font-size: 36px; margin-bottom: 8px;">📷</div>
+        <p>กดเพื่อเลือกไฟล์<br>รองรับ รูปภาพ (JPG, PNG) | วิดีโอ (MP4, MOV)</p>
+        <input type="file" id="fileInput" accept="image/*,video/*" />
+      </div>
+      <div class="preview-container" id="previewContainer">
+        <img id="previewImage" style="display:none;" alt="ตัวอย่างรูป" />
+        <video id="previewVideo" controls playsinline preload="auto" webkit-playsinline style="display:none;"></video>
+      </div>
+      <textarea class="caption-input" id="captionInput" placeholder="เขียนคำบรรยาย..."></textarea>
+      <button class="upload-btn" id="confirmBtn">โพสต์</button>
+    </div>
+    
+    <div class="bottom-bar">
+      <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าแรก</span></div>
+      <div class="b-nav" data-page="discover"><span class="b-icon">🔍</span><span>ค้นพบ</span></div>
+      <div class="b-nav create-box" id="createBtn">+</div>
+      <div class="b-nav" data-page="inbox"><span class="b-icon">💬</span><span>ข้อความ</span></div>
+      <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>ฉัน</span></div>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ โหลดเสร็จ — พร้อมใช้งาน!');
+
+      const createBtn = document.getElementById('createBtn');
+      const uploadPanel = document.getElementById('uploadPanel');
+      const closeUpload = document.getElementById('closeUpload');
+      const fileWrapper = document.getElementById('fileWrapper');
+      const fileInput = document.getElementById('fileInput');
+      const previewContainer = document.getElementById('previewContainer');
+      const previewImage = document.getElementById('previewImage');
+      const previewVideo = document.getElementById('previewVideo');
+      const captionInput = document.getElementById('captionInput');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const videoArea = document.getElementById('videoArea');
+      const videoPlaceholder = document.getElementById('videoPlaceholder');
+      const mainVideo = document.getElementById('mainVideo');
+      const postImage = document.getElementById('postImage');
+      const postInfo = document.getElementById('postInfo');
+      const videoCaption = document.getElementById('videoCaption');
+      const progressFill = document.getElementById('progressFill');
+      const progressBar = document.getElementById('progressBar');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const musicHint = document.getElementById('musicHint');
+      const musicBtn = document.getElementById('musicBtn');
+      const openMusicSheetBtn = document.getElementById('openMusicSheetBtn');
+      const musicModal = document.getElementById('musicModal');
+      const closeMusicSheet = document.getElementById('closeMusicSheet');
+      const musicItems = document.querySelectorAll('.music-item');
+      const soundName = document.getElementById('soundName');
+      const viewToggle = document.getElementById('viewToggle');
+      const bgMusic = document.getElementById('bgMusic');
+      const likeBtn = document.getElementById('likeBtn');
+      const likeCount = document.getElementById('likeCount');
+
+      let pendingFile = null;
+      let selectedMusic = 'none';
+      let selectedMusicUrl = null;
+      let isLiked = false, likeNum = 1;
+      let fitMode = false;
+      let postType = null;
+      let hasUserInteracted = false;
+
+      const musicLibrary = {
+        none: null,
+        upbeat: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9614d06d3b.mp3?filename=upbeat-112.mp3',
+        chill: 'https://cdn.pixabay.com/download/audio/2022/08/23/audio_270164b67e.mp3?filename=chill-folk-112.mp3',
+        energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3',
+        happy: 'https://cdn.pixabay.com/download/audio/2024/02/13/audio_98d03690b3.mp3?filename=happy-ukulele-123.mp3',
+        acoustic: 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_80b364747c.mp3?filename=acoustic-breeze-112.mp3'
+      };
+      const musicNames = {
+        none: 'ไม่ใช้เพลง',
+        upbeat: 'จังหวะสนุก',
+        chill: 'ผ่อนคลาย',
+        energetic: 'เร้าใจ',
+        happy: 'สดใส มีความสุข',
+        acoustic: 'ดนตรีสด เบา ๆ'
+      };
+
+      function openMusicSheet() { musicModal.classList.add('show'); }
+      function closeMusicSheetFn() { musicModal.classList.remove('show'); }
+      if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
+      if (openMusicSheetBtn) openMusicSheetBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
+      if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
+      if (musicModal) musicModal.addEventListener('click', e => { if (e.target === musicModal) closeMusicSheetFn(); });
+
+      musicItems.forEach(item => {
+        item.addEventListener('click', async () => {
+          musicItems.forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          selectedMusic = item.dataset.music;
+          selectedMusicUrl = musicLibrary[selectedMusic];
+          soundName.textContent = selectedMusic === 'none' ? 'กดเลือกเพลงประกอบ' : '🎵 ' + musicNames[selectedMusic];
+          closeMusicSheetFn();
+          
+          if (postType) {
+            if (selectedMusicUrl) {
+              musicHint.textContent = '⏳ กำลังโหลดเพลง...';
+              musicHint.classList.add('show', 'loading');
+              bgMusic.src = selectedMusicUrl;
+              bgMusic.volume = 0.5;
+              try {
+                if (hasUserInteracted) {
+                  await bgMusic.play();
+                  musicHint.textContent = '🎵 ' + musicNames[selectedMusic];
+                } else {
+                  musicHint.textContent = '✅ เลือกแล้ว — แตะหน้าจอเพื่อเล่นเสียง';
+                }
+                musicHint.classList.remove('loading', 'error');
+                musicHint.classList.add('show');
+                setTimeout(() => musicHint.classList.remove('show'), 3000);
+              } catch (err) {
+                musicHint.textContent = '✅ เลือกแล้ว — แตะหน้าจอเพื่อเล่นเสียง';
+                musicHint.classList.remove('loading', 'error');
+                musicHint.classList.add('show');
+                setTimeout(() => musicHint.classList.remove('show'), 3000);
+              }
+            } else {
+              bgMusic.pause();
+              bgMusic.src = '';
+              soundName.textContent = 'กดเลือกเพลงประกอบ';
+              musicHint.classList.remove('show');
+            }
+          }
+        });
+      });
+
+      if (createBtn) createBtn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); uploadPanel.classList.add('show'); });
+      if (closeUpload) closeUpload.addEventListener('click', () => { uploadPanel.classList.remove('show'); resetForm(); });
+      if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
+      if (fileInput) fileInput.addEventListener('change', e => {
+        const f = e.target.files[0]; if (!f) return;
+        const isImage = f.type.startsWith('image/');
+        pendingFile = { file: f, url: URL.createObjectURL(f), type: isImage ? 'image' : 'video' };
+        fileWrapper.style.display = 'none';
+        confirmBtn.style.display = 'block';
+        previewContainer.style.display = 'block';
+        if (pendingFile.type === 'image') {
+          previewImage.src = pendingFile.url;
+          previewImage.style.display = 'block';
+          previewVideo.style.display = 'none';
+        } else {
+          previewVideo.src = pendingFile.url;
+          previewVideo.style.display = 'block';
+          previewImage.style.display = 'none';
         }
-      } else {
-        bgMusic.pause();
-        bgMusic.src = '';
-        soundName.textContent = 'กดเลือกเพลงประกอบ';
-        musicHint.classList.remove('show');
-      }
-    }
-  });
-});
+      });
 
-// === แก้ไขส่วนแตะหน้าจอเพื่อเล่นเพลง ===
-if (videoArea) videoArea.addEventListener('click', async function(e) {
-  if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
-      e.target.closest('.music-modal') || e.target.closest('.view-toggle')) return;
-  
-  hasUserInteracted = true;
-  
-  if (postType === 'image' && selectedMusicUrl) {
-    if (bgMusic.paused || bgMusic.currentTime <= 0) {
-      try {
-        await bgMusic.play();
-        musicHint.textContent = '🎵 กำลังเล่นเพลง';
-        musicHint.classList.add('show');
-        setTimeout(() => musicHint.classList.remove('show'), 2000);
-      } catch (err) {
-        musicHint.textContent = '❌ เล่นไม่ได้ ลองเลือกเพลงใหม่';
-        musicHint.classList.add('show', 'error');
-        setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
+      if (confirmBtn) confirmBtn.addEventListener('click', () => {
+        if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), selectedMusicUrl);
+        uploadPanel.classList.remove('show');
+        resetForm();
+      });
+
+      function resetForm() {
+        pendingFile = null; postType = null;
+        fileInput.value = ''; previewImage.src = ''; previewImage.style.display = 'none';
+        previewVideo.src = ''; previewVideo.style.display = 'none';
+        previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
+        fileWrapper.style.display = 'block'; captionInput.value = '';
       }
-    } else {
-      bgMusic.pause();
-      musicHint.textContent = '⏸ หยุดเพลง';
-      musicHint.classList.add('show');
-      setTimeout(() => musicHint.classList.remove('show'), 2000);
-    }
-    return;
-  }
-  
-  if (postType === 'video') {
-    if (mainVideo.paused) {
-      mainVideo.muted = false;
-      await mainVideo.play();
-      if (selectedMusicUrl && bgMusic.src) bgMusic.play();
-      playPauseBtn.textContent = '⏸';
-    } else {
-      mainVideo.pause();
-      bgMusic.pause();
-      playPauseBtn.textContent = '▶';
-    }
-    playPauseBtn.classList.add('show');
-    setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
-  }
-});
+
+      function showContent(url, type, captionText, musicUrl) {
+        postType = type;
+        videoPlaceholder.style.display = 'none';
+        postInfo.style.display = 'block';
+        videoCaption.textContent = captionText || 'โพสต์ใหม่';
+        
+        if (musicUrl) {
+          bgMusic.src = musicUrl;
+          bgMusic.volume = 0.5;
+          soundName.textContent = '🎵 ' + musicNames[selectedMusic];
+        } else {
+          bgMusic.pause();
+          bgMusic.src = '';
+          soundName.textContent = 'กดเลือกเพลงประกอบ';
+        }
+
+        if (type === 'image') {
+          mainVideo.style.display = 'none';
+          postImage.src = url;
+          postImage.style.display = 'block';
+          progressBar.classList.remove('show');
+          playPauseBtn.style.display = 'none';
+        } else {
+          postImage.style.display = 'none';
+          mainVideo.src = url;
+          mainVideo.style.display = 'block';
+          mainVideo.muted = false;
+          mainVideo.loop = true;
+          progressBar.classList.add('show');
+          playPauseBtn.style.display = 'flex';
+          mainVideo.play().catch(() => {});
+        }
+      }
+
+      if (videoArea) videoArea.addEventListener('click', async function(e) {
+        if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
+            e.target.closest('.upload-panel') || e.target.closest('.music-modal') || 
+            e.target.closest('.view-toggle')) return;
+        
+        hasUserInteracted = true;
+        
+        if (postType === 'image' && selectedMusicUrl) {
+          if (bgMusic.paused || bgMusic.currentTime <= 0) {
+            try {
+              await bgMusic.play();
+              musicHint.textContent = '🎵 กำลังเล่นเพลง';
+              musicHint.classList.add('show');
+              setTimeout(() => musicHint.classList.remove('show'), 2000);
+            } catch (err) {
+              musicHint.textContent = '❌ เล่นไม่ได้ ลองเลือกเพลงใหม่';
+              musicHint.classList.add('show', 'error');
+              setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
+            }
+          } else {
+            bgMusic.pause();
+            musicHint.textContent = '⏸ หยุดเพลง';
+            musicHint.classList.add('show');
+            setTimeout(() => musicHint.classList.remove('show'), 2000);
+          }
+          return;
+        }
+
+        if (postType === 'video') {
+          if (mainVideo.paused) {
+            mainVideo.muted = false;
+            await mainVideo.play();
+            if (selectedMusicUrl && bgMusic.src) bgMusic.play();
+            playPauseBtn.textContent = '⏸';
+          } else {
+            mainVideo.pause();
+            bgMusic.pause();
+            playPauseBtn.textContent = '▶';
+          }
+          playPauseBtn.classList.add('show');
+          setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
+        }
+      });
+
+      if (likeBtn) likeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        isLiked = !isLiked;
+        likeNum += isLiked ? 1 : -1;
+        likeCount.textContent = likeNum;
+        likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
+      });
+
+      if (viewToggle) viewToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        fitMode = !fitMode;
+        if (postType === 'video' && mainVideo.src) {
+          mainVideo.style.objectFit = fitMode ? 'contain' : 'cover';
+        }
+        viewToggle.title = fitMode ? 'กลับเต็มจอ' : 'สลับพอดีจอ';
+      });
+    });
+  </script>
+</body>
+</html>
