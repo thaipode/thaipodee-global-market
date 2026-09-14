@@ -27,8 +27,6 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      opacity: 1;
-      visibility: visible;
       transition: opacity 0.4s ease, visibility 0.4s ease;
     }
     .splash-screen.hidden {
@@ -71,7 +69,7 @@
       letter-spacing: 1px;
     }
 
-    /* ===== แอปหลัก ===== */
+    /* ===== MAIN APP ===== */
     .app {
       width: 100%;
       height: 100vh;
@@ -88,7 +86,7 @@
       pointer-events: auto;
     }
 
-    /* ===== วิดีโอ — พอดีจอ ไม่ล้น เล่นได้ ===== */
+    /* ===== VIDEO ===== */
     .video-area {
       position: absolute;
       inset: 0;
@@ -104,7 +102,7 @@
     .video-area video {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* ✅ เห็นครบ ไม่ตัด ไม่ล้น */
+      object-fit: contain;
       object-position: center;
       background: #000;
       display: block;
@@ -118,7 +116,7 @@
       z-index: 2;
     }
 
-    /* ===== ปุ่มเล่น-หยุด ===== */
+    /* ===== PLAY/PAUSE INDICATOR ===== */
     .play-pause-indicator {
       position: absolute;
       top: 50%;
@@ -140,7 +138,7 @@
     }
     .play-pause-indicator.show { opacity: 1; }
 
-    /* ===== แถบความคืบหน้า ===== */
+    /* ===== PROGRESS BAR ===== */
     .progress-line {
       position: absolute;
       bottom: calc(80px + env(safe-area-inset-bottom, 0px));
@@ -158,7 +156,7 @@
       transition: width 0.1s linear;
     }
 
-    /* ===== เมนูขวา ===== */
+    /* ===== RIGHT MENU ===== */
     .right-menu {
       position: absolute;
       right: 12px;
@@ -214,7 +212,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== ข้อมูลซ้ายล่าง ===== */
+    /* ===== BOTTOM INFO ===== */
     .info-left {
       position: absolute;
       left: 12px;
@@ -244,7 +242,7 @@
       opacity: 0.85;
     }
 
-    /* ===== แถบบน ===== */
+    /* ===== TOP BAR ===== */
     .top-bar {
       position: absolute;
       top: max(18px, env(safe-area-inset-top, 0px));
@@ -276,7 +274,7 @@
       z-index: 15;
     }
 
-    /* ===== ปุ่มเสียง ===== */
+    /* ===== SOUND TOGGLE ===== */
     .sound-toggle {
       position: absolute;
       right: 12px;
@@ -296,7 +294,7 @@
       fill: none;
     }
 
-    /* ===== แถบล่าง ===== */
+    /* ===== BOTTOM NAV ===== */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -338,7 +336,7 @@
       border: none;
     }
 
-    /* ===== หน้าโปรไฟล์ ===== */
+    /* ===== PROFILE PAGE ===== */
     .profile-page {
       position: absolute;
       inset: 0;
@@ -470,7 +468,7 @@
       font-size: 14px;
     }
 
-    /* ===== อัปโหลดวิดีโอ ===== */
+    /* ===== UPLOAD PANEL ===== */
     .upload-panel {
       position: absolute;
       bottom: 0;
@@ -549,7 +547,7 @@
       cursor: pointer;
     }
 
-    /* ===== แก้ชื่อ ===== */
+    /* ===== EDIT NAME MODAL ===== */
     .edit-name-modal {
       position: fixed;
       inset: 0;
@@ -609,7 +607,7 @@
       cursor: pointer;
     }
 
-    /* ===== ความคิดเห็น ===== */
+    /* ===== COMMENTS PANEL ===== */
     .comments-panel {
       position: absolute;
       bottom: 0;
@@ -713,7 +711,7 @@
     <div class="splash-sub">สร้างสรรค์ แบ่งปัน สนุกไปด้วยกัน</div>
   </div>
 
-  <!-- ===== แอปหลัก ===== -->
+  <!-- ===== MAIN APP ===== -->
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
@@ -728,7 +726,7 @@
     <div class="sound-toggle" id="soundToggle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-        <path d="M19 7v10M23 12v2"></path>
+        <path d="M19 7v10M23 10v4"></path>
       </svg>
     </div>
 
@@ -882,7 +880,7 @@
   </div>
 
   <script>
-    // ===== ค่าคงที่เก็บข้อมูล =====
+    // ===== CONFIG =====
     const STORAGE = {
       AVATAR: 'thaipodee_avatar_v3',
       USERNAME: 'thaipodee_username_v3',
@@ -891,26 +889,25 @@
     const DEFAULT_AVATAR = 'https://picsum.photos/200/200';
     const DEFAULT_NAME = 'ชื่อผู้ใช้';
 
-    // =====================================================
-    // ===== SPLASH → หน้าหลัก — ทำงานแน่นอน =====
-    // =====================================================
+    // ===== SPLASH → MAIN — ทำงานแน่นอน =====
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
 
     function goToMain() {
-      console.log('✅ เข้าหน้าหลัก');
       if (splash) splash.classList.add('hidden');
       if (app) app.classList.add('visible');
-      if (typeof loadUserData === 'function') loadUserData();
-      if (typeof loadSavedVideos === 'function') loadSavedVideos();
+      loadUserData();
+      loadSavedVideos();
     }
 
-    // 1.5 วินาทีแล้วเข้าเอง
-    setTimeout(goToMain, 1500);
-    // กดที่หน้าจอก็เข้าได้ทันที
-    if (splash) splash.addEventListener('click', goToMain);
+    // โหลดเสร็จ → เข้าเอง 0.8 วินาที
+    window.addEventListener('load', function() {
+      setTimeout(goToMain, 800);
+      // แตะที่ไหนก็ได้ → เข้าทันที
+      document.addEventListener('click', goToMain, { once: true });
+    });
 
-    // ===== โหลดข้อมูลผู้ใช้ =====
+    // ===== USER DATA =====
     function loadUserData() {
       const avatar = localStorage.getItem(STORAGE.AVATAR) || DEFAULT_AVATAR;
       const name = localStorage.getItem(STORAGE.USERNAME) || DEFAULT_NAME;
@@ -934,7 +931,7 @@
       localStorage.setItem(STORAGE.USERNAME, name);
     }
 
-    // เปลี่ยนรูปโปรไฟล์
+    // Avatar upload
     const avatarTop = document.getElementById('avatarTop');
     const avatarPage = document.getElementById('avatarPage');
     const avatarInput = document.getElementById('avatarInput');
@@ -951,7 +948,7 @@
       });
     }
 
-    // เปลี่ยนชื่อ
+    // Edit Name Modal
     const profileNamePage = document.getElementById('profileNamePage');
     const profileNameBtn = document.getElementById('profileNameBtn');
     const editNameModal = document.getElementById('editNameModal');
@@ -987,7 +984,7 @@
       });
     }
 
-    // ===== หน้าโปรไฟล์ =====
+    // ===== PROFILE PAGE =====
     const profilePage = document.getElementById('profilePage');
     const profileClose = document.getElementById('profileClose');
     const profileBtnTop = document.getElementById('profileBtnTop');
@@ -1001,7 +998,7 @@
     if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
     if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== อัปโหลดวิดีโอ =====
+    // ===== UPLOAD VIDEO =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1083,11 +1080,11 @@
       mainVideo.src = url;
       mainVideo.style.display = 'block';
       mainVideo.muted = isMuted;
-      videoPlaceholder.style.display = 'none';
-      postInfo.style.display = 'block';
-      videoCaption.textContent = captionText || 'วิดีโอใหม่';
+      if (videoPlaceholder) videoPlaceholder.style.display = 'none';
+      if (postInfo) postInfo.style.display = 'block';
+      if (videoCaption) videoCaption.textContent = captionText || 'วิดีโอใหม่';
       
-      mainVideo.play().catch(err => console.log('เล่นอัตโนมัติถูกบล็อก:', err));
+      mainVideo.play().catch(err => console.log('Autoplay blocked:', err));
       
       mainVideo.ontimeupdate = () => {
         if (mainVideo.duration) {
@@ -1122,7 +1119,7 @@
         if (mainVideo) mainVideo.muted = isMuted;
         soundToggle.innerHTML = isMuted 
           ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M5 9v6"></path></svg>`
-          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 5v14"></path></svg>`;
+          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19 7v10M23 10v4"></path></svg>`;
       });
     }
 
@@ -1135,8 +1132,7 @@
       }
       
       profileVideosGrid.innerHTML = uploadedVideos.map(v => `
-        <div class="profile-video-item" style="background-image: url(${v.url})" data-url="${v.url}" data-caption="${v.caption || ''}">
-        </div>
+        <div class="profile-video-item" style="background-image: url(${v.url})" data-url="${v.url}" data-caption="${v.caption || ''}"></div>
       `).join('');
       
       profileVideosGrid.querySelectorAll('.profile-video-item').forEach(item => {
@@ -1159,7 +1155,7 @@
       if (captionInput) captionInput.value = '';
     }
 
-    // ===== ถูกใจ =====
+    // ===== LIKE =====
     const likeBtn = document.getElementById('likeBtn');
     const likeCount = document.getElementById('likeCount');
     let isLiked = false, likeNum = 0;
@@ -1172,7 +1168,7 @@
       });
     }
 
-    // ===== ความคิดเห็น =====
+    // ===== COMMENTS =====
     const commentBtn = document.getElementById('commentBtn');
     const commentsPanel = document.getElementById('commentsPanel');
     const commentsClose = document.getElementById('commentsClose');
@@ -1193,7 +1189,7 @@
       if (commentCountEl) commentCountEl.textContent = commentCount;
       if (commentsHeaderCount) commentsHeaderCount.textContent = commentCount + ' ความคิดเห็น';
       
-      const time = new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'});
+      const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
       const newComment = document.createElement('div');
       newComment.className = 'comment-item';
       newComment.innerHTML = `
@@ -1216,4 +1212,15 @@
       });
     }
     if (commentInput) {
-      commentInput.addEventListener('keydown',
+      commentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const text = commentInput.value.trim();
+          if (!text) return;
+          addComment(text);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
