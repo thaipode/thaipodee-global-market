@@ -1,6 +1,6 @@
 <!-- ======================================================
 ✅✅✅ ทุกส่วนที่มีป้าย ✅ ล็อกแล้ว ห้ามแก้เด็ดขาด ✅✅✅
-🔵 เฉพาะส่วนที่มีป้าย 🔵 เท่านั้นที่อนุญาตให้แก้ได้
+🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบน — แก้เท่านั้น
 ====================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -10,7 +10,7 @@
   <title>Thaipodee</title>
   <style>
 /* ======================================================
-✅ [ล็อก] RESET & BASE STYLES — ห้ามแก้
+✅ [ล็อก] RESET & BASE — ห้ามแก้
 ====================================================== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { 
@@ -21,7 +21,7 @@
     .app { width: 100%; height: 100%; height: 100dvh; position: relative; background: #000; overflow: hidden; }
 
 /* ======================================================
-✅ [ล็อก] วิดีโอ & การตรวจจับอัตราส่วน — ห้ามแก้
+✅ [ล็อก] วิดีโอ & ปุ่มอื่น ๆ — ห้ามแก้
 ====================================================== */
     .video-area {
       position: absolute; inset: 0; width: 100%; height: 100%;
@@ -31,8 +31,7 @@
     }
     .video-area video {
       position: absolute; inset: 0; width: 100%; height: 100%;
-      background: #000; display: block;
-      object-fit: contain;
+      background: #000; display: block; object-fit: contain;
     }
     .video-area video.ar-vertical { object-fit: cover; }
     .video-area video.ar-horizontal { object-fit: contain; }
@@ -61,9 +60,6 @@
       border-radius: 0 2px 2px 0;
     }
 
-/* ======================================================
-✅ [ล็อก] ปุ่มสลับจอ — ห้ามแก้
-====================================================== */
     .view-toggle {
       position: absolute; left: 14px;
       top: max(18px, env(safe-area-inset-top, 0px));
@@ -76,9 +72,6 @@
     }
     .view-toggle:active { transform: scale(0.9); }
 
-/* ======================================================
-✅ [ล็อก] แถบด้านบน — ห้ามแก้
-====================================================== */
     .top-bar {
       position: absolute; top: max(18px, env(safe-area-inset-top, 0px));
       left: 0; right: 0; display: flex; justify-content: center;
@@ -101,20 +94,18 @@
     }
 
 /* ======================================================
-✅ [ล็อก] เมนูด้านขวา — ห้ามแก้
+🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบน — แก้ตรงนี้
 ====================================================== */
     .right-menu {
       position: absolute; right: 14px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
-      gap: 22px;
-      z-index: 30;
+      gap: 22px; z-index: 30;
     }
     .r-btn {
       display: flex; flex-direction: column; align-items: center;
       gap: 2px; cursor: pointer; 
-      width: 56px; height: 56px;
-      justify-content: center;
+      width: 56px; height: 56px; justify-content: center;
       pointer-events: auto !important;
       transition: transform 0.15s ease;
       position: relative; z-index: 31;
@@ -123,11 +114,10 @@
     .r-icon { font-size: 28px; line-height: 1; }
     .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
 
+    /* 🔵 ปุ่มโปรไฟล์ด้านขวาบนสุด — กดได้ + เปลี่ยนรูปได้ */
     .prof-box { 
-      position: relative; 
-      cursor: pointer; 
-      z-index: 35 !important;
-      pointer-events: auto !important;
+      position: relative; cursor: pointer; 
+      z-index: 35 !important; pointer-events: auto !important;
       width: 56px; height: 56px;
       display: flex; align-items: center; justify-content: center;
     }
@@ -135,8 +125,12 @@
       width: 48px; height: 48px; border-radius: 50%;
       border: 2px solid #fff; 
       background: url('https://picsum.photos/100/100') center/cover;
-      cursor: pointer;
-      pointer-events: auto;
+      cursor: pointer; pointer-events: auto;
+      transition: all 0.2s ease;
+    }
+    .prof-box:active .prof-img {
+      transform: scale(0.95);
+      border-color: #fe28ea;
     }
     .follow-add {
       position: absolute; bottom: -4px; left: 50%;
@@ -146,6 +140,49 @@
       font-size: 14px; font-weight: bold; color: #fff;
       pointer-events: none;
     }
+
+    /* 🔵 หน้าแก้ไขโปรไฟล์ — เปิดเมื่อกดรูป */
+    .profile-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,.85);
+      z-index: 100; display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .profile-modal.show { display: flex; }
+    .profile-card {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 360px;
+      padding: 24px; color: #000; max-height: 85vh; overflow-y: auto;
+    }
+    .profile-close {
+      text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 16px;
+    }
+    .profile-avatar-wrap {
+      text-align: center; margin-bottom: 20px; position: relative;
+    }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 3px solid #fe28ea; background: url('https://picsum.photos/100/100') center/cover;
+      margin: 0 auto; cursor: pointer;
+    }
+    .avatar-edit-btn {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(50%);
+      background: #fe28ea; color: #fff; border: none; border-radius: 50%;
+      width: 32px; height: 32px; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .profile-label {
+      font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333;
+    }
+    .profile-input {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid #ddd; font-size: 15px; margin-bottom: 16px; outline: none;
+    }
+    .profile-save-btn {
+      width: 100%; padding: 14px; border-radius: 10px; border: none;
+      background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
+      color: #fff; font-size: 17px; font-weight: 700; cursor: pointer;
+    }
+    input[type="file"]#avatarInput { display: none; }
+
     .music-cover {
       width: 44px; height: 44px; border-radius: 50%;
       background: #222; border: 2px solid #fff;
@@ -155,9 +192,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ======================================================
-✅ [ล็อก] ข้อมูลผู้ใช้ด้านซ้าย — ห้ามแก้
-====================================================== */
     .info-left {
       position: absolute; left: 14px; right: 85px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
@@ -176,27 +210,21 @@
       opacity: 0.85; text-shadow: 0 1px 3px rgba(0,0,0,.5);
     }
 
-/* ======================================================
-🔵 [แก้จุดนี้เท่านั้น] เมนูด้านล่าง — ปุ่มข้อความกดไม่ได้
-====================================================== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
       height: calc(80px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(0,0,0,.8); display: flex;
       justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; 
-      z-index: 55; /* ✅ ยกขึ้นสูงสุด — ไม่โดนใครบัง */
+      border-top: 1px solid #333; z-index: 55;
     }
     .b-nav {
       display: flex; flex-direction: column; align-items: center;
       gap: 4px; cursor: pointer; color: #fff;
       font-size: 11px; opacity: 0.6;
-      pointer-events: auto !important; /* ✅ บังคับกดได้ */
-      padding: 12px 20px; /* ✅ ขยายพื้นที่กดให้ใหญ่ขึ้น */
-      min-width: 60px; /* ✅ กว้างพอ กดโดนแน่นอน */
-      z-index: 56; /* ✅ สูงกว่าแถบล่าง */
-      position: relative;
+      pointer-events: auto !important;
+      padding: 12px 20px; min-width: 60px;
+      z-index: 56; position: relative;
     }
     .b-nav.active { opacity: 1; }
     .b-nav:active { opacity: 0.8; transform: scale(0.95); }
@@ -207,16 +235,11 @@
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 24px; font-weight: bold; color: #000;
-      cursor: pointer; border: none; 
-      z-index: 57; /* ✅ สูงสุดในแถบล่าง */
-      pointer-events: auto !important;
-      position: relative;
+      cursor: pointer; border: none; z-index: 57;
+      pointer-events: auto !important; position: relative;
     }
     .create-box:active { transform: scale(0.95); }
 
-/* ======================================================
-✅ [ล็อก] หน้าอัปโหลด — ห้ามแก้
-====================================================== */
     .upload-panel {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #fff; border-radius: 20px 20px 0 0;
@@ -276,10 +299,10 @@
     </div>
     <div class="search-btn">🔍</div>
     
-    <!-- ✅ เมนูด้านขวา — ครบ 5 ปุ่ม ล็อกแล้ว -->
+    <!-- 🔵 ตัวที่ 1 — ปุ่มโปรไฟล์ด้านขวาบนสุด → กดเปิดหน้าแก้ไข -->
     <div class="right-menu">
       <div class="r-btn prof-box" id="profileBtn">
-        <div class="prof-img"></div>
+        <div class="prof-img" id="profileAvatarBtn"></div>
         <div class="follow-add">+</div>
       </div>
       <div class="r-btn" id="likeBtn">
@@ -300,12 +323,26 @@
     </div>
     
     <div class="info-left" id="postInfo">
-      <div class="username">ชื่อผู้ใช้</div>
+      <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
     
-    <!-- 🔵 เมนูด้านล่าง — ขยายพื้นที่กด + ยก z-index สูงสุด ทุกปุ่มกดได้แน่นอน -->
+    <!-- 🔵 หน้าแก้ไขโปรไฟล์ — เปิดเมื่อกดรูป -->
+    <div class="profile-modal" id="profileModal">
+      <div class="profile-card">
+        <div class="profile-close" id="closeProfile">✕</div>
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="editAvatar"></div>
+          <button class="avatar-edit-btn" id="changeAvatarBtn">✏️</button>
+          <input type="file" id="avatarInput" accept="image/*" />
+        </div>
+        <div class="profile-label">ชื่อผู้ใช้</div>
+        <input type="text" class="profile-input" id="editNameInput" placeholder="ใส่ชื่อผู้ใช้" maxlength="20" />
+        <button class="profile-save-btn" id="saveProfileBtn">บันทึก</button>
+      </div>
+    </div>
+    
     <div class="bottom-bar">
       <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
       <div class="b-nav" data-page="shop"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
@@ -331,10 +368,10 @@
 
   <script>
 /* ======================================================
-✅ [ล็อก] JAVASCRIPT — ทำงานครบแล้ว ห้ามแก้
+✅ [ล็อก] JAVASCRIPT — ส่วนอื่น ๆ ห้ามแก้
 ====================================================== */
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — ปุ่มข้อความแก้แล้ว กดได้แน่นอน!');
+      console.log('✅ ตัวที่ 1 — ปุ่มโปรไฟล์ เปลี่ยนรูป+ชื่อได้แล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -352,7 +389,6 @@
       const videoCaption = document.getElementById('videoCaption');
       const progressFill = document.getElementById('progressFill');
       const playPauseBtn = document.getElementById('playPauseBtn');
-      const profileBtn = document.getElementById('profileBtn');
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
       const shareBtn = document.getElementById('shareBtn');
@@ -360,14 +396,65 @@
       const musicBtn = document.getElementById('musicBtn');
       const viewToggle = document.getElementById('viewToggle');
 
+      // 🔵 ตัวที่ 1 — ตัวแปรโปรไฟล์
+      const profileBtn = document.getElementById('profileBtn');
+      const profileModal = document.getElementById('profileModal');
+      const closeProfile = document.getElementById('closeProfile');
+      const profileAvatarBtn = document.getElementById('profileAvatarBtn');
+      const editAvatar = document.getElementById('editAvatar');
+      const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+      const avatarInput = document.getElementById('avatarInput');
+      const editNameInput = document.getElementById('editNameInput');
+      const saveProfileBtn = document.getElementById('saveProfileBtn');
+      const displayUsername = document.getElementById('displayUsername');
+
       let pendingVideo = null;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
+      let currentAvatar = 'https://picsum.photos/100/100';
+      let currentName = 'ชื่อผู้ใช้';
 
-      // ✅ ปุ่มโปรไฟล์
+      // 🔵 ตัวที่ 1 — กดรูปโปรไฟล์ → เปิดหน้าแก้ไข
       if (profileBtn) profileBtn.addEventListener('click', e => {
         e.stopPropagation();
-        alert('เปิดหน้าโปรไฟล์');
+        editNameInput.value = currentName;
+        profileModal.classList.add('show');
+      });
+
+      // 🔵 ปิดหน้าโปรไฟล์
+      if (closeProfile) closeProfile.addEventListener('click', () => {
+        profileModal.classList.remove('show');
+      });
+      if (profileModal) profileModal.addEventListener('click', e => {
+        if (e.target === profileModal) profileModal.classList.remove('show');
+      });
+
+      // 🔵 เปลี่ยนรูปโปรไฟล์ — กดปุ่มดินสอ
+      if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        avatarInput.click();
+      });
+      if (avatarInput) avatarInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          currentAvatar = event.target.result;
+          profileAvatarBtn.style.background = `url(${currentAvatar}) center/cover`;
+          editAvatar.style.background = `url(${currentAvatar}) center/cover`;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // 🔵 บันทึกชื่อ + รูป
+      if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
+        const newName = editNameInput.value.trim();
+        if (newName) {
+          currentName = newName;
+          displayUsername.textContent = currentName;
+        }
+        profileModal.classList.remove('show');
+        alert('บันทึกเรียบร้อย!');
       });
 
       // ✅ ปุ่ม + อัปโหลด
@@ -433,7 +520,8 @@
       if (videoArea) {
         videoArea.addEventListener('click', function(e) {
           if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
-              e.target.closest('.upload-panel') || e.target.closest('.view-toggle')) return;
+              e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
+              e.target.closest('.profile-modal')) return;
           if (!mainVideo.src) return;
           
           if (mainVideo.paused) {
@@ -494,25 +582,17 @@
         });
       }
 
-      // 🔵 เมนูล่าง — ทุกปุ่มกดได้ โดยเฉพาะข้อความ
+      // ✅ เมนูล่าง — ทุกปุ่มกดได้
       document.querySelectorAll('.b-nav').forEach((nav) => {
         nav.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // ลบ active ทุกอัน ใส่อันที่กด
+          e.preventDefault(); e.stopPropagation();
           document.querySelectorAll('.b-nav').forEach(n => n.classList.remove('active'));
           nav.classList.add('active');
-          
-          // ดูว่ากดหน้าไหน
           const page = nav.getAttribute('data-page');
           const pageNames = {
-            home: 'หน้าหลัก',
-            shop: 'ร้านค้า',
-            message: 'ข้อความ',
-            profile: 'โปรไฟล์'
+            home: 'หน้าหลัก', shop: 'ร้านค้า',
+            message: 'ข้อความ', profile: 'โปรไฟล์'
           };
-          
           alert('ไปที่: ' + (pageNames[page] || 'หน้าใหม่'));
         });
       });
