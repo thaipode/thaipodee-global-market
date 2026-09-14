@@ -1,3 +1,7 @@
+<!-- ======================================================
+✅✅✅ ทุกส่วนที่มีป้าย ✅ ล็อกแล้ว ห้ามแก้เด็ดขาด ✅✅✅
+🔵 เฉพาะส่วนที่มีป้าย 🔵 เท่านั้นที่อนุญาตให้แก้ได้
+====================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -5,16 +9,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Thaipodee</title>
   <style>
+/* ======================================================
+✅ [ล็อก] RESET & BASE STYLES — ห้ามแก้
+====================================================== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     html, body { 
       width: 100%; height: 100%; height: 100dvh;
       overflow: hidden; background: #000; color: #fff;
       position: fixed; inset: 0; overscroll-behavior: none;
     }
-
-    .splash-screen { display: none !important; opacity: 0 !important; visibility: hidden !important; }
     .app { width: 100%; height: 100%; height: 100dvh; position: relative; background: #000; overflow: hidden; }
 
+/* ======================================================
+✅ [ล็อก] วิดีโอ & การตรวจจับอัตราส่วน — ห้ามแก้
+====================================================== */
     .video-area {
       position: absolute; inset: 0; width: 100%; height: 100%;
       background: #000; overflow: hidden; z-index: 1;
@@ -23,7 +31,7 @@
     }
     .video-area video {
       position: absolute; inset: 0; width: 100%; height: 100%;
-      background: #000; display: block; transition: all 0.3s ease;
+      background: #000; display: block;
       object-fit: contain;
     }
     .video-area video.ar-vertical { object-fit: cover; }
@@ -39,7 +47,7 @@
       transform: translate(-50%, -50%); font-size: 64px; color: #fff;
       background: rgba(0,0,0,.5); width: 90px; height: 90px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;
+      opacity: 0; pointer-events: none; z-index: 10;
     }
     .play-pause-indicator.show { opacity: 1; }
 
@@ -50,42 +58,94 @@
     .progress-done {
       width: 0%; height: 100%;
       background: linear-gradient(90deg, #25f4ee, #fe28ea);
-      border-radius: 0 2px 2px 0; transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
     }
 
-    /* ===== เมนูด้านขวา — ครบ 5 ปุ่ม เรียงชัด ไม่ซ้อน ไม่หาย ===== */
+/* ======================================================
+✅ [ล็อก] ปุ่มสลับจอ — ห้ามแก้
+====================================================== */
+    .view-toggle {
+      position: absolute; left: 14px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      z-index: 50; cursor: pointer;
+      background: rgba(0,0,0,.5); border-radius: 50%;
+      width: 40px; height: 40px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
+      pointer-events: auto;
+    }
+    .view-toggle:active { transform: scale(0.9); }
+
+/* ======================================================
+✅ [ล็อก] แถบด้านบน — ห้ามแก้
+====================================================== */
+    .top-bar {
+      position: absolute; top: max(18px, env(safe-area-inset-top, 0px));
+      left: 0; right: 0; display: flex; justify-content: center;
+      align-items: center; z-index: 40;
+    }
+    .tab {
+      font-size: 16px; color: rgba(255,255,255,.6);
+      cursor: pointer; padding: 0 12px;
+      pointer-events: auto;
+    }
+    .tab.active {
+      color: #fff; font-weight: 600;
+      border-bottom: 2px solid #fff; padding-bottom: 3px;
+    }
+    .search-btn {
+      position: absolute; right: 14px;
+      top: max(18px, env(safe-area-inset-top, 0px));
+      font-size: 22px; cursor: pointer; z-index: 41;
+      pointer-events: auto;
+    }
+
+/* ======================================================
+🔵 [อนุญาตแก้ได้] เมนูด้านขวา — ปุ่มโปรไฟล์+ทุกปุ่มกดได้
+====================================================== */
     .right-menu {
       position: absolute; right: 14px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
-      gap: 22px;
-      z-index: 20;
+      gap: 22px; /* ✅ ห่างกันพอดี ไม่ซ้อน — ล็อกค่านี้ */
+      z-index: 30;
     }
     .r-btn {
       display: flex; flex-direction: column; align-items: center;
       gap: 2px; cursor: pointer; 
-      width: 56px; height: 56px;
+      width: 56px; height: 56px; /* ✅ ขนาดพอดี กดง่าย — ล็อกค่านี้ */
       justify-content: center;
-      pointer-events: auto;
+      pointer-events: auto !important; /* ✅ บังคับกดได้ — ห้ามลบ */
       transition: transform 0.15s ease;
-      user-select: none; -webkit-tap-highlight-color: transparent;
+      position: relative; z-index: 31;
     }
     .r-btn:active { transform: scale(0.9); }
     .r-icon { font-size: 28px; line-height: 1; }
     .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
 
-    .prof-box { position: relative; cursor: pointer; }
+    /* 🔵 ปุ่มโปรไฟล์ — บนสุด สำคัญที่สุด z-index สูงสุด */
+    .prof-box { 
+      position: relative; 
+      cursor: pointer; 
+      z-index: 35 !important; /* ✅ สูงสุด — ห้ามลด */
+      pointer-events: auto !important;
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+    }
     .prof-img {
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 2px solid #fff; background: url('https://picsum.photos/100/100') center/cover;
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 2px solid #fff; 
+      background: url('https://picsum.photos/100/100') center/cover;
       cursor: pointer;
+      pointer-events: auto;
     }
     .follow-add {
       position: absolute; bottom: -4px; left: 50%;
-      transform: translateX(-50%); width: 18px; height: 18px;
+      transform: translateX(-50%); width: 20px; height: 20px;
       border-radius: 50%; background: #ff0050;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: bold; color: #fff;
+      font-size: 14px; font-weight: bold; color: #fff;
+      pointer-events: none;
     }
     .music-cover {
       width: 44px; height: 44px; border-radius: 50%;
@@ -96,6 +156,9 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ======================================================
+✅ [ล็อก] ข้อมูลผู้ใช้ด้านซ้าย — ห้ามแก้
+====================================================== */
     .info-left {
       position: absolute; left: 14px; right: 85px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
@@ -114,52 +177,24 @@
       opacity: 0.85; text-shadow: 0 1px 3px rgba(0,0,0,.5);
     }
 
-    .top-bar {
-      position: absolute; top: max(18px, env(safe-area-inset-top, 0px));
-      left: 0; right: 0; display: flex; justify-content: center;
-      align-items: center; z-index: 15;
-    }
-    .tab {
-      font-size: 16px; color: rgba(255,255,255,.6);
-      cursor: pointer; padding: 0 12px;
-    }
-    .tab.active {
-      color: #fff; font-weight: 600;
-      border-bottom: 2px solid #fff; padding-bottom: 3px;
-    }
-    .search-btn {
-      position: absolute; right: 14px;
-      top: max(18px, env(safe-area-inset-top, 0px));
-      font-size: 22px; cursor: pointer; z-index: 15;
-    }
-
-    .view-toggle {
-      position: absolute; left: 14px;
-      top: max(18px, env(safe-area-inset-top, 0px));
-      z-index: 15; cursor: pointer;
-      background: rgba(0,0,0,.5); border-radius: 50%;
-      width: 40px; height: 40px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 20px; color: #fff; border: 1px solid rgba(255,255,255,.3);
-      pointer-events: auto;
-    }
-    .view-toggle:active { transform: scale(0.9); }
-
-    /* ===== เมนูด้านล่าง — ทุกปุ่มกดได้แน่นอน ===== */
+/* ======================================================
+🔵 [อนุญาตแก้ได้] เมนูด้านล่าง — ทุกปุ่มกดได้
+====================================================== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
       height: calc(80px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(0,0,0,.8); display: flex;
       justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; z-index: 30;
+      border-top: 1px solid #333; z-index: 40; /* ✅ สูงสุด — ห้ามลด */
     }
     .b-nav {
       display: flex; flex-direction: column; align-items: center;
       gap: 4px; cursor: pointer; color: #fff;
       font-size: 11px; opacity: 0.6;
-      pointer-events: auto;
+      pointer-events: auto !important; /* ✅ บังคับกดได้ — ห้ามลบ */
       padding: 8px 12px;
+      z-index: 41;
     }
     .b-nav.active { opacity: 1; }
     .b-nav:active { opacity: 0.8; }
@@ -170,16 +205,19 @@
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 24px; font-weight: bold; color: #000;
-      cursor: pointer; border: none; z-index: 35;
-      pointer-events: auto;
+      cursor: pointer; border: none; z-index: 45; /* ✅ สูงสุด — ห้ามลด */
+      pointer-events: auto !important;
     }
     .create-box:active { transform: scale(0.95); }
 
+/* ======================================================
+✅ [ล็อก] หน้าอัปโหลด — ห้ามแก้
+====================================================== */
     .upload-panel {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: #fff; border-radius: 20px 20px 0 0;
       padding: 20px 24px; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-      z-index: 50; transform: translateY(100%);
+      z-index: 60; transform: translateY(100%);
       transition: transform 0.3s ease; max-height: 85vh;
       overflow-y: auto; overscroll-behavior: contain; color: #000;
     }
@@ -218,7 +256,6 @@
   </style>
 </head>
 <body>
-  <div class="splash-screen" id="splashScreen"></div>
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</div>
@@ -235,9 +272,9 @@
     </div>
     <div class="search-btn">🔍</div>
     
-    <!-- เมนูด้านขวา — ครบ 5 ปุ่ม ไม่มีปุ่มเสียงแล้ว -->
+    <!-- 🔵 เมนูด้านขวา — ครบ 5 ปุ่ม เรียง: โปรไฟล์, ❤️, 💬, ↗️, 🎵 -->
     <div class="right-menu">
-      <div class="r-btn prof-box">
+      <div class="r-btn prof-box" id="profileBtn">
         <div class="prof-img"></div>
         <div class="follow-add">+</div>
       </div>
@@ -264,7 +301,7 @@
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
     
-    <!-- เมนูด้านล่าง — ทุกปุ่มกดได้ -->
+    <!-- 🔵 เมนูด้านล่าง — ครบ 5 ปุ่ม ทุกอันกดได้ -->
     <div class="bottom-bar">
       <div class="b-nav active"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
       <div class="b-nav"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
@@ -289,8 +326,11 @@
   </div>
 
   <script>
+/* ======================================================
+✅ [ล็อก] JAVASCRIPT — ทำงานครบแล้ว ห้ามแก้
+====================================================== */
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — ไม่มีปุ่มเสียง แตะจอควบคุมเล่น/หยุด+เสียงเอง');
+      console.log('✅ โหลดเสร็จ — ทุกปุ่มทำงานครบ ล็อกเรียบร้อย');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -308,6 +348,7 @@
       const videoCaption = document.getElementById('videoCaption');
       const progressFill = document.getElementById('progressFill');
       const playPauseBtn = document.getElementById('playPauseBtn');
+      const profileBtn = document.getElementById('profileBtn');
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
       const shareBtn = document.getElementById('shareBtn');
@@ -318,6 +359,12 @@
       let pendingVideo = null;
       let isLiked = false, likeNum = 0;
       let fitMode = false;
+
+      // ✅ ปุ่มโปรไฟล์ — กดได้แน่นอน
+      if (profileBtn) profileBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        alert('เปิดหน้าโปรไฟล์');
+      });
 
       // ✅ ปุ่ม + อัปโหลด
       if (createBtn) createBtn.addEventListener('click', e => { 
@@ -348,17 +395,15 @@
         fileWrapper.style.display = 'block'; captionInput.value = '';
       }
 
-      // ✅ ตรวจจับอัตราส่วน 9:16 / 16:9 อัตโนมัติ
+      // ✅ ตรวจจับอัตราส่วน 9:16 / 16:9
       function checkAspectRatio(videoEl) {
         videoEl.addEventListener('loadedmetadata', function() {
           const ratio = videoEl.videoWidth / videoEl.videoHeight;
           videoEl.classList.remove('ar-vertical', 'ar-horizontal');
           if (ratio < 1) {
             videoEl.classList.add('ar-vertical');
-            console.log('✅ แนวตั้ง 9:16 → เต็มจอ');
           } else {
             videoEl.classList.add('ar-horizontal');
-            console.log('✅ แนวนอน 16:9 → พอดีจอ');
           }
         });
       }
@@ -366,7 +411,7 @@
       function showVideo(url, captionText) {
         mainVideo.src = url;
         mainVideo.style.display = 'block';
-        mainVideo.muted = false; // เริ่มต้นมีเสียงเลย
+        mainVideo.muted = false;
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'วิดีโอใหม่';
@@ -380,7 +425,7 @@
         });
       }
 
-      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียงเปิด-ปิดอัตโนมัติ
+      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียงอัตโนมัติ
       if (videoArea) {
         videoArea.addEventListener('click', function(e) {
           if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
@@ -388,12 +433,10 @@
           if (!mainVideo.src) return;
           
           if (mainVideo.paused) {
-            // เล่น → เปิดเสียงด้วย
             mainVideo.muted = false;
             mainVideo.play();
             playPauseBtn.textContent = '⏸';
           } else {
-            // หยุด → ปิดเสียงด้วย
             mainVideo.pause();
             playPauseBtn.textContent = '▶';
           }
@@ -457,8 +500,6 @@
           if (names[idx]) alert('ไปที่: ' + names[idx]);
         });
       });
-
-      console.log('✅ เสร็จ — ไม่มีปุ่มเสียง! แตะจอควบคุมเอง เล่น=มีเสียง หยุด=หยุดเสียง');
     });
   </script>
 </body>
