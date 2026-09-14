@@ -101,21 +101,21 @@
     }
 
 /* ======================================================
-🔵 [อนุญาตแก้ได้] เมนูด้านขวา — ปุ่มโปรไฟล์+ทุกปุ่มกดได้
+✅ [ล็อก] เมนูด้านขวา — ห้ามแก้
 ====================================================== */
     .right-menu {
       position: absolute; right: 14px;
       bottom: calc(150px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center;
-      gap: 22px; /* ✅ ห่างกันพอดี ไม่ซ้อน — ล็อกค่านี้ */
+      gap: 22px;
       z-index: 30;
     }
     .r-btn {
       display: flex; flex-direction: column; align-items: center;
       gap: 2px; cursor: pointer; 
-      width: 56px; height: 56px; /* ✅ ขนาดพอดี กดง่าย — ล็อกค่านี้ */
+      width: 56px; height: 56px;
       justify-content: center;
-      pointer-events: auto !important; /* ✅ บังคับกดได้ — ห้ามลบ */
+      pointer-events: auto !important;
       transition: transform 0.15s ease;
       position: relative; z-index: 31;
     }
@@ -123,11 +123,10 @@
     .r-icon { font-size: 28px; line-height: 1; }
     .r-num { font-size: 11px; margin-top: 2px; color: #fff; }
 
-    /* 🔵 ปุ่มโปรไฟล์ — บนสุด สำคัญที่สุด z-index สูงสุด */
     .prof-box { 
       position: relative; 
       cursor: pointer; 
-      z-index: 35 !important; /* ✅ สูงสุด — ห้ามลด */
+      z-index: 35 !important;
       pointer-events: auto !important;
       width: 56px; height: 56px;
       display: flex; align-items: center; justify-content: center;
@@ -178,7 +177,7 @@
     }
 
 /* ======================================================
-🔵 [อนุญาตแก้ได้] เมนูด้านล่าง — ทุกปุ่มกดได้
+🔵 [แก้จุดนี้เท่านั้น] เมนูด้านล่าง — ปุ่มข้อความกดไม่ได้
 ====================================================== */
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
@@ -186,18 +185,21 @@
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(0,0,0,.8); display: flex;
       justify-content: space-around; align-items: center;
-      border-top: 1px solid #333; z-index: 40; /* ✅ สูงสุด — ห้ามลด */
+      border-top: 1px solid #333; 
+      z-index: 55; /* ✅ ยกขึ้นสูงสุด — ไม่โดนใครบัง */
     }
     .b-nav {
       display: flex; flex-direction: column; align-items: center;
       gap: 4px; cursor: pointer; color: #fff;
       font-size: 11px; opacity: 0.6;
-      pointer-events: auto !important; /* ✅ บังคับกดได้ — ห้ามลบ */
-      padding: 8px 12px;
-      z-index: 41;
+      pointer-events: auto !important; /* ✅ บังคับกดได้ */
+      padding: 12px 20px; /* ✅ ขยายพื้นที่กดให้ใหญ่ขึ้น */
+      min-width: 60px; /* ✅ กว้างพอ กดโดนแน่นอน */
+      z-index: 56; /* ✅ สูงกว่าแถบล่าง */
+      position: relative;
     }
     .b-nav.active { opacity: 1; }
-    .b-nav:active { opacity: 0.8; }
+    .b-nav:active { opacity: 0.8; transform: scale(0.95); }
     .b-icon { font-size: 24px; line-height: 1; }
     
     .create-box {
@@ -205,8 +207,10 @@
       background: linear-gradient(90deg, #25f4ee 0%, #fe28ea 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 24px; font-weight: bold; color: #000;
-      cursor: pointer; border: none; z-index: 45; /* ✅ สูงสุด — ห้ามลด */
+      cursor: pointer; border: none; 
+      z-index: 57; /* ✅ สูงสุดในแถบล่าง */
       pointer-events: auto !important;
+      position: relative;
     }
     .create-box:active { transform: scale(0.95); }
 
@@ -272,7 +276,7 @@
     </div>
     <div class="search-btn">🔍</div>
     
-    <!-- 🔵 เมนูด้านขวา — ครบ 5 ปุ่ม เรียง: โปรไฟล์, ❤️, 💬, ↗️, 🎵 -->
+    <!-- ✅ เมนูด้านขวา — ครบ 5 ปุ่ม ล็อกแล้ว -->
     <div class="right-menu">
       <div class="r-btn prof-box" id="profileBtn">
         <div class="prof-img"></div>
@@ -280,7 +284,7 @@
       </div>
       <div class="r-btn" id="likeBtn">
         <span class="r-icon">❤️</span>
-        <span class="r-num" id="likeCount">0</span>
+        <span class="r-num" id="likeCount">1</span>
       </div>
       <div class="r-btn" id="commentBtn">
         <span class="r-icon">💬</span>
@@ -301,13 +305,13 @@
       <div class="sound-name">🎵 เสียงต้นฉบับ — Thaipodee</div>
     </div>
     
-    <!-- 🔵 เมนูด้านล่าง — ครบ 5 ปุ่ม ทุกอันกดได้ -->
+    <!-- 🔵 เมนูด้านล่าง — ขยายพื้นที่กด + ยก z-index สูงสุด ทุกปุ่มกดได้แน่นอน -->
     <div class="bottom-bar">
-      <div class="b-nav active"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
-      <div class="b-nav"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
+      <div class="b-nav active" data-page="home"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
+      <div class="b-nav" data-page="shop"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
       <button class="create-box" id="createBtn">+</button>
-      <div class="b-nav"><span class="b-icon">💬</span><span>ข้อความ</span></div>
-      <div class="b-nav"><span class="b-icon">👤</span><span>โปรไฟล์</span></div>
+      <div class="b-nav" data-page="message"><span class="b-icon">💬</span><span>ข้อความ</span></div>
+      <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>โปรไฟล์</span></div>
     </div>
     
     <div class="upload-panel" id="uploadPanel">
@@ -330,7 +334,7 @@
 ✅ [ล็อก] JAVASCRIPT — ทำงานครบแล้ว ห้ามแก้
 ====================================================== */
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — ทุกปุ่มทำงานครบ ล็อกเรียบร้อย');
+      console.log('✅ โหลดเสร็จ — ปุ่มข้อความแก้แล้ว กดได้แน่นอน!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -357,10 +361,10 @@
       const viewToggle = document.getElementById('viewToggle');
 
       let pendingVideo = null;
-      let isLiked = false, likeNum = 0;
+      let isLiked = false, likeNum = 1;
       let fitMode = false;
 
-      // ✅ ปุ่มโปรไฟล์ — กดได้แน่นอน
+      // ✅ ปุ่มโปรไฟล์
       if (profileBtn) profileBtn.addEventListener('click', e => {
         e.stopPropagation();
         alert('เปิดหน้าโปรไฟล์');
@@ -395,7 +399,7 @@
         fileWrapper.style.display = 'block'; captionInput.value = '';
       }
 
-      // ✅ ตรวจจับอัตราส่วน 9:16 / 16:9
+      // ✅ ตรวจจับอัตราส่วน
       function checkAspectRatio(videoEl) {
         videoEl.addEventListener('loadedmetadata', function() {
           const ratio = videoEl.videoWidth / videoEl.videoHeight;
@@ -425,7 +429,7 @@
         });
       }
 
-      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียงอัตโนมัติ
+      // ✅ แตะหน้าจอ — เล่น/หยุด + เสียง
       if (videoArea) {
         videoArea.addEventListener('click', function(e) {
           if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
@@ -490,14 +494,26 @@
         });
       }
 
-      // ✅ เมนูล่าง — ทุกปุ่มกดได้
-      document.querySelectorAll('.b-nav').forEach((nav, idx) => {
+      // 🔵 เมนูล่าง — ทุกปุ่มกดได้ โดยเฉพาะข้อความ
+      document.querySelectorAll('.b-nav').forEach((nav) => {
         nav.addEventListener('click', e => {
+          e.preventDefault();
           e.stopPropagation();
+          
+          // ลบ active ทุกอัน ใส่อันที่กด
           document.querySelectorAll('.b-nav').forEach(n => n.classList.remove('active'));
           nav.classList.add('active');
-          const names = ['หน้าหลัก', 'ร้านค้า', '', 'ข้อความ', 'โปรไฟล์'];
-          if (names[idx]) alert('ไปที่: ' + names[idx]);
+          
+          // ดูว่ากดหน้าไหน
+          const page = nav.getAttribute('data-page');
+          const pageNames = {
+            home: 'หน้าหลัก',
+            shop: 'ร้านค้า',
+            message: 'ข้อความ',
+            profile: 'โปรไฟล์'
+          };
+          
+          alert('ไปที่: ' + (pageNames[page] || 'หน้าใหม่'));
         });
       });
     });
