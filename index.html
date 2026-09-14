@@ -169,7 +169,6 @@
       max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
     }
 
-    /* === เมนูเลือกเพลงจากเครื่อง === */
     .music-modal {
       position: absolute; inset: 0; background: rgba(0,0,0,.85);
       z-index: 200; display: none; align-items: flex-end; justify-content: center;
@@ -189,7 +188,6 @@
     .music-sheet-title { font-size: 18px; font-weight: 700; }
     .music-sheet-close { font-size: 24px; cursor: pointer; color: #888; }
     
-    /* === ปุ่มเลือกไฟล์เพลง === */
     .music-upload-box {
       border: 2px dashed #25f4ee; border-radius: 12px;
       padding: 30px 20px; text-align: center;
@@ -213,7 +211,7 @@
     .music-selected-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
     .music-selected-actions { display: flex; gap: 10px; }
     .music-action-btn {
-      flex: 1; padding: 8px 12px; border-radius: 8px; border: none;
+      flex: 1; padding: 10px 12px; border-radius: 8px; border: none;
       font-size: 14px; cursor: pointer; font-weight: 500;
     }
     .btn-play { background: #25f4ee; color: #000; }
@@ -304,7 +302,7 @@
 <body>
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
-      <div class="music-hint" id="musicHint">🎵 แตะหน้าจอเพื่อเล่นเพลง</div>
+      <div class="music-hint" id="musicHint">🎵 แตะหน้าจอเพื่อเล่นเสียง</div>
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
       <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
       <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline muted></video>
@@ -337,7 +335,7 @@
         <span class="r-icon">↗️</span>
         <span class="r-num">0</span>
       </div>
-      <div class="r-btn" id="musicBtn" title="เลือกเพลงจากเครื่อง">
+      <div class="r-btn" id="musicBtn" title="เลือกไฟล์เสียงจากมือถือ">
         <div class="music-cover" id="musicCoverIcon">🎵</div>
       </div>
     </div>
@@ -345,40 +343,36 @@
     <div class="info-left" id="postInfo">
       <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
-      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">กดเลือกเพลงจากในมือถือ</span></div>
+      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">แตะเพื่อเลือกไฟล์เสียง</span></div>
     </div>
     
-    <!-- === เมนูเลือกเพลงจากไฟล์ในมือถือ === -->
     <div class="music-modal" id="musicModal">
       <div class="music-sheet">
         <div class="music-sheet-header">
-          <span class="music-sheet-title">🎵 เลือกไฟล์เพลงจากมือถือ</span>
+          <span class="music-sheet-title">🎵 เลือกไฟล์เสียงจากมือถือ</span>
           <span class="music-sheet-close" id="closeMusicSheet">✕</span>
         </div>
         
-        <!-- ปุ่มเลือกไฟล์เพลง -->
         <div class="music-upload-box" id="musicUploadBox">
           <div class="music-upload-icon">📁</div>
-          <div class="music-upload-text">แตะเพื่อเลือกไฟล์เพลง</div>
-          <div class="music-upload-hint">รองรับ MP3, WAV, OGG, M4A<br>รวมเพลงที่แต่งจาก Suno ด้วย</div>
+          <div class="music-upload-text">แตะเพื่อเปิดคลังเสียงในมือถือ</div>
+          <div class="music-upload-hint">รองรับ MP3, M4A, WAV, OGG, FLAC<br>เพลง ดนตรี เสียงพูด ทุกไฟล์เสียง</div>
           <input type="file" id="musicFileInput" accept="audio/*" />
         </div>
         
-        <!-- แสดงไฟล์เพลงที่เลือกแล้ว -->
         <div class="music-selected" id="musicSelectedBox">
-          <div class="music-selected-name" id="selectedMusicName">ชื่อเพลง.mp3</div>
+          <div class="music-selected-name" id="selectedMusicName">ชื่อไฟล์เสียง</div>
           <div class="music-selected-actions">
             <button class="music-action-btn btn-play" id="previewMusicBtn">▶ ฟังตัวอย่าง</button>
             <button class="music-action-btn btn-remove" id="removeMusicBtn">🗑️ ลบ</button>
           </div>
         </div>
         
-        <!-- ตัวเลือกไม่ใช้เพลง -->
         <div class="no-music-option" id="noMusicOption">
           <span style="font-size:24px;">🔇</span>
           <div>
-            <div style="font-weight:600;">ไม่ใช้เพลง</div>
-            <div style="font-size:12px; color:#888;">ใช้เสียงต้นฉบับของวิดีโอ</div>
+            <div style="font-weight:600;">ไม่ใช้เสียง</div>
+            <div style="font-size:12px; color:#888;">ปิดเสียงทั้งหมด</div>
           </div>
         </div>
       </div>
@@ -407,12 +401,12 @@
       <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>ฉัน</span></div>
     </div>
 
-    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous" style="display:none;">
+    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — เลือกเพลงจากมือถือได้แล้ว!');
+      console.log('✅ พร้อมใช้งาน — เลือกไฟล์เสียงจากมือถือได้แล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -445,7 +439,6 @@
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
       
-      // === ส่วนเลือกเพลงจากไฟล์ในมือถือ ===
       const musicUploadBox = document.getElementById('musicUploadBox');
       const musicFileInput = document.getElementById('musicFileInput');
       const musicSelectedBox = document.getElementById('musicSelectedBox');
@@ -455,15 +448,14 @@
       const noMusicOption = document.getElementById('noMusicOption');
 
       let pendingFile = null;
-      let selectedMusicFile = null; // เก็บไฟล์เพลงที่เลือกจากเครื่อง
-      let selectedMusicUrl = null;  // URL ของไฟล์เพลง
+      let selectedMusicFile = null;
+      let selectedMusicUrl = null;
       let isMusicPlaying = false;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let postType = null;
       let hasUserInteracted = false;
 
-      // === เปิด-ปิดเมนูเพลง ===
       function openMusicSheet() { musicModal.classList.add('show'); }
       function closeMusicSheetFn() { musicModal.classList.remove('show'); }
       if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
@@ -471,53 +463,46 @@
       if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
       if (musicModal) musicModal.addEventListener('click', e => { if (e.target === musicModal) closeMusicSheetFn(); });
 
-      // === กดเลือกไฟล์เพลงจากมือถือ ===
+      // === เปิดคลังไฟล์เสียงในมือถือโดยตรง ===
       if (musicUploadBox) musicUploadBox.addEventListener('click', () => {
         musicFileInput.click();
       });
 
-      // === เมื่อเลือกไฟล์เพลงเสร็จ ===
+      // === เมื่อเลือกไฟล์เสียงจากคลัง ===
       if (musicFileInput) musicFileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         if (!file) return;
         
-        // ตรวจสอบประเภทไฟล์
         if (!file.type.startsWith('audio/')) {
-          musicHint.textContent = '❌ กรุณาเลือกไฟล์เสียง MP3/WAV/M4A';
+          musicHint.textContent = '❌ กรุณาเลือกไฟล์เสียง';
           musicHint.classList.add('show', 'error');
           setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
           return;
         }
 
-        // บันทึกข้อมูลไฟล์
         selectedMusicFile = file;
         selectedMusicUrl = URL.createObjectURL(file);
         
-        // แสดงชื่อไฟล์ (ตัดให้สั้นลง)
         let displayName = file.name;
-        if (displayName.length > 25) {
-          displayName = displayName.substring(0, 22) + '...';
+        if (displayName.length > 28) {
+          displayName = displayName.substring(0, 25) + '...';
         }
         selectedMusicName.textContent = '🎵 ' + displayName;
         
-        // ซ่อนกล่องอัปโหลด แสดงกล่องที่เลือกแล้ว
         musicUploadBox.style.display = 'none';
         musicSelectedBox.classList.add('show');
         noMusicOption.classList.remove('selected');
-        
-        // อัปเดตชื่อเพลงที่แสดงในหน้าหลัก
         soundName.textContent = '🎵 ' + displayName;
         
-        // แจ้งเตือนสำเร็จ
-        musicHint.textContent = '✅ เลือกเพลงแล้ว — แตะหน้าจอเพื่อเล่น';
+        musicHint.textContent = '✅ เลือกเสียงแล้ว — แตะหน้าจอเพื่อเล่น';
         musicHint.classList.add('show', 'success');
-        setTimeout(() => musicHint.classList.remove('show', 'success'), 3000);
+        setTimeout(() => musicHint.classList.remove('show', 'success'), 2500);
         
         closeMusicSheetFn();
       });
 
-      // === ฟังตัวอย่างเพลง ===
-      if (previewMusicBtn) previewMusicBtn.addEventListener('click', e => {
+      // === ฟังตัวอย่างเสียง ===
+      if (previewMusicBtn) previewMusicBtn.addEventListener('click', async e => {
         e.stopPropagation();
         if (!selectedMusicUrl) return;
         
@@ -525,11 +510,17 @@
         
         if (bgMusic.paused) {
           bgMusic.src = selectedMusicUrl;
-          bgMusic.volume = 0.5;
-          bgMusic.play();
-          previewMusicBtn.textContent = '⏸ หยุด';
-          musicCoverIcon.classList.add('playing');
-          isMusicPlaying = true;
+          bgMusic.volume = 0.8;
+          try {
+            await bgMusic.play();
+            previewMusicBtn.textContent = '⏸ หยุด';
+            musicCoverIcon.classList.add('playing');
+            isMusicPlaying = true;
+          } catch (err) {
+            musicHint.textContent = '❌ ไม่สามารถเล่นไฟล์นี้ได้';
+            musicHint.classList.add('show', 'error');
+            setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
+          }
         } else {
           bgMusic.pause();
           previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
@@ -538,7 +529,7 @@
         }
       });
 
-      // === ลบเพลงที่เลือก ===
+      // === ลบไฟล์เสียง ===
       if (removeMusicBtn) removeMusicBtn.addEventListener('click', e => {
         e.stopPropagation();
         bgMusic.pause();
@@ -547,16 +538,15 @@
         selectedMusicUrl = null;
         isMusicPlaying = false;
         
-        // กลับสู่สถานะเริ่มต้น
         musicUploadBox.style.display = 'block';
         musicSelectedBox.classList.remove('show');
         musicCoverIcon.classList.remove('playing');
         previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
-        soundName.textContent = 'กดเลือกเพลงจากในมือถือ';
+        soundName.textContent = 'แตะเพื่อเลือกไฟล์เสียง';
         musicFileInput.value = '';
       });
 
-      // === ไม่ใช้เพลง ===
+      // === ไม่ใช้เสียง ===
       if (noMusicOption) noMusicOption.addEventListener('click', () => {
         bgMusic.pause();
         bgMusic.src = '';
@@ -568,7 +558,7 @@
         musicSelectedBox.classList.remove('show');
         musicCoverIcon.classList.remove('playing');
         noMusicOption.classList.add('selected');
-        soundName.textContent = '🔇 ไม่ใช้เพลง';
+        soundName.textContent = '🔇 ไม่ใช้เสียง';
         musicFileInput.value = '';
         
         closeMusicSheetFn();
@@ -611,20 +601,16 @@
         fileWrapper.style.display = 'block'; captionInput.value = '';
       }
 
-      // === แสดงเนื้อหา — พร้อมเพลงที่เลือก ===
+      // === แสดงภาพ/วิดีโอ พร้อมเสียงประกอบ ===
       function showContent(url, type, captionText) {
         postType = type;
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'โพสต์ใหม่';
         
-        // ถ้ามีเพลงที่เลือกไว้ ให้ตั้งค่าเตรียมเล่น
         if (selectedMusicUrl) {
           bgMusic.src = selectedMusicUrl;
-          bgMusic.volume = 0.5;
-          musicHint.textContent = '✅ พร้อมแล้ว — แตะหน้าจอเพื่อเล่นเพลง';
-          musicHint.classList.add('show', 'success');
-          setTimeout(() => musicHint.classList.remove('show', 'success'), 3000);
+          bgMusic.volume = 0.8;
         }
 
         if (type === 'image') {
@@ -645,7 +631,7 @@
         }
       }
 
-      // === แตะหน้าจอ — เล่น/หยุดเพลง ===
+      // === แตะหน้าจอ — เล่น/หยุดเสียงประกอบภาพนิ่ง ===
       if (videoArea) videoArea.addEventListener('click', async function(e) {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
             e.target.closest('.upload-panel') || e.target.closest('.music-modal') || 
@@ -653,7 +639,7 @@
         
         hasUserInteracted = true;
         
-        // ถ้าเป็นรูปภาพ + มีเพลง
+        // === ภาพนิ่ง + เสียงประกอบ ===
         if (postType === 'image' && selectedMusicUrl) {
           if (bgMusic.paused || bgMusic.currentTime <= 0) {
             try {
@@ -661,11 +647,11 @@
               isMusicPlaying = true;
               musicCoverIcon.classList.add('playing');
               previewMusicBtn.textContent = '⏸ หยุด';
-              musicHint.textContent = '🎵 กำลังเล่นเพลง';
+              musicHint.textContent = '🎵 กำลังเล่นเสียง';
               musicHint.classList.add('show');
               setTimeout(() => musicHint.classList.remove('show'), 2000);
             } catch (err) {
-              musicHint.textContent = '❌ ไม่สามารถเล่นเพลงได้';
+              musicHint.textContent = '❌ ไม่สามารถเล่นเสียงได้';
               musicHint.classList.add('show', 'error');
               setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
             }
@@ -674,14 +660,14 @@
             isMusicPlaying = false;
             musicCoverIcon.classList.remove('playing');
             previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
-            musicHint.textContent = '⏸ หยุดเพลงแล้ว';
+            musicHint.textContent = '⏸ หยุดเสียงแล้ว';
             musicHint.classList.add('show');
             setTimeout(() => musicHint.classList.remove('show'), 2000);
           }
           return;
         }
 
-        // ถ้าเป็นวิดีโอ
+        // === วิดีโอ ===
         if (postType === 'video') {
           if (mainVideo.paused) {
             mainVideo.muted = false;
@@ -698,7 +684,6 @@
         }
       });
 
-      // === ปุ่มกดไลก์ ===
       if (likeBtn) likeBtn.addEventListener('click', e => {
         e.stopPropagation();
         isLiked = !isLiked;
@@ -707,7 +692,6 @@
         likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
       });
 
-      // === ปุ่มสลับเต็มจอ ===
       if (viewToggle) viewToggle.addEventListener('click', e => {
         e.stopPropagation();
         fitMode = !fitMode;
