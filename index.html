@@ -40,6 +40,13 @@
     }
     .play-pause-indicator.show { opacity: 1; }
 
+    .music-hint {
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.6); color: #25f4ee; padding: 8px 16px;
+      border-radius: 20px; font-size: 13px; z-index: 15; display: none;
+    }
+    .music-hint.show { display: block; }
+
     .progress-line {
       position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
       left: 0; right: 0; height: 3px; background: rgba(255,255,255,.2); z-index: 12;
@@ -295,6 +302,7 @@
 <body>
   <div class="app" id="app">
     <div class="video-area" id="videoArea">
+      <div class="music-hint" id="musicHint">🎵 แตะหน้าจอเพื่อเล่นเพลง</div>
       <div class="video-placeholder" id="videoPlaceholder">กดปุ่ม + เพื่ออัปโหลด<br>รูปภาพ หรือ วิดีโอ</div>
       <img class="post-image" id="postImage" style="display:none;" alt="โพสต์ภาพ" />
       <video id="mainVideo" playsinline loop style="display:none;" preload="auto" webkit-playsinline muted></video>
@@ -375,7 +383,7 @@
       <div class="music-selector">
         <div class="music-title">
           🎵 เลือกเพลงประกอบ
-          <span style="font-size:12px; color:#888;">เพลงฟรี ไม่มีลิขสิทธิ์</span>
+          <span style="font-size:12px; color:#888;">ฟรี ไม่มีลิขสิทธิ์</span>
         </div>
         <div class="music-option selected" data-music="none">🔇 ไม่ใช้เพลง</div>
         <div class="music-option" data-music="upbeat">🎵 เพลงจังหวะสนุก (เหมาะสินค้า)</div>
@@ -391,12 +399,12 @@
       <button class="upload-btn" id="confirmBtn">โพสต์</button>
     </div>
 
-    <audio id="bgMusic" loop style="display:none;">
+    <audio id="bgMusic" loop preload="auto" style="display:none;" crossorigin="anonymous">
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — รูป+วิดีโอ+เพลงครบ!');
+      console.log('✅ โหลดเสร็จ — แก้ไขปัญหาเสียงเพลงแล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -417,6 +425,7 @@
       const progressFill = document.getElementById('progressFill');
       const progressBar = document.getElementById('progressBar');
       const playPauseBtn = document.getElementById('playPauseBtn');
+      const musicHint = document.getElementById('musicHint');
       const profileBtn = document.getElementById('profileBtn');
       const profileModal = document.getElementById('profileModal');
       const closeProfile = document.getElementById('closeProfile');
@@ -445,12 +454,14 @@
       let currentAvatar = 'https://picsum.photos/100/100';
       let currentName = 'ชื่อผู้ใช้';
       let postType = null;
+      let musicUrlToPlay = null;
+      let hasUserInteracted = false;
 
-      // === ตัวอย่างเพลงฟรี ไม่มีลิขสิทธิ์ ===
+      // === เพลงฟรี — ใช้ลิงก์ที่เชื่อถือได้ ===
       const musicLibrary = {
-        upbeat: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        chill: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        energetic: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+        upbeat: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9614d06d3b.mp3?filename=upbeat-112.mp3',
+        chill: 'https://cdn.pixabay.com/download/audio/2022/08/23/audio_270164b67e.mp3?filename=chill-folk-112.mp3',
+        energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3'
       };
 
       // === เลือกเพลง ===
@@ -461,6 +472,12 @@
           selectedMusic = opt.dataset.music;
         });
       });
+
+      // === บันทึกว่าผู้ใช้แตะหน้าจอแล้ว (สำคัญมากสำหรับเสียง!) ===
+      document.addEventListener('click', function markInteraction() {
+        hasUserInteracted = true;
+        document.removeEventListener('click', markInteraction);
+      }, { once: true });
 
       // === เลือกไฟล์ รูป/วิดีโอ ===
       if (createBtn) createBtn.addEventListener('click', e => {
@@ -496,19 +513,19 @@
       // === กดโพสต์ ===
       if (confirmBtn) confirmBtn.addEventListener('click', () => {
         if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        let musicUrl = null;
+        musicUrlToPlay = null;
         if (selectedMusic === 'custom' && customMusicUrl.value.trim()) {
-          musicUrl = customMusicUrl.value.trim();
+          musicUrlToPlay = customMusicUrl.value.trim();
         } else if (selectedMusic !== 'none' && musicLibrary[selectedMusic]) {
-          musicUrl = musicLibrary[selectedMusic];
+          musicUrlToPlay = musicLibrary[selectedMusic];
         }
-        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), musicUrl);
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), musicUrlToPlay);
         uploadPanel.classList.remove('show');
         resetForm();
       });
 
       function resetForm() {
-        pendingFile = null; postType = null; selectedMusic = 'none';
+        pendingFile = null; postType = null; selectedMusic = 'none'; musicUrlToPlay = null;
         fileInput.value = ''; customMusicUrl.value = '';
         musicOptions.forEach(o => o.classList.remove('selected'));
         document.querySelector('[data-music="none"]').classList.add('selected');
@@ -517,9 +534,10 @@
         previewContainer.style.display = 'none'; confirmBtn.style.display = 'none';
         fileWrapper.style.display = 'block'; captionInput.value = '';
         bgMusic.pause(); bgMusic.src = '';
+        musicHint.classList.remove('show');
       }
 
-      // === แสดงเนื้อหา + เล่นเพลง ===
+      // === แสดงเนื้อหา + เตรียมเพลง ===
       function showContent(url, type, captionText, musicUrl) {
         postType = type;
         videoPlaceholder.style.display = 'none';
@@ -528,13 +546,16 @@
         
         if (musicUrl) {
           bgMusic.src = musicUrl;
-          bgMusic.volume = 0.5;
-          bgMusic.play().catch(e => console.log('Autoplay blocked'));
-          soundName.textContent = 'เพลงประกอบ — ฟรีไม่มีลิขสิทธิ์';
+          bgMusic.volume = 0.6;
+          soundName.textContent = '🎵 เพลงประกอบ — ฟรีไม่มีลิขสิทธิ์';
+          // แจ้งให้แตะหน้าจอเพื่อเล่นเพลง
+          musicHint.classList.add('show');
+          setTimeout(() => musicHint.classList.remove('show'), 3000);
         } else {
           bgMusic.pause();
           bgMusic.src = '';
           soundName.textContent = 'เสียงต้นฉบับ — Thaipodee';
+          musicHint.classList.remove('show');
         }
 
         if (type === 'image') {
@@ -557,7 +578,8 @@
           mainVideo.ontimeupdate = () => {
             if (mainVideo.duration) progressFill.style.width = (mainVideo.currentTime / mainVideo.duration * 100) + '%';
           };
-          mainVideo.play().catch(e => console.log('Video autoplay blocked'));
+          // พยายามเล่นวิดีโอ (อาจต้องแตะก่อน)
+          mainVideo.play().catch(e => console.log('ต้องแตะหน้าจอก่อนถึงจะเล่น'));
         }
       }
 
@@ -569,19 +591,38 @@
         });
       }
 
-      // === แตะหน้าจอ เล่น/หยุด + เสียงเพลง ===
+      // === แตะหน้าจอ — เล่น/หยุด ทั้งรูปและวิดีโอ + เพลง ===
       if (videoArea) videoArea.addEventListener('click', function(e) {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
             e.target.closest('.upload-panel') || e.target.closest('.view-toggle') ||
             e.target.closest('.profile-modal')) return;
         
+        hasUserInteracted = true; // ยืนยันว่ามีการโต้ตอบ → เปิดเสียงได้แล้ว!
+        
         if (postType === 'image') {
-          if (bgMusic.paused) bgMusic.play();
-          else bgMusic.pause();
+          if (!bgMusic.src) return;
+          if (bgMusic.paused) {
+            bgMusic.play().then(() => {
+              console.log('🎵 เพลงเล่นแล้ว!');
+              musicHint.textContent = '🎵 กำลังเล่นเพลง... แตะเพื่อหยุด';
+              musicHint.classList.add('show');
+              setTimeout(() => musicHint.classList.remove('show'), 2000);
+            }).catch(err => {
+              console.log('❌ เล่นเพลงไม่ได้:', err);
+              alert('ไม่สามารถเล่นเพลงได้ ลองเลือกเพลงอื่นหรือแตะหน้าจออีกครั้ง');
+            });
+          } else {
+            bgMusic.pause();
+            musicHint.textContent = '⏸ หยุดเพลงแล้ว';
+            musicHint.classList.add('show');
+            setTimeout(() => musicHint.classList.remove('show'), 2000);
+          }
           return;
         }
+
         if (!mainVideo.src) return;
         if (mainVideo.paused) {
+          mainVideo.muted = false;
           mainVideo.play();
           if (bgMusic.src) bgMusic.play();
           playPauseBtn.textContent = '⏸';
@@ -594,7 +635,7 @@
         setTimeout(() => playPauseBtn.classList.remove('show'), 1500);
       });
 
-      // === ปุ่มอื่นๆ ===
+      // === ปุ่มอื่น ๆ ===
       if (likeBtn) likeBtn.addEventListener('click', e => {
         e.stopPropagation();
         isLiked = !isLiked;
