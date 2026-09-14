@@ -48,7 +48,7 @@
     }
     .music-hint.show { display: block; }
     .music-hint.error { color: #ff6b6b; border-color: #ff6b6b; }
-    .music-hint.loading { color: #ffd700; border-color: #ffd700; }
+    .music-hint.success { color: #4ade80; border-color: #4ade80; }
 
     .progress-line {
       position: absolute; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
@@ -141,11 +141,12 @@
 
     .music-cover {
       width: 44px; height: 44px; border-radius: 50%;
-      background: #222; border: 2px solid #fff;
-      animation: spin 4s linear infinite;
+      background: linear-gradient(45deg, #25f4ee, #fe28ea);
+      border: 2px solid #fff;
       display: flex; align-items: center; justify-content: center;
       font-size: 20px;
     }
+    .music-cover.playing { animation: spin 3s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .info-left {
@@ -165,8 +166,10 @@
       font-size: 13px; display: flex; align-items: center; gap: 6px;
       opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,.5);
       cursor: pointer; font-weight: 500;
+      max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
     }
 
+    /* === เมนูเลือกเพลงจากเครื่อง === */
     .music-modal {
       position: absolute; inset: 0; background: rgba(0,0,0,.85);
       z-index: 200; display: none; align-items: flex-end; justify-content: center;
@@ -174,7 +177,7 @@
     }
     .music-modal.show { display: flex; }
     .music-sheet {
-      background: #1c1c1e; width: 100%; max-height: 70vh;
+      background: #1c1c1e; width: 100%; max-height: 80vh;
       border-radius: 20px 20px 0 0; padding: 20px 20px 40px;
       overflow-y: auto; color: #fff;
     }
@@ -185,23 +188,45 @@
     }
     .music-sheet-title { font-size: 18px; font-weight: 700; }
     .music-sheet-close { font-size: 24px; cursor: pointer; color: #888; }
-    .music-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 12px; border-radius: 10px;
-      margin-bottom: 8px; cursor: pointer;
+    
+    /* === ปุ่มเลือกไฟล์เพลง === */
+    .music-upload-box {
+      border: 2px dashed #25f4ee; border-radius: 12px;
+      padding: 30px 20px; text-align: center;
+      cursor: pointer; margin-bottom: 20px;
       transition: all 0.2s;
-      border: 1px solid transparent;
     }
-    .music-item:hover, .music-item.selected {
-      background: linear-gradient(90deg, rgba(37,244,238,.2), rgba(254,40,234,.2));
-      border-color: #fe28ea;
+    .music-upload-box:hover {
+      border-color: #fe28ea; background: rgba(254,40,234,.1);
     }
-    .music-item-icon { font-size: 24px; }
-    .music-item-info { flex: 1; }
-    .music-item-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-    .music-item-desc { font-size: 12px; color: #888; }
-    .music-item-check { color: #fe28ea; font-size: 20px; opacity: 0; }
-    .music-item.selected .music-item-check { opacity: 1; }
+    .music-upload-icon { font-size: 40px; margin-bottom: 10px; }
+    .music-upload-text { font-size: 15px; color: #ccc; margin-bottom: 5px; }
+    .music-upload-hint { font-size: 12px; color: #888; }
+    input[type="file"]#musicFileInput { display: none; }
+
+    .music-selected {
+      background: linear-gradient(90deg, rgba(74,222,128,.2), rgba(37,244,238,.2));
+      border: 1px solid #4ade80; border-radius: 10px;
+      padding: 14px; margin-bottom: 15px; display: none;
+    }
+    .music-selected.show { display: block; }
+    .music-selected-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+    .music-selected-actions { display: flex; gap: 10px; }
+    .music-action-btn {
+      flex: 1; padding: 8px 12px; border-radius: 8px; border: none;
+      font-size: 14px; cursor: pointer; font-weight: 500;
+    }
+    .btn-play { background: #25f4ee; color: #000; }
+    .btn-remove { background: #ff4757; color: #fff; }
+    
+    .no-music-option {
+      padding: 14px 12px; border-radius: 10px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .no-music-option:hover, .no-music-option.selected {
+      background: rgba(255,255,255,.1); border-color: #666;
+    }
 
     .bottom-bar {
       position: absolute; bottom: 0; left: 0; width: 100%;
@@ -312,71 +337,48 @@
         <span class="r-icon">↗️</span>
         <span class="r-num">0</span>
       </div>
-      <div class="r-btn" id="musicBtn" title="เลือกเพลง">
-        <div class="music-cover">🎵</div>
+      <div class="r-btn" id="musicBtn" title="เลือกเพลงจากเครื่อง">
+        <div class="music-cover" id="musicCoverIcon">🎵</div>
       </div>
     </div>
     
     <div class="info-left" id="postInfo">
       <div class="username" id="displayUsername">ชื่อผู้ใช้</div>
       <div class="caption" id="videoCaption"></div>
-      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">กดเลือกเพลงประกอบ</span></div>
+      <div class="sound-name" id="openMusicSheetBtn">🎵 <span id="soundName">กดเลือกเพลงจากในมือถือ</span></div>
     </div>
     
+    <!-- === เมนูเลือกเพลงจากไฟล์ในมือถือ === -->
     <div class="music-modal" id="musicModal">
       <div class="music-sheet">
         <div class="music-sheet-header">
-          <span class="music-sheet-title">🎵 เลือกเพลงประกอบ</span>
+          <span class="music-sheet-title">🎵 เลือกไฟล์เพลงจากมือถือ</span>
           <span class="music-sheet-close" id="closeMusicSheet">✕</span>
         </div>
-        <div id="musicList">
-          <div class="music-item selected" data-music="none">
-            <span class="music-item-icon">🔇</span>
-            <div class="music-item-info">
-              <div class="music-item-name">ไม่ใช้เพลง</div>
-              <div class="music-item-desc">ปิดเสียง</div>
-            </div>
-            <span class="music-item-check">✓</span>
+        
+        <!-- ปุ่มเลือกไฟล์เพลง -->
+        <div class="music-upload-box" id="musicUploadBox">
+          <div class="music-upload-icon">📁</div>
+          <div class="music-upload-text">แตะเพื่อเลือกไฟล์เพลง</div>
+          <div class="music-upload-hint">รองรับ MP3, WAV, OGG, M4A<br>รวมเพลงที่แต่งจาก Suno ด้วย</div>
+          <input type="file" id="musicFileInput" accept="audio/*" />
+        </div>
+        
+        <!-- แสดงไฟล์เพลงที่เลือกแล้ว -->
+        <div class="music-selected" id="musicSelectedBox">
+          <div class="music-selected-name" id="selectedMusicName">ชื่อเพลง.mp3</div>
+          <div class="music-selected-actions">
+            <button class="music-action-btn btn-play" id="previewMusicBtn">▶ ฟังตัวอย่าง</button>
+            <button class="music-action-btn btn-remove" id="removeMusicBtn">🗑️ ลบ</button>
           </div>
-          <div class="music-item" data-music="upbeat">
-            <span class="music-item-icon">🎵</span>
-            <div class="music-item-info">
-              <div class="music-item-name">จังหวะสนุก</div>
-              <div class="music-item-desc">เหมาะสำหรับโฆษณาสินค้า</div>
-            </div>
-            <span class="music-item-check">✓</span>
-          </div>
-          <div class="music-item" data-music="chill">
-            <span class="music-item-icon">🎶</span>
-            <div class="music-item-info">
-              <div class="music-item-name">ผ่อนคลาย</div>
-              <div class="music-item-desc">บรรยากาศสบาย ๆ</div>
-            </div>
-            <span class="music-item-check">✓</span>
-          </div>
-          <div class="music-item" data-music="energetic">
-            <span class="music-item-icon">🎸</span>
-            <div class="music-item-info">
-              <div class="music-item-name">เร้าใจ</div>
-              <div class="music-item-desc">พลังงานเต็มที่</div>
-            </div>
-            <span class="music-item-check">✓</span>
-          </div>
-          <div class="music-item" data-music="happy">
-            <span class="music-item-icon">🎹</span>
-            <div class="music-item-info">
-              <div class="music-item-name">สดใส มีความสุข</div>
-              <div class="music-item-desc">เหมาะสินค้าแฟชั่น</div>
-            </div>
-            <span class="music-item-check">✓</span>
-          </div>
-          <div class="music-item" data-music="acoustic">
-            <span class="music-item-icon">🎻</span>
-            <div class="music-item-info">
-              <div class="music-item-name">ดนตรีสด เบา ๆ</div>
-              <div class="music-item-desc">เปียโน กีตาร์</div>
-            </div>
-            <span class="music-item-check">✓</span>
+        </div>
+        
+        <!-- ตัวเลือกไม่ใช้เพลง -->
+        <div class="no-music-option" id="noMusicOption">
+          <span style="font-size:24px;">🔇</span>
+          <div>
+            <div style="font-weight:600;">ไม่ใช้เพลง</div>
+            <div style="font-size:12px; color:#888;">ใช้เสียงต้นฉบับของวิดีโอ</div>
           </div>
         </div>
       </div>
@@ -405,12 +407,12 @@
       <div class="b-nav" data-page="profile"><span class="b-icon">👤</span><span>ฉัน</span></div>
     </div>
 
-    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous" style="display:none;">
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ โหลดเสร็จ — พร้อมใช้งาน!');
+      console.log('✅ โหลดเสร็จ — เลือกเพลงจากมือถือได้แล้ว!');
 
       const createBtn = document.getElementById('createBtn');
       const uploadPanel = document.getElementById('uploadPanel');
@@ -436,38 +438,32 @@
       const openMusicSheetBtn = document.getElementById('openMusicSheetBtn');
       const musicModal = document.getElementById('musicModal');
       const closeMusicSheet = document.getElementById('closeMusicSheet');
-      const musicItems = document.querySelectorAll('.music-item');
       const soundName = document.getElementById('soundName');
+      const musicCoverIcon = document.getElementById('musicCoverIcon');
       const viewToggle = document.getElementById('viewToggle');
       const bgMusic = document.getElementById('bgMusic');
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
+      
+      // === ส่วนเลือกเพลงจากไฟล์ในมือถือ ===
+      const musicUploadBox = document.getElementById('musicUploadBox');
+      const musicFileInput = document.getElementById('musicFileInput');
+      const musicSelectedBox = document.getElementById('musicSelectedBox');
+      const selectedMusicName = document.getElementById('selectedMusicName');
+      const previewMusicBtn = document.getElementById('previewMusicBtn');
+      const removeMusicBtn = document.getElementById('removeMusicBtn');
+      const noMusicOption = document.getElementById('noMusicOption');
 
       let pendingFile = null;
-      let selectedMusic = 'none';
-      let selectedMusicUrl = null;
+      let selectedMusicFile = null; // เก็บไฟล์เพลงที่เลือกจากเครื่อง
+      let selectedMusicUrl = null;  // URL ของไฟล์เพลง
+      let isMusicPlaying = false;
       let isLiked = false, likeNum = 1;
       let fitMode = false;
       let postType = null;
       let hasUserInteracted = false;
 
-      const musicLibrary = {
-        none: null,
-        upbeat: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9614d06d3b.mp3?filename=upbeat-112.mp3',
-        chill: 'https://cdn.pixabay.com/download/audio/2022/08/23/audio_270164b67e.mp3?filename=chill-folk-112.mp3',
-        energetic: 'https://cdn.pixabay.com/download/audio/2023/03/23/audio_596083b990.mp3?filename=energetic-upbeat-112.mp3',
-        happy: 'https://cdn.pixabay.com/download/audio/2024/02/13/audio_98d03690b3.mp3?filename=happy-ukulele-123.mp3',
-        acoustic: 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_80b364747c.mp3?filename=acoustic-breeze-112.mp3'
-      };
-      const musicNames = {
-        none: 'ไม่ใช้เพลง',
-        upbeat: 'จังหวะสนุก',
-        chill: 'ผ่อนคลาย',
-        energetic: 'เร้าใจ',
-        happy: 'สดใส มีความสุข',
-        acoustic: 'ดนตรีสด เบา ๆ'
-      };
-
+      // === เปิด-ปิดเมนูเพลง ===
       function openMusicSheet() { musicModal.classList.add('show'); }
       function closeMusicSheetFn() { musicModal.classList.remove('show'); }
       if (musicBtn) musicBtn.addEventListener('click', e => { e.stopPropagation(); openMusicSheet(); });
@@ -475,47 +471,110 @@
       if (closeMusicSheet) closeMusicSheet.addEventListener('click', closeMusicSheetFn);
       if (musicModal) musicModal.addEventListener('click', e => { if (e.target === musicModal) closeMusicSheetFn(); });
 
-      musicItems.forEach(item => {
-        item.addEventListener('click', async () => {
-          musicItems.forEach(i => i.classList.remove('selected'));
-          item.classList.add('selected');
-          selectedMusic = item.dataset.music;
-          selectedMusicUrl = musicLibrary[selectedMusic];
-          soundName.textContent = selectedMusic === 'none' ? 'กดเลือกเพลงประกอบ' : '🎵 ' + musicNames[selectedMusic];
-          closeMusicSheetFn();
-          
-          if (postType) {
-            if (selectedMusicUrl) {
-              musicHint.textContent = '⏳ กำลังโหลดเพลง...';
-              musicHint.classList.add('show', 'loading');
-              bgMusic.src = selectedMusicUrl;
-              bgMusic.volume = 0.5;
-              try {
-                if (hasUserInteracted) {
-                  await bgMusic.play();
-                  musicHint.textContent = '🎵 ' + musicNames[selectedMusic];
-                } else {
-                  musicHint.textContent = '✅ เลือกแล้ว — แตะหน้าจอเพื่อเล่นเสียง';
-                }
-                musicHint.classList.remove('loading', 'error');
-                musicHint.classList.add('show');
-                setTimeout(() => musicHint.classList.remove('show'), 3000);
-              } catch (err) {
-                musicHint.textContent = '✅ เลือกแล้ว — แตะหน้าจอเพื่อเล่นเสียง';
-                musicHint.classList.remove('loading', 'error');
-                musicHint.classList.add('show');
-                setTimeout(() => musicHint.classList.remove('show'), 3000);
-              }
-            } else {
-              bgMusic.pause();
-              bgMusic.src = '';
-              soundName.textContent = 'กดเลือกเพลงประกอบ';
-              musicHint.classList.remove('show');
-            }
-          }
-        });
+      // === กดเลือกไฟล์เพลงจากมือถือ ===
+      if (musicUploadBox) musicUploadBox.addEventListener('click', () => {
+        musicFileInput.click();
       });
 
+      // === เมื่อเลือกไฟล์เพลงเสร็จ ===
+      if (musicFileInput) musicFileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // ตรวจสอบประเภทไฟล์
+        if (!file.type.startsWith('audio/')) {
+          musicHint.textContent = '❌ กรุณาเลือกไฟล์เสียง MP3/WAV/M4A';
+          musicHint.classList.add('show', 'error');
+          setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
+          return;
+        }
+
+        // บันทึกข้อมูลไฟล์
+        selectedMusicFile = file;
+        selectedMusicUrl = URL.createObjectURL(file);
+        
+        // แสดงชื่อไฟล์ (ตัดให้สั้นลง)
+        let displayName = file.name;
+        if (displayName.length > 25) {
+          displayName = displayName.substring(0, 22) + '...';
+        }
+        selectedMusicName.textContent = '🎵 ' + displayName;
+        
+        // ซ่อนกล่องอัปโหลด แสดงกล่องที่เลือกแล้ว
+        musicUploadBox.style.display = 'none';
+        musicSelectedBox.classList.add('show');
+        noMusicOption.classList.remove('selected');
+        
+        // อัปเดตชื่อเพลงที่แสดงในหน้าหลัก
+        soundName.textContent = '🎵 ' + displayName;
+        
+        // แจ้งเตือนสำเร็จ
+        musicHint.textContent = '✅ เลือกเพลงแล้ว — แตะหน้าจอเพื่อเล่น';
+        musicHint.classList.add('show', 'success');
+        setTimeout(() => musicHint.classList.remove('show', 'success'), 3000);
+        
+        closeMusicSheetFn();
+      });
+
+      // === ฟังตัวอย่างเพลง ===
+      if (previewMusicBtn) previewMusicBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (!selectedMusicUrl) return;
+        
+        hasUserInteracted = true;
+        
+        if (bgMusic.paused) {
+          bgMusic.src = selectedMusicUrl;
+          bgMusic.volume = 0.5;
+          bgMusic.play();
+          previewMusicBtn.textContent = '⏸ หยุด';
+          musicCoverIcon.classList.add('playing');
+          isMusicPlaying = true;
+        } else {
+          bgMusic.pause();
+          previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
+          musicCoverIcon.classList.remove('playing');
+          isMusicPlaying = false;
+        }
+      });
+
+      // === ลบเพลงที่เลือก ===
+      if (removeMusicBtn) removeMusicBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        bgMusic.pause();
+        bgMusic.src = '';
+        selectedMusicFile = null;
+        selectedMusicUrl = null;
+        isMusicPlaying = false;
+        
+        // กลับสู่สถานะเริ่มต้น
+        musicUploadBox.style.display = 'block';
+        musicSelectedBox.classList.remove('show');
+        musicCoverIcon.classList.remove('playing');
+        previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
+        soundName.textContent = 'กดเลือกเพลงจากในมือถือ';
+        musicFileInput.value = '';
+      });
+
+      // === ไม่ใช้เพลง ===
+      if (noMusicOption) noMusicOption.addEventListener('click', () => {
+        bgMusic.pause();
+        bgMusic.src = '';
+        selectedMusicFile = null;
+        selectedMusicUrl = null;
+        isMusicPlaying = false;
+        
+        musicUploadBox.style.display = 'block';
+        musicSelectedBox.classList.remove('show');
+        musicCoverIcon.classList.remove('playing');
+        noMusicOption.classList.add('selected');
+        soundName.textContent = '🔇 ไม่ใช้เพลง';
+        musicFileInput.value = '';
+        
+        closeMusicSheetFn();
+      });
+
+      // === อัปโหลดรูป/วิดีโอ ===
       if (createBtn) createBtn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); uploadPanel.classList.add('show'); });
       if (closeUpload) closeUpload.addEventListener('click', () => { uploadPanel.classList.remove('show'); resetForm(); });
       if (fileWrapper) fileWrapper.addEventListener('click', () => fileInput.click());
@@ -539,7 +598,7 @@
 
       if (confirmBtn) confirmBtn.addEventListener('click', () => {
         if (!pendingFile) return alert('กรุณาเลือกไฟล์ก่อน');
-        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim(), selectedMusicUrl);
+        showContent(pendingFile.url, pendingFile.type, captionInput.value.trim());
         uploadPanel.classList.remove('show');
         resetForm();
       });
@@ -552,20 +611,20 @@
         fileWrapper.style.display = 'block'; captionInput.value = '';
       }
 
-      function showContent(url, type, captionText, musicUrl) {
+      // === แสดงเนื้อหา — พร้อมเพลงที่เลือก ===
+      function showContent(url, type, captionText) {
         postType = type;
         videoPlaceholder.style.display = 'none';
         postInfo.style.display = 'block';
         videoCaption.textContent = captionText || 'โพสต์ใหม่';
         
-        if (musicUrl) {
-          bgMusic.src = musicUrl;
+        // ถ้ามีเพลงที่เลือกไว้ ให้ตั้งค่าเตรียมเล่น
+        if (selectedMusicUrl) {
+          bgMusic.src = selectedMusicUrl;
           bgMusic.volume = 0.5;
-          soundName.textContent = '🎵 ' + musicNames[selectedMusic];
-        } else {
-          bgMusic.pause();
-          bgMusic.src = '';
-          soundName.textContent = 'กดเลือกเพลงประกอบ';
+          musicHint.textContent = '✅ พร้อมแล้ว — แตะหน้าจอเพื่อเล่นเพลง';
+          musicHint.classList.add('show', 'success');
+          setTimeout(() => musicHint.classList.remove('show', 'success'), 3000);
         }
 
         if (type === 'image') {
@@ -586,6 +645,7 @@
         }
       }
 
+      // === แตะหน้าจอ — เล่น/หยุดเพลง ===
       if (videoArea) videoArea.addEventListener('click', async function(e) {
         if (e.target.closest('.r-btn') || e.target.closest('.bottom-bar') || 
             e.target.closest('.upload-panel') || e.target.closest('.music-modal') || 
@@ -593,27 +653,35 @@
         
         hasUserInteracted = true;
         
+        // ถ้าเป็นรูปภาพ + มีเพลง
         if (postType === 'image' && selectedMusicUrl) {
           if (bgMusic.paused || bgMusic.currentTime <= 0) {
             try {
               await bgMusic.play();
+              isMusicPlaying = true;
+              musicCoverIcon.classList.add('playing');
+              previewMusicBtn.textContent = '⏸ หยุด';
               musicHint.textContent = '🎵 กำลังเล่นเพลง';
               musicHint.classList.add('show');
               setTimeout(() => musicHint.classList.remove('show'), 2000);
             } catch (err) {
-              musicHint.textContent = '❌ เล่นไม่ได้ ลองเลือกเพลงใหม่';
+              musicHint.textContent = '❌ ไม่สามารถเล่นเพลงได้';
               musicHint.classList.add('show', 'error');
               setTimeout(() => musicHint.classList.remove('show', 'error'), 3000);
             }
           } else {
             bgMusic.pause();
-            musicHint.textContent = '⏸ หยุดเพลง';
+            isMusicPlaying = false;
+            musicCoverIcon.classList.remove('playing');
+            previewMusicBtn.textContent = '▶ ฟังตัวอย่าง';
+            musicHint.textContent = '⏸ หยุดเพลงแล้ว';
             musicHint.classList.add('show');
             setTimeout(() => musicHint.classList.remove('show'), 2000);
           }
           return;
         }
 
+        // ถ้าเป็นวิดีโอ
         if (postType === 'video') {
           if (mainVideo.paused) {
             mainVideo.muted = false;
@@ -630,6 +698,7 @@
         }
       });
 
+      // === ปุ่มกดไลก์ ===
       if (likeBtn) likeBtn.addEventListener('click', e => {
         e.stopPropagation();
         isLiked = !isLiked;
@@ -638,6 +707,7 @@
         likeBtn.querySelector('.r-icon').style.color = isLiked ? '#ff0050' : '#fff';
       });
 
+      // === ปุ่มสลับเต็มจอ ===
       if (viewToggle) viewToggle.addEventListener('click', e => {
         e.stopPropagation();
         fitMode = !fitMode;
