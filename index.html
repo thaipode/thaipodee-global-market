@@ -998,7 +998,7 @@
     if (profileBtnBottom) profileBtnBottom.addEventListener('click', openProfile);
     if (profileClose) profileClose.addEventListener('click', closeProfile);
 
-    // ===== UPLOAD VIDEO =====
+    // ===== UPLOAD VIDEO — แก้จุดโพสต์แล้วไม่ขึ้น =====
     const createBtn = document.getElementById('createBtn');
     const uploadPanel = document.getElementById('uploadPanel');
     const closeUpload = document.getElementById('closeUpload');
@@ -1042,14 +1042,30 @@
       });
     }
 
+    // ✅ แก้แล้ว — กดโพสต์ → แสดงทันที
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
-        if (!pendingVideo) return;
+        if (!pendingVideo) {
+          alert('กรุณาเลือกวิดีโอก่อนครับ');
+          return;
+        }
         const caption = captionInput.value.trim();
+        
+        // บันทึกและแสดงทันที
         saveVideoToStorage(pendingVideo.url, caption);
         showVideo(pendingVideo.url, caption);
+        
+        // ปิดหน้าต่าง
         uploadPanel.classList.remove('show');
         resetUploadForm();
+        
+        // เล่นทันที
+        setTimeout(() => {
+          if (mainVideo) {
+            mainVideo.muted = isMuted;
+            mainVideo.play().catch(e => console.log('เล่นอัตโนมัติไม่ได้'));
+          }
+        }, 300);
       });
     }
 
@@ -1083,8 +1099,6 @@
       if (videoPlaceholder) videoPlaceholder.style.display = 'none';
       if (postInfo) postInfo.style.display = 'block';
       if (videoCaption) videoCaption.textContent = captionText || 'วิดีโอใหม่';
-      
-      mainVideo.play().catch(err => console.log('Autoplay blocked:', err));
       
       mainVideo.ontimeupdate = () => {
         if (mainVideo.duration) {
@@ -1216,11 +1230,4 @@
         if (e.key === 'Enter') {
           e.preventDefault();
           const text = commentInput.value.trim();
-          if (!text) return;
-          addComment(text);
-        }
-      });
-    }
-  </script>
-</body>
-</html>
+          if (!text
