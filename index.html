@@ -3,202 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>คำสั่งซื้อทั้งหมด — ThaiPodee</title>
+  <title>ThaiPodee — สำหรับคุณ</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f5f5f7; color: #1d1d1f; font-size: 15px; line-height: 1.5; padding-bottom: 20px; }
-    
+    html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
+
+    /* === คอนเทนเนอร์วิดีโอแบบเต็มจอ === */
+    .video-feed {
+      height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch;
+    }
+    .video-slide {
+      height: 100vh; scroll-snap-align: start; position: relative; background: #000;
+    }
+    .video-bg {
+      width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;
+      background: linear-gradient(135deg, #333, #111);
+    }
+
     /* === แถบด้านบน === */
-    .header-top {
-      background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-      position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e5e5e7;
+    .top-nav {
+      position: absolute; top: 0; left: 0; right: 0; padding: 12px 16px; padding-top: 44px;
+      display: flex; justify-content: center; gap: 24px; z-index: 10;
+      background: linear-gradient(to bottom, rgba(0,0,0,.4), transparent);
     }
-    .back-btn { font-size: 22px; color: #007aff; cursor: pointer; }
-    .search-bar {
-      flex: 1; background: #f2f2f7; border-radius: 10px; padding: 10px 14px; font-size: 15px; border: none; outline: none;
+    .nav-tab { font-size: 15px; color: rgba(255,255,255,.7); cursor: pointer; }
+    .nav-tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+    .search-icon { position: absolute; top: 50px; right: 16px; font-size: 22px; z-index: 10; cursor: pointer; }
+
+    /* === ข้อมูลผู้ใช้ & คำอธิบาย === */
+    .bottom-info {
+      position: absolute; bottom: 100px; left: 16px; right: 100px; z-index: 10;
     }
-    .menu-btn { font-size: 22px; color: #1d1d1f; cursor: pointer; }
-    
-    /* === แถบหมวดหมู่สถานะ === */
-    .tabs {
-      background: #fff; display: flex; border-bottom: 1px solid #e5e5e7; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    .username { font-size: 15px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .desc { font-size: 14px; line-height: 1.5; margin-bottom: 10px; color: #f1f1f1; }
+    .music { font-size: 13px; display: flex; align-items: center; gap: 6px; color: #eee; }
+
+    /* === ปุ่มสินค้า — เพิ่มเข้าไปใหม่ === */
+    .product-card {
+      background: #fff; color: #1d1d1f; border-radius: 12px; padding: 10px 12px;
+      margin-top: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer;
     }
-    .tab {
-      padding: 12px 16px; font-size: 15px; color: #86868b; white-space: nowrap; cursor: pointer; position: relative;
+    .product-img { width: 50px; height: 50px; border-radius: 8px; background: #eee; }
+    .product-meta { flex: 1; }
+    .product-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .product-price { font-size: 15px; font-weight: 700; color: #e53935; }
+    .buy-btn {
+      background: linear-gradient(90deg, #fe28ea, #ff4d6d); color: #fff; border: none; border-radius: 20px;
+      padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
     }
-    .tab.active { color: #fe28ea; font-weight: 500; }
-    .tab.active::after {
-      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 40px; height: 3px; background: linear-gradient(90deg, #25f4ee, #fe28ea); border-radius: 2px;
+
+    /* === ปุ่มแถบด้านขวา — ของเดิมครบ + ตะกร้าสินค้า === */
+    .side-actions {
+      position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10;
     }
-    
-    /* === แบนเนอร์ === */
-    .banner {
-      background: linear-gradient(90deg, #fef2f2, #fff7ed); margin: 12px; border-radius: 12px; padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .action-icon { font-size: 28px; }
+    .action-count { font-size: 11px; color: #fff; }
+    .profile-pic { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
+    .add-btn {
+      width: 22px; height: 22px; border-radius: 50%; background: #fe28ea; color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; margin-top: -12px;
     }
-    .banner-text { font-size: 14px; color: #c2410c; font-weight: 500; }
-    .banner-arrow { color: #c2410c; font-size: 14px; }
-    
-    /* === การ์ดคำสั่งซื้อ === */
-    .order-card {
-      background: #fff; margin: 0 12px 12px; border-radius: 16px; overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    .music-disc {
+      width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #25f4ee, #fe28ea);
+      display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; font-size: 20px;
     }
-    .shop-header {
-      padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid #f2f2f7; cursor: pointer;
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* === แถบเมนูล่างสุด — ของเดิมครบ + ตะกร้าสินค้า === */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(10px);
+      display: flex; justify-content: space-around; align-items: center; padding: 8px 0; padding-bottom: env(safe-area-inset-bottom, 0);
+      border-top: 1px solid rgba(255,255,255,.1); z-index: 10;
     }
-    .shop-left { display: flex; align-items: center; gap: 8px; }
-    .shop-badge { background: #ffcc00; color: #000; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
-    .shop-name { font-size: 15px; font-weight: 500; }
-    .order-status { font-size: 14px; font-weight: 600; color: #1d1d1f; }
-    
-    .delivery-info {
-      padding: 10px 16px; font-size: 13px; color: #515154; display: flex; align-items: center; gap: 6px;
-    }
-    .delivery-icon { font-size: 14px; }
-    .delivery-date { color: #007aff; font-weight: 500; }
-    
-    .product-item {
-      padding: 12px 16px; display: flex; gap: 12px; border-bottom: 1px solid #f2f2f7; cursor: pointer;
-    }
-    .product-img { width: 70px; height: 70px; border-radius: 8px; background: #f5f5f7; object-fit: cover; }
-    .product-info { flex: 1; }
-    .product-name { font-size: 14px; line-height: 1.5; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-bottom { display: flex; justify-content: space-between; align-items: center; }
-    .product-price { font-weight: 600; color: #fe28ea; font-size: 15px; }
-    .product-qty { font-size: 13px; color: #86868b; }
-    
-    .order-footer {
-      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .total-text { font-size: 14px; color: #86868b; }
-    .total-price { font-size: 15px; font-weight: 600; }
-    .order-btn {
-      padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; border: 1px solid #d1d1d6;
-      background: #fff; color: #1d1d1f; cursor: pointer;
-    }
-    .order-btn.cancel { border-color: #ff3b30; color: #ff3b30; }
-    
-    /* === สถานะยกเลิกแล้ว === */
-    .cancelled .shop-header { opacity: 0.7; }
-    .cancelled .product-item { opacity: 0.6; }
-    .cancel-note {
-      padding: 10px 16px; font-size: 13px; color: #86868b; background: #f9f9f9;
-      border-bottom: 1px solid #f2f2f7;
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; }
+    .nav-item.active .nav-label { color: #fe28ea; }
+    .nav-center {
+      width: 50px; height: 30px; border-radius: 8px; background: linear-gradient(90deg, #25f4ee, #fe28ea);
+      display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- === แถบด้านบน === -->
-  <div class="header-top">
-    <span class="back-btn">←</span>
-    <input type="text" class="search-bar" placeholder="ค้นหาคำสั่งซื้อของคุณ" />
-    <span class="menu-btn">☰</span>
-  </div>
+  <div class="video-feed">
+    <!-- === วิดีโอ 1 === -->
+    <div class="video-slide">
+      <div class="video-bg"></div>
 
-  <!-- === แถบสถานะ === -->
-  <div class="tabs">
-    <div class="tab active">ทั้งหมด</div>
-    <div class="tab">รับ</div>
-    <div class="tab">รอชำระเงิน</div>
-    <div class="tab">ที่ต้องจัดส่ง</div>
-    <div class="tab">รอรับ</div>
-  </div>
-
-  <!-- === แบนเนอร์คืนสินค้า === -->
-  <div class="banner">
-    <span class="banner-text">🎁 คืนสินค้าฟรี ไม่ง้อค่าธรรมเนียม</span>
-    <span class="banner-arrow">→</span>
-  </div>
-
-  <!-- === คำสั่งซื้อที่ 1: TopChoice === -->
-  <div class="order-card">
-    <div class="shop-header">
-      <div class="shop-left">
-        <span class="shop-badge">TopChoice</span>
-        <span class="shop-name">ภิญโญช้อปปิ้ง</span>
+      <!-- แถบด้านบน -->
+      <div class="top-nav">
+        <div class="nav-tab">ติดตาม</div>
+        <div class="nav-tab active">สำหรับคุณ</div>
       </div>
-      <div class="order-status">สั่งซื้อแล้ว</div>
-    </div>
-    <div class="delivery-info">
-      <span class="delivery-icon">🚚</span>
-      <span>วันที่จัดส่งถึงโดยประมาณ: <span class="delivery-date">16 ก.ย. - 17 ก.ย.</span></span>
-    </div>
-    <div class="product-item">
-      <img class="product-img" src="https://picsum.photos/70/70?random=1" alt="สินค้า" />
-      <div class="product-info">
-        <div class="product-name">โคมไฟโซล่าเซลล์ เปิดปิดไฟอัตโนมัติ ไฟโซล่าเซลล์ตั้งโต๊ะ ไฟโซล่าเซลล์สวน 2in1 ขาว-อร์มิ</div>
-        <div class="product-bottom">
-          <span class="product-price">฿167.40</span>
-          <span class="product-qty">x4</span>
+      <div class="search-icon">🔍</div>
+
+      <!-- ข้อมูลด้านล่างซ้าย -->
+      <div class="bottom-info">
+        <div class="username">ชื่อผู้ใช้ ✅</div>
+        <div class="desc">โพสต์ใหม่ — สินค้าโคมไฟโซล่าเซลล์ 600W ราคา 1,990 บาท สนใจกดซื้อได้เลยครับ!</div>
+        <div class="music">🎵 เพลง__THAI PODEE ติดตาม...</div>
+        
+        <!-- ปุ่มสินค้า — เพิ่มเข้าไปใหม่ -->
+        <div class="product-card" onclick="window.location.href='product.html'">
+          <img class="product-img" src="https://picsum.photos/50/50" alt="สินค้า" />
+          <div class="product-meta">
+            <div class="product-name">โคมไฟโซล่าเซลล์ 600W แผงโซลาร์แยก H-3</div>
+            <div class="product-price">฿1,990</div>
+          </div>
+          <button class="buy-btn">ซื้อเลย</button>
         </div>
       </div>
-    </div>
-    <div class="order-footer">
-      <div>
-        <span class="total-text">ยอดรวม: </span>
-        <span class="total-price">฿569.60</span>
-      </div>
-      <button class="order-btn cancel">ยกเลิกคำสั่งซื้อ</button>
-    </div>
-  </div>
 
-  <!-- === คำสั่งซื้อที่ 2: QQ8shop === -->
-  <div class="order-card">
-    <div class="shop-header">
-      <div class="shop-left">
-        <span class="shop-name">QQ8shop <span style="font-size:12px;background:#e5e5e7;padding:2px 6px;border-radius:4px;">฿51</span></span>
-      </div>
-      <div class="order-status">สั่งซื้อแล้ว</div>
-    </div>
-    <div class="delivery-info">
-      <span class="delivery-icon">🚚</span>
-      <span>วันที่จัดส่งถึงโดยประมาณ: <span class="delivery-date">16 ก.ย. - 17 ก.ย.</span></span>
-    </div>
-    <div class="product-item">
-      <img class="product-img" src="https://picsum.photos/70/70?random=2" alt="สินค้า" />
-      <div class="product-info">
-        <div class="product-name">1ชิ้นแบมพาวเวอร์ซัมได้ นำไฟหน้า ยูเอสบี ชาร์จกัน น้ำท่วมไฟสว่างขึ้นในแบต...</div>
-        <div class="product-bottom">
-          <span class="product-price">฿130.00</span>
-          <span class="product-qty">x2</span>
+      <!-- ปุ่มด้านขวา — ของเดิมครบ + ตะกร้าสินค้า -->
+      <div class="side-actions">
+        <div class="action-btn">
+          <img class="profile-pic" src="https://picsum.photos/44/44" alt="โปรไฟล์" />
+          <div class="add-btn">+</div>
+        </div>
+        <div class="action-btn" onclick="toggleLike()">
+          <span class="action-icon">❤️</span>
+          <span class="action-count" id="like-count">1</span>
+        </div>
+        <div class="action-btn" onclick="window.location.href='comments.html'">
+          <span class="action-icon">💬</span>
+          <span class="action-count">0</span>
+        </div>
+        <!-- ปุ่มตะกร้าสินค้า — เพิ่มตรงนี้! -->
+        <div class="action-btn" onclick="window.location.href='cart.html'">
+          <span class="action-icon">🛒</span>
+          <span class="action-count">0</span>
+        </div>
+        <div class="action-btn">
+          <span class="action-icon">↗️</span>
+          <span class="action-count">0</span>
+        </div>
+        <div class="action-btn">
+          <div class="music-disc">🎵</div>
         </div>
       </div>
-    </div>
-    <div class="order-footer">
-      <div>
-        <span class="total-text">ยอดรวม: </span>
-        <span class="total-price">฿259.00</span>
-      </div>
-      <button class="order-btn cancel">ยกเลิกคำสั่งซื้อ</button>
-    </div>
-  </div>
 
-  <!-- === คำสั่งซื้อที่ 3: ยกเลิกสำเร็จแล้ว === -->
-  <div class="order-card cancelled">
-    <div class="shop-header">
-      <div class="shop-left">
-        <span class="shop-name">QQ8shop <span style="font-size:12px;background:#e5e5e7;padding:2px 6px;border-radius:4px;">฿51</span></span>
-      </div>
-      <div class="order-status" style="color:#86868b;">ยกเลิกสำเร็จแล้ว</div>
-    </div>
-    <div class="cancel-note">
-      19:17 น. ยกเลิกการจัดส่งแล้ว — การจัดส่งพัสดุของคุณถูกยกเลิก
-    </div>
-    <div class="product-item">
-      <img class="product-img" src="https://picsum.photos/70/70?random=3" alt="สินค้า" />
-      <div class="product-info">
-        <div class="product-name">1ชิ้นแบมพาวเวอร์ซัมได้ นำไฟหน้า ยูเอสบี ชาร์จกัน น้ำท่วมไฟสว่างขึ้นในแบต...</div>
-        <div class="product-bottom">
-          <span class="product-price">฿130.00</span>
-          <span class="product-qty">x1</span>
+      <!-- แถบเมนูล่างสุด — ของเดิมครบ + ตะกร้าสินค้า -->
+      <div class="bottom-nav">
+        <div class="nav-item active">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">หน้าแรก</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='search.html'">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">ค้นหา</span>
+        </div>
+        <div class="nav-center" onclick="window.location.href='upload.html'">+</div>
+        <!-- ตะกร้าสินค้าในเมนูล่างด้วย -->
+        <div class="nav-item" onclick="window.location.href='cart.html'">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-label">ตะกร้า</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">ฉัน</span>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    function toggleLike() {
+      const count = document.getElementById('like-count');
+      count.textContent = count.textContent === '1' ? '0' : '1';
+    }
+  </script>
 
 </body>
 </html>
