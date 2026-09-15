@@ -48,20 +48,45 @@
             z-index: 999; letter-spacing: 1px;
         }
 
-        /* ===== วิดีโอ/ภาพ — พอดีจอ ===== */
+        /* ==============================================
+           ✅ จอวิดีโอ/ภาพ อยู่ตรงกลางทุกครั้ง
+           ============================================== */
         .media-container {
-            position: fixed; inset: 0; width: 100vw; height: 100vh;
-            overflow: hidden; z-index: 1;
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+
+            /* ✅ บังคับให้เนื้อหาอยู่ตรงกลาง */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         #main-media {
-            width: 100%; height: 100%;
-            object-fit: contain; object-position: center;
+            /* ✅ ย่อขยายพอดีจอ อัตโนมัติ ทั้งแนวตั้งและแนวนอน */
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+
+            /* ✅ ไม่ตัดภาพ ไม่บังส่วนไหน */
+            object-fit: contain;
+
+            /* ✅ ตรงกลางแน่นอน */
+            object-position: center center;
+
             background: #000;
         }
+
         .overlay {
-            position: fixed; inset: 0;
+            position: fixed;
+            inset: 0;
             background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.6) 100%);
-            z-index: 2; pointer-events: none;
+            z-index: 2;
+            pointer-events: none;
         }
 
         /* 🔊 ปุ่มเปิด/ปิดเสียง */
@@ -74,27 +99,25 @@
             border: 2px solid #fff;
         }
 
-        /* ===== ชื่อวิดีโอ/บริษัท — ปรับขนาดตามสั่ง ===== */
+        /* ===== ชื่อวิดีโอ/บริษัท ===== */
         .text-overlay {
             position: fixed; bottom: 140px; left: 16px; right: 80px;
-            font-size: 14px; /* ✅ เล็กลงกว่าชื่อผู้ใช้ */
+            font-size: 14px;
             font-weight: 500; color: #fff;
             text-shadow: 1px 1px 3px rgba(0,0,0,.9);
             z-index: 9; line-height: 1.5;
             transition: opacity 0.3s ease;
         }
 
-        /* ===== กลุ่มชื่อผู้ใช้ — LOCKED ===== */
+        /* ===== กลุ่มชื่อผู้ใช้ ===== */
         .user-info {
             position: fixed; left: 16px; right: 100px; bottom: 85px;
             z-index: 10;
         }
-        /* ✅ ชื่อผู้ใช้ — ใหญ่กว่าชื่อบริษัท */
         .username {
-            font-weight: 700; font-size: 16px; /* ✅ ใหญ่กว่า 14px */
+            font-weight: 700; font-size: 16px;
             margin-bottom: 6px;
         }
-        /* ✅ คำอธิบาย — เล็กกว่าชื่อผู้ใช้ */
         .caption {
             font-size: 13px; line-height: 1.5; margin-bottom: 8px;
             color: #e0e0e0;
@@ -105,7 +128,7 @@
             font-size: 11px; color: #ddd;
         }
 
-        /* ===== เมนูด้านขวา 6 ตัว — LOCKED ===== */
+        /* ===== เมนูด้านขวา 6 ตัว ===== */
         .right-menu {
             position: fixed; right: 12px; bottom: 160px;
             display: flex; flex-direction: column; align-items: center;
@@ -136,7 +159,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== เมนูด้านล่าง 5 ตัว — LOCKED ===== */
+        /* ===== เมนูด้านล่าง 5 ตัว ===== */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 99;
             display: flex; justify-content: space-around; align-items: center;
@@ -182,7 +205,7 @@
 <!-- ===== แถบขนาดจอ ===== -->
 <div class="screen-size-label" id="screenSizeLabel">ขนาดจอ: กำลังตรวจสอบ...</div>
 
-<!-- ===== วิดีโอ/ภาพ ===== -->
+<!-- ===== จอวิดีโอ/ภาพ อยู่ตรงกลางทุกครั้ง ===== -->
 <div class="media-container">
     <img id="main-media" src="https://picsum.photos/seed/rockstage/720/1280" alt="ภาพ/วิดีโอ">
 </div>
@@ -191,14 +214,14 @@
 <!-- 🔊 ปุ่มเสียง -->
 <div class="sound-btn" id="soundToggle" onclick="toggleSound()">🔇</div>
 
-<!-- ✅ ชื่อบริษัท/ฝ่าย — เล็กกว่าชื่อผู้ใช้!! -->
+<!-- ===== ชื่อวิดีโอ/บริษัท ===== -->
 <div class="text-overlay" id="videoTitle">
     บริษัท ไทยโพดี โปรดักส์ เอ็นจิเนียริ่ง จำกัด<br>
     THAIPODEE PRODUCT ENGINEERING CO.,LTD.<br>
     ผู้อำนวยการสร้าง / Producer
 </div>
 
-<!-- ✅ ชื่อผู้ใช้ — ใหญ่กว่าชื่อบริษัท!! -->
+<!-- ===== ชื่อผู้ใช้ ===== -->
 <div class="user-info">
     <div class="username" id="uploaderName">Bob Dominator</div>
     <div class="caption" id="videoDesc">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
@@ -265,7 +288,7 @@
         else prompt('คัดลอกลิงก์:', window.location.href);
     }
 
-    // อัปโหลด + เปลี่ยนชื่อ
+    // อัปโหลด + เปลี่ยนชื่อ + จออยู่ตรงกลาง
     function handleUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -284,11 +307,16 @@
         reader.onload = function(event) {
             const container = document.querySelector('.media-container');
             const btn = document.getElementById('soundToggle');
+
             if (file.type.startsWith('video/')) {
-                container.innerHTML = `<video id="main-media" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000;"><source src="${event.target.result}" type="${file.type}"></video>`;
+                container.innerHTML = `
+                    <video id="main-media" autoplay loop muted playsinline webkit-playsinline style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center center;background:#000;">
+                        <source src="${event.target.result}" type="${file.type}">
+                    </video>`;
                 soundOn = true; btn.textContent = '🔊'; btn.style.display = 'flex';
             } else {
-                container.innerHTML = `<img id="main-media" src="${event.target.result}" style="width:100%;height:100%;object-fit:contain;background:#000;">`;
+                container.innerHTML = `
+                    <img id="main-media" src="${event.target.result}" style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center center;background:#000;">`;
                 btn.style.display = 'none';
             }
         };
