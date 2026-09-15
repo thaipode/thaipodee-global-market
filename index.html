@@ -5,154 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ThaiPodee Global Market</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         html, body {
-            height: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background: #000;
-            color: #fff;
-            position: fixed;
-            inset: 0;
-            width: 100%;
+            height: 100vh; overflow: hidden; background: #000; color: #fff;
+            position: fixed; inset: 0; width: 100%;
         }
 
-        /* ===== SPLASH SCREEN ===== */
-        #splash {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-        #splash.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-        .splash-logo {
-            width: 120px; height: 120px; border-radius: 24px;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 60px; font-weight: bold; margin-bottom: 20px;
-        }
-        .splash-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
-        .splash-sub { font-size: 14px; color: #888; }
-
-        /* ===== แถบแสดงขนาดจอ ===== */
         .screen-size-label {
             position: fixed; top: 0; left: 0; right: 0; height: 28px;
             background: rgba(0,0,0,.75); color: #0f0;
             font-size: 13px; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
-            z-index: 999; letter-spacing: 1px;
+            z-index: 999;
         }
 
-        /* ==============================================
-           ✅ จอวิดีโอ/ภาพ อยู่ตรงกลางแบบยืดหยุ่น
-           ============================================== */
         .media-container {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+            position: fixed; inset: 0; width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
             z-index: 1;
-
-            /* ✅ ตรงกลางแนวนอน + ปรับแนวตั้งอัตโนมัติ */
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 0;
         }
-
         #main-media {
-            /* ✅ ขยายเต็มพื้นที่ แต่ไม่ตัดภาพ */
-            width: 100%;
-            height: 100%;
-            max-width: 100vw;
-            max-height: 100vh;
-
-            /* ✅ ไม่ตัดภาพ ไม่บังส่วนไหน */
-            object-fit: contain;
-
-            /* ✅ ตรงกลางแน่นอน */
-            object-position: center center;
-
+            width: 100%; height: 100%;
+            max-width: 100vw; max-height: 100vh;
+            object-fit: contain; object-position: center;
             background: #000;
         }
-
         .overlay {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.6) 100%);
-            z-index: 2;
-            pointer-events: none;
+            z-index: 2; pointer-events: none;
         }
 
-        /* 🔊 ปุ่มเปิด/ปิดเสียง */
         .sound-btn {
-            position: fixed; right: 16px; top: 50%;
-            transform: translateY(-50%);
+            position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
             width: 44px; height: 44px;
             background: rgba(0,0,0,.5); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; z-index: 15; cursor:: pointer;
+            font-size: 22px; z-index: 15; cursor: pointer;
             border: 2px solid #fff;
         }
 
-        /* ===== ชื่อวิดีโอ/บริษัท ===== */
         .text-overlay {
             position: fixed; bottom: 140px; left: 16px; right: 80px;
-            font-size: 14px;
-            font-weight: 500; color: #fff;
-            text-shadow: 11px 1px 3px rgba(0,00,0,.9);
+            font-size: 14px; font-weight: 500; color: #fff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,.9);
             z-index: 9; line-height: 1.5;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
         }
 
-        /* ===== กลุ่มชื่อผ用户 ===== */
         .user-info {
-            position: fixed; left: 16px; right: 100px; bottom: 85px;
-            z-index: 10;
+            position: fixed; left: 16px; right: 100px; bottom: 85px; z-index: 10;
         }
-        .username {
-            font-weight: 700; font-size: 16px;
-            margin-bottom: 6px;
-        }
-        .caption {
-            font-size: 13px; line-height: 1.5; margin-bottom: 8px;
-            color: #e0e0e0;
-        }
+        .username { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+        .caption { font-size: 13px; line-height: 1.5; margin-bottom: 8px; color: #e0e0e0; }
         .ai-tag {
             display: inline-block; background: rgba(255,255,255,.15);
             padding: 3px 10px; border-radius: 4px;
             font-size: 11px; color: #ddd;
         }
 
-        /* ===== เมนูด้านขวา 6 ตัว ===== */
         .right-menu {
             position: fixed; right: 12px; bottom: 160px;
             display: flex; flex-direction: column; align-items: center;
             gap: 24px; z-index: 10;
         }
-        .menu-item {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 2px; cursor: pointer;
-        }
+        .menu-item { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .avatar-wrap { position: relative; width: 48px; height: 48px; }
-        .avatar {
-            width: 100%; height: 100%; border-radius: 50%;
-            border: 2px solid #fff; object-fit: cover;
-        }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
         .plus-btn {
             position: absolute; bottom: -4px; right: -4px;
             width: 20px; height: 20px; background: #ff2442;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 14px; font-weight: bold; color: #fff;
         }
-        .icon { font-size: 28px; }
-        .count { font-size: 12px; font-weight: 500; }
+        .icon { font-size: 28px; pointer-events: none; }
+        .count { font-size: 12px; pointer-events: none; }
         .music-icon {
             width: 48px; height: 48px; border-radius: 50%;
             background: linear-gradient(45deg, #00c6ff, #ff0080);
@@ -161,45 +88,183 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== เมนูด้านล่าง 5 ตัว ===== */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 99;
             display: flex; justify-content: space-around; align-items: center;
             padding: 8px 0 25px; background: #000;
-            border-top: 1px solid #222;
-            height: 60px;
-            /*<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>จอภาพหลักและวิดีโอให้แ<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>*/
+            border-top: 1px solid #222; height: 60px;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 2px; cursor: pointer; position: relative;
-        }
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 11px; color: #fff; }
+        .nav-item { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+        .nav-icon { font-size: 24px; pointer-events: none; }
+        .nav-label { font-size: 11px; color: #fff; pointer-events: none; }
         .nav-badge {
             position: absolute; top: -2px; right: -8px;
             background: #ff2442; color: #fff;
             font-size: 10px; min-width: 18px; height: 18px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
+            font-weight: 700; pointer-events: none;
         }
         .nav-add {
             width: 45px; height: 32px; background: #fff;
             border-radius: 8px; position: relative; cursor: pointer;
         }
-        .nav-add::before, .nav-add::after {
-            content: ''; position: absolute; background: #000;
-        }
-        .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
-        .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
-        }
+        .nav-add::before { content: ''; position: absolute; width: 18px; height: 2px; background: #000; top: 15px; left: 13px; }
+        .nav-add::after { content: ''; position: absolute; width: 2px; height: 18px; background: #000; left: 21px; top: 7px; }
 
         #file-upload { display: none; }
     </style>
 </head>
 <body>
 
-<!-- ===== SPLASH ===== -->
-<div id="splash">
-    <div class="splash-logo">ท</div>
-    <div class="splash-title">ThaiPodee</<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>
+<div class="screen-size-label" id="screenSizeLabel">ขนาดจอ: กำลังตรวจสอบ...</div>
+
+<div class="media-container">
+    <img id="main-media" src="https://picsum.photos/seed/rockstage/720/1280" alt="ภาพ/วิดีโอ">
+</div>
+<div class="overlay"></div>
+
+<div class="sound-btn" id="soundToggle" onclick="toggleSound()">🔇</div>
+
+<div class="text-overlay" id="videoTitle">
+    บริษัท ไทยโพดี โปรดักส์ เอ็นจิเนียริ่ง จำกัด<br>
+    THAIPODEE PRODUCT ENGINEERING CO.,LTD.<br>
+    ผู้อำนวยการสร้าง / Producer
+</div>
+
+<div class="user-info">
+    <div class="username" id="uploaderName">Bob Dominator</div>
+    <div class="caption" id="videoDesc">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
+    <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
+</div>
+
+<div class="right-menu">
+    <div class="menu-item" onclick="alert('เปิดหน้าโปรไฟล์ผู้ใช้')">
+        <div class="avatar-wrap">
+            <img class="avatar" src="https://picsum.photos/seed/user-avatar/100/100" alt="โปรไฟล์">
+            <span class="plus-btn" onclick="event.stopPropagation(); alert('ติดตามผู้ใช้นี้')">+</span>
+        </div>
+    </div>
+    <div class="menu-item" onclick="toggleLike(this)">
+        <span class="icon">❤️</span>
+        <span class="count">425</span>
+    </div>
+    <div class="menu-item" onclick="alert('เปิดกล่องคอมเมนต์')">
+        <span class="icon">💬</span>
+        <span class="count">8</span>
+    </div>
+    <div class="menu-item" onclick="shareContent()">
+        <span class="icon">➡️</span>
+        <span class="count">22</span>
+    </div>
+    <div class="menu-item" onclick="toggleBookmark(this)">
+        <span class="icon">⭐</span>
+        <span class="count">บันทึก</span>
+    </div>
+    <div class="menu-item" onclick="alert('เปิดเพลงประกอบ')">
+        <div class="music-icon">🎵</div>
+        <span class="count" style="font-size:10px; margin-top:2px;">11</span>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item" onclick="alert('กลับไปหน้าหลัก')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าหลัก</span>
+    </div>
+    <div class="nav-item" onclick="alert('เปิดร้านค้า')">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">ร้านค้า</span>
+        <span class="nav-badge">99+</span>
+    </div>
+    <div class="nav-item" onclick="document.getElementById('file-upload').click()">
+        <div class="nav-add"></div>
+        <input type="file" id="file-upload" accept="video/*,image/*" onchange="handleUpload(event)">
+    </div>
+    <div class="nav-item" onclick="alert('เปิดข้อความ')">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">ข้อความ</span>
+        <span class="nav-badge">99+</span>
+    </div>
+    <div class="nav-item" onclick="alert('เข้าโปรไฟล์')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    updateScreenSizeLabel();
+});
+
+function updateScreenSizeLabel() {
+    const w = window.innerWidth, h = window.innerHeight;
+    const ratio = h / w;
+    let label = '';
+    if (ratio > 1.55) label = '9:16';
+    else if (ratio < 0.7) label = '16:9';
+    else label = 'จออื่น';
+    document.getElementById('screenSizeLabel').textContent = `สัดส่วนจอ: ${label} | ${Math.round(w)}×${Math.round(h)}`;
+}
+window.addEventListener('resize', updateScreenSizeLabel);
+
+let soundOn = false;
+function toggleSound() {
+    const media = document.getElementById('main-media'), btn = document.getElementById('soundToggle');
+    if (media.tagName.toLowerCase() === 'video') {
+        soundOn = !soundOn; media.muted = !soundOn;
+        btn.textContent = soundOn ? '🔊' : '🔇';
+        if (soundOn) media.play().catch(()=>{});
+    }
+}
+
+function toggleLike(el) { el.style.color = el.style.color === 'red' ? '' : 'red'; }
+function toggleBookmark(el) { el.style.color = el.style.color === 'gold' ? '' : 'gold'; }
+
+function shareContent() {
+    if (navigator.share) {
+        navigator.share({title:'ThaiPodee Global Market', url:window.location.href});
+    } else {
+        prompt('คัดลอกลิงก์:', window.location.href);
+    }
+}
+
+function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const titleEl = document.getElementById('videoTitle');
+    titleEl.style.opacity = '0';
+    
+    setTimeout(() => {
+        let fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
+        titleEl.innerHTML = fileName;
+        titleEl.style.opacity = '1';
+        document.getElementById('videoDesc').textContent = 
+            'อัปโหลดเมื่อ: ' + new Date().toLocaleString('th-TH');
+    }, 250);
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const container = document.querySelector('.media-container');
+        const btn = document.getElementById('soundToggle');
+        
+        if (file.type.startsWith('video/')) {
+            container.innerHTML = `
+                <video id="main-media" autoplay loop muted playsinline style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center;background:#000;">
+                    <source src="${ev.target.result}" type="${file.type}">
+                </video>`;
+            soundOn = true;
+            btn.textContent = '🔊';
+            btn.style.display = 'flex';
+        } else {
+            container.innerHTML = `
+                <img id="main-media" src="${ev.target.result}" style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center;background:#000;">`;
+            btn.style.display = 'none';
+        }
+    };
+    reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
