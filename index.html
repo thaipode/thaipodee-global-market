@@ -1,22 +1,301 @@
-<div class="bottom-info">
-  <!-- ✅ แถบสินค้า — อยู่บนสุด ก่อนชื่อผู้ใช้ ตามที่บอสสั่ง! -->
-  <div class="product-card" onclick="goToProduct()">
-    <img class="product-img" src="https://picsum.photos/50/50?random=product" alt="สินค้า" />
-    <div class="product-meta">
-      <div class="product-name">โคมไฟโซล่าเซลล์ 600W แผงโซลาร์แยก H-3</div>
-      <div class="product-price">฿1,990</div>
-    </div>
-    <button class="buy-btn" onclick="event.stopPropagation(); goToProductPage()">ซื้อเลย</button>
-  </div>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ThaiPodee Global Market Online</title>
+    <!-- 👇 ใส่ลิงก์โลโก้จาก GitHub ตรงนี้ -->
+    <link rel="icon" href="https://raw.githubusercontent.com/ชื่อเจ้าของ/ชื่อที่เก็บ/main/ชื่อไฟล์โลโก้.png" type="image/png">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGUgR2xvYmFsIE1hcmtldCBPbmxpbmUiLCJzaG9ydF9uYW1lIjoiVGhhaVBvZGUiLCJkZXNjcmlwdGlvbiI6IuC4beC4quC4tOC4gOC4ieC4beC4reC4quC4leC4reC4oeC4quC4reC4oeC4uOC4gOC4iLCJzdGFydF91cmwiOiIuaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDcyZmYiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0LXByaW1hcnkiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9wcmF3Lm9yZy81MjgweDEyODAvIzAwMCIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    <meta name="theme-color" content="#000000">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #000; color: #fff; overflow: hidden; height: 100vh; }
 
-  <!-- ✅ ชื่อผู้ใช้ — อยู่ล่างแถบสินค้า -->
-  <div class="username">ชื่อผู้ใช้ ✅</div>
-  
-  <!-- ข้อความสินค้า — ย่อ/ขยายได้ -->
-  <div class="product-desc" id="productDesc">
-    โพสต์ใหม่! — สินค้าโคมไฟโซล่าเซลล์ 600W ราคา 1,990 บาท สนใจกดซื้อได้เลยครับ! รายละเอียดสินค้าเพิ่มเติม: กำลังไฟ 600 วัตต์ แผงโซลาร์ขนาดใหญ่ ทนทาน กันน้ำ ใช้งานได้นาน รับประกัน 1 ปี จัดส่งฟรีทั่วประเทศ สามารถเก็บเงินปลายทางได้ครับ
-  </div>
-  <button class="toggle-desc-btn" id="toggleDescBtn" onclick="toggleDescription()">ดูข้อมูลเพิ่มเติม ▼</button>
-  
-  <div class="music">🎵 เพลง__Thaipodee Global Market Online ติดตาม...</div>
+        /* ========== หน้าจอเริ่มต้น — โลโก้จริงจาก GitHub ========== */
+        .splash-screen { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; }
+        .splash-logo { width: 160px; height: 160px; margin-bottom: 24px; border-radius: 24px; overflow: hidden; }
+        .splash-logo img { width: 100%; height: 100%; object-fit: contain; }
+        .splash-title { font-size: 26px; font-weight: 700; color: #fff; }
+        .splash-sub { font-size: 15px; color: #888; margin-top: 8px; }
+        .splash-hidden { opacity: 0; pointer-events: none; }
+
+        /* ========== ครอบภาชนะหลัก ========== */
+        .app-container { height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
+        .app-visible { opacity: 1; }
+
+        /* ========== ฟีดวิดีโอ แนวตั้ง 9:16 ========== */
+        .feed-container { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        .video-slide { height: 100vh; position: relative; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; background: #111; }
+        .video-bg { position: absolute; inset: 0; object-fit: cover; width: 100%; height: 100%; }
+        .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)); }
+
+        /* ========== ปุ่มโต้ตอบด้านขวา ========== */
+        .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 10; }
+        .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .action-icon { font-size: 28px; }
+        .action-count { font-size: 11px; color: #fff; }
+        .music-disc { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, #00c6ff, #ff0080); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+        /* ========== ข้อมูลสินค้า ด้านซ้ายล่าง ========== */
+        .content-info { position: absolute; left: 16px; right: 80px; bottom: 100px; z-index: 10; }
+        .username { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .product-tag { display: inline-block; background: #25f; color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 12px; margin-left: 8px; }
+        .description { font-size: 14px; line-height: 1.5; margin-bottom: 10px; }
+        .price-tag { display: inline-block; background: #00c853; color: #fff; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
+        .add-to-cart-btn { background: #ff5c39; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; }
+
+        /* ========== แถบเมนูด้านล่าง ========== */
+        .bottom-nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 20px; background: #000; border-top: 1px solid #222; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 10px; color: #999; }
+        .nav-item.active .nav-label { color: #fff; font-weight: 600; }
+        .nav-item.active .nav-icon { transform: scale(1.15); }
+        .nav-add { width: 44px; height: 30px; background: #fff; border-radius: 6px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .nav-add::before, .nav-add::after { content: ''; position: absolute; background: #000; }
+        .nav-add::before { width: 18px; height: 2px; }
+        .nav-add::after { width: 2px; height: 18px; }
+
+        /* ========== หน้าอื่น ๆ ========== */
+        .page { display: none; position: absolute; inset: 0; background: #000; z-index: 50; padding: 20px; overflow-y: auto; }
+        .page.active { display: block; }
+        .page-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; margin-top: 40px; }
+        .cart-item, .order-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-bottom: 1px solid #333; }
+        .cart-btn-float { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #ff5c39; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 40; }
+        .badge { position: absolute; top: -4px; right: -4px; background: #f00; color: #fff; font-size: 10px; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<!-- ========== หน้าจอเริ่มต้น — โลโก้จริงจาก GitHub ========== -->
+<div class="splash-screen" id="splashScreen">
+    <div class="splash-logo">
+        <!-- 👇 ใส่ลิงก์โลโก้จาก GitHub ตรงนี้ด้วยนะ -->
+        <img src="https://raw.githubusercontent.com/ชื่อเจ้าของ/ชื่อที่เก็บ/main/ชื่อไฟล์โลโก้.png" alt="ThaiPodee">
+    </div>
+    <div class="splash-title">ThaiPodee</div>
+    <div class="splash-sub">Global Market Online</div>
 </div>
+
+<!-- ========== แอปหลัก ========== -->
+<div class="app-container" id="appContainer">
+
+    <!-- ฟีดวิดีโอ — หน้าแรก -->
+    <div class="feed-container" id="feedContainer">
+        <!-- สินค้า 1 -->
+        <div class="video-slide">
+            <img class="video-bg" src="https://picsum.photos/seed/product1/720/1280" alt="สินค้า">
+            <div class="video-overlay"></div>
+            <div class="content-info">
+                <div class="username">thaipodee_official <span class="product-tag">สินค้าแนะนำ</span></div>
+                <div class="description">โซลาร์เซลล์ 600W แผงโซลาร์เซลล์ H-3 ประสิทธิภาพสูง คุ้มค่า ประหยัดไฟ</div>
+                <div class="price-tag">฿1,990</div>
+                <button class="add-to-cart-btn" onclick="addToCart('โซลาร์เซลล์ 600W', 1990)">🛒 ใส่ตะกร้า</button>
+            </div>
+            <div class="side-actions">
+                <div class="action-btn" onclick="toggleLike(this)"><span class="action-icon">❤️</span><span class="action-count">1.2K</span></div>
+                <div class="action-btn" onclick="showPage('comments')"><span class="action-icon">💬</span><span class="action-count">65</span></div>
+                <div class="action-btn" onclick="shareProduct()"><span class="action-icon">↗️</span><span class="action-count">แชร์</span></div>
+                <div class="action-btn"><div class="music-disc">🎵</div></div>
+            </div>
+        </div>
+        <!-- สินค้า 2 -->
+        <div class="video-slide">
+            <img class="video-bg" src="https://picsum.photos/seed/product2/720/1280" alt="สินค้า">
+            <div class="video-overlay"></div>
+            <div class="content-info">
+                <div class="username">thaipodee_official <span class="product-tag">มาใหม่</span></div>
+                <div class="description">แผงโซลาร์ 600 วัตต์ พร้อมติดตั้ง คุ้มค่าเกินราคา รับประกัน 1 ปี</div>
+                <div class="price-tag">฿2,490</div>
+                <button class="add-to-cart-btn" onclick="addToCart('แผงโซลาร์ 600W พร้อมติดตั้ง', 2490)">🛒 ใส่ตะกร้า</button>
+            </div>
+            <div class="side-actions">
+                <div class="action-btn" onclick="toggleLike(this)"><span class="action-icon">❤️</span><span class="action-count">856</span></div>
+                <div class="action-btn" onclick="showPage('comments')"><span class="action-icon">💬</span><span class="action-count">42</span></div>
+                <div class="action-btn" onclick="shareProduct()"><span class="action-icon">↗️</span><span class="action-count">แชร์</span></div>
+                <div class="action-btn"><div class="music-disc">🎵</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ปุ่มตะกร้าลอย -->
+    <div class="cart-btn-float" onclick="showPage('cart')">🛒<span class="badge" id="cartBadge">0</span></div>
+
+    <!-- หน้าค้นหา -->
+    <div class="page" id="page-search">
+        <div class="page-title">🔍 ค้นหาสินค้า</div>
+        <input type="text" placeholder="พิมพ์ชื่อสินค้า..." style="width:100%; padding:12px; border-radius:8px; border:none; background:#222; color:#fff; font-size:16px; margin-bottom:20px;">
+        <p style="color:#888;">พิมพ์ชื่อสินค้าเพื่อค้นหา</p>
+    </div>
+
+    <!-- หน้าอัปโหลด -->
+    <div class="page" id="page-upload">
+        <div class="page-title">➕ เพิ่มสินค้าใหม่</div>
+        <input type="file" accept="video/*,image/*" style="margin-bottom:15px; width:100%;">
+        <input type="text" placeholder="ชื่อสินค้า" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:none; background:#222; color:#fff; font-size:16px;">
+        <input type="number" placeholder="ราคา ฿" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:none; background:#222; color:#fff; font-size:16px;">
+        <textarea placeholder="รายละเอียดสินค้า" style="width:100%; padding:12px; border-radius:8px; border:none; background:#222; color:#fff; font-size:16px; height:100px; margin-bottom:15px;"></textarea>
+        <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600;" onclick="alert('✅ สินค้าถูกเพิ่มแล้ว!')">📤 โพสต์สินค้า</button>
+    </div>
+
+    <!-- หน้าแจ้งเตือน -->
+    <div class="page" id="page-notify">
+        <div class="page-title">🔔 การแจ้งเตือน</div>
+        <div style="padding:15px 0; border-bottom:1px solid #333;">❤️ มีคนกดถูกใจสินค้าของคุณ <small style="color:#888;">5 นาทีก่อน</small></div>
+        <div style="padding:15px 0; border-bottom:1px solid #333;">💬 มีความคิดเห็นใหม่ <small style="color:#888;">1 ชม. ก่อน</small></div>
+        <div style="padding:15px 0; border-bottom:1px solid #333;">✅ คำสั่งซื้อได้รับการยืนยัน <small style="color:#888;">2 ชม. ก่อน</small></div>
+    </div>
+
+    <!-- หน้าโปรไฟล์ -->
+    <div class="page" id="page-profile">
+        <div style="text-align:center; padding:30px 0;">
+            <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#00c6ff,#0072ff); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:32px;">ท</div>
+            <div style="font-size:20px; font-weight:700;">ThaiPodee Official</div>
+            <div style="color:#888; font-size:14px;">@thaipodee_official</div>
+            <div style="display:flex; justify-content:center; gap:30px; margin-top:20px;">
+                <div style="text-align:center;"><div style="font-weight:700;">128</div><div style="font-size:12px; color:#888;">สินค้า</div></div>
+                <div style="text-align:center;"><div style="font-weight:700;">4.5K</div><div style="font-size:12px; color:#888;">ผู้ติดตาม</div></div>
+                <div style="text-align:center;"><div style="font-weight:700;">32</div><div style="font-size:12px; color:#888;">กำลังติดตาม</div></div>
+            </div>
+            <button style="margin-top:20px; padding:8px 20px; background:transparent; color:#fff; border:1px solid #444; border-radius:6px;">⚙️ ตั้งค่า</button>
+        </div>
+        <div style="border-top:1px solid #222; padding-top:20px;">
+            <div style="padding:12px 0; border-bottom:1px solid #222; cursor:pointer;" onclick="showPage('orders')">📋 ประวัติการสั่งซื้อ</div>
+            <div style="padding:12px 0; border-bottom:1px solid #222; cursor:pointer;">💳 วิธีการชำระเงิน</div>
+            <div style="padding:12px 0; border-bottom:1px solid #222; cursor:pointer;">📍 ที่อยู่จัดส่ง</div>
+            <div style="padding:12px 0; border-bottom:1px solid #222; cursor:pointer;">🔒 ความเป็นส่วนตัว</div>
+        </div>
+    </div>
+
+    <!-- หน้าตะกร้า -->
+    <div class="page" id="page-cart">
+        <div class="page-title">🛒 ตะกร้าสินค้า</div>
+        <div id="cartList"></div>
+        <div style="margin-top:20px; padding-top:15px; border-top:1px solid #333;">
+            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:15px;">
+                <span>รวมทั้งหมด</span>
+                <span id="cartTotal">฿0</span>
+            </div>
+            <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600;" onclick="checkout()">✅ ยืนยันการสั่งซื้อ</button>
+        </div>
+    </div>
+
+    <!-- หน้าประวัติ -->
+    <div class="page" id="page-orders">
+        <div class="page-title">📋 ประวัติการสั่งซื้อ</div>
+        <div id="orderList"><p style="color:#888;">ยังไม่มีประวัติการสั่งซื้อ</p></div>
+    </div>
+
+    <!-- หน้าคอมเมนต์ -->
+    <div class="page" id="page-comments">
+        <div class="page-title" style="display:flex; justify-content:space-between; align-items:center;">ความคิดเห็น <span onclick="closePage()" style="font-size:24px; cursor:pointer;">✕</span></div>
+        <div style="padding:12px 0; border-bottom:1px solid #333;"><b>ผู้ใช้คนที่ 1:</b> สนใจครับ ราคาเต็มไหมครับ?</div>
+        <div style="padding:12px 0; border-bottom:1px solid #333;"><b>ผู้ใช้คนที่ 2:</b> มีประกันไหมครับ</div>
+        <div style="padding:12px 0; border-bottom:1px solid #333;"><b>เรา:</b> มีประกัน 1 ปีครับ</div>
+        <div style="position:absolute; bottom:80px; left:20px; right:20px; display:flex; gap:10px;">
+            <input type="text" placeholder="เขียนความคิดเห็น..." style="flex:1; padding:12px; border-radius:24px; border:none; background:#222; color:#fff;">
+            <button style="padding:12px 20px; background:#25f; color:#fff; border:none; border-radius:24px;">ส่ง</button>
+        </div>
+    </div>
+
+    <!-- เมนูล่าง -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="home" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">หน้าแรก</span>
+        </div>
+        <div class="nav-item" data-page="search" onclick="switchTab('search')">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">ค้นหา</span>
+        </div>
+        <div class="nav-item" data-page="upload" onclick="switchTab('upload')">
+            <div class="nav-add"></div>
+        </div>
+        <div class="nav-item" data-page="notify" onclick="switchTab('notify')">
+            <span class="nav-icon">🔔</span>
+            <span class="nav-label">แจ้งเตือน</span>
+        </div>
+        <div class="nav-item" data-page="profile" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">โปรไฟล์</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cart = [], orders = [], currentPage = 'home';
+
+    // โลโก้แสดง 1.5 วินาที แล้วเข้าหน้าแรก
+    setTimeout(() => {
+        document.getElementById('splashScreen').classList.add('splash-hidden');
+        document.getElementById('appContainer').classList.add('app-visible');
+    }, 1500);
+
+    function switchTab(pageName) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        if (pageName !== 'home') {
+            document.getElementById(`page-${pageName}`).classList.add('active');
+            currentPage = pageName;
+        } else currentPage = 'home';
+        document.querySelector(`.nav-item[data-page="${pageName}"]`)?.classList.add('active');
+    }
+
+    function showPage(pageName) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${pageName}`).classList.add('active');
+        currentPage = pageName;
+    }
+
+    function closePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        currentPage = 'home';
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelector('.nav-item[data-page="home"]').classList.add('active');
+    }
+
+    function addToCart(name, price) {
+        cart.push({ name, price, id: Date.now() });
+        updateCartUI();
+        alert('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
+    }
+
+    function updateCartUI() {
+        const list = document.getElementById('cartList'), badge = document.getElementById('cartBadge'), totalEl = document.getElementById('cartTotal');
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        badge.textContent = cart.length;
+        badge.style.display = cart.length > 0 ? 'flex' : 'none';
+        totalEl.textContent = '฿' + total.toLocaleString();
+        list.innerHTML = cart.length === 0 
+            ? '<p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p>'
+            : cart.map((item, idx) => `<div class="cart-item"><div><div style="font-weight:600;">${item.name}</div><div style="color:#00c853; font-weight:700;">฿${item.price.toLocaleString()}</div></div><button onclick="removeFromCart(${idx})" style="background:transparent; color:#f55; border:none; font-size:20px; cursor:pointer;">✕</button></div>`).join('');
+    }
+
+    function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
+
+    function checkout() {
+        if (cart.length === 0) { alert('⚠️ ไม่มีสินค้าในตะกร้า!'); return; }
+        const total = cart.reduce((sum, i) => sum + i.price, 0);
+        orders.unshift({ items: [...cart], total, date: new Date().toLocaleString('th-TH') });
+        alert(`✅ สั่งซื้อสำเร็จ!\nรวมทั้งหมด: ฿${total.toLocaleString()}\nขอบคุณครับ!`);
+        cart = []; updateCartUI(); renderOrders(); closePage();
+    }
+
+    function renderOrders() {
+        const list = document.getElementById('orderList');
+        list.innerHTML = orders.length === 0 
+            ? '<p style="color:#888;">ยังไม่มีประวัติการสั่งซื้อ</p>'
+            : orders.map(o => `<div class="order-item" style="border-bottom:1px solid #333; padding:15px 0;"><div style="font-size:13px; color:#888; margin-bottom:8px;">📅 ${o.date}</div><div style="font-weight:600; margin-bottom:5px;">สินค้า ${o.items.length} รายการ</div><div style="color:#00c853; font-weight:700; font-size:16px;">รวม ฿${o.total.toLocaleString()}</div></div>`).join('');
+    }
+
+    function toggleLike(btn) { btn.style.color = btn.style.color === 'red' ? '' : 'red'; }
+    function shareProduct() { navigator.share ? navigator.share({ title: 'ThaiPodee Global Market', url: window.location.href }) : prompt('คัดลอกลิงก์นี้ได้เลย:', window.location.href); }
+
+    updateCartUI();
+</script>
+
+</body>
+</html>
