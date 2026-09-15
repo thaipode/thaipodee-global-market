@@ -34,7 +34,8 @@
         .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
         .info-desc { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
         .info-price { display: inline-block; background: #00c853; color: #fff; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 18px; margin-bottom: 12px; }
-        .info-btn { width: 100%; padding: 12px; background: #ff5c39; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        /* ✅ ปุ่มใส่ตะกร้าเล็กลง ไม่เกะกะจอ */
+        .info-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #ff5c39; color: #fff; border: none; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 4px; }
 
         /* ========== ปุ่มขวา ========== */
         .actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 10; }
@@ -44,12 +45,14 @@
         .music-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #00c6ff, #ff0080); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; font-size: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ========== เมนูล่าง — ไม่มีอะไรมาบังแล้ว! ========== */
+        /* ========== เมนูล่าง — ไม่มีแถบสีส้มแล้ว! ========== */
         .nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 25px; background: #000; border-top: 1px solid #222; z-index: 20; position: relative; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; position: relative; }
         .nav-icon { font-size: 24px; }
         .nav-label { font-size: 10px; color: #888; }
         .nav-item.active .nav-label { color: #fff; }
+        /* ✅ ป้ายแจ้งจำนวนสินค้าบนไอคอนตะกร้า */
+        .nav-cart-badge { position: absolute; top: -4px; right: -8px; background: #f00; color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
         .nav-add { width: 42px; height: 28px; background: #fff; border-radius: 6px; position: relative; }
         .nav-add::before, .nav-add::after { content: ''; position: absolute; background: #000; }
         .nav-add::before { width: 16px; height: 2px; top: 13px; left: 13px; }
@@ -87,6 +90,7 @@
                 <div class="info-user">thaipodee_official <span class="info-tag">สินค้าแนะนำ</span></div>
                 <div class="info-desc">โซลาร์เซลล์ 600W แผงโซลาร์เซลล์ H-3 ประสิทธิภาพสูง คุ้มค่า ประหยัดไฟ</div>
                 <div class="info-price">฿1,990</div>
+                <!-- ✅ ปุ่มเล็กลง ไม่มีแถบสีส้มเต็มจอแล้ว! -->
                 <button class="info-btn" onclick="addToCart('โซลาร์เซลล์ 600W', 1990)">🛒 ใส่ตะกร้า</button>
             </div>
 
@@ -119,7 +123,7 @@
         </div>
     </div>
 
-    <!-- ❌ ลบปุ่มตะกร้าลอยทิ้งไปเลย ไม่มีแล้ว! -->
+    <!-- ❌ ลบแถบสีส้ม "ใส่ตะกร้า" ทิ้งไปเลย! -->
 
     <!-- หน้าค้นหา -->
     <div class="page" id="page-search">
@@ -136,7 +140,7 @@
         <input type="text" placeholder="ชื่อสินค้า">
         <input type="number" placeholder="ราคา ฿">
         <textarea placeholder="รายละเอียดสินค้า" rows="4"></textarea>
-        <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600;" onclick="alert('✅ สินค้าถูกเพิ่มแล้ว!'); closePage();">📤 โพสต์สินค้า</button>
+        <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600; margin-top:10px;" onclick="alert('✅ สินค้าถูกเพิ่มแล้ว!'); closePage();">📤 โพสต์สินค้า</button>
     </div>
 
     <!-- หน้าแจ้งเตือน -->
@@ -181,12 +185,17 @@
         <div style="padding:12px 0; border-bottom:1px solid #333;"><b>เรา:</b> มีประกัน 1 ปีครับ</div>
     </div>
 
-    <!-- เมนูล่าง — ✅ ไม่มีอะไรมาบังแล้ว! -->
+    <!-- เมนูล่าง — ✅ ไม่มีแถบสีส้ม! กดที่ไอคอนตะกร้าได้เลย -->
     <div class="nav">
         <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
         <div class="nav-item" onclick="openPage('search')"><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
         <div class="nav-item" onclick="openPage('upload')"><div class="nav-add"></div></div>
-        <div class="nav-item" onclick="openPage('cart')"><span class="nav-icon">🛒</span><span class="nav-label" id="navCartLabel">ตะกร้า</span></div>
+        <div class="nav-item" onclick="openPage('cart')" id="navCartItem">
+            <span class="nav-icon">🛒</span>
+            <span class="nav-label" id="navCartLabel">ตะกร้า</span>
+            <!-- ✅ ป้ายแจ้งจำนวนสินค้าบนไอคอนตะกร้า -->
+            <span class="nav-cart-badge" id="navCartBadge" style="display:none;">0</span>
+        </div>
         <div class="nav-item" onclick="openPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
     </div>
 </div>
@@ -238,13 +247,16 @@
         const countEl = document.getElementById('cartCount');
         const totalEl = document.getElementById('cartTotal');
         const list = document.getElementById('cartList');
-        const navLabel = document.getElementById('navCartLabel');
+        const badge = document.getElementById('navCartBadge');
         const total = cart.reduce((s, i) => s + i.price, 0);
         
-        // อัปเดตจำนวน
+        // อัปเดตจำนวนที่หน้าตะกร้า
         countEl.textContent = `(${cart.length} ชิ้น)`;
-        navLabel.textContent = cart.length > 0 ? `ตะกร้า (${cart.length})` : 'ตะกร้า';
         totalEl.textContent = '฿' + total.toLocaleString();
+        
+        // ✅ อัปเดตป้ายแดงบนไอคอนตะกร้า
+        badge.textContent = cart.length;
+        badge.style.display = cart.length > 0 ? 'flex' : 'none';
         
         // แสดงรายการ
         list.innerHTML = cart.length === 0 
