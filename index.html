@@ -4,179 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; position: fixed; inset: 0; width: 100%; }
 
-        .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
-        .page-hidden { opacity: 0; pointer-events: none; transform: translateX(100%); }
-        .modal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; }
-        .modal-hidden { display: none; }
-        .modal-head { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
-        .modal-body { flex: 1; overflow-y: auto; padding: 15px; }
-        .item-row { padding: 12px 0; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .item-row:hover { background: #222; }
-        .check-mark { color: #00f080; font-weight: bold; }
+        .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+        .page-hidden { display: none; }
 
-        /* === หน้าวิดีโอหลัก — พื้นที่แสดงเต็มจอ === */
-        .video-page { z-index: 10; }
+        /* === วิดีโออยู่ตรงกลาง — เว้นที่ล่างเยอะ === */
         .video-wrap {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 70px; /* เหลือที่แถบล่าง */
-            cursor: pointer; background: #000;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 200px;
             display: flex; align-items: center; justify-content: center;
+            background: #000; overflow: hidden;
         }
-        #main-media, #main-video {
-            width: 100%; height: 100%;
-            object-fit: cover; object-position: center;
-            background: #000;
+        #main-video {
+            width: 100%; height: 100%; object-fit: cover;
         }
 
         .progress-bar {
-            position: absolute; bottom: 70px; left: 12px; right: 12px; height: 2px;
-            background: rgba(255,255,255,0.25); border-radius: 2px; z-index: 15; cursor: pointer;
+            position: absolute; bottom: 200px; left: 12px; right: 12px; height: 2px;
+            background: rgba(255,255,255,0.2); border-radius: 2px; z-index: 15; cursor: pointer;
         }
-        .progress-fill { height: 100%; background: #fff; border-radius: 2px; width: 0%; transition: width 0.1s linear; }
+        .progress-fill { height: 100%; background: #fff; border-radius: 2px; width: 0%; }
 
         .shade-bottom {
-            position: absolute; bottom: 70px; left: 0; right: 0; height: 140px;
-            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+            position: absolute; bottom: 200px; left: 0; right: 0; height: 120px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
             z-index: 2; pointer-events: none;
         }
 
-        .info-left { position: absolute; left: 14px; bottom: 85px; right: 80px; z-index: 10; }
-        .acc-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; cursor: pointer; }
-        .desc-text { font-size: 13px; line-height: 1.4; margin-bottom: 4px; color: #f0f0f0; }
-        .music-row { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #ddd; cursor: pointer; }
+        /* === ข้อมูลซ้าย — ขยับขึ้น === */
+        .info-left {
+            position: absolute; left: 16px; bottom: 215px; right: 90px; z-index: 10;
+        }
+        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; cursor: pointer; }
+        .desc-text { font-size: 13px; line-height: 1.4; margin-bottom: 6px; color: #eee; }
+        .music-row { font-size: 12px; color: #ddd; display: flex; align-items: center; gap: 5px; cursor: pointer; }
 
-        /* === เมนูด้านขวา — ย่อขนาด ไม่ล้นจอ === */
-        .menu-right { position: absolute; right: 8px; bottom: 85px; display: flex; flex-direction: column; gap: 16px; z-index: 10; }
-        .menu-btn { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; }
-        .avatar-box { position: relative; width: 40px; height: 40px; cursor: pointer; }
+        /* === เมนูขวา — ขยับขึ้น === */
+        .menu-right {
+            position: absolute; right: 10px; bottom: 215px;
+            display: flex; flex-direction: column; gap: 20px; z-index: 10;
+        }
+        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .avatar-box { position: relative; width: 42px; height: 42px; }
         .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
         .follow-plus {
             position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
             width: 18px; height: 18px; background: #ff2442; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+            font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center;
         }
-        .icon { font-size: 22px; pointer-events: none; }
-        .num { font-size: 10px; }
+        .icon { font-size: 24px; }
+        .num { font-size: 11px; }
         .music-disc {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 38px; height: 38px; border-radius: 50%;
             background: linear-gradient(45deg, #00c6ff, #ff0080);
             display: flex; align-items: center; justify-content: center;
-            animation: spin 3s linear infinite; font-size: 14px;
+            animation: spin 3s linear infinite; font-size: 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* === หน้าโปรไฟล์ === */
-        .profile-page { background: #fff; color: #000; overflow-y: auto; z-index: 20; }
-        .profile-back {
-            position: absolute; top: 12px; left: 12px; background: none; border: none;
-            font-size: 22px; cursor: pointer; color: #000; z-index: 5;
-        }
-        .profile-header { padding: 45px 15px 15px; text-align: center; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #ddd; object-fit: cover; margin-bottom: 8px; }
-        .profile-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
-        .profile-username { color: #666; font-size: 13px; margin-bottom: 12px; }
-        .profile-stats { display: flex; justify-content: center; gap: 25px; margin-bottom: 12px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 16px; font-weight: 700; }
-        .stat-label { font-size: 11px; color: #666; margin-top: 2px; }
-        .profile-desc { font-size: 12px; color: #444; padding: 0 15px 15px; line-height: 1.5; }
-        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 0 3px; }
-        .profile-item {
-            aspect-ratio: 9/12; background: #eee; border-radius: 3px; overflow: hidden;
-            position: relative; cursor: pointer;
-        }
-        .profile-item-img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-item-view {
-            position: absolute; bottom: 3px; left: 3px; font-size: 10px;
-            background: rgba(0,0,0,0.5); color: #fff; padding: 2px 5px; border-radius: 10px;
-        }
-        .profile-empty { text-align: center; color: #999; padding: 50px 20px; font-size: 13px; }
-
-        /* === หน้าถ่าย/อัปโหลด === */
-        .camera-page { background: #000; z-index: 30; }
-        .camera-view { width: 100%; height: 65%; object-fit: cover; background: #111; transform: scaleX(-1); }
-        .camera-controls { padding: 15px; text-align: center; }
-        .cam-btn {
-            width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff;
-            background: none; cursor: pointer; margin: 8px; font-size: 11px; color: #fff;
-        }
-        .cam-btn.rec { background: #ff2442; }
-        .cam-btn.audio { background: #00c6ff; }
-        .cam-btn-group { display: flex; justify-content: center; gap: 12px; margin-top: 10px; }
-        .input-field {
-            width: 100%; padding: 10px; margin: 6px 0; background: #222; border: none; color: #fff; border-radius: 6px; font-size: 14px;
-        }
-        .select-label { font-size: 12px; color: #aaa; margin-top: 10px; display: block; text-align: left; }
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
-        .toggle { width: 40px; height: 22px; background: #555; border-radius: 11px; position: relative; cursor: pointer; }
-        .toggle.on { background: #00f080; }
-        .toggle::after {
-            content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
-            background: #fff; border-radius: 50%; transition: transform 0.2s;
-        }
-        .toggle.on::after { transform: translateX(18px); }
-        .btn-primary {
-            width: 100%; padding: 12px; background: #00f080; color: #000; border: none;
-            border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px;
-        }
-        .btn-secondary {
-            width: 100%; padding: 10px; background: #333; color: #fff; border: none;
-            border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 8px;
-        }
-
-        /* === แถบล่าง — พอดีจอ ไม่ล้น === */
+        /* === แถบล่าง — ครบ 5 ปุ่ม ชัดเจน === */
         .nav-bottom {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
             background: #000; display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 8px 10px 12px; border-top: 1px solid #222; z-index: 50;
+            padding: 8px 10px 15px; border-top: 1px solid #222; z-index: 50;
         }
-        .nav-col { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
-        .nav-icon { font-size: 20px; pointer-events: none; }
-        .nav-label { font-size: 9px; pointer-events: none; }
+        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .nav-icon { font-size: 22px; }
+        .nav-label { font-size: 10px; }
         .nav-add {
-            width: 44px; height: 28px; background: #fff; border-radius: 6px;
-            position: relative; cursor: pointer; margin-bottom: 4px;
+            width: 46px; height: 30px; background: #fff; border-radius: 6px;
+            position: relative; margin-bottom: 4px;
         }
         .nav-add::before {
-            content: ''; position: absolute; width: 16px; height: 2px; background: #000;
-            top: 13px; left: 14px;
+            content: ''; position: absolute; width: 18px; height: 2px; background: #000;
+            top: 14px; left: 14px;
         }
         .nav-add::after {
-            content: ''; position: absolute; width: 2px; height: 16px; background: #000;
-            left: 21px; top: 6px;
+            content: ''; position: absolute; width: 2px; height: 18px; background: #000;
+            left: 22px; top: 6px;
         }
         .badge {
             position: absolute; top: -2px; right: -6px;
-            background: #ff2442; color: #fff; font-size: 8px;
+            background: #ff2442; color: #fff; font-size: 9px;
             min-width: 14px; height: 14px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; pointer-events: none;
         }
 
-        #file-input, #audio-input { display: none; }
+        /* ซ่อนไฟล์*/
+        #file-input { display: none; }
     </style>
 </head>
 <body>
 
 <!-- ===== หน้าวิดีโอหลัก ===== -->
 <div class="page video-page" id="videoPage">
-    <div class="video-wrap" id="vidWrap" onclick="toggleAudio()">
+    <div class="video-wrap" onclick="toggleAudio()">
         <video id="main-video" autoplay loop muted playsinline>
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
-            <div style="color:#888; text-align:center;">
-                <p>วิดีโอตรงนี้</p>
-                <p style="font-size:12px; margin-top:10px;">กดปุ่ม + ด้านล่างเพื่ออัปโหลดของคุณ</p>
-            </div>
         </video>
     </div>
 
-    <div class="progress-bar" id="progressBar" onclick="seekVideo(event)">
+    <div class="progress-bar" onclick="seekVideo(event)">
         <div class="progress-fill" id="progressFill"></div>
     </div>
 
@@ -184,357 +115,122 @@
 
     <div class="info-left">
         <div class="acc-name" onclick="openProfile()">@ThaiPodee_Official</div>
-        <div class="desc-text" id="currentDesc">ยินดีต้อนรับสู่ ThaiPodee Global Market — แพลตฟอร์มของคนไทย ✨</div>
-        <div class="music-row" onclick="openMusicModal()">
-            🎵 <span id="currentMusic">เสียงต้นฉบับ • ThaiPodee Original</span>
-        </div>
+        <div class="desc-text">ยินดีต้อนรับสู่ ThaiPodee Global Market — แพลตฟอร์มของคนไทย ✨</div>
+        <div class="music-row">🎵 เสียงต้นฉบับ • ThaiPodee Original</div>
     </div>
 
     <div class="menu-right">
         <div class="menu-btn" onclick="openProfile()">
             <div class="avatar-box">
-                <img class="avatar" src="https://picsum.photos/seed/thaipodee/100/100" alt="โปรไฟล์">
-                <span class="follow-plus" onclick="event.stopPropagation(); alert('ติดตามแล้ว')">+</span>
+                <img class="avatar" src="https://picsum.photos/seed/thaipodee/100/100">
+                <span class="follow-plus" onclick="event.stopPropagation();">+</span>
             </div>
         </div>
         <div class="menu-btn" onclick="toggleLike()">
             <span class="icon" id="likeIcon">❤️</span>
             <span class="num" id="likeCount">0</span>
         </div>
-        <div class="menu-btn" onclick="openCommentModal()">
+        <div class="menu-btn">
             <span class="icon">💬</span>
-            <span class="num" id="commentCount">0</span>
+            <span class="num">0</span>
         </div>
-        <div class="menu-btn" onclick="toggleBookmark()">
-            <span class="icon" id="bookmarkIcon">⭐</span>
-            <span class="num" id="bookmarkText">บันทึก</span>
+        <div class="menu-btn">
+            <span class="icon">⭐</span>
+            <span class="num">บันทึก</span>
         </div>
-        <div class="menu-btn" onclick="openShareModal()">
+        <div class="menu-btn">
             <span class="icon">➡️</span>
             <span class="num">แชร์</span>
         </div>
-        <div class="menu-btn" onclick="openMusicModal()">
+        <div class="menu-btn">
             <div class="music-disc">🎵</div>
-            <span class="num" style="font-size:9px; margin-top:3px;">11</span>
         </div>
-    </div>
-</div>
-
-<!-- ===== กล่องเลือกเสียง ===== -->
-<div class="modal modal-hidden" id="musicModal">
-    <div class="modal-head">
-        <h3>เลือกเสียงประกอบ</h3>
-        <button class="modal-close" onclick="closeMusicModal()">×</button>
-    </div>
-    <div class="modal-body">
-        <div class="toggle-row">
-            <span>ปิดเสียงต้นฉบับวิดีโอ</span>
-            <div class="toggle" id="muteOrigToggle" onclick="toggleMuteOriginal()"></div>
-        </div>
-        <hr style="border-color:#333; margin:12px 0;">
-        <div class="item-row" onclick="selectMusic('original', '🎵 เสียงต้นฉบับ')">
-            <span>🎵 เสียงต้นฉบับ</span>
-            <span class="check-mark" id="chk-original">✓</span>
-        </div>
-        <div class="item-row" onclick="selectMusic('recording', '🎤 เสียงบันทึกของฉัน')">
-            <span>🎤 เสียงบันทึกของฉัน</span>
-            <span class="check-mark" id="chk-recording"></span>
-        </div>
-        <div class="item-row" onclick="selectMusic('bgm1', '🎹 เพลงบรรเลง')">
-            <span>🎹 เพลงบรรเลง</span>
-            <span class="check-mark" id="chk-bgm1"></span>
-        </div>
-        <div class="item-row" onclick="selectMusic('song1', '🎤 เพลงร้อง')">
-            <span>🎤 เพลงร้อง</span>
-            <span class="check-mark" id="chk-song1"></span>
-        </div>
-        <div class="item-row" onclick="selectMusic('effect1', '🔊 เสียงประกอบ')">
-            <span>🔊 เสียงประกอบ</span>
-            <span class="check-mark" id="chk-effect1"></span>
-        </div>
-        <input type="file" id="audio-input" accept="audio/*" onchange="loadAudioFile(event)" style="margin-top:12px;">
-        <button class="btn-secondary" onclick="startVoiceRecord()">🎤 บันทึกเสียงสด</button>
-    </div>
-</div>
-
-<!-- ===== กล่องแชร์ ===== -->
-<div class="modal modal-hidden" id="shareModal">
-    <div class="modal-head">
-        <h3>แชร์</h3>
-        <button class="modal-close" onclick="closeShareModal()">×</button>
-    </div>
-    <div class="modal-body">
-        <div class="item-row" onclick="copyLink()">
-            <span>🔗 คัดลอกลิงก์</span><span>คัดลอก</span>
-        </div>
-        <div class="item-row" onclick="alert('ส่งผ่านไลน์')">
-            <span>💬 ส่งผ่านไลน์</span>
-        </div>
-        <div class="item-row" onclick="alert('โพสต์เฟซบุ๊ก')">
-            <span>📘 โพสต์เฟซบุ๊ก</span>
-        </div>
-    </div>
-</div>
-
-<!-- ===== กล่องคอมเมนต์ ===== -->
-<div class="modal modal-hidden" id="commentModal">
-    <div class="modal-head">
-        <h3>ความคิดเห็น (<span id="commentCountModal">0</span>)</h3>
-        <button class="modal-close" onclick="closeCommentModal()">×</button>
-    </div>
-    <div class="modal-body" id="commentList">
-        <p style="color:#888; text-align:center; padding:30px;">ยังไม่มีความคิดเห็น</p>
-    </div>
-    <div style="padding:12px; border-top:1px solid #333; display:flex; gap:8px;">
-        <input type="text" id="commentInput" class="input-field" style="flex:1; margin:0;" placeholder="เขียนความคิดเห็น...">
-        <button class="btn-primary" style="width:auto; padding:10px 15px; margin:0;" onclick="postComment()">ส่ง</button>
     </div>
 </div>
 
 <!-- ===== หน้าโปรไฟล์ ===== -->
-<div class="page profile-page page-hidden" id="profilePage">
-    <button class="profile-back" onclick="closeProfile()">←</button>
-    <div class="profile-header">
-        <img class="profile-avatar" src="https://picsum.photos/seed/thaipodee/100/100" alt="โปรไฟล์">
-        <div class="profile-name">ThaiPodee Global Market</div>
-        <div class="profile-username">@ThaiPodee_Official</div>
-        <div class="profile-stats">
-            <div class="stat-item">
-                <div class="stat-num" id="statPosts">0</div>
-                <div class="stat-label">โพสต์</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">1,237</div>
-                <div class="stat-label">ติดตาม</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">2,742</div>
-                <div class="stat-label">ถูกใจ</div>
-            </div>
-        </div>
-        <div class="profile-desc">แพลตฟอร์มสำหรับคนไทย — แชร์ ขาย สร้างรายได้</div>
-    </div>
-    <div class="profile-grid" id="profileGrid">
-        <div class="profile-empty">ยังไม่มีโพสต์<br>กด + เพื่ออัปโหลด</div>
+<div class="page page-hidden" id="profilePage">
+    <button style="position:absolute; top:15px; left:15px; background:none; border:none; color:#fff; font-size:22px; cursor:pointer;" onclick="closeProfile()">←</button>
+    <div style="padding:60px 20px; text-align:center; color:#fff;">
+        <img style="width:90px; height:90px; border-radius:50%; border:3px solid #fff;" src="https://picsum.photos/seed/thaipodee/100/100">
+        <h3 style="margin:10px 0 5px;">ThaiPodee Global Market</h3>
+        <p style="color:#aaa; font-size:14px;">@ThaiPodee_Official</p>
+        <p style="margin-top:15px; font-size:13px; color:#ddd;">แพลตฟอร์มสำหรับคนไทย — แชร์ ขาย สร้างรายได้</p>
     </div>
 </div>
 
-<!-- ===== หน้าถ่าย/อัปโหลด ===== -->
-<div class="page camera-page page-hidden" id="cameraPage">
-    <div style="padding:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333;">
-        <button style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;" onclick="closeCamera()">×</button>
-        <h4>ถ่าย / อัปโหลด</h4>
-        <div></div>
-    </div>
-    <video id="cameraView" class="camera-view" autoplay muted playsinline></video>
-    <div class="camera-controls">
-        <p id="cameraStatus" style="color:#aaa; font-size:12px;">กำลังเปิดกล้อง...</p>
-        <div class="cam-btn-group">
-            <button class="cam-btn" onclick="capturePhoto()">📷</button>
-            <button class="cam-btn" id="recordBtn" onclick="toggleRecordVideo()">⏺️</button>
-            <button class="cam-btn audio" id="micBtn" onclick="toggleMic()">🎤</button>
-        </div>
-        <input type="file" id="file-input" accept="video/*,image/*" onchange="handleFileSelect(event)">
-        <p class="select-label">คำบรรยาย</p>
-        <input type="text" id="postDesc" class="input-field" placeholder="เขียนคำบรรยาย...">
-        <div class="toggle-row">
-            <span>ปิดเสียงเดิม</span>
-            <div class="toggle" id="muteOrigUploadToggle" onclick="toggleMuteOrigUpload()"></div>
-        </div>
-        <button class="btn-primary" onclick="publishContent()">เผยแพร่</button>
+<!-- ===== หน้าอัปโหลด ===== -->
+<div class="page page-hidden" id="uploadPage">
+    <button style="position:absolute; top:15px; left:15px; background:none; border:none; color:#fff; font-size:22px; cursor:pointer;" onclick="closeUpload()">←</button>
+    <div style="padding:60px 20px; text-align:center;">
+        <h3 style="margin-bottom:20px;">อัปโหลด / ถ่ายภาพ</h3>
+        <p style="color:#aaa; font-size:13px; margin-bottom:20px;">กดเลือกไฟล์เพื่ออัปโหลดวิดีโอหรือรูปภาพ</p>
+        <input type="file" id="file-input" accept="video/*,image/*">
+        <button style="width:100%; padding:14px; background:#00f080; color:#000; border:none; border-radius:8px; font-size:16px; font-weight:bold; margin-top:20px; cursor:pointer;" onclick="alert('อัปโหลดสำเร็จ!')">เผยแพร่</button>
     </div>
 </div>
 
-<!-- ===== แถบล่าง ===== -->
+<!-- ===== แถบล่าง — ครบ 5 ปุ่ม ===== -->
 <div class="nav-bottom">
     <div class="nav-col" onclick="showPage('video')">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าหลัก</span>
     </div>
-    <div class="nav-col" onclick="alert('ค้นหา')">
+    <div class="nav-col">
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-col" onclick="openCamera()">
-        <div class="nav-add" title="อัปโหลด / ถ่าย"></div>
-        <span class="nav-label" style="font-size:8px;">อัปโหลด</span>
+    <div class="nav-col" onclick="showPage('upload')">
+        <div class="nav-add"></div>
+        <span class="nav-label">อัปโหลด</span>
     </div>
-    <div class="nav-col" onclick="alert('ข้อความ')">
+    <div class="nav-col">
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
         <span class="badge">99+</span>
     </div>
-    <div class="nav-col" onclick="openProfile()">
+    <div class="nav-col" onclick="showPage('profile')">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-const STORAGE_KEY = 'thaipodee_posts';
-let currentAudio = { type: 'original', name: 'เสียงต้นฉบับ • ThaiPodee Original' };
-let isMuted = true, muteOriginal = false;
-let liked = false, bookmarked = false, commentCount = 0, comments = [];
-let recordedVideoBlob = null;
-
-// === สลับหน้า ===
 function showPage(name) {
-    ['videoPage','profilePage','cameraPage'].forEach(id => {
+    ['videoPage','profilePage','uploadPage'].forEach(id => {
         document.getElementById(id).classList.toggle('page-hidden', id !== `${name}Page`);
     });
 }
-function openProfile() { showPage('profile'); renderProfileGrid(); }
+function openProfile() { showPage('profile'); }
 function closeProfile() { showPage('video'); }
-function openCamera() { showPage('camera'); initCamera(); }
-function closeCamera() { showPage('video'); }
+function closeUpload() { showPage('video'); }
 
-// === กล้อง ===
-async function initCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-        document.getElementById('cameraView').srcObject = stream;
-        document.getElementById('cameraStatus').textContent = 'พร้อมถ่าย — กดปุ่ม';
-    } catch {
-        document.getElementById('cameraStatus').textContent = 'ใช้ไฟล์จากเครื่องแทน';
-    }
-}
-function capturePhoto() {
-    const v = document.getElementById('cameraView');
-    const c = document.createElement('canvas');
-    c.width = v.videoWidth; c.height = v.videoHeight;
-    const ctx = c.getContext('2d');
-    ctx.translate(c.width, 0); ctx.scale(-1, 1); ctx.drawImage(v,0,0);
-    c.toBlob(b => { recordedVideoBlob = b; alert('ถ่ายภาพเสร็จ → กดเผยแพร่'); }, 'image/png');
-}
-function handleFileSelect(e) {
-    const f = e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = ev => { recordedVideoBlob = ev.target.result; alert(`เลือก: ${f.name}`); };
-    r.readAsDataURL(f);
-}
-
-// === วิดีโอหลัก ===
 function toggleAudio() {
-    const vid = document.querySelector('#main-video');
-    if (!vid) return;
-    isMuted = !isMuted;
-    vid.muted = isMuted;
+    const vid = document.getElementById('main-video');
+    vid.muted = !vid.muted;
 }
 function seekVideo(e) {
-    const bar = document.getElementById('progressBar');
+    const bar = e.currentTarget;
     const rect = bar.getBoundingClientRect();
     const pct = (e.clientX - rect.left) / rect.width;
-    const vid = document.querySelector('#main-video');
-    if (vid && vid.duration) vid.currentTime = pct * vid.duration;
+    const vid = document.getElementById('main-video');
+    if (vid.duration) vid.currentTime = pct * vid.duration;
 }
 setInterval(() => {
-    const vid = document.querySelector('#main-video');
-    if (vid && vid.duration) {
-        document.getElementById('progressFill').style.width = 
-            (vid.currentTime / vid.duration * 100) + '%';
+    const vid = document.getElementById('main-video');
+    if (vid.duration) {
+        document.getElementById('progressFill').style.width = (vid.currentTime / vid.duration * 100) + '%';
     }
 }, 200);
 
-// === เสียง ===
-function openMusicModal() { document.getElementById('musicModal').classList.remove('modal-hidden'); }
-function closeMusicModal() { document.getElementById('musicModal').classList.add('modal-hidden'); }
-function toggleMuteOriginal() {
-    muteOriginal = !muteOriginal;
-    document.getElementById('muteOrigToggle').classList.toggle('on', muteOriginal);
-    const vid = document.querySelector('#main-video');
-    if (vid) vid.muted = muteOriginal;
-}
-function selectMusic(type, name) {
-    ['original','recording','bgm1','song1','effect1','uploaded'].forEach(t => {
-        document.getElementById(`chk-${t}`).textContent = t === type ? '✓' : '';
-    });
-    currentAudio = { type, name };
-    document.getElementById('currentMusic').textContent = name;
-    closeMusicModal();
-}
-function startVoiceRecord() { alert('บันทึกเสียงพร้อม — พูดเลย\n(บันทึกเต็มระบบจะเปิดใช้เร็วๆ นี้)'); }
-
-// === ปุ่มกด ===
 function toggleLike() {
-    liked = !liked;
-    document.getElementById('likeIcon').style.color = liked ? '#ff2442' : '';
-    document.getElementById('likeCount').textContent = liked ? '1' : '0';
-}
-function toggleBookmark() {
-    bookmarked = !bookmarked;
-    document.getElementById('bookmarkIcon').style.color = bookmarked ? 'gold' : '';
-    document.getElementById('bookmarkText').textContent = bookmarked ? 'บันทึกแล้ว' : 'บันทึก';
-}
-function openShareModal() { document.getElementById('shareModal').classList.remove('modal-hidden'); }
-function closeShareModal() { document.getElementById('shareModal').classList.add('modal-hidden'); }
-function copyLink() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        alert('คัดลอกลิงก์เรียบร้อย!');
-        closeShareModal();
-    });
-}
-function openCommentModal() {
-    document.getElementById('commentModal').classList.remove('modal-hidden');
-    document.getElementById('commentCountModal').textContent = commentCount;
-}
-function closeCommentModal() { document.getElementById('commentModal').classList.add('modal-hidden'); }
-function postComment() {
-    const inp = document.getElementById('commentInput');
-    if (!inp.value.trim()) return;
-    comments.unshift({ u: 'คุณ', t: inp.value.trim(), time: 'ขณะนี้' });
-    commentCount++;
-    document.getElementById('commentCount').textContent = commentCount;
-    document.getElementById('commentCountModal').textContent = commentCount;
-    inp.value = '';
-    renderComments();
-}
-function renderComments() {
-    const list = document.getElementById('commentList');
-    if (!comments.length) { list.innerHTML = '<p style="color:#888; text-align:center; padding:30px;">ยังไม่มีความคิดเห็น</p>'; return; }
-    list.innerHTML = comments.map(c => `<div style="padding:10px 0; border-bottom:1px solid #222;"><div style="font-weight:bold; font-size:13px;">${c.u}</div><div style="font-size:14px; margin:3px 0;">${c.t}</div><div style="font-size:11px; color:#666;">${c.time}</div></div>`).join('');
-}
-
-// === บันทึกโพสต์ ===
-function getPosts() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
-function savePost(desc, dataUrl, type) {
-    try {
-        const posts = getPosts();
-        posts.unshift({ id: Date.now(), desc, type, data: dataUrl, time: new Date().toLocaleString('th-TH'), views: Math.floor(Math.random()*200)+30 });
-        if (posts.length > 12) posts.length.length = 12;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    } catch { alert('ข้อมูลอาจใหญ่เกินไปบางส่วน'); }
-}
-function publishContent() {
-    const desc = document.getElementById('postDesc').value || 'โพสต์ใหม่';
-    if (!recordedVideoBlob) { alert('กรุณาถ่ายหรือเลือกไฟล์ก่อน'); return; }
-    const isStr = typeof recordedVideoBlob === 'string';
-    savePost(desc, isStr ? recordedVideoBlob : URL.createObjectURL(recordedVideoBlob), isStr ? 'image/png' : 'video/mp4');
-    alert('✅ เผยแพร่สำเร็จ! ไปดูที่โปรไฟล์');
-    recordedVideoBlob = null;
-    document.getElementById('postDesc').value = '';
-    showPage('video');
-}
-
-// === แสดงโปรไฟล์ ===
-function renderProfileGrid() {
-    const grid = document.getElementById('profileGrid');
-    const posts = getPosts();
-    document.getElementById('statPosts').textContent = posts.length;
-    if (!posts.length) { grid.innerHTML = '<div class="profile-empty">ยังไม่มีโพสต์<br>กด + เพื่ออัปโหลด</div>'; return; }
-    grid.innerHTML = posts.map(p => `<div class="profile-item" onclick="playPost('${p.id}')"><img class="profile-item-img" src="${p.data}"><div class="profile-item-view">▶ ${p.views}</div></div>`).join('');
-}
-function playPost(id) {
-    const post = getPosts().find(p => p.id == id);
-    if (!post) return;
-    const wrap = document.getElementById('vidWrap');
-    if (post.type.startsWith('video/')) {
-        wrap.innerHTML = `<video id="main-video" autoplay loop muted playsinline><source src="${post.data}"></video>`;
-    } else {
-        wrap.innerHTML = `<img id="main-media" src="${post.data}" style="width:100%; height:100%; object-fit:cover;">`;
-    }
-    document.getElementById('currentDesc').textContent = post.desc;
-    closeProfile();
+    const icon = document.getElementById('likeIcon');
+    const count = document.getElementById('likeCount');
+    const isLiked = icon.style.color === 'red';
+    icon.style.color = isLiked ? '' : '#ff2442';
+    count.textContent = isLiked ? '0' : '1';
 }
 </script>
+
 </body>
 </html>
