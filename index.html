@@ -11,66 +11,58 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
-        /* ========== หน้าจอเริ่มต้น — โลโก้ขึ้นก่อนเสมอ ========== */
         .splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; }
         .splash.hidden { opacity: 0; pointer-events: none; }
         .splash-logo { width: 140px; height: 140px; border-radius: 28px; background: linear-gradient(135deg, #00c6ff, #0072ff); display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; margin-bottom: 20px; }
         .splash-title { font-size: 26px; font-weight: 700; }
         .splash-sub { font-size: 14px; color: #888; margin-top: 6px; }
 
-        /* ========== แอปหลัก ========== */
-        .app { height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
+        .app { height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; padding-bottom: 60px; }
         .app.visible { opacity: 1; }
 
-        /* ========== ฟีดวิดีโอ — เต็มจอ 9:16 ========== */
         .feed { flex: 1; overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
-        .item { height: 100vh; position: relative; scroll-snap-align: start; background: #000; }
+        .item { height: calc(100vh - 60px); position: relative; scroll-snap-align: start; background: #000; }
         .item-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
         .item-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.1) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.5) 100%); }
 
-        /* ========== ข้อมูลซ้ายล่าง — เหมือน TikTok ========== */
-        .info { position: absolute; left: 16px; right: 90px; bottom: 100px; z-index: 10; }
+        .info { position: absolute; left: 16px; right: 90px; bottom: 90px; z-index: 10; }
         .info-user { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
         .info-desc { font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
-        /* ❌ ซ่อนราคาและปุ่มใส่ตะกร้าในหน้าแรก */
         .info-price, .info-btn { display: none !important; }
 
-        /* ========== ปุ่มขวา — เหมือน TikTok ========== */
-        .actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 10; }
+        .actions { position: absolute; right: 12px; bottom: 110px; display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 10; }
         .action { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .action-icon { font-size: 32px; }
         .action-num { font-size: 11px; }
         .music-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #00c6ff, #ff0080); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; font-size: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ========== เมนูล่าง — ✅ คืนมาเต็มๆ อยู่กับที่ ไม่หาย! ========== */
         .nav { 
-            position: relative; 
-            z-index: 9999; 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 99999;
             display: flex; 
             justify-content: space-around; 
             align-items: center; 
-            padding: 12px 0 34px; 
+            padding: 8px 0 25px;
             background: #000; 
             border-top: 1px solid #222; 
-            min-height: 78px; 
-            flex-shrink: 0;
+            height: 60px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; position: relative; }
-        .nav-icon { font-size: 26px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative; }
+        .nav-icon { font-size: 24px; }
         .nav-label { font-size: 11px; color: #888; }
         .nav-item.active .nav-label { color: #fff; }
-        /* ป้ายแจ้งจำนวนสินค้าบนไอคอนตะกร้า */
         .nav-cart-badge { position: absolute; top: -2px; right: -8px; background: #f00; color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-        /* ปุ่มเพิ่มสินค้า */
         .nav-add { width: 45px; height: 32px; background: #fff; border-radius: 8px; position: relative; }
         .nav-add::before, .nav-add::after { content: ''; position: absolute; background: #000; }
         .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
         .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
 
-        /* ========== หน้าอื่น ๆ ========== */
-        .page { display: none; position: absolute; inset: 0; background: #000; z-index: 30; padding: 20px; overflow-y: auto; }
+        .page { display: none; position: absolute; inset: 0; background: #000; z-index: 30; padding: 20px; overflow-y: auto; padding-bottom: 80px; }
         .page.show { display: block; }
         .page-title { font-size: 22px; font-weight: 700; margin: 40px 0 20px; }
         .page-close { position: absolute; top: 40px; right: 20px; font-size: 24px; cursor: pointer; }
@@ -80,31 +72,23 @@
 </head>
 <body>
 
-<!-- ========== หน้าเริ่มต้น — โลโก้ขึ้นก่อนเสมอ ========== -->
 <div class="splash" id="splash">
     <div class="splash-logo">ท</div>
     <div class="splash-title">ThaiPodee</div>
     <div class="splash-sub">Global Market Online</div>
 </div>
 
-<!-- ========== แอปหลัก ========== -->
 <div class="app" id="app">
-
-    <!-- ฟีดวิดีโอ — เหมือน TikTok! -->
     <div class="feed">
-        <!-- สินค้า 1 -->
         <div class="item" onclick="openProduct(1)">
             <img class="item-bg" src="https://picsum.photos/seed/product1/720/1280" alt="สินค้า">
             <div class="item-overlay"></div>
-            
             <div class="info">
                 <div class="info-user">thaipodee_official <span class="info-tag">สินค้าแนะนำ</span></div>
                 <div class="info-desc">โซลาร์เซลล์ 600W แผงโซลาร์เซลล์ H-3 ประสิทธิภาพสูง คุ้มค่า ประหยัดไฟ</div>
-                <!-- ❌ ซ่อนราคาและปุ่ม — จะโชว์ตอนกดเข้าเท่านั้น -->
                 <div class="info-price">฿1,990</div>
                 <button class="info-btn" onclick="event.stopPropagation(); addToCart('โซลาร์เซลล์ 600W', 1990)">🛒 ใส่ตะกร้า</button>
             </div>
-
             <div class="actions">
                 <div class="action" onclick="event.stopPropagation(); toggleLike(this)"><span class="action-icon">❤️</span><span class="action-num">1.2K</span></div>
                 <div class="action" onclick="event.stopPropagation(); openPage('comments')"><span class="action-icon">💬</span><span class="action-num">65</span></div>
@@ -112,37 +96,14 @@
                 <div class="action"><div class="music-icon">🎵</div></div>
             </div>
         </div>
-
-        <!-- สินค้า 2 -->
-        <div class="item" onclick="openProduct(2)">
-            <img class="item-bg" src="https://picsum.photos/seed/product2/720/1280" alt="สินค้า">
-            <div class="item-overlay"></div>
-            
-            <div class="info">
-                <div class="info-user">thaipodee_official <span class="info-tag">มาใหม่</span></div>
-                <div class="info-desc">แผงโซลาร์ 600 วัตต์ พร้อมติดตั้ง คุ้มค่าเกินราคา รับประกัน 1 ปี</div>
-                <!-- ❌ ซ่อนราคาและปุ่ม — จะโชว์ตอนกดเข้าเท่านั้น -->
-                <div class="info-price">฿2,490</div>
-                <button class="info-btn" onclick="event.stopPropagation(); addToCart('แผงโซลาร์ 600W พร้อมติดตั้ง', 2490)">🛒 ใส่ตะกร้า</button>
-            </div>
-
-            <div class="actions">
-                <div class="action" onclick="event.stopPropagation(); toggleLike(this)"><span class="action-icon">❤️</span><span class="action-num">856</span></div>
-                <div class="action" onclick="event.stopPropagation(); openPage('comments')"><span class="action-icon">💬</span><span class="action-num">42</span></div>
-                <div class="action" onclick="event.stopPropagation(); share()"><span class="action-icon">↗️</span><span class="action-num">แชร์</span></div>
-                <div class="action"><div class="music-icon">🎵</div></div>
-            </div>
-        </div>
     </div>
 
-    <!-- หน้าค้นหา -->
     <div class="page" id="page-search">
         <span class="page-close" onclick="closePage()">✕</span>
         <div class="page-title">🔍 ค้นหาสินค้า</div>
         <input type="text" placeholder="พิมพ์ชื่อสินค้า...">
     </div>
 
-    <!-- หน้าเพิ่มสินค้า -->
     <div class="page" id="page-upload">
         <span class="page-close" onclick="closePage()">✕</span>
         <div class="page-title">➕ เพิ่มสินค้าใหม่</div>
@@ -153,16 +114,6 @@
         <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600; margin-top:10px;" onclick="alert('✅ สินค้าถูกเพิ่มแล้ว!'); closePage();">📤 โพสต์สินค้า</button>
     </div>
 
-    <!-- หน้าแจ้งเตือน -->
-    <div class="page" id="page-notify">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">🔔 การแจ้งเตือน</div>
-        <div style="padding:15px 0; border-bottom:1px solid #333;">❤️ มีคนกดถูกใจสินค้าของคุณ <small style="color:#888;">5 นาทีก่อน</small></div>
-        <div style="padding:15px 0; border-bottom:1px solid #333;">💬 มีความคิดเห็นใหม่ <small style="color:#888;">1 ชม. ก่อน</small></div>
-        <div style="padding:15px 0; border-bottom:1px solid #333;">✅ คำสั่งซื้อได้รับการยืนยัน <small style="color:#888;">2 ชม. ก่อน</small></div>
-    </div>
-
-    <!-- หน้าโปรไฟล์ -->
     <div class="page" id="page-profile">
         <span class="page-close" onclick="closePage()">✕</span>
         <div class="page-title">👤 โปรไฟล์</div>
@@ -173,7 +124,6 @@
         </div>
     </div>
 
-    <!-- หน้าตะกร้า -->
     <div class="page" id="page-cart">
         <span class="page-close" onclick="closePage()">✕</span>
         <div class="page-title">🛒 ตะกร้าสินค้า <span id="cartCount" style="font-size:16px; color:#888; font-weight:normal;">(0 ชิ้น)</span></div>
@@ -187,32 +137,28 @@
         </div>
     </div>
 
-    <!-- หน้าคอมเมนต์ -->
     <div class="page" id="page-comments">
         <span class="page-close" onclick="closePage()">✕</span>
         <div class="page-title">💬 ความคิดเห็น</div>
         <div style="padding:12px 0; border-bottom:1px solid #333;"><b>ผู้ใช้:</b> สนใจครับ ราคาเต็มไหมครับ?</div>
         <div style="padding:12px 0; border-bottom:1px solid #333;"><b>เรา:</b> มีประกัน 1 ปีครับ</div>
     </div>
+</div>
 
-    <!-- ✅ เมนูล่าง 5 ปุ่ม — คืนมาเต็มๆ อยู่ด้านล่างสุด ไม่หาย! -->
-    <div class="nav">
-        <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
-        <div class="nav-item" onclick="openPage('search')"><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
-        <div class="nav-item" onclick="openPage('upload')"><div class="nav-add"></div></div>
-        <div class="nav-item" onclick="openPage('cart')" id="navCartItem">
-            <span class="nav-icon">🛒</span>
-            <span class="nav-label" id="navCartLabel">ตะกร้า</span>
-            <span class="nav-cart-badge" id="navCartBadge" style="display:none;">0</span>
-        </div>
-        <div class="nav-item" onclick="openPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
+<div class="nav">
+    <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
+    <div class="nav-item" onclick="openPage('search')"><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
+    <div class="nav-item" onclick="openPage('upload')"><div class="nav-add"></div></div>
+    <div class="nav-item" onclick="openPage('cart')" id="navCartItem">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label" id="navCartLabel">ตะกร้า</span>
+        <span class="nav-cart-badge" id="navCartBadge" style="display:none;">0</span>
     </div>
+    <div class="nav-item" onclick="openPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
 </div>
 
 <script>
     let cart = [];
-
-    // ========== โลโก้ขึ้นก่อน — 1.5 วินาที ค่อยเข้าแอป ==========
     setTimeout(() => {
         document.getElementById('splash').classList.add('hidden');
         document.getElementById('app').classList.add('visible');
@@ -247,7 +193,7 @@
     }
 
     function openProduct(id) {
-        alert('เข้าดูรายละเอียดสินค้า #' + id + '\n(ตรงนี้จะแสดงราคาและปุ่มซื้อ)');
+        alert('เข้าดูรายละเอียดสินค้า #' + id);
     }
 
     function addToCart(name, price) {
@@ -262,12 +208,10 @@
         const list = document.getElementById('cartList');
         const badge = document.getElementById('navCartBadge');
         const total = cart.reduce((s, i) => s + i.price, 0);
-        
         countEl.textContent = `(${cart.length} ชิ้น)`;
         totalEl.textContent = '฿' + total.toLocaleString();
         badge.textContent = cart.length;
         badge.style.display = cart.length > 0 ? 'flex' : 'none';
-        
         list.innerHTML = cart.length === 0 
             ? '<p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p>'
             : cart.map((item, i) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #333;"><div><div style="font-weight:600;">${item.name}</div><div style="color:#00c853;">฿${item.price.toLocaleString()}</div></div><button onclick="cart.splice(${i},1); updateCart();" style="background:none; border:none; color:#f55; font-size:20px; cursor:pointer;">✕</button></div>`).join('');
