@@ -6,7 +6,16 @@
     <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
+        html, body {
+            height: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+        }
 
         /* ==============================================
            SPLASH SCREEN — แยกออก ไม่กระทบเนื้อหา
@@ -50,28 +59,47 @@
         }
 
         /* ==============================================
-           เนื้อหาหลัก — LOCKED ตำแหน่งทั้งหมด
+           วิดีโอ — เต็มจอพอดี ไม่ล้นจอ ทุกยี่ห้อ!
            ============================================== */
-        .main-content {
+        .video-container {
             position: fixed;
             inset: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
             z-index: 1;
         }
-
-        /* พื้นหลังวิดีโอ */
-        .video-bg {
-            position: fixed;
-            inset: 0;
+        #main-video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            z-index: 1;
+            object-fit: cover; /* ครอบพอดีจอ ไม่ล้น ไม่ขาด */
+            object-position: center center;
         }
         .overlay {
             position: fixed;
             inset: 0;
             background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.6) 100%);
             z-index: 2;
+            pointer-events: none;
+        }
+
+        /* 🔊 ปุ่มเปิด/ปิดเสียง */
+        .sound-btn {
+            position: fixed;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            z-index: 15;
+            cursor: pointer;
+            border: 2px solid #fff;
         }
 
         /* ===== กลุ่มชื่อผู้ใช้ — LOCKED ===== */
@@ -100,6 +128,18 @@
             border-radius: 4px;
             font-size: 11px;
             color: #ddd;
+        }
+        .text-overlay {
+            position: fixed;
+            bottom: 140px;
+            left: 16px;
+            right: 80px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,.8), -1px -1px 2px rgba(128,0,255,.8);
+            z-index: 9;
+            line-height: 1.6;
         }
 
         /* ===== เมนูด้านขวา 6 ตัว — LOCKED ===== */
@@ -202,7 +242,6 @@
             justify-content: center;
             font-weight: 700;
         }
-        /* ปุ่ม + กลาง — อัปโหลด */
         .nav-add {
             width: 45px;
             height: 32px;
@@ -219,14 +258,13 @@
         .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
         .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
 
-        /* ===== ซ่อน input file ===== */
         #file-upload { display: none; }
     </style>
 </head>
 <body>
 
 <!-- ==============================================
-     SPLASH SCREEN — ขึ้นก่อน แล้วหายไปเอง
+     SPLASH SCREEN
      ============================================== -->
 <div id="splash">
     <div class="splash-logo">ท</div>
@@ -235,82 +273,106 @@
 </div>
 
 <!-- ==============================================
-     หน้าหลัก — LOCKED ทุกตำแหน่ง + ปุ่มทำงาน
+     วิดีโอ — เต็มจอพอดี + มีเสียง
      ============================================== -->
-<div class="main-content">
-    <img class="video-bg" src="https://picsum.photos/seed/leopard/720/1280" alt="วิดีโอ" id="main-media">
-    <div class="overlay"></div>
+<div class="video-container">
+    <video id="main-video" autoplay loop muted playsinline webkit-playsinline>
+        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+    </video>
+</div>
+<div class="overlay"></div>
 
-    <!-- กลุ่มชื่อผู้ใช้ & ข้อความ — LOCKED -->
-    <div class="user-info">
-        <div class="username">Bob Dominator</div>
-        <div class="caption">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
-        <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
-    </div>
+<!-- 🔊 ปุ่มเปิด/ปิดเสียง -->
+<div class="sound-btn" id="soundToggle" onclick="toggleSound()">🔇</div>
 
-    <!-- เมนูด้านขวา 6 ตัว — LOCKED + ทุกปุ่มทำงาน -->
-    <div class="right-menu">
-        <div class="menu-item" onclick="alert('เปิดหน้าโปรไฟล์ผู้ใช้')">
-            <div class="avatar-wrap">
-                <img class="avatar" src="https://picsum.photos/seed/user-avatar/100/100" alt="โปรไฟล์">
-                <span class="plus-btn" onclick="event.stopPropagation(); alert('ติดตามผู้ใช้นี้')">+</span>
-            </div>
-        </div>
-        <div class="menu-item" onclick="toggleLike(this)">
-            <span class="icon">❤️</span>
-            <span class="count">425</span>
-        </div>
-        <div class="menu-item" onclick="alert('เปิดกล่องคอมเมนต์')">
-            <span class="icon">💬</span>
-            <span class="count">8</span>
-        </div>
-        <div class="menu-item" onclick="shareContent()">
-            <span class="icon">➡️</span>
-            <span class="count">22</span>
-        </div>
-        <div class="menu-item" onclick="toggleBookmark(this)">
-            <span class="icon">⭐</span>
-            <span class="count">บันทึก</span>
-        </div>
-        <div class="menu-item" onclick="alert('เปิดเพลงประกอบ')">
-            <div class="music-icon">🎵</div>
-            <span class="count" style="font-size:10px; margin-top:2px;">11</span>
+<!-- ข้อความซ้อนวิดีโอ -->
+<div class="text-overlay">
+    คุณตาร๊อคอำลาปลายมาศ<br>
+    ตำบลทะเมนชัย อำเภอลำปลายมาศ<br>
+    จังหวัดบุรีรัมย์ ครับ
+</div>
+
+<!-- กลุ่มชื่อผู้ใช้ — LOCKED -->
+<div class="user-info">
+    <div class="username">Bob Dominator</div>
+    <div class="caption">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
+    <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
+</div>
+
+<!-- เมนูด้านขวา 6 ตัว — LOCKED -->
+<div class="right-menu">
+    <div class="menu-item" onclick="alert('เปิดหน้าโปรไฟล์ผู้ใช้')">
+        <div class="avatar-wrap">
+            <img class="avatar" src="https://picsum.photos/seed/user-avatar/100/100" alt="โปรไฟล์">
+            <span class="plus-btn" onclick="event.stopPropagation(); alert('ติดตามผู้ใช้นี้')">+</span>
         </div>
     </div>
+    <div class="menu-item" onclick="toggleLike(this)">
+        <span class="icon">❤️</span>
+        <span class="count">425</span>
+    </div>
+    <div class="menu-item" onclick="alert('เปิดกล่องคอมเมนต์')">
+        <span class="icon">💬</span>
+        <span class="count">8</span>
+    </div>
+    <div class="menu-item" onclick="shareContent()">
+        <span class="icon">➡️</span>
+        <span class="count">22</span>
+    </div>
+    <div class="menu-item" onclick="toggleBookmark(this)">
+        <span class="icon">⭐</span>
+        <span class="count">บันทึก</span>
+    </div>
+    <div class="menu-item" onclick="alert('เปิดเพลงประกอบ')">
+        <div class="music-icon">🎵</div>
+        <span class="count" style="font-size:10px; margin-top:2px;">11</span>
+    </div>
+</div>
 
-    <!-- เมนูด้านล่าง 5 ตัว — LOCKED + ปุ่ม + ทำงานอัปโหลด! -->
-    <div class="bottom-nav">
-        <div class="nav-item" onclick="alert('กลับไปหน้าหลัก')">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">หน้าหลัก</span>
-        </div>
-        <div class="nav-item" onclick="alert('เปิดร้านค้า')">
-            <span class="nav-icon">🛒</span>
-            <span class="nav-label">ร้านค้า</span>
-            <span class="nav-badge">99+</span>
-        </div>
-        <!-- ปุ่ม + กลาง — เปิดอัปโหลดวิดีโอ/ภาพ -->
-        <div class="nav-item" onclick="document.getElementById('file-upload').click()">
-            <div class="nav-add"></div>
-            <input type="file" id="file-upload" accept="video/*,image/*" onchange="handleUpload(event)">
-        </div>
-        <div class="nav-item" onclick="alert('เปิดข้อความ/การแจ้งเตือน')">
-            <span class="nav-icon">💬</span>
-            <span class="nav-label">คล้องข้อความ</span>
-            <span class="nav-badge">99+</span>
-        </div>
-        <div class="nav-item" onclick="alert('เข้าหน้าโปรไฟล์ส่วนตัว')">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">โปรไฟล์</span>
-        </div>
+<!-- เมนูด้านล่าง 5 ตัว — LOCKED + ปุ่ม + อัปโหลด -->
+<div class="bottom-nav">
+    <div class="nav-item" onclick="alert('กลับไปหน้าหลัก')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าหลัก</span>
+    </div>
+    <div class="nav-item" onclick="alert('เปิดร้านค้า')">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">ร้านค้า</span>
+        <span class="nav-badge">99+</span>
+    </div>
+    <div class="nav-item" onclick="document.getElementById('file-upload').click()">
+        <div class="nav-add"></div>
+        <input type="file" id="file-upload" accept="video/*,image/*" onchange="handleUpload(event)">
+    </div>
+    <div class="nav-item" onclick="alert('เปิดข้อความ/การแจ้งเตือน')">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">คล้องข้อความ</span>
+        <span class="nav-badge">99+</span>
+    </div>
+    <div class="nav-item" onclick="alert('เข้าหน้าโปรไฟล์ส่วนตัว')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-    // ซ่อน Splash แล้วแสดงเนื้อหา
+    // ซ่อน Splash
     setTimeout(() => {
         document.getElementById('splash').classList.add('fade-out');
     }, 1500);
+
+    // 🔊 เปิด/ปิดเสียง
+    let soundOn = false;
+    function toggleSound() {
+        const video = document.getElementById('main-video');
+        const btn = document.getElementById('soundToggle');
+        soundOn = !soundOn;
+        video.muted = !soundOn;
+        btn.textContent = soundOn ? '🔊' : '🔇';
+        if (soundOn) {
+            video.play().catch(e => console.log('Autoplay blocked — กดเพื่อเล่นเสียง'));
+        }
+    }
 
     // ❤️ ถูกใจ
     function toggleLike(el) {
@@ -325,31 +387,34 @@
     // ➡️ แชร์
     function shareContent() {
         if (navigator.share) {
-            navigator.share({
-                title: 'ThaiPodee Global Market',
-                url: window.location.href
-            });
+            navigator.share({ title: 'ThaiPodee Global Market', url: window.location.href });
         } else {
             prompt('คัดลอกลิงก์:', window.location.href);
         }
     }
 
-    // ➕ อัปโหลดวิดีโอ/ภาพ — ทำงานแล้ว!
+    // ➕ อัปโหลดวิดีโอ/ภาพ — พร้อมเสียง!
     function handleUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = function(event) {
-            const media = document.getElementById('main-media');
+            const container = document.querySelector('.video-container');
             if (file.type.startsWith('video/')) {
-                // ถ้าเป็นวิดีโอ
-                media.outerHTML = `<video class="video-bg" id="main-media" src="${event.target.result}" autoplay loop muted playsinline></video>`;
+                // วิดีโอ — มีเสียง!
+                container.innerHTML = `
+                    <video id="main-video" autoplay loop playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;">
+                        <source src="${event.target.result}" type="${file.type}">
+                    </video>`;
+                soundOn = true;
+                document.getElementById('soundToggle').textContent = '🔊';
             } else {
-                // ถ้าเป็นรูปภาพ
-                media.src = event.target.result;
+                // รูปภาพ
+                container.innerHTML = `<img id="main-video" src="${event.target.result}" style="width:100%;height:100%;object-fit:cover;" alt="รูปภาพ">`;
+                document.getElementById('soundToggle').style.display = 'none';
             }
-            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name);
+            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name + '\n✅ เต็มจอพอดี + มีเสียงแล้ว!');
         };
         reader.readAsDataURL(file);
     }
