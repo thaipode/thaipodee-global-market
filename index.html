@@ -9,7 +9,7 @@
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
         /* ==============================================
-           SPLASH SCREEN — แยกออกมาต่างหาก ไม่กระทบเนื้อหา
+           SPLASH SCREEN — แยกออก ไม่กระทบเนื้อหา
            ============================================== */
         #splash {
             position: fixed;
@@ -50,7 +50,7 @@
         }
 
         /* ==============================================
-           ส่วนเนื้อหาหลัก — LOCKED ตำแหน่งทั้งหมด
+           เนื้อหาหลัก — LOCKED ตำแหน่งทั้งหมด
            ============================================== */
         .main-content {
             position: fixed;
@@ -74,7 +74,7 @@
             z-index: 2;
         }
 
-        /* ===== กลุ่มชื่อผู้ใช้ & ข้อความ — LOCKED ===== */
+        /* ===== กลุ่มชื่อผู้ใช้ — LOCKED ===== */
         .user-info {
             position: fixed;
             left: 16px;
@@ -186,7 +186,7 @@
             position: relative;
         }
         .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 11px; color: #888; }
+        .nav-label { font-size: 11px; color: #fff; }
         .nav-badge {
             position: absolute;
             top: -2px;
@@ -202,12 +202,14 @@
             justify-content: center;
             font-weight: 700;
         }
+        /* ปุ่ม + กลาง — อัปโหลด */
         .nav-add {
             width: 45px;
             height: 32px;
             background: #fff;
             border-radius: 8px;
             position: relative;
+            cursor: pointer;
         }
         .nav-add::before, .nav-add::after {
             content: '';
@@ -216,6 +218,9 @@
         }
         .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
         .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
+
+        /* ===== ซ่อน input file ===== */
+        #file-upload { display: none; }
     </style>
 </head>
 <body>
@@ -230,80 +235,124 @@
 </div>
 
 <!-- ==============================================
-     หน้าหลัก — ทุกตำแหน่ง LOCKED
+     หน้าหลัก — LOCKED ทุกตำแหน่ง + ปุ่มทำงาน
      ============================================== -->
 <div class="main-content">
-    <img class="video-bg" src="https://picsum.photos/seed/concert-stage/720/1280" alt="วิดีโอ">
+    <img class="video-bg" src="https://picsum.photos/seed/leopard/720/1280" alt="วิดีโอ" id="main-media">
     <div class="overlay"></div>
 
-    <!-- กลุ่มชื่อผู้ใช้ & ข้อความ -->
+    <!-- กลุ่มชื่อผู้ใช้ & ข้อความ — LOCKED -->
     <div class="user-info">
         <div class="username">Bob Dominator</div>
         <div class="caption">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
         <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
     </div>
 
-    <!-- เมนูด้านขวา 6 ตัว: โปรไฟล์, ถูกใจ, คอมเมนต์, แชร์, บันทึก, เพลง -->
+    <!-- เมนูด้านขวา 6 ตัว — LOCKED + ทุกปุ่มทำงาน -->
     <div class="right-menu">
-        <div class="menu-item">
+        <div class="menu-item" onclick="alert('เปิดหน้าโปรไฟล์ผู้ใช้')">
             <div class="avatar-wrap">
-                <img class="avatar" src="https://picsum.photos/seed/bobdominator/100/100" alt="โปรไฟล์">
-                <span class="plus-btn">+</span>
+                <img class="avatar" src="https://picsum.photos/seed/user-avatar/100/100" alt="โปรไฟล์">
+                <span class="plus-btn" onclick="event.stopPropagation(); alert('ติดตามผู้ใช้นี้')">+</span>
             </div>
         </div>
-        <div class="menu-item" onclick="this.style.color=this.style.color==='red'?'':'red'">
+        <div class="menu-item" onclick="toggleLike(this)">
             <span class="icon">❤️</span>
             <span class="count">425</span>
         </div>
-        <div class="menu-item">
+        <div class="menu-item" onclick="alert('เปิดกล่องคอมเมนต์')">
             <span class="icon">💬</span>
             <span class="count">8</span>
         </div>
-        <div class="menu-item">
-            <span class="icon">↗️</span>
+        <div class="menu-item" onclick="shareContent()">
+            <span class="icon">➡️</span>
             <span class="count">22</span>
         </div>
-        <div class="menu-item">
+        <div class="menu-item" onclick="toggleBookmark(this)">
             <span class="icon">⭐</span>
             <span class="count">บันทึก</span>
         </div>
-        <div class="menu-item">
+        <div class="menu-item" onclick="alert('เปิดเพลงประกอบ')">
             <div class="music-icon">🎵</div>
             <span class="count" style="font-size:10px; margin-top:2px;">11</span>
         </div>
     </div>
 
-    <!-- เมนูด้านล่าง 5 ตัว: โฮม, ร้านค้า(อันดับ2), ปุ่มกลาง, ข้อความ, โปรไฟล์ -->
+    <!-- เมนูด้านล่าง 5 ตัว — LOCKED + ปุ่ม + ทำงานอัปโหลด! -->
     <div class="bottom-nav">
-        <div class="nav-item">
+        <div class="nav-item" onclick="alert('กลับไปหน้าหลัก')">
             <span class="nav-icon">🏠</span>
             <span class="nav-label">หน้าหลัก</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="alert('เปิดร้านค้า')">
             <span class="nav-icon">🛒</span>
             <span class="nav-label">ร้านค้า</span>
             <span class="nav-badge">99+</span>
         </div>
-        <div class="nav-item">
+        <!-- ปุ่ม + กลาง — เปิดอัปโหลดวิดีโอ/ภาพ -->
+        <div class="nav-item" onclick="document.getElementById('file-upload').click()">
             <div class="nav-add"></div>
+            <input type="file" id="file-upload" accept="video/*,image/*" onchange="handleUpload(event)">
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="alert('เปิดข้อความ/การแจ้งเตือน')">
             <span class="nav-icon">💬</span>
             <span class="nav-label">คล้องข้อความ</span>
             <span class="nav-badge">99+</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="alert('เข้าหน้าโปรไฟล์ส่วนตัว')">
             <span class="nav-icon">👤</span>
             <span class="nav-label">โปรไฟล์</span>
         </div>
     </div>
 </div>
 
-<!-- Splash หายไปเอง ไม่กระทบเนื้อหา -->
 <script>
+    // ซ่อน Splash แล้วแสดงเนื้อหา
     setTimeout(() => {
         document.getElementById('splash').classList.add('fade-out');
     }, 1500);
+
+    // ❤️ ถูกใจ
+    function toggleLike(el) {
+        el.style.color = el.style.color === 'red' ? '' : 'red';
+    }
+
+    // ⭐ บันทึก
+    function toggleBookmark(el) {
+        el.style.color = el.style.color === 'gold' ? '' : 'gold';
+    }
+
+    // ➡️ แชร์
+    function shareContent() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'ThaiPodee Global Market',
+                url: window.location.href
+            });
+        } else {
+            prompt('คัดลอกลิงก์:', window.location.href);
+        }
+    }
+
+    // ➕ อัปโหลดวิดีโอ/ภาพ — ทำงานแล้ว!
+    function handleUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const media = document.getElementById('main-media');
+            if (file.type.startsWith('video/')) {
+                // ถ้าเป็นวิดีโอ
+                media.outerHTML = `<video class="video-bg" id="main-media" src="${event.target.result}" autoplay loop muted playsinline></video>`;
+            } else {
+                // ถ้าเป็นรูปภาพ
+                media.src = event.target.result;
+            }
+            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name);
+        };
+        reader.readAsDataURL(file);
+    }
 </script>
 
 </body>
