@@ -3,64 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ThaiPodee Global Market Online</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global/main/logo.png" type="image/png">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGUgR2xvYmFsIE1hcmtldCBPbmxpbmUiLCJzaG9ydF9uYW1lIjoiVGhhaVBvZGUiLCJzdGFydF91cmwiOiIuaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDcyZmYiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9wcmF3Lm9yZy81Mjh4MTI4MC8jMDAwIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
-    <meta name="theme-color" content="#000">
+    <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
-        .splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; }
-        .splash.hidden { opacity: 0; pointer-events: none; }
-        .splash-logo { width: 140px; height: 140px; border-radius: 28px; background: linear-gradient(135deg, #00c6ff, #0072ff); display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; margin-bottom: 20px; }
-        .splash-title { font-size: 26px; font-weight: 700; }
-        .splash-sub { font-size: 14px; color: #888; margin-top: 6px; }
+        /* ==============================================
+           SPLASH SCREEN — แยกออกมาต่างหาก ไม่กระทบเนื้อหา
+           ============================================== */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        #splash.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .splash-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .splash-sub {
+            font-size: 14px;
+            color: #888;
+        }
 
-        .app { height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; padding-bottom: 60px; }
-        .app.visible { opacity: 1; }
+        /* ==============================================
+           ส่วนเนื้อหาหลัก — LOCKED ตำแหน่งทั้งหมด
+           ============================================== */
+        .main-content {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
 
-        .feed { flex: 1; overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
-        .item { height: calc(100vh - 80px); position: relative; scroll-snap-align: start; background: #000; }
-        .item-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-        .item-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.1) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.5) 100%); }
+        /* พื้นหลังวิดีโอ */
+        .video-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.6) 100%);
+            z-index: 2;
+        }
 
-        .info { position: absolute; left: 16px; right: 90px; bottom: 140px; z-index: 10; }
-        .info-user { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
-        .info-desc { font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
-        .info-price, .info-btn { display: none !important; }
+        /* ===== กลุ่มชื่อผู้ใช้ & ข้อความ — LOCKED ===== */
+        .user-info {
+            position: fixed;
+            left: 16px;
+            right: 100px;
+            bottom: 85px;
+            z-index: 10;
+        }
+        .username {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .caption {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: #f0f0f0;
+        }
+        .ai-tag {
+            display: inline-block;
+            background: rgba(255,255,255,.15);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #ddd;
+        }
 
-        .actions {
-            position: absolute;
+        /* ===== เมนูด้านขวา 6 ตัว — LOCKED ===== */
+        .right-menu {
+            position: fixed;
             right: 12px;
             bottom: 160px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 28px;
+            gap: 24px;
             z-index: 10;
         }
-
-        .action {
+        .menu-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             cursor: pointer;
         }
-
-        .action-icon {
-            font-size: 30px;
+        .avatar-wrap {
+            position: relative;
+            width: 48px;
+            height: 48px;
         }
-
-        .action-num {
-            font-size: 11px;
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            object-fit: cover;
         }
-
+        .plus-btn {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: #ff2442;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .icon { font-size: 28px; }
+        .count { font-size: 12px; font-weight: 500; }
         .music-icon {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: linear-gradient(45deg, #00c6ff, #ff0080);
             display: flex;
@@ -69,17 +160,15 @@
             animation: spin 3s linear infinite;
             font-size: 20px;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .nav {
+        /* ===== เมนูด้านล่าง 5 ตัว — LOCKED ===== */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 99999;
+            z-index: 99;
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -88,7 +177,6 @@
             border-top: 1px solid #222;
             height: 60px;
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -97,36 +185,23 @@
             cursor: pointer;
             position: relative;
         }
-
-        .nav-icon {
-            font-size: 24px;
-        }
-
-        .nav-label {
-            font-size: 11px;
-            color: #888;
-        }
-
-        .nav-item.active .nav-label {
-            color: #fff;
-        }
-
-        .nav-cart-badge {
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; color: #888; }
+        .nav-badge {
             position: absolute;
             top: -2px;
             right: -8px;
-            background: #f00;
+            background: #ff2442;
             color: #fff;
             font-size: 10px;
-            min-width: 16px;
-            height: 16px;
+            min-width: 18px;
+            height: 18px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
         }
-
         .nav-add {
             width: 45px;
             height: 32px;
@@ -134,250 +209,101 @@
             border-radius: 8px;
             position: relative;
         }
-
-        .nav-add::before,
-        .nav-add::after {
+        .nav-add::before, .nav-add::after {
             content: '';
             position: absolute;
             background: #000;
         }
-
-        .nav-add::before {
-            width: 18px;
-            height: 2px;
-            top: 15px;
-            left: 13px;
-        }
-
-        .nav-add::after {
-            width: 2px;
-            height: 18px;
-            left: 21px;
-            top: 7px;
-        }
-
-        .page {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: #000;
-            z-index: 30;
-            padding: 20px;
-            overflow-y: auto;
-            padding-bottom: 80px;
-        }
-
-        .page.show {
-            display: block;
-        }
-
-        .page-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 40px 0 20px;
-        }
-
-        .page-close {
-            position: absolute;
-            top: 40px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: none;
-            background: #222;
-            color: #fff;
-            font-size: 16px;
-        }
-
-        button {
-            cursor: pointer;
-        }
+        .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
+        .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
     </style>
 </head>
 <body>
 
-<div class="splash" id="splash">
+<!-- ==============================================
+     SPLASH SCREEN — ขึ้นก่อน แล้วหายไปเอง
+     ============================================== -->
+<div id="splash">
     <div class="splash-logo">ท</div>
     <div class="splash-title">ThaiPodee</div>
     <div class="splash-sub">Global Market Online</div>
 </div>
 
-<div class="app" id="app">
-    <div class="feed">
-        <div class="item" onclick="openProduct(1)">
-            <img class="item-bg" src="https://picsum.photos/seed/product1/720/1280" alt="สินค้า">
-            <div class="item-overlay"></div>
-            <div class="info">
-                <div class="info-user">thaipodee_official <span class="info-tag">สินค้าแนะนำ</span></div>
-                <div class="info-desc">โซลาร์เซลล์ 600W แผงโซลาร์เซลล์ H-3 ประสิทธิภาพสูง คุ้มค่า ประหยัดไฟ</div>
-                <div class="info-price">฿1,990</div>
-                <button class="info-btn" onclick="event.stopPropagation(); addToCart('โซลาร์เซลล์ 600W', 1990)">🛒 ใส่ตะกร้า</button>
-            </div>
+<!-- ==============================================
+     หน้าหลัก — ทุกตำแหน่ง LOCKED
+     ============================================== -->
+<div class="main-content">
+    <img class="video-bg" src="https://picsum.photos/seed/concert-stage/720/1280" alt="วิดีโอ">
+    <div class="overlay"></div>
 
-            <div class="actions">
-                <div class="action" onclick="event.stopPropagation(); toggleLike(this)">
-                    <span class="action-icon">❤️</span>
-                    <span class="action-num">1.2K</span>
-                </div>
-                <div class="action" onclick="event.stopPropagation(); openPage('comments')">
-                    <span class="action-icon">💬</span>
-                    <span class="action-num">65</span>
-                </div>
-                <div class="action" onclick="event.stopPropagation(); addToCart('โซลาร์เซลล์ 600W', 1990)">
-                    <span class="action-icon">🛒</span>
-                    <span class="action-num">ตะกร้า</span>
-                </div>
-                <div class="action" onclick="event.stopPropagation(); share()">
-                    <span class="action-icon">↗️</span>
-                    <span class="action-num">แชร์</span>
-                </div>
-                <div class="action">
-                    <div class="music-icon">🎵</div>
-                </div>
+    <!-- กลุ่มชื่อผู้ใช้ & ข้อความ -->
+    <div class="user-info">
+        <div class="username">Bob Dominator</div>
+        <div class="caption">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
+        <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
+    </div>
+
+    <!-- เมนูด้านขวา 6 ตัว: โปรไฟล์, ถูกใจ, คอมเมนต์, แชร์, บันทึก, เพลง -->
+    <div class="right-menu">
+        <div class="menu-item">
+            <div class="avatar-wrap">
+                <img class="avatar" src="https://picsum.photos/seed/bobdominator/100/100" alt="โปรไฟล์">
+                <span class="plus-btn">+</span>
             </div>
+        </div>
+        <div class="menu-item" onclick="this.style.color=this.style.color==='red'?'':'red'">
+            <span class="icon">❤️</span>
+            <span class="count">425</span>
+        </div>
+        <div class="menu-item">
+            <span class="icon">💬</span>
+            <span class="count">8</span>
+        </div>
+        <div class="menu-item">
+            <span class="icon">↗️</span>
+            <span class="count">22</span>
+        </div>
+        <div class="menu-item">
+            <span class="icon">⭐</span>
+            <span class="count">บันทึก</span>
+        </div>
+        <div class="menu-item">
+            <div class="music-icon">🎵</div>
+            <span class="count" style="font-size:10px; margin-top:2px;">11</span>
         </div>
     </div>
 
-    <div class="page" id="page-search">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">🔍 ค้นหาสินค้า</div>
-        <input type="text" placeholder="พิมพ์ชื่อสินค้า...">
-    </div>
-
-    <div class="page" id="page-upload">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">➕ เพิ่มสินค้าใหม่</div>
-        <input type="file" accept="video/*,image/*">
-        <input type="text" placeholder="ชื่อสินค้า">
-        <input type="number" placeholder="ราคา ฿">
-        <textarea placeholder="รายละเอียดสินค้า" rows="4"></textarea>
-        <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600; margin-top:10px;" onclick="alert('✅ สินค้าถูกเพิ่มแล้ว!'); closePage();">📤 โพสต์สินค้า</button>
-    </div>
-
-    <div class="page" id="page-profile">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">👤 โปรไฟล์</div>
-        <div style="text-align:center; padding:20px 0;">
-            <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#00c6ff,#0072ff); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:32px;">ท</div>
-            <div style="font-size:20px; font-weight:700;">ThaiPodee Official</div>
-            <div style="color:#888; font-size:14px;">@thaipodee_official</div>
+    <!-- เมนูด้านล่าง 5 ตัว: โฮม, ร้านค้า(อันดับ2), ปุ่มกลาง, ข้อความ, โปรไฟล์ -->
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">หน้าหลัก</span>
         </div>
-    </div>
-
-    <div class="page" id="page-cart">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">🛒 ตะกร้าสินค้า <span id="cartCount" style="font-size:16px; color:#888; font-weight:normal;">(0 ชิ้น)</span></div>
-        <div id="cartList"><p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p></div>
-        <div style="margin-top:20px; padding-top:15px; border-top:1px solid #333;">
-            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:15px;">
-                <span>รวมทั้งหมด</span>
-                <span id="cartTotal">฿0</span>
-            </div>
-            <button style="width:100%; padding:14px; background:#00c853; color:#fff; border:none; border-radius:8px; font-size:17px; font-weight:600;" onclick="checkout()">✅ ยืนยันการสั่งซื้อ</button>
+        <div class="nav-item">
+            <span class="nav-icon">🛒</span>
+            <span class="nav-label">ร้านค้า</span>
+            <span class="nav-badge">99+</span>
         </div>
-    </div>
-
-    <div class="page" id="page-comments">
-        <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">💬 ความคิดเห็น</div>
-        <div style="padding:12px 0; border-bottom:1px solid #333;"><b>ผู้ใช้:</b> สนใจครับ ราคาเต็มไหมครับ?</div>
-        <div style="padding:12px 0; border-bottom:1px solid #333;"><b>เรา:</b> มีประกัน 1 ปีครับ</div>
+        <div class="nav-item">
+            <div class="nav-add"></div>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">คล้องข้อความ</span>
+            <span class="nav-badge">99+</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">โปรไฟล์</span>
+        </div>
     </div>
 </div>
 
-<div class="nav">
-    <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
-    <div class="nav-item" onclick="openPage('search')"><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
-    <div class="nav-item" onclick="openPage('upload')"><div class="nav-add"></div></div>
-    <div class="nav-item" onclick="openPage('cart')" id="navCartItem">
-        <span class="nav-icon">🛒</span>
-        <span class="nav-label" id="navCartLabel">ตะกร้า</span>
-        <span class="nav-cart-badge" id="navCartBadge" style="display:none;">0</span>
-    </div>
-    <div class="nav-item" onclick="openPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
-</div>
-
+<!-- Splash หายไปเอง ไม่กระทบเนื้อหา -->
 <script>
-    let cart = [];
-
     setTimeout(() => {
-        document.getElementById('splash').classList.add('hidden');
-        document.getElementById('app').classList.add('visible');
+        document.getElementById('splash').classList.add('fade-out');
     }, 1500);
-
-    function goHome() {
-        closePage();
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelector('.nav-item').classList.add('active');
-    }
-
-    function openPage(name) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
-        document.getElementById(`page-${name}`).classList.add('show');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-    }
-
-    function closePage() {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelector('.nav-item').classList.add('active');
-    }
-
-    function toggleLike(el) {
-        el.style.color = el.style.color === 'red' ? '' : 'red';
-    }
-
-    function share() {
-        if (navigator.share) {
-            navigator.share({ url: location.href });
-        } else {
-            prompt('คัดลอกลิงก์:', location.href);
-        }
-    }
-
-    function openProduct(id) {
-        alert('เข้าดูรายละเอียดสินค้า #' + id);
-    }
-
-    function addToCart(name, price) {
-        cart.push({ name, price });
-        updateCart();
-        alert('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
-    }
-
-    function updateCart() {
-        const countEl = document.getElementById('cartCount');
-        const totalEl = document.getElementById('cartTotal');
-        const list = document.getElementById('cartList');
-        const badge = document.getElementById('navCartBadge');
-        const total = cart.reduce((s, i) => s + i.price, 0);
-
-        countEl.textContent = `(${cart.length} ชิ้น)`;
-        totalEl.textContent = '฿' + total.toLocaleString();
-        badge.textContent = cart.length;
-        badge.style.display = cart.length > 0 ? 'flex' : 'none';
-
-        list.innerHTML = cart.length === 0
-            ? '<p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p>'
-            : cart.map((item, i) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #333;"><div><div style="font-weight:600;">${item.name}</div><div style="color:#00c853;">฿${item.price.toLocaleString()}</div></div><button onclick="cart.splice(${i},1); updateCart();" style="background:none; border:none; color:#f55; font-size:20px; cursor:pointer;">✕</button></div>`).join('');
-    }
-
-    function checkout() {
-        if (!cart.length) return alert('⚠️ ไม่มีสินค้าในตะกร้า!');
-        const total = cart.reduce((s, i) => s + i.price, 0);
-        alert(`✅ สั่งซื้อสำเร็จ!\nรวมทั้งหมด: ฿${total.toLocaleString()}\nขอบคุณครับ!`);
-        cart = [];
-        updateCart();
-        closePage();
-    }
 </script>
 
 </body>
