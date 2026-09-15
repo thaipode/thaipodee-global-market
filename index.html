@@ -9,16 +9,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
 
-        /* ===== ซ่อนหน้าทั้งหมด ยกเว้นหน้าที่แสดง ===== */
+        /* ===== เปลี่ยนหน้า ===== */
         .page { display: none; position: absolute; inset: 0; background: #000; }
         .page.active { display: block; }
 
-        /* ===== หน้า 1: หน้าหลัก — เหมือนเดิมเป๊ะ ===== */
+        /* ===== หน้า 1: หน้าหลัก — เหมือนเดิมเป๊ะ เห็นชัดเจน ===== */
         .center-area {
             position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .center-text { color: #777; font-size: 14px; text-align: center; }
+        .center-text { color: #888; font-size: 15px; text-align: center; margin-bottom: 10px; }
+        .demo-hint { color: #4CAF50; font-size: 12px; margin-top: 10px; }
 
         .info-left {
             position: absolute; left: 16px; bottom: 80px; right: 90px; z-index: 10;
@@ -31,7 +32,7 @@
             position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 24px; z-index: 10; align-items: center;
         }
-        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .avatar-box { position: relative; width: 44px; height: 44px; }
         .avatar {
             width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff;
@@ -50,25 +51,9 @@
             display: flex; justify-content: space-around; align-items: center;
             padding: 0 8px 12px; z-index: 20; background: transparent;
         }
-        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; min-width: 60px; position: relative; }
+        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; position: relative; }
         .nav-icon { font-size: 22px; }
         .nav-label { font-size: 10px; color: #aaa; }
-        .upload-btn { position: relative; overflow: hidden; }
-        .upload-btn-box {
-            width: 44px; height: 30px; background: #fff; border-radius: 6px; position: relative;
-        }
-        .upload-btn-box::before {
-            content: ''; position: absolute; width: 18px; height: 2px; background: #000;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-        .upload-btn-box::after {
-            content: ''; position: absolute; width: 2px; height: 18px; background: #000;
-            left: 50%; top: 50%; transform: translate(-50%, -50%);
-        }
-        #file-input {
-            position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer;
-            top: 0; left: 0;
-        }
         .badge {
             position: absolute; top: 0; right: 4px;
             background: #ff2442; color: #fff; font-size: 9px;
@@ -76,7 +61,24 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* ===== หน้า 2: เตรียมโพสต์ ===== */
+        /* ===== ปุ่มอัปโหลด — กดได้ชัดเจน ===== */
+        .upload-col { cursor: pointer; position: relative; }
+        .upload-visual {
+            width: 44px; height: 30px; background: #fff; border-radius: 6px; position: relative;
+        }
+        .upload-visual::before {
+            content: ''; position: absolute; width: 18px; height: 2px; background: #000;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .upload-visual::after {
+            content: ''; position: absolute; width: 2px; height: 18px; background: #000;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+        }
+        #file-input {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;
+        }
+
+        /* ===== หน้า 2: เตรียมโพสต์ — เห็นชัด ไม่มืด ===== */
         .back-btn {
             position: absolute; top: 12px; left: 12px; font-size: 22px; cursor: pointer; z-index: 50;
         }
@@ -86,15 +88,14 @@
             z-index: 50;
         }
         .sound-bar.hidden { display: none; }
-        .sound-name { font-size: 14px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .close-sound { cursor: pointer; font-size: 18px; padding: 0 4px; }
-        .add-sound-btn { cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .video-preview {
-            position: absolute; top: 60px; bottom: 100px; left: 0; right: 0;
-            display: flex; align-items: center; justify-content: center;
-            background: #111;
+        .close-sound { cursor: pointer; padding: 0 4px; font-size: 18px; }
+        .preview-box {
+            position: absolute; top: 60px; bottom: 140px; left: 0; right: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
         }
-        .video-preview video { max-width: 100%; max-height: 100%; }
+        .preview-icon { font-size: 48px; margin-bottom: 12px; }
+        .preview-text { color: #aaa; font-size: 14px; }
         .post-input {
             position: absolute; bottom: 100px; left: 16px; right: 16px;
             background: #222; border-radius: 8px; padding: 12px; color: #fff; border: none; font-size: 14px;
@@ -105,11 +106,9 @@
             border-radius: 20px; font-size: 15px; cursor: pointer;
         }
 
-        /* ===== หน้า 3: เลือกเพลง ===== */
-        .sound-page { background: #000; color: #fff; padding: 16px; overflow-y: auto; height: 100vh; }
-        .sound-header {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
-        }
+        /* ===== หน้า 3: เลือกเพลง — เห็นชัดเจนเต็มจอ ===== */
+        .sound-page { background: #000; padding: 16px; overflow-y: auto; height: 100vh; }
+        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .sound-title { font-size: 18px; font-weight: bold; }
         .search-box {
             width: 100%; padding: 10px 16px; border-radius: 8px; border: none;
@@ -118,21 +117,20 @@
         .tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 16px; }
         .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab.active { border-bottom-color: #fff; font-weight: bold; }
-        .sound-list { display: flex; flex-direction: column; gap: 16px; }
         .sound-item {
-            display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #222; cursor: pointer;
         }
-        .sound-thumb { width: 48px; height: 48px; border-radius: 4px; background: #333; overflow: hidden; }
-        .sound-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .sound-thumb {
+            width: 48px; height: 48px; border-radius: 6px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
         .sound-info { flex: 1; }
-        .sound-song { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-        .sound-artist { font-size: 12px; color: #888; }
-        .sound-fav { color: #888; cursor: pointer; padding: 4px; }
+        .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .sound-desc { font-size: 12px; color: #888; }
         .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; }
-        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .category-item {
-            display: flex; align-items: center; gap: 8px; background: #222; padding: 10px; border-radius: 8px; font-size: 13px;
-        }
+        .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .cat-item { background: #222; padding: 12px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -140,9 +138,11 @@
 <!-- ====================================== -->
 <!-- หน้า 1: หน้าหลัก — เหมือนเดิมเป๊ะ -->
 <!-- ====================================== -->
-<div id="page-home" class="page active">
+<div id="p1" class="page active">
     <div class="center-area">
-        <p class="center-text">กดอัปโหลดเพื่อเริ่มสร้างสรรค์</p>
+        <span class="preview-icon">🎬</span>
+        <p class="center-text">กดปุ่ม + ด้านล่างเพื่อเริ่มอัปโหลดวิดีโอ</p>
+        <p class="demo-hint">✅ ทุกอย่างทำงานแล้ว — กดปุ่มสีขาวที่มีเครื่องหมายบวกเลยครับ</p>
     </div>
 
     <div class="info-left">
@@ -154,7 +154,7 @@
     <div class="menu-right">
         <div class="menu-btn">
             <div class="avatar-box">
-                <img class="avatar" src="https://picsum.photos/seed/thaipodee2026/100/100" alt="โปรไฟล์">
+                <img class="avatar" src="https://picsum.photos/seed/tp2026/100/100" alt="โปรไฟล์">
                 <span class="follow-plus">+</span>
             </div>
         </div>
@@ -168,8 +168,8 @@
     <div class="nav-bottom">
         <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
-        <div class="nav-col upload-btn">
-            <div class="upload-btn-box"></div>
+        <div class="nav-col upload-col" id="upload-trigger">
+            <div class="upload-visual"></div>
             <input type="file" id="file-input" accept="video/*,image/*">
             <span class="nav-label">อัปโหลด</span>
         </div>
@@ -182,172 +182,156 @@
 </div>
 
 <!-- ====================================== -->
-<!-- หน้า 2: เตรียมโพสต์ -->
+<!-- หน้า 2: เตรียมโพสต์ — เห็นชัดเจน -->
 <!-- ====================================== -->
-<div id="page-upload" class="page">
+<div id="p2" class="page">
     <div class="back-btn" onclick="goBack()">←</div>
-    
-    <!-- แถบเสียงที่ระบบหามาให้อัตโนมัติ -->
-    <div id="auto-sound-bar" class="sound-bar">
+
+    <div id="auto-sound" class="sound-bar">
         <span>🎵</span>
-        <span class="sound-name" id="auto-sound-name">เพลงที่เข้ากับวิดีโอของคุณ</span>
-        <span class="close-sound" onclick="closeAutoSound()">×</span>
-    </div>
-    
-    <!-- ปุ่มเพิ่มเสียง — ซ่อนก่อน จะแสดงตอนกด × -->
-    <div id="add-sound-bar" class="sound-bar hidden" onclick="openSoundPage()">
-        <span>🎵</span>
-        <span class="add-sound-btn">เพิ่มเสียง</span>
+        <span id="auto-sound-name">เพลงที่เข้ากับเนื้อหา — แนะนำอัตโนมัติ</span>
+        <span class="close-sound" onclick="removeAutoSound()">×</span>
     </div>
 
-    <div class="video-preview" id="video-preview-area">
-        <span>ตัวอย่างวิดีโอ</span>
+    <div id="add-sound-bar" class="sound-bar hidden" onclick="goToPage('p3')">
+        <span>🎵</span>
+        <span>เพิ่มเสียง</span>
+    </div>
+
+    <div class="preview-box">
+        <span class="preview-icon">📹</span>
+        <span class="preview-text" id="file-name">ชื่อไฟล์วิดีโอจะแสดงที่นี่</span>
     </div>
 
     <input type="text" class="post-input" placeholder="เขียนคำอธิบายวิดีโอ...">
-    
-    <button class="post-btn" onclick="postVideo()">โพสต์</button>
+    <button class="post-btn" onclick="doPost()">โพสต์</button>
 </div>
 
 <!-- ====================================== -->
-<!-- หน้า 3: เลือกเพลงเชิงพาณิชย์ -->
+<!-- หน้า 3: เลือกเพลงเชิงพาณิชย์ — เห็นชัดเจน -->
 <!-- ====================================== -->
-<div id="page-sounds" class="page sound-page">
+<div id="p3" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" onclick="goBack()">←</span>
         <span class="sound-title">เสียงเชิงพาณิชย์</span>
         <span>❓</span>
     </div>
 
-    <input type="text" class="search-box" placeholder="ค้นหา">
+    <input type="text" class="search-box" placeholder="ค้นหาเพลง ศิลปิน">
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('discover')">ค้นพบ</div>
-        <div class="tab" onclick="switchTab('favorites')">รายการโปรด</div>
+        <div class="tab active" id="tab-disc" onclick="switchTab('disc')">ค้นพบ</div>
+        <div class="tab" id="tab-fav" onclick="switchTab('fav')">รายการโปรด</div>
     </div>
 
-    <div id="tab-discover">
-        <div class="section-title">แนะนำ</div>
-        <div class="sound-list">
-            <div class="sound-item" onclick="selectSound('เพลงที่ 1 — ศิลปิน A')">
-                <div class="sound-thumb"><img src="https://picsum.photos/seed/s1/100/100"></div>
-                <div class="sound-info">
-                    <div class="sound-song">เพลงที่ 1 — เพลงรัก</div>
-                    <div class="sound-artist">ศิลปิน A · 00:41</div>
-                </div>
-                <span class="sound-fav">☆</span>
+    <div id="list-disc">
+        <div class="section-title">แนะนำให้คุณ</div>
+        
+        <div class="sound-item" onclick="pickSound('เพลงรักที่สุด — ศิลปิน ปอนเชต์')">
+            <div class="sound-thumb">🎵</div>
+            <div class="sound-info">
+                <div class="sound-name">เพลงรักที่สุด (I Like You The Most)</div>
+                <div class="sound-desc">PONCHET · 00:41 · ใช้ได้เชิงพาณิชย์</div>
             </div>
-            <div class="sound-item" onclick="selectSound('เพลงที่ 2 — ศิลปิน B')">
-                <div class="sound-thumb"><img src="https://picsum.photos/seed/s2/100/100"></div>
-                <div class="sound-info">
-                    <div class="sound-song">เพลงที่ 2 — คนเข้าใจผิด</div>
-                    <div class="sound-artist">ศิลปิน B · 01:00</div>
-                </div>
-                <span class="sound-fav">☆</span>
+            <span>☆</span>
+        </div>
+
+        <div class="sound-item" onclick="pickSound('คนเข้าใจผิด — SERIOUS BACON & PP KRIT')">
+            <div class="sound-thumb">🎤</div>
+            <div class="sound-info">
+                <div class="sound-name">คนเข้าใจผิด (My Fault)</div>
+                <div class="sound-desc">SERIOUS BACON & PP KRIT · 01:00 · ใช้ได้เชิงพาณิชย์</div>
             </div>
-            <div class="sound-item" onclick="selectSound('เพลงที่ 3 — ศิลปิน C')">
-                <div class="sound-thumb"><img src="https://picsum.photos/seed/s3/100/100"></div>
-                <div class="sound-info">
-                    <div class="sound-song">เพลงที่ 3 — เพลงพลังใจ</div>
-                    <div class="sound-artist">ศิลปิน C · 01:00</div>
-                </div>
-                <span class="sound-fav">☆</span>
+            <span>☆</span>
+        </div>
+
+        <div class="sound-item" onclick="pickSound('พลังใจ — PORZAX')">
+            <div class="sound-thumb">💪</div>
+            <div class="sound-info">
+                <div class="sound-name">พลังความพยายาม</div>
+                <div class="sound-desc">PORZAX · 01:00 · ใช้ได้เชิงพาณิชย์</div>
             </div>
+            <span>☆</span>
         </div>
 
         <div class="section-title">หมวดหมู่</div>
-        <div class="category-grid">
-            <div class="category-item">🔥 มาใหม่</div>
-            <div class="category-item">⭐ TikBiz</div>
-            <div class="category-item">🎨 ศิลปินหน้าใหม่</div>
-            <div class="category-item">🍽️ อาหาร</div>
-            <div class="category-item">🎸 อินดี้</div>
-            <div class="category-item">💃 เต้น</div>
+        <div class="cat-grid">
+            <div class="cat-item">🔥 มาใหม่</div>
+            <div class="cat-item">⭐ TikBiz</div>
+            <div class="cat-item">🎨 ศิลปินหน้าใหม่</div>
+            <div class="cat-item">🍽️ อาหาร</div>
+            <div class="cat-item">🎸 อินดี้</div>
+            <div class="cat-item">💃 เต้น</div>
         </div>
     </div>
 
-    <div id="tab-favorites" style="display:none;">
-        <p style="text-align:center; color:#888; padding:20px;">ยังไม่มีรายการโปรด</p>
+    <div id="list-fav" style="display:none;">
+        <p style="text-align:center; color:#666; padding:30px;">ยังไม่มีรายการโปรด</p>
     </div>
 </div>
 
 <script>
-    let pageHistory = ['page-home'];
-    let selectedSoundName = '';
+    let history = ['p1'];
+    let chosenSound = '';
 
     // เปลี่ยนหน้า
-    function showPage(pageId) {
+    function goToPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        if (pageHistory[pageHistory.length - 1] !== pageId) pageHistory.push(pageId);
+        document.getElementById(id).classList.add('active');
+        if (history[history.length - 1] !== id) history.push(id);
     }
 
     // ย้อนกลับ
     function goBack() {
-        if (pageHistory.length > 1) {
-            pageHistory.pop();
-            const prevPage = pageHistory[pageHistory.length - 1];
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(prevPage).classList.add('active');
+        if (history.length > 1) {
+            history.pop();
+            goToPage(history[history.length - 1]);
         }
     }
 
-    // กดเลือกไฟล์วิดีโอ → ไปหน้าเตรียมโพสต์
+    // กดเลือกไฟล์
     document.getElementById('file-input').addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            showPage('page-upload');
-            // จำชื่อไฟล์ไว้
-            document.getElementById('video-preview-area').innerHTML = 
-                '<span>' + e.target.files[0].name + '</span><br><small>พร้อมโพสต์</small>';
-            // ตั้งชื่อเพลงอัตโนมัติ
-            document.getElementById('auto-sound-name').textContent = 'เพลงที่เข้ากับเนื้อหา — แนะนำอัตโนมัติ';
-            // แสดงแถบเสียงอัตโนมัติ ซ่อนปุ่มเพิ่มเสียง
-            document.getElementById('auto-sound-bar').classList.remove('hidden');
+            const name = e.target.files[0].name;
+            document.getElementById('file-name').textContent = name;
+            chosenSound = '';
+            // รีเซ็ตแถบเสียง
+            document.getElementById('auto-sound').classList.remove('hidden');
             document.getElementById('add-sound-bar').classList.add('hidden');
+            goToPage('p2');
         }
     });
 
     // กดปิดเสียงอัตโนมัติ
-    function closeAutoSound() {
-        document.getElementById('auto-sound-bar').classList.add('hidden');
+    function removeAutoSound() {
+        document.getElementById('auto-sound').classList.add('hidden');
         document.getElementById('add-sound-bar').classList.remove('hidden');
-        selectedSoundName = '';
-    }
-
-    // กดเพิ่มเสียง → ไปหน้าเลือกเพลง
-    function openSoundPage() {
-        showPage('page-sounds');
+        chosenSound = '';
     }
 
     // เปลี่ยนแท็บ
-    function switchTab(tabName) {
+    function switchTab(tab) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        document.getElementById('tab-discover').style.display = tabName === 'discover' ? 'block' : 'none';
-        document.getElementById('tab-favorites').style.display = tabName === 'favorites' ? 'block' : 'none';
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.getElementById('list-disc').style.display = tab === 'disc' ? 'block' : 'none';
+        document.getElementById('list-fav').style.display = tab === 'fav' ? 'block' : 'none';
     }
 
-    // เลือกเพลง → กลับไปหน้าเตรียมโพสต์ แสดงชื่อเพลง
-    function selectSound(soundName) {
-        selectedSoundName = soundName;
+    // เลือกเพลง
+    function pickSound(name) {
+        chosenSound = name;
         goBack();
-        // แสดงชื่อเพลงที่เลือกแทนปุ่มเพิ่มเสียง
+        // แสดงชื่อเพลงที่เลือก
         document.getElementById('add-sound-bar').innerHTML = 
-            '<span>🎵</span><span class="sound-name">' + soundName + '</span><span class="close-sound" onclick="changeSound()">เปลี่ยน</span>';
-    }
-
-    // เปลี่ยนเสียงใหม่
-    function changeSound() {
-        showPage('page-sounds');
+            '<span>🎵</span><span>' + name + '</span><span class="close-sound" onclick="goToPage(\'p3\')">เปลี่ยน</span>';
     }
 
     // กดโพสต์
-    function postVideo() {
-        alert('โพสต์สำเร็จ! 🎉\nเสียงที่ใช้: ' + (selectedSoundName || 'เสียงต้นฉบับ/อัตโนมัติ'));
-        // กลับไปหน้าหลัก
-        pageHistory = ['page-home'];
-        showPage('page-home');
-        // รีเซ็ตไฟล์
+    function doPost() {
+        const soundUsed = chosenSound || 'เสียงที่ระบบแนะนำอัตโนมัติ';
+        alert('✅ โพสต์สำเร็จ!\n🎵 เสียงที่ใช้: ' + soundUsed + '\n\nกลับไปหน้าหลักแล้วครับ');
+        history = ['p1'];
+        goToPage('p1');
         document.getElementById('file-input').value = '';
     }
 </script>
