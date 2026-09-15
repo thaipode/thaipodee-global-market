@@ -12,7 +12,7 @@
         .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.25s ease; }
         .page-hidden { opacity: 0; pointer-events: none; z-index: 0; }
 
-        /* ===== วิดีโอหลัก — แสดงตามสัดส่วนจริงเอง ===== */
+        /* ===== วิดีโอ — แตะได้ เล่น/หยุด ได้ ปกติ ===== */
         .video-wrap {
             position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -23,6 +23,7 @@
             object-fit: contain;
             background: #000;
             display: none;
+            /* แตะได้ เล่น/หยุด ได้ ปกติ */
         }
         #main-image {
             max-width: 100%; max-height: 100%;
@@ -33,9 +34,9 @@
             color: #888; text-align: center; padding: 20px;
         }
 
-        /* ===== ข้อมูลซ้ายล่าง — ชื่อ Master ===== */
-        .info-left { position: absolute; left: 12px; bottom: 85px; right: 85px; z-index: 10; }
-        .acc-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; cursor: pointer; }
+        /* ===== ข้อมูลซ้ายล่าง ===== */
+        .info-left { position: absolute; left: 12px; bottom: 85px; right: 85px; z-index: 10; pointer-events: none; }
+        .acc-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; cursor: pointer; pointer-events: auto; }
         .desc-text { font-size: 12px; line-height: 1.4; margin-bottom: 4px; color: #fff; }
         .music-row { font-size: 11px; color: #ddd; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
 
@@ -90,7 +91,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* ===== หน้าอัปโหลด — ไม่มีปุ่มสัดส่วน ===== */
+        /* ===== หน้าอัปโหลด ===== */
         .upload-page {
             background: #000;
             padding: 50px 16px 90px;
@@ -145,7 +146,7 @@
             border-radius: 8px; font-size: 15px; cursor: pointer;
         }
 
-        /* ===== หน้าโปรไฟล์ Master ===== */
+        /* ===== หน้าโปรไฟล์ ===== */
         .profile-page {
             background: #000; padding: 50px 16px 90px; overflow-y: auto; min-height: 100vh;
         }
@@ -180,7 +181,7 @@
 
 <!-- ===== หน้าหลัก — Master ===== -->
 <div class="page active" id="homePage">
-    <div class="video-wrap" onclick="toggleAudio()">
+    <div class="video-wrap" id="videoWrap">
         <video id="main-video" autoplay loop muted playsinline webkit-playsinline style="display:none;">
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
         </video>
@@ -192,7 +193,7 @@
 
     <div class="info-left">
         <div class="acc-name" id="home-acc-name" onclick="goProfile()">@ThaiPodee_Master</div>
-        <div class="desc-text" id="home-desc-name">ยินดีต้อนรับสู่ ThaiPodee Global Market — ต้นฉบับหลัก ✨</div>
+        <div class="desc-text" id="home-desc-name">ทดสอบ ✨</div>
         <div class="music-row">🎵 เสียงต้นฉบับ • ThaiPodee Original</div>
     </div>
 
@@ -317,6 +318,14 @@ let selectedFile = null;
 let uploadedUrl = null;
 let uploadedType = null;
 
+const mainVideo = document.getElementById('main-video');
+
+// ===== เล่นวนซ้ำเมื่อจบ — ทำงานร่วมกับ loop =====
+mainVideo.addEventListener('ended', function() {
+    this.currentTime = 0; // กลับจุดเริ่มต้น
+    this.play(); // เล่นต่อทันที
+});
+
 // ===== สลับหน้า =====
 function goHome() {
     document.getElementById('homePage').classList.remove('page-hidden');
@@ -335,12 +344,6 @@ function goProfile() {
     document.getElementById('profilePage').classList.remove('page-hidden');
 }
 
-// ===== เสียงวิดีโอ =====
-const mainVideo = document.getElementById('main-video');
-function toggleAudio() {
-    mainVideo.muted = !mainVideo.muted;
-}
-
 // ===== กดถูกใจ =====
 let liked = false, cnt = 0;
 function toggleLike() {
@@ -350,7 +353,7 @@ function toggleLike() {
     document.getElementById('likeCount').textContent = cnt;
 }
 
-// ===== เลือกไฟล์ — ไม่มีปุ่มสัดส่วน =====
+// ===== เลือกไฟล์ =====
 function handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -375,7 +378,7 @@ function handleFileSelect(e) {
     }
 }
 
-// ===== โพสต์ — แสดงทันที ไม่หน้าจอดำ =====
+// ===== โพสต์ — แสดงและเล่นวนซ้ำทันที =====
 function publishPost() {
     if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
 
@@ -433,7 +436,7 @@ function handleAvatarChange(e) {
     alert('✅ เปลี่ยนรูปเรียบร้อย!');
 }
 
-// ===== เปลี่ยนชื่อ — ซิงค์ทุกจุดทันที =====
+// ===== เปลี่ยนชื่อ =====
 function toggleEditName() {
     document.getElementById('editNameSec').classList.toggle('show');
     document.getElementById('editUserSec').classList.remove('show');
