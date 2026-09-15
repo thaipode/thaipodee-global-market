@@ -18,7 +18,7 @@
         .splash-title { font-size: 26px; font-weight: 700; }
         .splash-sub { font-size: 14px; color: #888; margin-top: 6px; }
 
-        /* ========== แอปหลัก — ซ่อนไว้จนกว่าโลโก้หายไป ========== */
+        /* ========== แอปหลัก ========== */
         .app { height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
         .app.visible { opacity: 1; }
 
@@ -29,7 +29,7 @@
         .item-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,.6)); }
 
         /* ========== ข้อมูลซ้ายล่าง ========== */
-        .info { position: absolute; left: 16px; right: 20px; bottom: 90px; z-index: 10; }
+        .info { position: absolute; left: 16px; right: 90px; bottom: 100px; z-index: 10; }
         .info-user { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
         .info-desc { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
@@ -37,15 +37,15 @@
         .info-btn { width: 100%; padding: 12px; background: #ff5c39; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
 
         /* ========== ปุ่มขวา ========== */
-        .actions { position: absolute; right: 12px; bottom: 110px; display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 10; }
+        .actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 10; }
         .action { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .action-icon { font-size: 28px; }
         .action-num { font-size: 11px; }
         .music-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #00c6ff, #ff0080); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; font-size: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ========== เมนูล่าง ========== */
-        .nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 25px; background: #000; border-top: 1px solid #222; z-index: 20; }
+        /* ========== เมนูล่าง — ไม่มีอะไรมาบังแล้ว! ========== */
+        .nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 25px; background: #000; border-top: 1px solid #222; z-index: 20; position: relative; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
         .nav-icon { font-size: 24px; }
         .nav-label { font-size: 10px; color: #888; }
@@ -53,12 +53,7 @@
         .nav-add { width: 42px; height: 28px; background: #fff; border-radius: 6px; position: relative; }
         .nav-add::before, .nav-add::after { content: ''; position: absolute; background: #000; }
         .nav-add::before { width: 16px; height: 2px; top: 13px; left: 13px; }
-        .nav-add::after { width: 2px; height: 16px; left: 20px; top: 9px; }
-
-        /* ========== ปุ่มตะกร้าลอย — ซ่อนก่อน โชว์เฉพาะหน้าตะกร้า ========== */
-        .cart-float { position: fixed; bottom: 95px; right: 18px; width: 54px; height: 54px; border-radius: 50%; background: #ff5c39; display: none; /* ✅ ซ่อนไว้ก่อน */ align-items: center; justify-content: center; font-size: 22px; z-index: 15; }
-        .cart-float.show { display: flex; /* ✅ โชว์เฉพาะเรียกใช้ */ }
-        .cart-badge { position: absolute; top: -4px; right: -4px; background: #f00; color: #fff; font-size: 10px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .nav-add::after { width: 2px; height: 16px; left: 20px; top: 6px; }
 
         /* ========== หน้าอื่น ๆ ========== */
         .page { display: none; position: absolute; inset: 0; background: #000; z-index: 30; padding: 20px; overflow-y: auto; }
@@ -124,8 +119,7 @@
         </div>
     </div>
 
-    <!-- ปุ่มตะกร้าลอย — ✅ ซ่อนไว้ โชว์เฉพาะตอนเข้าหน้าตะกร้า -->
-    <div class="cart-float" id="cartFloat" onclick="openPage('cart')">🛒<span class="cart-badge" id="cartBadge">0</span></div>
+    <!-- ❌ ลบปุ่มตะกร้าลอยทิ้งไปเลย ไม่มีแล้ว! -->
 
     <!-- หน้าค้นหา -->
     <div class="page" id="page-search">
@@ -168,7 +162,7 @@
     <!-- หน้าตะกร้า -->
     <div class="page" id="page-cart">
         <span class="page-close" onclick="closePage()">✕</span>
-        <div class="page-title">🛒 ตะกร้าสินค้า</div>
+        <div class="page-title">🛒 ตะกร้าสินค้า <span id="cartCount" style="font-size:16px; color:#888; font-weight:normal;">(0 ชิ้น)</span></div>
         <div id="cartList"><p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p></div>
         <div style="margin-top:20px; padding-top:15px; border-top:1px solid #333;">
             <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:15px;">
@@ -187,19 +181,18 @@
         <div style="padding:12px 0; border-bottom:1px solid #333;"><b>เรา:</b> มีประกัน 1 ปีครับ</div>
     </div>
 
-    <!-- เมนูล่าง -->
+    <!-- เมนูล่าง — ✅ ไม่มีอะไรมาบังแล้ว! -->
     <div class="nav">
         <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
         <div class="nav-item" onclick="openPage('search')"><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
         <div class="nav-item" onclick="openPage('upload')"><div class="nav-add"></div></div>
-        <div class="nav-item" onclick="openPage('notify')"><span class="nav-icon">🔔</span><span class="nav-label">แจ้งเตือน</span></div>
+        <div class="nav-item" onclick="openPage('cart')"><span class="nav-icon">🛒</span><span class="nav-label" id="navCartLabel">ตะกร้า</span></div>
         <div class="nav-item" onclick="openPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
     </div>
 </div>
 
 <script>
     let cart = [];
-    const cartFloat = document.getElementById('cartFloat');
 
     // ========== โลโก้ขึ้นก่อน — 1.5 วินาที ค่อยเข้าแอป ==========
     setTimeout(() => {
@@ -209,7 +202,6 @@
 
     function goHome() {
         closePage();
-        cartFloat.classList.remove('show'); // ✅ ซ่อนตะกร้าลอยเมื่อกลับหน้าแรก
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.querySelector('.nav-item').classList.add('active');
     }
@@ -217,20 +209,12 @@
     function openPage(name) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
         document.getElementById(`page-${name}`).classList.add('show');
-        
-        // ✅ โชว์ตะกร้าลอยเฉพาะตอนเข้าหน้าตะกร้า
-        if (name === 'cart') {
-            cartFloat.classList.add('show');
-        } else {
-            cartFloat.classList.remove('show');
-        }
-        
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        event.currentTarget.classList.add('active');
     }
 
     function closePage() {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
-        cartFloat.classList.remove('show'); // ✅ ปิดหน้าไหนก็ซ่อนตะกร้าลอย
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.querySelector('.nav-item').classList.add('active');
     }
@@ -247,28 +231,31 @@
     function addToCart(name, price) {
         cart.push({ name, price });
         updateCart();
-        alert('✅ เพิ่มลงตะกร้าแล้ว!');
+        alert('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
     }
 
     function updateCart() {
-        const badge = document.getElementById('cartBadge');
+        const countEl = document.getElementById('cartCount');
         const totalEl = document.getElementById('cartTotal');
         const list = document.getElementById('cartList');
+        const navLabel = document.getElementById('navCartLabel');
         const total = cart.reduce((s, i) => s + i.price, 0);
         
-        badge.textContent = cart.length;
-        badge.style.display = cart.length ? 'flex' : 'none';
+        // อัปเดตจำนวน
+        countEl.textContent = `(${cart.length} ชิ้น)`;
+        navLabel.textContent = cart.length > 0 ? `ตะกร้า (${cart.length})` : 'ตะกร้า';
         totalEl.textContent = '฿' + total.toLocaleString();
         
+        // แสดงรายการ
         list.innerHTML = cart.length === 0 
             ? '<p style="color:#888; text-align:center; padding:30px 0;">ยังไม่มีสินค้าในตะกร้า</p>'
-            : cart.map((item, i) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #333;"><div><div style="font-weight:600;">${item.name}</div><div style="color:#00c853;">฿${item.price.toLocaleString()}</div></div><button onclick="cart.splice(${i},1); updateCart();" style="background:none; border:none; color:#f55; font-size:20px;">✕</button></div>`).join('');
+            : cart.map((item, i) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #333;"><div><div style="font-weight:600;">${item.name}</div><div style="color:#00c853;">฿${item.price.toLocaleString()}</div></div><button onclick="cart.splice(${i},1); updateCart();" style="background:none; border:none; color:#f55; font-size:20px; cursor:pointer;">✕</button></div>`).join('');
     }
 
     function checkout() {
-        if (!cart.length) return alert('⚠️ ไม่มีสินค้า!');
+        if (!cart.length) return alert('⚠️ ไม่มีสินค้าในตะกร้า!');
         const total = cart.reduce((s, i) => s + i.price, 0);
-        alert(`✅ สั่งซื้อสำเร็จ! รวม ฿${total.toLocaleString()}`);
+        alert(`✅ สั่งซื้อสำเร็จ!\nรวมทั้งหมด: ฿${total.toLocaleString()}\nขอบคุณครับ!`);
         cart = [];
         updateCart();
         closePage();
