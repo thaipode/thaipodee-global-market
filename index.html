@@ -11,7 +11,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
-        /* ========== หน้าจอเริ่มต้น — โลโก้ ต้องขึ้นก่อนเสมอ ========== */
+        /* ========== หน้าจอเริ่มต้น — โลโก้ขึ้นก่อนเสมอ ========== */
         .splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; }
         .splash.hidden { opacity: 0; pointer-events: none; }
         .splash-logo { width: 140px; height: 140px; border-radius: 28px; background: linear-gradient(135deg, #00c6ff, #0072ff); display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; margin-bottom: 20px; }
@@ -29,7 +29,7 @@
         .item-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,.6)); }
 
         /* ========== ข้อมูลซ้ายล่าง ========== */
-        .info { position: absolute; left: 16px; right: 90px; bottom: 90px; z-index: 10; }
+        .info { position: absolute; left: 16px; right: 20px; bottom: 90px; z-index: 10; }
         .info-user { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
         .info-desc { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
@@ -55,8 +55,9 @@
         .nav-add::before { width: 16px; height: 2px; top: 13px; left: 13px; }
         .nav-add::after { width: 2px; height: 16px; left: 20px; top: 9px; }
 
-        /* ========== ปุ่มตะกร้าลอย ========== */
-        .cart-float { position: fixed; bottom: 95px; right: 18px; width: 54px; height: 54px; border-radius: 50%; background: #ff5c39; display: flex; align-items: center; justify-content: center; font-size: 22px; z-index: 15; }
+        /* ========== ปุ่มตะกร้าลอย — ซ่อนก่อน โชว์เฉพาะหน้าตะกร้า ========== */
+        .cart-float { position: fixed; bottom: 95px; right: 18px; width: 54px; height: 54px; border-radius: 50%; background: #ff5c39; display: none; /* ✅ ซ่อนไว้ก่อน */ align-items: center; justify-content: center; font-size: 22px; z-index: 15; }
+        .cart-float.show { display: flex; /* ✅ โชว์เฉพาะเรียกใช้ */ }
         .cart-badge { position: absolute; top: -4px; right: -4px; background: #f00; color: #fff; font-size: 10px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
         /* ========== หน้าอื่น ๆ ========== */
@@ -70,14 +71,14 @@
 </head>
 <body>
 
-<!-- ========== หน้าเริ่มต้น — ต้องขึ้นก่อนเสมอ ========== -->
+<!-- ========== หน้าเริ่มต้น — โลโก้ขึ้นก่อนเสมอ ========== -->
 <div class="splash" id="splash">
     <div class="splash-logo">ท</div>
     <div class="splash-title">ThaiPodee</div>
     <div class="splash-sub">Global Market Online</div>
 </div>
 
-<!-- ========== แอปหลัก — ซ่อนก่อน ========== -->
+<!-- ========== แอปหลัก ========== -->
 <div class="app" id="app">
 
     <!-- ฟีดวิดีโอ -->
@@ -123,8 +124,8 @@
         </div>
     </div>
 
-    <!-- ปุ่มตะกร้าลอย -->
-    <div class="cart-float" onclick="openPage('cart')">🛒<span class="cart-badge" id="cartBadge">0</span></div>
+    <!-- ปุ่มตะกร้าลอย — ✅ ซ่อนไว้ โชว์เฉพาะตอนเข้าหน้าตะกร้า -->
+    <div class="cart-float" id="cartFloat" onclick="openPage('cart')">🛒<span class="cart-badge" id="cartBadge">0</span></div>
 
     <!-- หน้าค้นหา -->
     <div class="page" id="page-search">
@@ -198,6 +199,7 @@
 
 <script>
     let cart = [];
+    const cartFloat = document.getElementById('cartFloat');
 
     // ========== โลโก้ขึ้นก่อน — 1.5 วินาที ค่อยเข้าแอป ==========
     setTimeout(() => {
@@ -207,6 +209,7 @@
 
     function goHome() {
         closePage();
+        cartFloat.classList.remove('show'); // ✅ ซ่อนตะกร้าลอยเมื่อกลับหน้าแรก
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.querySelector('.nav-item').classList.add('active');
     }
@@ -214,11 +217,20 @@
     function openPage(name) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
         document.getElementById(`page-${name}`).classList.add('show');
+        
+        // ✅ โชว์ตะกร้าลอยเฉพาะตอนเข้าหน้าตะกร้า
+        if (name === 'cart') {
+            cartFloat.classList.add('show');
+        } else {
+            cartFloat.classList.remove('show');
+        }
+        
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     }
 
     function closePage() {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+        cartFloat.classList.remove('show'); // ✅ ปิดหน้าไหนก็ซ่อนตะกร้าลอย
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.querySelector('.nav-item').classList.add('active');
     }
