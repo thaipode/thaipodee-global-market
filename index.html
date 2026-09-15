@@ -59,7 +59,7 @@
         }
 
         /* ==============================================
-           แถบแสดงขนาดจอ — บนสุดสุด
+           แถบแสดงขนาดจอ — บนสุด
            ============================================== */
         .screen-size-label {
             position: fixed;
@@ -79,7 +79,7 @@
         }
 
         /* ==============================================
-           วิดีโอ/ภาพ — พอดีจอสุดขีด ไม่ถูกบัง
+           วิดีโอ/ภาพ — พอดีจอ ไม่ถูกบัง
            ============================================== */
         .media-container {
             position: fixed;
@@ -92,7 +92,7 @@
         #main-media {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* ✅ ย่อให้พอดีจอ ไม่บังส่วนไหน */
+            object-fit: contain;
             object-position: center center;
             background: #000;
         }
@@ -123,7 +123,7 @@
             border: 2px solid #fff;
         }
 
-        /* ===== ข้อความซ้อนวิดีโอ ===== */
+        /* ===== ข้อความชื่อวิดีโอ — เปลี่ยนตามไฟล์ใหม่ ===== */
         .text-overlay {
             position: fixed;
             bottom: 140px;
@@ -137,7 +137,7 @@
             line-height: 1.6;
         }
 
-        /* ===== กลุ่มชื่อผู้ใช้ — LOCKED ===== */
+        /* ===== กลุ่มชื่อผู้ใช้ & คำอธิบาย — LOCKED ===== */
         .user-info {
             position: fixed;
             left: 16px;
@@ -280,6 +280,7 @@
         }
         .nav-add::before { width: 18px; height: 2px; top: 15px; left: 13px; }
         .nav-add::after { width: 2px; height: 18px; left: 21px; top: 7px; }
+        }
 
         #file-upload { display: none; }
     </style>
@@ -313,8 +314,8 @@
 <!-- 🔊 ปุ่มเปิด/ปิดเสียง -->
 <div class="sound-btn" id="soundToggle" onclick="toggleSound()">🔇</div>
 
-<!-- ข้อความซ้อนวิดีโอ -->
-<div class="text-overlay">
+<!-- ✅ ชื่อวิดีโอ — จะเปลี่ยนตามไฟล์ที่อัปโหลดใหม่ -->
+<div class="text-overlay" id="videoTitle">
     คุณตาร๊อคอำลาปลายมาศ<br>
     ตำบลทะเมนชัย อำเภอลำปลายมาศ<br>
     จังหวัดบุรีรัมย์ ครับ
@@ -322,8 +323,8 @@
 
 <!-- กลุ่มชื่อผู้ใช้ — LOCKED -->
 <div class="user-info">
-    <div class="username">Bob Dominator</div>
-    <div class="caption">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
+    <div class="username" id="uploaderName">Bob Dominator</div>
+    <div class="caption" id="videoDesc">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
     <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
 </div>
 
@@ -454,10 +455,18 @@
         }
     }
 
-    // ➕ อัปโหลดวิดีโอ/ภาพ — พอดีจอ ไม่ถูกบัง
+    // ==============================================
+    // ➕ อัปโหลด — ชื่อเปลี่ยนตามไฟล์ใหม่อัตโนมัติ!
+    // ==============================================
     function handleUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
+
+        // ✅ ตัดนามสกุลไฟล์ออก เอาเป็นชื่อวิดีโอ
+        const fileName = file.name.replace(/\.[^/.]+$/, "");
+        
+        // ✅ แทนที่ขีดล่าง/ขีดกลางด้วยช่องว่าง ให้อ่านง่าย
+        const displayName = fileName.replace(/[_-]/g, " ");
 
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -465,7 +474,7 @@
             const btn = document.getElementById('soundToggle');
 
             if (file.type.startsWith('video/')) {
-                // วิดีโอ — พอดีจอ + มีเสียง
+                // วิดีโอ — พอดีจอ + มีเสียง + เปลี่ยนชื่อ!
                 container.innerHTML = `
                     <video id="main-media" autoplay loop muted playsinline webkit-playsinline style="width:100%;height:100%;object-fit:contain;background:#000;">
                         <source src="${event.target.result}" type="${file.type}">
@@ -474,12 +483,16 @@
                 btn.textContent = '🔊';
                 btn.style.display = 'flex';
             } else {
-                // รูปภาพ — พอดีจอ
+                // รูปภาพ — พอดีจอ + เปลี่ยนชื่อ!
                 container.innerHTML = `<img id="main-media" src="${event.target.result}" style="width:100%;height:100%;object-fit:contain;background:#000;" alt="รูปภาพ">`;
                 btn.style.display = 'none';
             }
 
-            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name + '\n✅ พอดีจอทุกส่วน ไม่ถูกบังแล้ว!');
+            // ✅ เปลี่ยนชื่อวิดีโอ ตามชื่อไฟล์ที่อัปโหลด!
+            document.getElementById('videoTitle').innerHTML = displayName;
+            document.getElementById('videoDesc').textContent = 'อัปโหลดใหม่ — ' + new Date().toLocaleString('th-TH');
+
+            alert('อัปโหลดสำเร็จ! 🎉\n📄 ชื่อวิดีโอ: ' + displayName + '\n✅ เปลี่ยนชื่ออัตโนมัติแล้ว!');
         };
         reader.readAsDataURL(file);
     }
