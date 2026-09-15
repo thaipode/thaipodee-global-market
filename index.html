@@ -9,17 +9,15 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
 
-        /* ===== เปลี่ยนหน้า ===== */
         .page { display: none; position: absolute; inset: 0; background: #000; }
         .page.active { display: block; }
 
-        /* ===== หน้า 1: หน้าหลัก — เหมือนเดิมเป๊ะ เห็นชัดเจน ===== */
+        /* ===== หน้าหลัก — เหมือนเดิมเป๊ะ ===== */
         .center-area {
             position: absolute; inset: 0;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .center-text { color: #888; font-size: 15px; text-align: center; margin-bottom: 10px; }
-        .demo-hint { color: #4CAF50; font-size: 12px; margin-top: 10px; }
+        .center-text { color: #777; font-size: 14px; text-align: center; }
 
         .info-left {
             position: absolute; left: 16px; bottom: 80px; right: 90px; z-index: 10;
@@ -61,7 +59,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* ===== ปุ่มอัปโหลด — กดได้ชัดเจน ===== */
+        /* ===== ปุ่มอัปโหลด ===== */
         .upload-col { cursor: pointer; position: relative; }
         .upload-visual {
             width: 44px; height: 30px; background: #fff; border-radius: 6px; position: relative;
@@ -74,11 +72,11 @@
             content: ''; position: absolute; width: 2px; height: 18px; background: #000;
             left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
-        #file-input {
+        #video-input {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;
         }
 
-        /* ===== หน้า 2: เตรียมโพสต์ — เห็นชัด ไม่มืด ===== */
+        /* ===== หน้าเตรียมโพสต์ ===== */
         .back-btn {
             position: absolute; top: 12px; left: 12px; font-size: 22px; cursor: pointer; z-index: 50;
         }
@@ -89,13 +87,15 @@
         }
         .sound-bar.hidden { display: none; }
         .close-sound { cursor: pointer; padding: 0 4px; font-size: 18px; }
-        .preview-box {
+        .video-area {
             position: absolute; top: 60px; bottom: 140px; left: 0; right: 0;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex; align-items: center; justify-content: center;
+            background: #000;
         }
-        .preview-icon { font-size: 48px; margin-bottom: 12px; }
-        .preview-text { color: #aaa; font-size: 14px; }
+        .video-area video {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+        }
         .post-input {
             position: absolute; bottom: 100px; left: 16px; right: 16px;
             background: #222; border-radius: 8px; padding: 12px; color: #fff; border: none; font-size: 14px;
@@ -106,43 +106,37 @@
             border-radius: 20px; font-size: 15px; cursor: pointer;
         }
 
-        /* ===== หน้า 3: เลือกเพลง — เห็นชัดเจนเต็มจอ ===== */
+        /* ===== หน้าเลือกเสียง — มีลิงก์จริง ฟังได้ ===== */
         .sound-page { background: #000; padding: 16px; overflow-y: auto; height: 100vh; }
-        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .sound-title { font-size: 18px; font-weight: bold; }
-        .search-box {
-            width: 100%; padding: 10px 16px; border-radius: 8px; border: none;
-            background: #222; color: #fff; margin-bottom: 16px; font-size: 14px;
-        }
-        .tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 16px; }
-        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab.active { border-bottom-color: #fff; font-weight: bold; }
+        .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; }
         .sound-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #222; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; padding: 12px; background: #111; border-radius: 8px; margin-bottom: 8px;
         }
-        .sound-thumb {
-            width: 48px; height: 48px; border-radius: 6px;
-            background: linear-gradient(45deg, #4CAF50, #2196F3);
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
+        .play-btn { font-size: 20px; cursor: pointer; padding: 4px; }
         .sound-info { flex: 1; }
         .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
         .sound-desc { font-size: 12px; color: #888; }
-        .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; }
-        .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .cat-item { background: #222; padding: 12px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .select-btn {
+            background: #ff2442; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 12px; font-size: 12px; cursor: pointer;
+        }
+        .local-option {
+            display: flex; align-items: center; gap: 12px; padding: 16px; background: #1a1a2e; border-radius: 10px; margin-bottom: 12px; cursor: pointer;
+        }
+        .local-icon { font-size: 24px; }
+        .hidden-audio { display: none; }
     </style>
 </head>
 <body>
 
 <!-- ====================================== -->
-<!-- หน้า 1: หน้าหลัก — เหมือนเดิมเป๊ะ -->
+<!-- หน้า 1: หน้าหลัก -->
 <!-- ====================================== -->
 <div id="p1" class="page active">
     <div class="center-area">
-        <span class="preview-icon">🎬</span>
-        <p class="center-text">กดปุ่ม + ด้านล่างเพื่อเริ่มอัปโหลดวิดีโอ</p>
-        <p class="demo-hint">✅ ทุกอย่างทำงานแล้ว — กดปุ่มสีขาวที่มีเครื่องหมายบวกเลยครับ</p>
+        <p class="center-text">กดปุ่ม + เพื่อเลือกวิดีโอ</p>
     </div>
 
     <div class="info-left">
@@ -168,9 +162,9 @@
     <div class="nav-bottom">
         <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
-        <div class="nav-col upload-col" id="upload-trigger">
+        <div class="nav-col upload-col">
             <div class="upload-visual"></div>
-            <input type="file" id="file-input" accept="video/*,image/*">
+            <input type="file" id="video-input" accept="video/*">
             <span class="nav-label">อัปโหลด</span>
         </div>
         <div class="nav-col" style="position:relative;">
@@ -182,25 +176,24 @@
 </div>
 
 <!-- ====================================== -->
-<!-- หน้า 2: เตรียมโพสต์ — เห็นชัดเจน -->
+<!-- หน้า 2: เตรียมโพสต์ -->
 <!-- ====================================== -->
 <div id="p2" class="page">
     <div class="back-btn" onclick="goBack()">←</div>
 
-    <div id="auto-sound" class="sound-bar">
+    <div id="auto-sound-bar" class="sound-bar">
         <span>🎵</span>
-        <span id="auto-sound-name">เพลงที่เข้ากับเนื้อหา — แนะนำอัตโนมัติ</span>
-        <span class="close-sound" onclick="removeAutoSound()">×</span>
+        <span id="sound-display-name">เสียงต้นฉบับจากวิดีโอ</span>
+        <span class="close-sound" onclick="removeOriginalSound()">×</span>
     </div>
 
-    <div id="add-sound-bar" class="sound-bar hidden" onclick="goToPage('p3')">
+    <div id="add-sound-link" class="sound-bar hidden" onclick="goToPage('p3')">
         <span>🎵</span>
         <span>เพิ่มเสียง</span>
     </div>
 
-    <div class="preview-box">
-        <span class="preview-icon">📹</span>
-        <span class="preview-text" id="file-name">ชื่อไฟล์วิดีโอจะแสดงที่นี่</span>
+    <div class="video-area">
+        <video id="preview-video" controls autoplay loop muted></video>
     </div>
 
     <input type="text" class="post-input" placeholder="เขียนคำอธิบายวิดีโอ...">
@@ -208,71 +201,79 @@
 </div>
 
 <!-- ====================================== -->
-<!-- หน้า 3: เลือกเพลงเชิงพาณิชย์ — เห็นชัดเจน -->
+<!-- หน้า 3: เลือกเสียง -->
 <!-- ====================================== -->
 <div id="p3" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" onclick="goBack()">←</span>
-        <span class="sound-title">เสียงเชิงพาณิชย์</span>
+        <span class="sound-title">เลือกเสียง</span>
         <span>❓</span>
     </div>
 
-    <input type="text" class="search-box" placeholder="ค้นหาเพลง ศิลปิน">
-
-    <div class="tabs">
-        <div class="tab active" id="tab-disc" onclick="switchTab('disc')">ค้นพบ</div>
-        <div class="tab" id="tab-fav" onclick="switchTab('fav')">รายการโปรด</div>
-    </div>
-
-    <div id="list-disc">
-        <div class="section-title">แนะนำให้คุณ</div>
-        
-        <div class="sound-item" onclick="pickSound('เพลงรักที่สุด — ศิลปิน ปอนเชต์')">
-            <div class="sound-thumb">🎵</div>
-            <div class="sound-info">
-                <div class="sound-name">เพลงรักที่สุด (I Like You The Most)</div>
-                <div class="sound-desc">PONCHET · 00:41 · ใช้ได้เชิงพาณิชย์</div>
-            </div>
-            <span>☆</span>
-        </div>
-
-        <div class="sound-item" onclick="pickSound('คนเข้าใจผิด — SERIOUS BACON & PP KRIT')">
-            <div class="sound-thumb">🎤</div>
-            <div class="sound-info">
-                <div class="sound-name">คนเข้าใจผิด (My Fault)</div>
-                <div class="sound-desc">SERIOUS BACON & PP KRIT · 01:00 · ใช้ได้เชิงพาณิชย์</div>
-            </div>
-            <span>☆</span>
-        </div>
-
-        <div class="sound-item" onclick="pickSound('พลังใจ — PORZAX')">
-            <div class="sound-thumb">💪</div>
-            <div class="sound-info">
-                <div class="sound-name">พลังความพยายาม</div>
-                <div class="sound-desc">PORZAX · 01:00 · ใช้ได้เชิงพาณิชย์</div>
-            </div>
-            <span>☆</span>
-        </div>
-
-        <div class="section-title">หมวดหมู่</div>
-        <div class="cat-grid">
-            <div class="cat-item">🔥 มาใหม่</div>
-            <div class="cat-item">⭐ TikBiz</div>
-            <div class="cat-item">🎨 ศิลปินหน้าใหม่</div>
-            <div class="cat-item">🍽️ อาหาร</div>
-            <div class="cat-item">🎸 อินดี้</div>
-            <div class="cat-item">💃 เต้น</div>
+    <!-- เลือกจากเครื่องเอง -->
+    <div class="section-title">📂 เสียงในเครื่องของคุณ</div>
+    <div class="local-option" onclick="document.getElementById('audio-local-input').click()">
+        <span class="local-icon">📁</span>
+        <div class="sound-info">
+            <div class="sound-name">เลือกไฟล์เสียงจากเครื่อง</div>
+            <div class="sound-desc">MP3, WAV, OGG — ใช้เสียงของคุณเอง</div>
         </div>
     </div>
+    <input type="file" id="audio-local-input" accept="audio/*" style="display:none;">
 
-    <div id="list-fav" style="display:none;">
-        <p style="text-align:center; color:#666; padding:30px;">ยังไม่มีรายการโปรด</p>
+    <!-- เสียงเชิงพาณิชย์ — มีลิงก์จริง ฟังได้ -->
+    <div class="section-title">🎵 เสียงเชิงพาณิชย์ (ใช้ฟรีได้)</div>
+
+    <div class="sound-item">
+        <span class="play-btn" onclick="togglePlay('audio1')">▶️</span>
+        <div class="sound-info">
+            <div class="sound-name">เพลงบรรเลง — บรรยากาศสดใส</div>
+            <div class="sound-desc">เหมาะกับวิดีโอทั่วไป · ใช้ได้ฟรี</div>
+        </div>
+        <button class="select-btn" onclick="pickSound('เพลงบรรเลง — สดใส', 'audio1')">เลือก</button>
     </div>
+
+    <div class="sound-item">
+        <span class="play-btn" onclick="togglePlay('audio2')">▶️</span>
+        <div class="sound-info">
+            <div class="sound-name">จังหวะสนุก — พลังงานบวก</div>
+            <div class="sound-desc">เหมาะกับคลิปสั้น ๆ · ใช้ได้ฟรี</div>
+        </div>
+        <button class="select-btn" onclick="pickSound('จังหวะสนุก — พลังงานบวก', 'audio2')">เลือก</button>
+    </div>
+
+    <div class="sound-item">
+        <span class="play-btn" onclick="togglePlay('audio3')">▶️</span>
+        <div class="sound-info">
+            <div class="sound-name">ดนตรีผ่อนคลาย — สงบ</div>
+            <div class="sound-desc">เหมาะกับธรรมชาติ ชีวิตประจำวัน · ใช้ได้ฟรี</div>
+        </div>
+        <button class="select-btn" onclick="pickSound('ดนตรีผ่อนคลาย — สงบ', 'audio3')">เลือก</button>
+    </div>
+
+    <div class="sound-item">
+        <span class="play-btn" onclick="togglePlay('audio4')">▶️</span>
+        <div class="sound-info">
+            <div class="sound-name">จังหวะเร็ว — กระฉับกระเฉง</div>
+            <div class="sound-desc">เหมาะกับการออกกำลังกาย กิจกรรม · ใช้ได้ฟรี</div>
+        </div>
+        <button class="select-btn" onclick="pickSound('จังหวะเร็ว — กระฉับกระเฉง', 'audio4')">เลือก</button>
+    </div>
+
+    <!-- เสียงตัวอย่างจากแหล่งฟรี -->
+    <audio id="audio1" class="hidden-audio" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e634609b7.mp3?filename=upbeat-1122.mp3" preload="metadata">
+    <audio id="audio2" class="hidden-audio" src="https://cdn.pixabay.com/download/audio/2023/01/04/audio_26c4f344b3.mp3?filename=happy-ukulele-127133.mp3" preload="metadata">
+    <audio id="audio3" class="hidden-audio" src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_9220708107.mp3?filename=relaxing-ambient-122146.mp3" preload="metadata">
+    <audio id="audio4" class="hidden-audio" src="https://cdn.pixabay.com/download/audio/2023/02/14/audio_599101608f.mp3?filename=energetic-136913.mp3" preload="metadata">
+
 </div>
 
 <script>
     let history = ['p1'];
-    let chosenSound = '';
+    let selectedSoundName = '';
+    let selectedAudioId = '';
+    let videoFile = null;
+    let currentPlayingAudio = null;
 
     // เปลี่ยนหน้า
     function goToPage(id) {
@@ -289,50 +290,85 @@
         }
     }
 
-    // กดเลือกไฟล์
-    document.getElementById('file-input').addEventListener('change', function(e) {
+    // เลือกวิดีโอ
+    document.getElementById('video-input').addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            const name = e.target.files[0].name;
-            document.getElementById('file-name').textContent = name;
-            chosenSound = '';
-            // รีเซ็ตแถบเสียง
-            document.getElementById('auto-sound').classList.remove('hidden');
-            document.getElementById('add-sound-bar').classList.add('hidden');
+            videoFile = e.target.files[0];
+            const url = URL.createObjectURL(videoFile);
+            document.getElementById('preview-video').src = url;
+            // รีเซ็ตเสียง
+            selectedSoundName = '';
+            selectedAudioId = '';
+            document.getElementById('auto-sound-bar').classList.remove('hidden');
+            document.getElementById('add-sound-link').classList.add('hidden');
+            document.getElementById('sound-display-name').textContent = 'เสียงต้นฉบับจากวิดีโอ';
             goToPage('p2');
         }
     });
 
-    // กดปิดเสียงอัตโนมัติ
-    function removeAutoSound() {
-        document.getElementById('auto-sound').classList.add('hidden');
-        document.getElementById('add-sound-bar').classList.remove('hidden');
-        chosenSound = '';
+    // ลบเสียงต้นฉบับ → เปลี่ยนเป็นเพิ่มเสียง
+    function removeOriginalSound() {
+        document.getElementById('auto-sound-bar').classList.add('hidden');
+        document.getElementById('add-sound-link').classList.remove('hidden');
+        selectedSoundName = '';
+        selectedAudioId = '';
     }
 
-    // เปลี่ยนแท็บ
-    function switchTab(tab) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        document.getElementById('list-disc').style.display = tab === 'disc' ? 'block' : 'none';
-        document.getElementById('list-fav').style.display = tab === 'fav' ? 'block' : 'none';
+    // เลือกไฟล์เสียงจากเครื่อง
+    document.getElementById('audio-local-input').addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            selectedSoundName = e.target.files[0].name;
+            selectedAudioId = ''; // ไฟล์เครื่องเอง
+            goBack();
+            document.getElementById('add-sound-link').innerHTML = 
+                '<span>🎵</span><span>' + selectedSoundName + '</span><span class="close-sound" onclick="goToPage(\'p3\')">เปลี่ยน</span>';
+        }
+    });
+
+    // เล่น/หยุดเสียงตัวอย่าง
+    function togglePlay(audioId) {
+        const audio = document.getElementById(audioId);
+        // หยุดเสียงอื่นก่อน
+        if (currentPlayingAudio && currentPlayingAudio !== audio) {
+            currentPlayingAudio.pause();
+        }
+        if (audio.paused) {
+            audio.play();
+            currentPlayingAudio = audio;
+        } else {
+            audio.pause();
+            currentPlayingAudio = null;
+        }
     }
 
-    // เลือกเพลง
-    function pickSound(name) {
-        chosenSound = name;
+    // เลือกเสียง → กลับไปหน้าโพสต์
+    function pickSound(name, audioId) {
+        // หยุดเสียงที่เล่นอยู่
+        if (currentPlayingAudio) {
+            currentPlayingAudio.pause();
+            currentPlayingAudio = null;
+        }
+        selectedSoundName = name;
+        selectedAudioId = audioId;
         goBack();
-        // แสดงชื่อเพลงที่เลือก
-        document.getElementById('add-sound-bar').innerHTML = 
+        // แสดงชื่อเสียงที่เลือก
+        document.getElementById('add-sound-link').innerHTML = 
             '<span>🎵</span><span>' + name + '</span><span class="close-sound" onclick="goToPage(\'p3\')">เปลี่ยน</span>';
     }
 
     // กดโพสต์
     function doPost() {
-        const soundUsed = chosenSound || 'เสียงที่ระบบแนะนำอัตโนมัติ';
+        const soundUsed = selectedSoundName || 'เสียงต้นฉบับจากวิดีโอ';
         alert('✅ โพสต์สำเร็จ!\n🎵 เสียงที่ใช้: ' + soundUsed + '\n\nกลับไปหน้าหลักแล้วครับ');
+        // กลับหน้าหลัก
         history = ['p1'];
         goToPage('p1');
-        document.getElementById('file-input').value = '';
+        // รีเซ็ต
+        document.getElementById('video-input').value = '';
+        document.getElementById('audio-local-input').value = '';
+        videoFile = null;
+        selectedSoundName = '';
+        selectedAudioId = '';
     }
 </script>
 
