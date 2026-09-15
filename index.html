@@ -25,15 +25,16 @@
         .item-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
         .item-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.1) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.5) 100%); }
 
-        .info { position: absolute; left: 16px; right: 90px; bottom: 120px; z-index: 10; }
+        .info { position: absolute; left: 16px; right: 90px; bottom: 140px; z-index: 10; }
         .info-user { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .info-tag { background: #25f; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; }
         .info-desc { font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
         .info-price, .info-btn { display: none !important; }
 
-        .actions { position: absolute; right: 12px; bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 10; }
+        /* ✅ ปุ่มขวา — เพิ่มระยะห่าง ขยับขึ้น เห็นครบ 6 ปุ่ม! */
+        .actions { position: absolute; right: 12px; bottom: 160px; display: flex; flex-direction: column; align-items: center; gap: 28px; z-index: 10; }
         .action { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-        .action-icon { font-size: 32px; }
+        .action-icon { font-size: 30px; }
         .action-num { font-size: 11px; }
         .music-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(45deg, #00c6ff, #ff0080); display: flex; align-items: center; justify-content: center; animation: spin 3s linear infinite; font-size: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -89,10 +90,13 @@
                 <div class="info-price">฿1,990</div>
                 <button class="info-btn" onclick="event.stopPropagation(); addToCart('โซลาร์เซลล์ 600W', 1990)">🛒 ใส่ตะกร้า</button>
             </div>
+            <!-- ✅ ปุ่มด้านขวา — ครบ 6 ปุ่ม! -->
             <div class="actions">
                 <div class="action" onclick="event.stopPropagation(); toggleLike(this)"><span class="action-icon">❤️</span><span class="action-num">1.2K</span></div>
                 <div class="action" onclick="event.stopPropagation(); openPage('comments')"><span class="action-icon">💬</span><span class="action-num">65</span></div>
+                <div class="action" onclick="event.stopPropagation(); savePost(this)"><span class="action-icon">🔖</span><span class="action-num">บันทึก</span></div>
                 <div class="action" onclick="event.stopPropagation(); share()"><span class="action-icon">↗️</span><span class="action-num">แชร์</span></div>
+                <div class="action" onclick="event.stopPropagation(); openMore(this)"><span class="action-icon">⋮</span><span class="action-num">เพิ่มเติม</span></div>
                 <div class="action"><div class="music-icon">🎵</div></div>
             </div>
         </div>
@@ -185,6 +189,15 @@
 
     function toggleLike(el) {
         el.style.color = el.style.color === 'red' ? '' : 'red';
+    }
+
+    function savePost(el) {
+        el.style.color = el.style.color === 'gold' ? '' : 'gold';
+        alert('✅ บันทึกแล้ว!');
+    }
+
+    function openMore(el) {
+        alert('เมนูเพิ่มเติม: รายงาน, คัดลอกลิงก์, ไม่สนใจ...');
     }
 
     function share() {
