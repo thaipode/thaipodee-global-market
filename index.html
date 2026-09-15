@@ -11,25 +11,42 @@
             position: fixed; inset: 0; width: 100%;
         }
 
-        /* === ตรวจจับอัตโนมัติ — ไม่ต้องเลือกเอง === */
+        /* === ล็อก: วิดีโอยันขอบจอ ไม่มีขอบดำ === */
         .video-wrap {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            display: flex; align-items: center; justify-content: center;
             z-index: 1; cursor: pointer; background: #000;
+            display: flex; align-items: center; justify-content: center;
         }
         #main-media {
-            max-width: 100vw;
-            max-height: 100vh;
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* เห็นครบ ไม่ตัดขอบ ไม่ล้นจอ */
+            width: 100%; height: 100%;
+            object-fit: cover;
             object-position: center center;
             background: #000;
         }
 
+        /* === ล็อก: แถบเลื่อนจับได้ === */
+        .progress-container {
+            position: fixed; bottom: 70px; left: 12px; right: 12px; z-index: 15;
+            height: 32px; display: flex; align-items: center;
+        }
+        .progress-bar {
+            width: 100%; height: 3px; background: rgba(255,255,255,0.25);
+            border-radius: 3px; cursor: pointer; position: relative;
+        }
+        .progress-fill {
+            height: 100%; background: #fff; border-radius: 3px; width: 0%;
+            transition: width 0.1s linear;
+        }
+        .progress-dot {
+            position: absolute; right: 0; top: 50%; transform: translate(50%, -50%);
+            width: 12px; height: 12px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+
+        /* === ล็อก: เงาเพื่ออ่านข้อความชัดขึ้น === */
         .shade-bottom {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 200px;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 180px;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
             z-index: 2; pointer-events: none;
         }
 
@@ -40,44 +57,79 @@
         }
         .sound-sign.show { opacity: 1; }
 
+        /* === ล็อก: ข้อความลอยบนวิดีโอ === */
         .info-left {
-            position: fixed; left: 16px; bottom: 90px; right: 95px; z-index: 10;
+            position: fixed; left: 16px; bottom: 95px; right: 95px; z-index: 10;
         }
-        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; word-break: break-word; }
-        .desc-text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; color: #f0f0f0; word-break: break-word; }
-        .music-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .acc-name {
+            font-weight: 700; font-size: 15px; margin-bottom: 6px; word-break: break-word;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
+        .desc-text {
+            font-size: 14px; line-height: 1.5; margin-bottom: 8px; color: #f0f0f0;
+            word-break: break-word; text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
+        .music-row {
+            display: flex; align-items: center; gap: 6px; font-size: 13px; color: #eee;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
 
+        /* === ล็อก: เมนูขวาลอยบนวิดีโอ ขนาดพอดี === */
         .menu-right {
-            position: fixed; right: 10px; bottom: 115px;
-            display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10;
+            position: fixed; right: 10px; bottom: 120px;
+            display: flex; flex-direction: column; align-items: center; gap: 18px; z-index: 10;
         }
-        .menu-btn { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .avatar-box { position: relative; width: 42px; height: 42px; }
-        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
+        .menu-btn {
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+        }
+        .avatar-box { position: relative; width: 40px; height: 40px; }
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff;
+            object-fit: cover;
+        }
         .follow-plus {
             position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
             width: 18px; height: 18px; background: #ff2442; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 13px; font-weight: 700; color: #fff; line-height: 1;
         }
-        .icon { font-size: 26px; pointer-events: none; }
-        .num { font-size: 11px; pointer-events: none; color: #fff; }
+        .icon {
+            font-size: 24px; pointer-events: none;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
+        .num {
+            font-size: 11px; pointer-events: none; color: #fff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
         .music-disc {
-            width: 42px; height: 42px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             background: linear-gradient(45deg, #00c6ff, #ff0080);
             display: flex; align-items: center; justify-content: center;
-            animation: spin 3s linear infinite; font-size: 18px;
+            animation: spin 3s linear infinite; font-size: 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* === ล็อก: แถบล่างโปร่งแสง ลอยบนวิดีโอ === */
         .nav-bottom {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
-            background: #000; display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 10px 15px 20px; border-top: 1px solid #222; z-index: 99;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 68px;
+            background: rgba(0,0,0,0.72);
+            display: flex; justify-content: space-around; align-items: flex-end;
+            padding: 10px 15px 18px; border-top: 1px solid rgba(255,255,255,0.08);
+            z-index: 99;
         }
-        .nav-col { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
-        .nav-icon { font-size: 24px; pointer-events: none; }
-        .nav-label { font-size: 10px; color: #fff; pointer-events: none; }
+        .nav-col {
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+            position: relative;
+        }
+        .nav-icon {
+            font-size: 23px; pointer-events: none;
+            text-shadow: 0 0 6px rgba(0,0,0,0.9);
+        }
+        .nav-label {
+            font-size: 10px; color: #fff; pointer-events: none;
+            text-shadow: 0 0 6px rgba(0,0,0,0.9);
+        }
         .add-btn {
             width: 46px; height: 30px; background: #fff; border-radius: 8px;
             position: relative; cursor: pointer; margin-bottom: 5px;
@@ -103,11 +155,18 @@
 </head>
 <body>
 
-<!-- ไม่ต้องเลือกอะไร — เอาไฟล์เข้ามา มันจัดเอง -->
 <div class="video-wrap" id="vidWrap" onclick="toggleAudio()">
     <video id="main-media" autoplay loop muted playsinline>
         <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
     </video>
+</div>
+
+<!-- แถบเลื่อน -->
+<div class="progress-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-dot" id="progressDot"></div>
+    </div>
 </div>
 
 <div class="shade-bottom"></div>
@@ -177,15 +236,79 @@
 
 <script>
 let isMuted = true;
+const progressFill = document.getElementById('progressFill');
+const progressBar = document.getElementById('progressBar');
+let vid = document.getElementById('main-media');
 
+// === ฟังก์ชันผูกเหตุการณ์แถบเลื่อน ===
+function bindVideoEvents(videoEl) {
+    videoEl.addEventListener('timeupdate', () => {
+        if (videoEl.duration) {
+            const pct = (videoEl.currentTime / videoEl.duration) * 100;
+            progressFill.style.width = pct + '%';
+        }
+    });
+    // กดเลื่อนเวลา
+    progressBar.onclick = (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        if (videoEl.duration) {
+            videoEl.currentTime = pct * videoEl.duration;
+        }
+    };
+}
+
+// เปลี่ยนเสียง
 function toggleAudio() {
-    const vid = document.getElementById('main-media');
     const hint = document.getElementById('soundHint');
     isMuted = !isMuted;
     vid.muted = isMuted;
     hint.textContent = isMuted ? '🔇' : '🔊';
     hint.classList.add('show');
     setTimeout(() => hint.classList.remove('show'), 700);
+}
+
+bindVideoEvents(vid);
+
+// === โหลดวิดีโอที่บันทึกไว้เมื่อเปิดหน้า ===
+window.addEventListener('load', () => {
+    const savedData = localStorage.getItem('thaipodee_video_data');
+    const savedType = localStorage.getItem('thaipodee_video_type');
+    if (savedData && savedType) {
+        renderMedia(savedData, savedType);
+    }
+});
+
+// === แสดงวิดีโอ/ภาพ และบันทึกไว้ ===
+function renderMedia(dataUrl, mimeType) {
+    const wrap = document.getElementById('vidWrap');
+    if (mimeType.startsWith('video/')) {
+        wrap.innerHTML = `<video id="main-media" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;">
+            <source src="${dataUrl}" type="${mimeType}">
+        </video>`;
+        vid = document.getElementById('main-media');
+        isMuted = true;
+        bindVideoEvents(vid);
+    } else {
+        wrap.innerHTML = `<img id="main-media" src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+        progressFill.style.width = '0%';
+    }
+}
+
+// === อัปโหลดไฟล์ใหม่ → บันทึกอัตโนมัติ ===
+function doUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const dataUrl = ev.target.result;
+        // บันทึกลงเครื่อง — รีเฟรชก็ไม่หาย
+        localStorage.setItem('thaipodee_video_data', dataUrl);
+        localStorage.setItem('thaipodee_video_type', file.type);
+        // แสดงผล
+        renderMedia(dataUrl, file.type);
+    };
+    reader.readAsDataURL(file);
 }
 
 function toggleHeart(el) {
@@ -202,25 +325,6 @@ function doShare() {
     } else {
         prompt('คัดลอกลิงก์:', window.location.href);
     }
-}
-
-// === อัปโหลดแล้วจัดเองเลย ไม่ต้องสั่งอะไรเพิ่ม ===
-function doUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        const wrap = document.getElementById('vidWrap');
-        if (file.type.startsWith('video/')) {
-            wrap.innerHTML = `<video id="main-media" autoplay loop muted playsinline style="max-width:100vw; max-height:100vh; width:100%; height:100%; object-fit:contain;">
-                <source src="${ev.target.result}" type="${file.type}">
-            </video>`;
-        } else {
-            wrap.innerHTML = `<img id="main-media" src="${ev.target.result}" style="max-width:100vw; max-height:100vh; width:100%; height:100%; object-fit:contain;">`;
-        }
-        isMuted = true;
-    };
-    reader.readAsDataURL(file);
 }
 </script>
 
