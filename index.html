@@ -4,199 +4,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ThaiPodee — สลับบัญชี</title>
+    <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
 
-        /* === พื้นหลังเบลอเมื่อเมนูเปิด === */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 99;
-            display: none;
+        /* ระบบสลับหน้า — ไม่แตะโครงสร้างเดิม */
+        .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.25s ease; }
+        .page-hidden { opacity: 0; pointer-events: none; z-index: 0; }
+
+        /* ===== หน้าหลัก — กลับมาเหมือนเดิมทุกประการ ไม่มืด ===== */
+        .video-wrap {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; cursor: pointer; background: #111;
+        }
+        #main-video { width: 100%; height: 100%; object-fit: cover; background: #222; }
+
+        .info-left { position: absolute; left: 16px; bottom: 90px; right: 100px; z-index: 10; }
+        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; cursor: pointer; }
+        .desc-text { font-size: 13px; line-height: 1.4; margin-bottom: 6px; color: #fff; }
+        .music-row { font-size: 12px; color: #fff; display: flex; align-items: center; gap: 5px; }
+
+        /* เมนูขวา — ตำแหน่งเดิม เป๊ะ */
+        .menu-right {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 24px; z-index: 10; align-items: center;
+        }
+        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .avatar-box { position: relative; width: 48px; height: 48px; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #444; }
+        .follow-plus {
+            position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background: #ff2442; border-radius: 50%;
+            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        .icon { font-size: 28px; }
+        .num { font-size: 12px; }
+        .music-disc {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(45deg, #00c6ff, #ff0080);
+            display: flex; align-items: center; justify-content: center;
+            animation: spin 3s linear infinite; font-size: 18px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* แถบล่าง — เหมือนเดิมทุกประการ */
+        .nav-bottom {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+            display: flex; justify-content: space-around; align-items: flex-end;
+            padding: 10px 15px 15px; z-index: 20; background: transparent;
+        }
+        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; }
+        .nav-add {
+            width: 50px; height: 34px; background: #fff; border-radius: 8px;
+            position: relative; margin-bottom: 4px;
+        }
+        .nav-add::before {
+            content: ''; position: absolute; width: 20px; height: 2px; background: #000;
+            top: 16px; left: 15px;
+        }
+        .nav-add::after {
+            content: ''; position: absolute; width: 2px; height: 20px; background: #000;
+            left: 24px; top: 7px;
+        }
+        .badge {
+            position: absolute; top: -2px; right: -8px;
+            background: #ff2442; color: #fff; font-size: 10px;
+            min-width: 16px; height: 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* === กล่องสลับบัญชี === */
+        /* ===== หน้าโปรไฟล์ — เพิ่มแยกส่วน ไม่แตะหน้าหลัก ===== */
+        .profile-page {
+            background: #000; padding: 60px 20px 90px; overflow-y: auto;
+        }
+        .back-btn {
+            position: absolute; top: 15px; left: 15px;
+            background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; z-index: 10;
+        }
+        .profile-header { text-align: center; margin-top: 20px; }
+        .profile-avatar {
+            width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 12px; background: #444;
+        }
+        .profile-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .profile-username { color: #888; font-size: 14px; margin-bottom: 16px; }
+        .profile-stats {
+            display: flex; justify-content: center; gap: 30px; margin-bottom: 20px;
+        }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 18px; font-weight: 700; }
+        .stat-label { font-size: 11px; color: #888; }
+
+        /* ปุ่มสลับบัญชี — อยู่เฉพาะหน้าโปรไฟล์ */
+        .switcher-btn {
+            background: #2c2c2e; border: none; color: #fff;
+            padding: 12px 16px; border-radius: 10px; font-size: 14px;
+            cursor: pointer; width: 100%; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .switcher-btn::after { content: '›'; font-size: 18px; color: #888; }
+
+        /* กล่องสลับบัญชี — แยกส่วน ไม่กระทบหน้าอื่น */
+        .overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 50; display: none;
+        }
         .account-switcher {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #1c1c1e;
-            border-radius: 20px 20px 0 0;
-            z-index: 100;
-            transform: translateY(100%);
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1c1c1e; border-radius: 20px 20px 0 0;
+            z-index: 51; transform: translateY(100%);
             transition: transform 0.3s ease;
             padding: 20px 16px 30px;
         }
-        .account-switcher.open {
-            transform: translateY(0);
+        .account-switcher.open { transform: translateY(0); }
+        .switcher-title { text-align: center; font-size: 17px; font-weight: 600; margin-bottom: 20px; }
+        .close-switcher {
+            position: absolute; top: 20px; right: 16px;
+            font-size: 22px; color: #888; background: none; border: none; cursor: pointer;
         }
-
-        .switcher-header {
-            text-align: center;
-            position: relative;
-            margin-bottom: 24px;
-        }
-        .switcher-title {
-            font-size: 17px;
-            font-weight: 600;
-        }
-        .close-btn {
-            position: absolute;
-            right: 0; top: 50%; transform: translateY(-50%);
-            font-size: 22px;
-            color: #888;
-            background: none; border: none; cursor: pointer;
-        }
-
-        /* === รายการบัญชี === */
         .account-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 12px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
+            display: flex; align-items: center; padding: 14px 12px;
+            border-radius: 12px; margin-bottom: 8px; cursor: pointer;
         }
-        .account-item:hover, .account-item.active {
-            background: #2c2c2e;
+        .account-item:hover, .account-item.active { background: #2c2c2e; }
+        .acc-avatar {
+            width: 44px; height: 44px; border-radius: 50%; background: #444;
+            margin-right: 12px; overflow: hidden;
         }
-        .account-avatar {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: #333; margin-right: 12px;
-            overflow: hidden; flex-shrink: 0;
-        }
-        .account-avatar img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .account-info {
-            flex: 1;
-        }
-        .account-name {
-            font-size: 15px; font-weight: 500;
-        }
-        .account-check {
-            color: #00f080; font-size: 20px; font-weight: bold;
-        }
-        .badge {
-            background: #ff2442; color: #fff; font-size: 11px;
-            padding: 2px 6px; border-radius: 10px;
-            margin-left: 8px;
-        }
-        .add-account {
-            margin-top: 8px;
-        }
+        .acc-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .acc-name { flex: 1; font-size: 15px; }
+        .acc-check { color: #00f080; font-size: 20px; font-weight: bold; }
+        .add-acc { margin-top: 8px; }
         .add-icon {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: #2c2c2e; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: #888; margin-right: 12px; flex-shrink: 0;
+            width: 44px; height: 44px; border-radius: 50%; background: #2c2c2e;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #888; margin-right: 12px;
         }
-
-        /* === ปุ่มเปิดเมนู === */
-        .open-switcher-btn {
-            position: fixed;
-            top: 12px; left: 12px;
-            background: #2c2c2e; border: none; color: #fff;
-            padding: 8px 12px; border-radius: 8px;
-            font-size: 14px; cursor: pointer;
-            z-index: 50;
+        .badge-notif {
+            background: #ff2442; color: #fff; font-size: 11px;
+            padding: 2px 6px; border-radius: 10px; margin-left: 8px;
         }
     </style>
 </head>
 <body>
 
-<!-- ปุ่มเปิดสลับบัญชี -->
-<button class="open-switcher-btn" onclick="openSwitcher()">สลับบัญชี</button>
+<!-- ===== หน้าหลัก — กลับมาทำงานปกติ ไม่มืดแน่นอน ===== -->
+<div class="page active" id="homePage">
+    <div class="video-wrap" onclick="toggleAudio()">
+        <video id="main-video" autoplay loop muted playsinline>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+        </video>
+    </div>
 
-<!-- พื้นหลังปิดได้ -->
+    <div class="info-left">
+        <div class="acc-name" onclick="goProfile()">@ThaiPodee_Official</div>
+        <div class="desc-text">ยินดีต้อนรับสู่ ThaiPodee Global Market — แพลตฟอร์มของคนไทย ✨</div>
+        <div class="music-row">🎵 เสียงต้นฉบับ • ThaiPodee Original</div>
+    </div>
+
+    <div class="menu-right">
+        <div class="menu-btn" onclick="goProfile()">
+            <div class="avatar-box">
+                <img class="avatar" src="https://picsum.photos/seed/thaipodee/100/100" alt="โปรไฟล์">
+                <span class="follow-plus">+</span>
+            </div>
+        </div>
+        <div class="menu-btn" onclick="toggleLike()">
+            <span class="icon" id="likeIcon">🤍</span>
+            <span class="num">0</span>
+        </div>
+        <div class="menu-btn">
+            <span class="icon">💬</span>
+            <span class="num">0</span>
+        </div>
+        <div class="menu-btn">
+            <span class="icon">⭐</span>
+            <span class="num">บันทึก</span>
+        </div>
+        <div class="menu-btn">
+            <span class="icon">➡️</span>
+            <span class="num">แชร์</span>
+        </div>
+        <div class="menu-btn">
+            <div class="music-disc">🎵</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== หน้าโปรไฟล์ — แยกส่วน ไม่แตะหน้าหลัก ===== -->
+<div class="page page-hidden profile-page" id="profilePage">
+    <button class="back-btn" onclick="goHome()">←</button>
+
+    <div class="profile-header">
+        <img class="profile-avatar" src="https://picsum.photos/seed/thaipodee/100/100" alt="โปรไฟล์">
+        <h2 class="profile-name">ThaiPodee Global Market</h2>
+        <p class="profile-username">@ThaiPodee_Official</p>
+        <div class="profile-stats">
+            <div class="stat-item"><div class="stat-num">3,271</div><div class="stat-label">กำลังติดตาม</div></div>
+            <div class="stat-item"><div class="stat-num">1,237</div><div class="stat-label">ผู้ติดตาม</div></div>
+            <div class="stat-item"><div class="stat-num">2,742</div><div class="stat-label">ถูกใจ</div></div>
+        </div>
+    </div>
+
+    <button class="switcher-btn" onclick="openSwitcher()">สลับบัญชี</button>
+
+    <p style="color:#aaa; font-size:13px; line-height:1.5;">บริการที่ปรึกษาบริหารโครงการ จัดทำ ออกแบบ เขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรทุกชนิด</p>
+</div>
+
+<!-- ===== แถบเมนูล่าง — เหมือนเดิมทุกประการ ===== -->
+<div class="nav-bottom">
+    <div class="nav-col" onclick="goHome()">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าหลัก</span>
+    </div>
+    <div class="nav-col">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">ค้นหา</span>
+    </div>
+    <div class="nav-col">
+        <div class="nav-add"></div>
+        <span class="nav-label">อัปโหลด</span>
+    </div>
+    <div class="nav-col">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">ข้อความ</span>
+        <span class="badge">99+</span>
+    </div>
+    <div class="nav-col" onclick="goProfile()">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
+    </div>
+</div>
+
+<!-- ===== กล่องสลับบัญชี — แยกอิสระ ไม่กระทบหน้าอื่น ===== -->
 <div class="overlay" id="overlay" onclick="closeSwitcher()"></div>
-
-<!-- กล่องสลับบัญชี -->
 <div class="account-switcher" id="switcher">
-    <div class="switcher-header">
-        <div class="switcher-title">สลับบัญชี</div>
-        <button class="close-btn" onclick="closeSwitcher()">×</button>
-    </div>
+    <button class="close-switcher" onclick="closeSwitcher()">×</button>
+    <div class="switcher-title">สลับบัญชี</div>
 
-    <!-- บัญชีที่ใช้อยู่ -->
-    <div class="account-item active" data-account="main" onclick="selectAccount(this)">
-        <div class="account-avatar">
-            <img src="https://picsum.photos/seed/thaipodee-logo/100/100">
-        </div>
-        <div class="account-info">
-            <div class="account-name">podee.office.cancel</div>
-        </div>
-        <div class="account-check">✓</div>
+    <div class="account-item active" data-acc="main" onclick="selectAcc(this)">
+        <div class="acc-avatar"><img src="https://picsum.photos/seed/thaipodee/100/100" alt=""></div>
+        <div class="acc-name">podee.office.cancel</div>
+        <div class="acc-check">✓</div>
     </div>
-
-    <!-- บัญชีที่ 2 -->
-    <div class="account-item" data-account="music" onclick="selectAccount(this)">
-        <div class="account-avatar">
-            <img src="https://picsum.photos/seed/thaipodee-music/100/100">
-        </div>
-        <div class="account-info">
-            <div class="account-name">thaipodee.music.band <span class="badge">9+</span></div>
-        </div>
+    <div class="account-item" data-acc="music" onclick="selectAcc(this)">
+        <div class="acc-avatar"><img src="https://picsum.photos/seed/music/100/100" alt=""></div>
+        <div class="acc-name">thaipodee.music.band <span class="badge-notif">9+</span></div>
         <div></div>
     </div>
-
-    <!-- บัญชีที่ 3 -->
-    <div class="account-item" data-account="kom" onclick="selectAccount(this)">
-        <div class="account-avatar">
-            <img src="https://picsum.photos/seed/kompodee/100/100">
-        </div>
-        <div class="account-info">
-            <div class="account-name">kompodee <span class="badge">9+</span></div>
-        </div>
+    <div class="account-item" data-acc="kom" onclick="selectAcc(this)">
+        <div class="acc-avatar"><img src="https://picsum.photos/seed/kom/100/100" alt=""></div>
+        <div class="acc-name">kompodee <span class="badge-notif">9+</span></div>
         <div></div>
     </div>
-
-    <!-- เพิ่มบัญชีใหม่ -->
-    <div class="account-item add-account" onclick="addNewAccount()">
+    <div class="account-item add-acc" onclick="addNewAcc()">
         <div class="add-icon">+</div>
-        <div class="account-info">
-            <div class="account-name" style="color:#888;">เพิ่มบัญชี</div>
-        </div>
+        <div class="acc-name" style="color:#888;">เพิ่มบัญชี</div>
         <div></div>
     </div>
 </div>
 
 <script>
+// สลับหน้า — ไม่แตะโค้ดส่วนอื่น
+function goHome() {
+    document.getElementById('homePage').classList.remove('page-hidden');
+    document.getElementById('profilePage').classList.add('page-hidden');
+}
+function goProfile() {
+    document.getElementById('homePage').classList.add('page-hidden');
+    document.getElementById('profilePage').classList.remove('page-hidden');
+}
+function toggleAudio() {
+    const vid = document.getElementById('main-video');
+    vid.muted = !vid.muted;
+}
+function toggleLike() {
+    const icon = document.getElementById('likeIcon');
+    icon.textContent = icon.textContent === '❤️' ? '🤍' : '❤️';
+}
 function openSwitcher() {
     document.getElementById('overlay').style.display = 'block';
     document.getElementById('switcher').classList.add('open');
 }
-
 function closeSwitcher() {
     document.getElementById('overlay').style.display = 'none';
     document.getElementById('switcher').classList.remove('open');
 }
-
-function selectAccount(item) {
-    // ลบถูกจากทุกอัน
+function selectAcc(item) {
     document.querySelectorAll('.account-item').forEach(el => {
         el.classList.remove('active');
-        const check = el.querySelector('.account-check');
+        const check = el.querySelector('.acc-check');
         if (check) check.remove();
     });
-    // ใส่ถูกให้อันที่เลือก
     item.classList.add('active');
-    const checkMark = document.createElement('div');
-    checkMark.className = 'account-check';
-    checkMark.textContent = '✓';
-    item.appendChild(checkMark);
-
-    const accountName = item.querySelector('.account-name').textContent.split(' ')[0];
-    alert('สลับไปใช้บัญชี: ' + accountName);
+    const check = document.createElement('div');
+    check.className = 'acc-check';
+    check.textContent = '✓';
+    item.appendChild(check);
     closeSwitcher();
 }
-
-function addNewAccount() {
-    alert('เปิดฟอร์มเพิ่ม/เข้าสู่ระบบบัญชีใหม่');
+function addNewAcc() {
+    alert('เพิ่มบัญชีใหม่');
 }
 </script>
-
 </body>
 </html>
