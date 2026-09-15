@@ -49,7 +49,7 @@
         }
 
         /* ==============================================
-           ✅ จอวิดีโอ/ภาพ อยู่ตรงกลางทุกครั้ง
+           ✅ จอวิดีโอ/ภาพ อยู่ตรงกลางแบบยืดหยุ่น
            ============================================== */
         .media-container {
             position: fixed;
@@ -59,14 +59,15 @@
             overflow: hidden;
             z-index: 1;
 
-            /* ✅ บังคับให้เนื้อหาอยู่ตรงกลาง */
+            /* ✅ ตรงกลางแนวนอน + ปรับแนวตั้งอัตโนมัติ */
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            padding-top: 0;
         }
 
         #main-media {
-            /* ✅ ย่อขยายพอดีจอ อัตโนมัติ ทั้งแนวตั้งและแนวนอน */
+            /* ✅ ขยายเต็มพื้นที่ แต่ไม่ตัดภาพ */
             width: 100%;
             height: 100%;
             max-width: 100vw;
@@ -91,11 +92,12 @@
 
         /* 🔊 ปุ่มเปิด/ปิดเสียง */
         .sound-btn {
-            position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
+            position: fixed; right: 16px; top: 50%;
+            transform: translateY(-50%);
             width: 44px; height: 44px;
             background: rgba(0,0,0,.5); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; z-index: 15; cursor: pointer;
+            font-size: 22px; z-index: 15; cursor:: pointer;
             border: 2px solid #fff;
         }
 
@@ -104,12 +106,12 @@
             position: fixed; bottom: 140px; left: 16px; right: 80px;
             font-size: 14px;
             font-weight: 500; color: #fff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,.9);
+            text-shadow: 11px 1px 3px rgba(0,00,0,.9);
             z-index: 9; line-height: 1.5;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s;
         }
 
-        /* ===== กลุ่มชื่อผู้ใช้ ===== */
+        /* ===== กลุ่มชื่อผ用户 ===== */
         .user-info {
             position: fixed; left: 16px; right: 100px; bottom: 85px;
             z-index: 10;
@@ -164,7 +166,9 @@
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 99;
             display: flex; justify-content: space-around; align-items: center;
             padding: 8px 0 25px; background: #000;
-            border-top: 1px solid #222; height: 60px;
+            border-top: 1px solid #222;
+            height: 60px;
+            /*<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>จอภาพหลักและวิดีโอให้แ<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>*/
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
@@ -198,131 +202,4 @@
 <!-- ===== SPLASH ===== -->
 <div id="splash">
     <div class="splash-logo">ท</div>
-    <div class="splash-title">ThaiPodee</div>
-    <div class="splash-sub">Global Market Online</div>
-</div>
-
-<!-- ===== แถบขนาดจอ ===== -->
-<div class="screen-size-label" id="screenSizeLabel">ขนาดจอ: กำลังตรวจสอบ...</div>
-
-<!-- ===== จอวิดีโอ/ภาพ อยู่ตรงกลางทุกครั้ง ===== -->
-<div class="media-container">
-    <img id="main-media" src="https://picsum.photos/seed/rockstage/720/1280" alt="ภาพ/วิดีโอ">
-</div>
-<div class="overlay"></div>
-
-<!-- 🔊 ปุ่มเสียง -->
-<div class="sound-btn" id="soundToggle" onclick="toggleSound()">🔇</div>
-
-<!-- ===== ชื่อวิดีโอ/บริษัท ===== -->
-<div class="text-overlay" id="videoTitle">
-    บริษัท ไทยโพดี โปรดักส์ เอ็นจิเนียริ่ง จำกัด<br>
-    THAIPODEE PRODUCT ENGINEERING CO.,LTD.<br>
-    ผู้อำนวยการสร้าง / Producer
-</div>
-
-<!-- ===== ชื่อผู้ใช้ ===== -->
-<div class="user-info">
-    <div class="username" id="uploaderName">Bob Dominator</div>
-    <div class="caption" id="videoDesc">«Viking Gods» by Bob Dominator is available now on all streaming platforms...</div>
-    <div class="ai-tag">ประกอบด้วยสื่อที่สร้างด้วย AI</div>
-</div>
-
-<!-- ===== เมนูด้านขวา ===== -->
-<div class="right-menu">
-    <div class="menu-item" onclick="alert('เปิดหน้าโปรไฟล์ผู้ใช้')">
-        <div class="avatar-wrap">
-            <img class="avatar" src="https://picsum.photos/seed/user-avatar/100/100" alt="โปรไฟล์">
-            <span class="plus-btn" onclick="event.stopPropagation(); alert('ติดตามผู้ใช้นี้')">+</span>
-        </div>
-    </div>
-    <div class="menu-item" onclick="toggleLike(this)"><span class="icon">❤️</span><span class="count">425</span></div>
-    <div class="menu-item" onclick="alert('เปิดกล่องคอมเมนต์')"><span class="icon">💬</span><span class="count">8</span></div>
-    <div class="menu-item" onclick="shareContent()"><span class="icon">➡️</span><span class="count">22</span></div>
-    <div class="menu-item" onclick="toggleBookmark(this)"><span class="icon">⭐</span><span class="count">บันทึก</span></div>
-    <div class="menu-item" onclick="alert('เปิดเพลงประกอบ')"><div class="music-icon">🎵</div><span class="count" style="font-size:10px; margin-top:2px;">11</span></div>
-</div>
-
-<!-- ===== เมนูด้านล่าง ===== -->
-<div class="bottom-nav">
-    <div class="nav-item" onclick="alert('กลับไปหน้าหลัก')"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
-    <div class="nav-item" onclick="alert('เปิดร้านค้า')"><span class="nav-icon">🛒</span><span class="nav-label">ร้านค้า</span><span class="nav-badge">99+</span></div>
-    <div class="nav-item" onclick="document.getElementById('file-upload').click()">
-        <div class="nav-add"></div>
-        <input type="file" id="file-upload" accept="video/*,image/*" onchange="handleUpload(event)">
-    </div>
-    <div class="nav-item" onclick="alert('เปิดข้อความ')"><span class="nav-icon">💬</span><span class="nav-label">คล้องข้อความ</span><span class="nav-badge">99+</span></div>
-    <div class="nav-item" onclick="alert('เข้าโปรไฟล์')"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
-</div>
-
-<script>
-    // Splash
-    setTimeout(() => document.getElementById('splash').classList.add('fade-out'), 1500);
-
-    // ขนาดจอ
-    function updateScreenSizeLabel() {
-        const w = window.innerWidth, h = window.innerHeight;
-        const ratio = h / w;
-        let label = ratio > 1.7 ? 'แนวตั้ง 9:16' : ratio > 0.65 ? 'แนวนอน 16:9' : 'แนวนอนกว้าง';
-        document.getElementById('screenSizeLabel').textContent = `ขนาดจอ: ${label} | ${Math.round(w)}×${Math.round(h)}`;
-    }
-    window.addEventListener('resize', updateScreenSizeLabel);
-    updateScreenSizeLabel();
-
-    // เสียง
-    let soundOn = false;
-    function toggleSound() {
-        const media = document.getElementById('main-media'), btn = document.getElementById('soundToggle');
-        if (media.tagName.toLowerCase() === 'video') {
-            soundOn = !soundOn; media.muted = !soundOn;
-            btn.textContent = soundOn ? '🔊' : '🔇';
-            if (soundOn) media.play().catch(e => {});
-        }
-    }
-
-    // ปุ่มต่างๆ
-    function toggleLike(el) { el.style.color = el.style.color === 'red' ? '' : 'red'; }
-    function toggleBookmark(el) { el.style.color = el.style.color === 'gold' ? '' : 'gold'; }
-    function shareContent() {
-        if (navigator.share) navigator.share({title:'ThaiPodee Global Market', url:window.location.href});
-        else prompt('คัดลอกลิงก์:', window.location.href);
-    }
-
-    // อัปโหลด + เปลี่ยนชื่อ + จออยู่ตรงกลาง
-    function handleUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const titleEl = document.getElementById('videoTitle');
-        titleEl.style.opacity = '0';
-
-        setTimeout(() => {
-            let fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
-            titleEl.innerHTML = fileName;
-            titleEl.style.opacity = '1';
-            document.getElementById('videoDesc').textContent = 'อัปโหลดเมื่อ: ' + new Date().toLocaleString('th-TH');
-        }, 250);
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const container = document.querySelector('.media-container');
-            const btn = document.getElementById('soundToggle');
-
-            if (file.type.startsWith('video/')) {
-                container.innerHTML = `
-                    <video id="main-media" autoplay loop muted playsinline webkit-playsinline style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center center;background:#000;">
-                        <source src="${event.target.result}" type="${file.type}">
-                    </video>`;
-                soundOn = true; btn.textContent = '🔊'; btn.style.display = 'flex';
-            } else {
-                container.innerHTML = `
-                    <img id="main-media" src="${event.target.result}" style="width:100%;height:100%;max-width:100vw;max-height:100vh;object-fit:contain;object-position:center center;background:#000;">`;
-                btn.style.display = 'none';
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-</script>
-
-</body>
-</html>
+    <div class="splash-title">ThaiPodee</<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>
