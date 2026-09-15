@@ -12,7 +12,7 @@
         .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.25s ease; }
         .page-hidden { opacity: 0; pointer-events: none; z-index: 0; }
 
-        /* ===== วิดีโอ — แสดงแถบควบคุม กดหยุด/เล่นได้ ===== */
+        /* ===== วิดีโอ — ควบคุมภาพ+เสียงพร้อมกัน ===== */
         .video-wrap {
             position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -23,7 +23,6 @@
             object-fit: contain;
             background: #000;
             display: none;
-            /* แสดงแถบควบคุม กดหยุดได้ ปกติ */
         }
         #main-image {
             max-width: 100%; max-height: 100%;
@@ -182,8 +181,8 @@
 <!-- ===== หน้าหลัก — Master ===== -->
 <div class="page active" id="homePage">
     <div class="video-wrap" id="videoWrap">
-        <!-- ✅ เพิ่ม controls — แสดงแถบเลื่อนเวลา กดหยุดได้ -->
-        <video id="main-video" autoplay loop muted playsinline webkit-playsinline controls style="display:none;">
+        <!-- ✅ ไม่ใช้ muted → เสียงทำงานตลอด ควบคุมทั้งภาพ+เสียง -->
+        <video id="main-video" loop playsinline webkit-playsinline controls style="display:none;">
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
         </video>
         <img id="main-image" style="display:none;">
@@ -320,12 +319,22 @@ let uploadedUrl = null;
 let uploadedType = null;
 
 const mainVideo = document.getElementById('main-video');
+let isFirstPlay = true;
 
-// ===== เล่นวนซ้ำเมื่อจบ — ทำงานร่วมกับ loop =====
+// ===== เล่นวนซ้ำเมื่อจบ — ควบคุมภาพ+เสียงไปพร้อมกัน =====
 mainVideo.addEventListener('ended', function() {
-    this.currentTime = 0; // กลับจุดเริ่มต้น
-    this.play(); // เล่นต่อทันที
+    this.currentTime = 0;
+    this.play().catch(e => console.log('เล่นวนซ้ำ:', e));
 });
+
+// ===== ปลดล็อกเสียงเมื่อกดเล่นครั้งแรก =====
+document.addEventListener('click', function unlockAudio() {
+    if (isFirstPlay && mainVideo.paused) {
+        mainVideo.muted = false;
+        mainVideo.play().catch(e => console.log('ปลดล็อกเสียง:', e));
+        isFirstPlay = false;
+    }
+}, { once: true });
 
 // ===== สลับหน้า =====
 function goHome() {
@@ -379,7 +388,7 @@ function handleFileSelect(e) {
     }
 }
 
-// ===== โพสต์ — แสดงและเล่นวนซ้ำทันที =====
+// ===== โพสต์ — แสดงและเล่นพร้อมเสียง =====
 function publishPost() {
     if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
 
@@ -404,7 +413,8 @@ function closeAlertAndGoHome() {
     if (uploadedType === 'video') {
         mainVideoEl.src = uploadedUrl;
         mainVideoEl.style.display = 'block';
-        mainVideoEl.play().catch(() => {});
+        mainVideoEl.muted = false; // เปิดเสียง
+        mainVideoEl.play().catch(e => console.log('เล่นวิดีโอ:', e));
         mainImageEl.style.display = 'none';
     } else if (uploadedType === 'image') {
         mainImageEl.src = uploadedUrl;
