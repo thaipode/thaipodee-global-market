@@ -7,19 +7,12 @@
     <title>ThaiPodee Global Market — Master</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html, body { 
-            height: 100vh; 
-            overflow: hidden; 
-            background: #000; 
-            color: #fff;
-            position: fixed;
-            width: 100%;
-        }
+        html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
 
         .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.25s ease; }
         .page-hidden { opacity: 0; pointer-events: none; z-index: -1; }
 
-        /* ===== พื้นที่แสดงวิดีโอ — เต็มจอ ไม่มีขอบตัด ===== */
+        /* ===== พื้นที่วิดีโอ — เต็มจอ ไม่ตัดส่วนล่าง ===== */
         .video-wrap {
             position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -27,15 +20,13 @@
             overflow: hidden;
         }
         #main-video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* ไม่ตัดภาพ เต็มจอพอดี */
+            width: 100%; height: 100%;
+            object-fit: contain;
             background: #000;
             display: none;
         }
         #main-image {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: contain;
             display: none;
         }
@@ -43,326 +34,152 @@
             color: #888; text-align: center; padding: 20px;
         }
 
-        /* ===== ข้อมูลซ้ายล่าง — ลอยเหนือวิดีโอ ===== */
-        .info-left { 
-            position: absolute; 
-            left: 16px; 
-            bottom: 90px; /* เว้นระยะไม่ให้ทับแถบควบคุมวิดีโอ */
-            right: 90px; 
-            z-index: 10; 
-            pointer-events: none; 
+        /* ===== ข้อมูลซ้ายล่าง — เว้นระยะไม่ทับอะไร ===== */
+        .info-left {
+            position: absolute; left: 16px; bottom: 75px; right: 90px;
+            z-index: 10; pointer-events: none;
         }
-        .acc-name { 
-            font-weight: 700; 
-            font-size: 15px; 
-            margin-bottom: 4px; 
-            cursor: pointer; 
-            pointer-events: auto; 
+        .acc-name {
+            font-weight: 700; font-size: 15px; margin-bottom: 4px;
+            cursor: pointer; pointer-events: auto;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
-        .desc-text { 
-            font-size: 13px; 
-            line-height: 1.4; 
-            margin-bottom: 4px; 
+        .desc-text {
+            font-size: 13px; line-height: 1.4; margin-bottom: 4px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
-        .music-row { 
-            font-size: 11px; 
-            color: #ddd; 
-            display: flex; 
-            align-items: center; 
-            gap: 4px;
+        .music-row {
+            font-size: 11px; color: #ddd; display: flex; align-items: center; gap: 4px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
-        /* ===== เมนูด้านขวา — ลอย ไม่มีพื้นหลัง ===== */
+        /* ===== เมนูด้านขวา ===== */
         .menu-right {
-            position: absolute; 
-            right: 12px; 
-            top: 50%; 
-            transform: translateY(-50%);
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            z-index: 10; 
-            align-items: center;
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 20px; z-index: 10; align-items: center;
         }
-        .menu-btn { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 2px; 
-            cursor: pointer; 
+        .menu-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
         }
-        .avatar-box { 
-            position: relative; 
-            width: 44px; 
-            height: 44px; 
-        }
-        .avatar { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            border: 2px solid #fff; 
-            object-fit: cover; 
-            background: #444; 
+        .avatar-box { position: relative; width: 44px; height: 44px; }
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff;
+            object-fit: cover; background: #444;
         }
         .follow-plus {
-            position: absolute; 
-            bottom: -4px; 
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 18px; 
-            height: 18px; 
-            background: #ff2442; 
-            border-radius: 50%;
-            font-size: 12px; 
-            font-weight: bold; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+            position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+            width: 18px; height: 18px; background: #ff2442; border-radius: 50%;
+            font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center;
         }
-        .icon { 
-            font-size: 26px; 
-            line-height: 1; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-        .num { 
-            font-size: 11px; 
-            margin-top: 2px; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
+        .icon { font-size: 26px; line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .num { font-size: 11px; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .music-disc {
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             background: linear-gradient(45deg, #00c6ff, #ff0080);
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            animation: spin 3s linear infinite; 
-            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            animation: spin 3s linear infinite; font-size: 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== เมนูด้านล่าง — ลอย ไม่มีแถบสีดำพื้นหลัง ===== */
+        /* ===== เมนูล่าง — ลอย ไม่มีแถบดำ พื้นโปร่งใส ===== */
         .nav-bottom {
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            height: 60px; /* สูงพอดี ไม่ทับแถบควบคุมวิดีโอ */
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center;
-            padding: 0 10px 8px;
-            z-index: 10;
-            /* ❌ ไม่มีพื้นหลังสีดำ — ลอยอย่างเดียว */
-            background: transparent;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0 10px 10px;
+            z-index: 20; /* ✅ อยู่บนสุด ไม่ถูกบัง */
+            background: transparent; /* ❌ ไม่มีพื้นสีดำ */
         }
-        .nav-col { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 2px; 
-            cursor: pointer; 
-            position: relative; 
+        .nav-col {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; position: relative;
         }
-        .nav-icon { 
-            font-size: 22px; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-        .nav-label { 
-            font-size: 10px; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
+        .nav-icon { font-size: 22px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .nav-label { font-size: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .upload-btn-box {
-            width: 44px; 
-            height: 30px; 
-            background: #fff; 
-            border-radius: 6px;
-            position: relative; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+            width: 44px; height: 30px; background: #fff; border-radius: 6px;
+            position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .upload-btn-box::before {
-            content: ''; 
-            position: absolute; 
-            width: 18px; 
-            height: 2px; 
-            background: #000;
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%);
+            content: ''; position: absolute; width: 18px; height: 2px; background: #000;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
         .upload-btn-box::after {
-            content: ''; 
-            position: absolute; 
-            width: 2px; 
-            height: 18px; 
-            background: #000;
-            left: 50%; 
-            top: 50%; 
-            transform: translate(-50%, -50%);
+            content: ''; position: absolute; width: 2px; height: 18px; background: #000;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
         .badge {
-            position: absolute; 
-            top: -2px; 
-            right: -6px;
-            background: #ff2442; 
-            color: #fff; 
-            font-size: 9px;
-            min-width: 14px; 
-            height: 14px; 
-            border-radius: 50%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+            position: absolute; top: -2px; right: -6px;
+            background: #ff2442; color: #fff; font-size: 9px;
+            min-width: 14px; height: 14px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
 
         /* ===== หน้าอัปโหลด ===== */
         .upload-page {
-            background: #000;
-            padding: 50px 16px 90px;
-            overflow-y: auto;
-            min-height: 100vh;
+            background: #000; padding: 50px 16px 90px; overflow-y: auto; min-height: 100vh;
         }
         .back-btn {
-            position: absolute; 
-            top: 12px; 
-            left: 12px;
-            background: none; 
-            border: none; 
-            color: #fff; 
-            font-size: 20px; 
-            cursor: pointer; 
-            z-index: 20;
+            position: absolute; top: 12px; left: 12px;
+            background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; z-index: 20;
         }
-        .upload-title { 
-            text-align: center; 
-            font-size: 18px; 
-            margin: 10px 0 20px; 
-        }
+        .upload-title { text-align: center; font-size: 18px; margin: 10px 0 20px; }
         .select-file-btn {
-            width: 100%; 
-            padding: 14px; 
-            background: #2c2c2e; 
-            border: none;
-            color: #fff; 
-            border-radius: 10px; 
-            font-size: 15px; 
-            cursor: pointer;
+            width: 100%; padding: 14px; background: #2c2c2e; border: none;
+            color: #fff; border-radius: 10px; font-size: 15px; cursor: pointer;
         }
         .upload-preview {
-            width: 100%; 
-            max-height: 400px; 
-            background: #111;
-            border-radius: 12px; 
-            margin: 20px 0; 
-            overflow: hidden;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+            width: 100%; max-height: 400px; background: #111;
+            border-radius: 12px; margin: 20px 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
         .upload-preview video, .upload-preview img {
-            max-width: 100%; 
-            max-height: 400px; 
-            object-fit: contain;
+            max-width: 100%; max-height: 400px; object-fit: contain;
         }
         .form-group { margin-bottom: 16px; }
-        .form-label { 
-            font-size: 13px; 
-            color: #888; 
-            margin-bottom: 6px; 
-            display: block; 
-        }
+        .form-label { font-size: 13px; color: #888; margin-bottom: 6px; display: block; }
         .form-input {
-            width: 100%; 
-            padding: 12px 14px; 
-            border-radius: 10px; 
-            border: none;
-            background: #2c2c2e; 
-            color: #fff; 
-            font-size: 15px;
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: none;
+            background: #2c2c2e; color: #fff; font-size: 15px;
         }
         .post-btn {
-            width: 100%; 
-            padding: 14px; 
-            background: #ff2442; 
-            border: none;
-            color: #fff; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            font-weight: 600;
-            cursor: pointer; 
-            margin-top: 10px;
+            width: 100%; padding: 14px; background: #ff2442; border: none;
+            color: #fff; border-radius: 10px; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px;
         }
         .post-btn:active { background: #d61e38; }
         .hidden-input { display: none; }
 
-        /* ===== กล่องแจ้งเตือน ===== */
+        /* ===== แจ้งเตือนสำเร็จ ===== */
         .success-alert {
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.75);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 100;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center; z-index: 100;
         }
         .success-alert.hidden { display: none; }
         .alert-box {
-            background: #1c1c1e; 
-            padding: 30px 25px; 
-            border-radius: 14px; 
-            width: 85%; 
-            max-width: 320px;
+            background: #1c1c1e; padding: 30px 25px; border-radius: 14px; width: 85%; max-width: 320px;
             text-align: center;
         }
         .alert-icon { font-size: 40px; margin-bottom: 10px; }
         .alert-text { font-size: 17px; font-weight: 600; margin-bottom: 20px; }
         .alert-ok {
-            background: #ff2442; 
-            border: none; 
-            color: #fff; 
-            padding: 10px 30px;
-            border-radius: 8px; 
-            font-size: 15px; 
-            cursor: pointer;
+            background: #ff2442; border: none; color: #fff; padding: 10px 30px;
+            border-radius: 8px; font-size: 15px; cursor: pointer;
         }
 
         /* ===== หน้าโปรไฟล์ ===== */
         .profile-page {
-            background: #000; 
-            padding: 50px 16px 90px; 
-            overflow-y: auto; 
-            min-height: 100vh;
+            background: #000; padding: 50px 16px 90px; overflow-y: auto; min-height: 100vh;
         }
         .profile-header { text-align: center; margin-top: 10px; }
         .avatar-edit-wrap { position: relative; display: inline-block; cursor: pointer; }
         .profile-avatar {
-            width: 80px; 
-            height: 80px; 
-            border-radius: 50%; 
-            border: 3px solid #fff; 
-            margin-bottom: 12px;
-            object-fit: cover; 
-            background: #444;
+            width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 12px;
+            object-fit: cover; background: #444;
         }
         .avatar-edit-icon {
-            position: absolute; 
-            bottom: 5px; 
-            right: 5px;
-            background: #ff2442; 
-            border-radius: 50%; 
-            width: 22px; 
-            height: 22px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 13px;
+            position: absolute; bottom: 5px; right: 5px;
+            background: #ff2442; border-radius: 50%; width: 22px; height: 22px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
             pointer-events: none;
         }
         .profile-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
@@ -372,14 +189,8 @@
         .stat-num { font-size: 17px; font-weight: 700; }
         .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
         .edit-btn {
-            background: #2c2c2e; 
-            border: none; 
-            color: #fff; 
-            padding: 11px 20px;
-            border-radius: 8px; 
-            font-size: 14px; 
-            width: 100%; 
-            margin-bottom: 12px;
+            background: #2c2c2e; border: none; color: #fff; padding: 11px 20px;
+            border-radius: 8px; font-size: 14px; width: 100%; margin-bottom: 12px;
             cursor: pointer;
         }
         .edit-section { display: none; margin-top: 12px; }
@@ -388,10 +199,10 @@
 </head>
 <body>
 
-<!-- ===== หน้าหลัก ===== -->
+<!-- ===== หน้าหลัก — เมนูกลับมาครบ ไม่มีแถบดำ ===== -->
 <div class="page active" id="homePage">
     <div class="video-wrap" id="videoWrap">
-        <video id="main-video" loop playsinline webkit-playsinline style="display:none;">
+        <video id="main-video" loop playsinline webkit-playsinline controls style="display:none;">
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
         </video>
         <img id="main-image" style="display:none;" alt="">
@@ -423,7 +234,7 @@
         <div class="menu-btn"><div class="music-disc">🎵</div></div>
     </div>
 
-    <!-- ===== เมนูล่าง — ลอย ไม่มีพื้นหลัง ===== -->
+    <!-- ✅ เมนูล่าง — กลับมาครบ ลอย ไม่มีแถบดำ -->
     <div class="nav-bottom">
         <div class="nav-col" onclick="goHome()">
             <span class="nav-icon">🏠</span>
@@ -513,7 +324,7 @@
     </div>
 </div>
 
-<!-- ===== กล่องแจ้งเตือน ===== -->
+<!-- ===== แจ้งเตือนสำเร็จ ===== -->
 <div class="success-alert hidden" id="successAlert">
     <div class="alert-box">
         <div class="alert-icon">✅</div>
