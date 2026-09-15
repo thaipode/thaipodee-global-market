@@ -53,33 +53,34 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== แถบล่าง + ปุ่มอัปโหลด ===== */
+        /* ===== แถบล่าง — แก้ไม่ให้ซ้อนกัน ===== */
         .nav-bottom {
             position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
-            display: flex; justify-content: space-around; align-items: flex-end;
+            display: flex; justify-content: space-around; align-items: center;
             padding: 8px 10px 12px; z-index: 20; background: transparent;
         }
-        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative; }
         .nav-icon { font-size: 20px; }
         .nav-label { font-size: 10px; }
 
-        /* ===== ปุ่มอัปโหลดตรงกลาง ===== */
-        .upload-center {
-            position: relative; width: 42px; height: 28px;
-            background: #fff; border-radius: 6px;
-            cursor: pointer; overflow: hidden;
+        /* ===== ปุ่มอัปโหลด — แยกชัดเจน ไม่ซ้อนกัน ===== */
+        .upload-btn-wrap {
+            position: relative; display: flex; flex-direction: column; align-items: center;
         }
-        .upload-center::before {
+        .upload-btn-box {
+            width: 42px; height: 28px; background: #fff; border-radius: 6px;
+            position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .upload-btn-box::before {
             content: ''; position: absolute; width: 16px; height: 2px; background: #000;
-            top: 13px; left: 13px;
+            top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: -4px;
         }
-        .upload-center::after {
+        .upload-btn-box::after {
             content: ''; position: absolute; width: 2px; height: 16px; background: #000;
-            left: 20px; top: 6px;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
-        #file-input {
-            position: absolute; inset: 0; opacity: 0; cursor: pointer;
-            width: 100%; height: 100%;
+        #file-input-hidden {
+            position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;
         }
         .badge {
             position: absolute; top: -2px; right: -6px;
@@ -183,42 +184,35 @@
     </div>
 </div>
 
-<!-- ===== หน้าอัปโหลด — ทำงานจริง ===== -->
+<!-- ===== หน้าอัปโหลด ===== -->
 <div class="page page-hidden upload-page" id="uploadPage">
     <button class="back-btn" onclick="goHome()">←</button>
     <div style="text-align:center; margin-top:40px;">
         <h3 style="font-size:18px; margin-bottom:20px;">อัปโหลดวิดีโอ / รูปภาพ</h3>
 
-        <!-- ปุ่มเลือกไฟล์ -->
-        <div style="margin-bottom:20px;">
-            <button class="post-btn" style="background:#2c2c2e;" onclick="document.getElementById('upload-input').click()">
-                📂 เลือกไฟล์จากมือถือ
-            </button>
-            <input type="file" id="upload-input" accept="video/*,image/*" style="display:none;" onchange="handleFileSelect(event)">
-        </div>
+        <button class="post-btn" style="background:#2c2c2e;" onclick="document.getElementById('upload-input-main').click()">
+            📂 เลือกไฟล์จากมือถือ
+        </button>
+        <input type="file" id="upload-input-main" accept="video/*,image/*" style="display:none;" onchange="handleFileSelect(event)">
 
-        <!-- ตัวอย่างไฟล์ที่เลือก -->
         <div class="upload-preview" id="preview-area" style="display:none;">
             <video id="preview-video" controls style="display:none;"></video>
             <img id="preview-img" style="display:none;">
         </div>
 
-        <!-- เลือกอัตราส่วน -->
         <div class="form-group" id="ratio-group" style="display:none;">
-            <label class="form-label">เลือกอัตราส่วนการแสดง</label>
+            <label class="form-label">เลือกอัตราส่วน</label>
             <div class="aspect-ratio">
-                <button class="ratio-btn active" data-ratio="9:16" onclick="setRatio('9:16', this)">9:16 (แนวตั้ง)</button>
-                <button class="ratio-btn" data-ratio="16:9" onclick="setRatio('16:9', this)">16:9 (แนวนอน)</button>
+                <button class="ratio-btn active" onclick="setRatio('9:16', this)">9:16 แนวตั้ง</button>
+                <button class="ratio-btn" onclick="setRatio('16:9', this)">16:9 แนวนอน</button>
             </div>
         </div>
 
-        <!-- คำอธิบาย -->
         <div class="form-group" id="desc-group" style="display:none;">
-            <label class="form-label">คำอธิบาย / ข้อความ</label>
+            <label class="form-label">คำอธิบาย</label>
             <input class="form-input" id="post-desc" placeholder="เขียนคำอธิบาย...">
         </div>
 
-        <!-- ปุ่มโพสต์ -->
         <button class="post-btn" id="post-btn" style="display:none;" onclick="publishPost()">📤 โพสต์เผยแพร่</button>
     </div>
 </div>
@@ -242,23 +236,22 @@
         <div class="edit-section" id="editNameSec">
             <div class="form-group">
                 <label class="form-label">ชื่อที่แสดง</label>
-                <input class="form-input" id="inputName" placeholder="ใส่ชื่อโปรไฟล์...">
+                <input class="form-input" id="inputName" placeholder="ใส่ชื่อ...">
             </div>
-            <button class="post-btn" style="background:#ff2442;" onclick="saveName()">บันทึกชื่อ</button>
+            <button class="post-btn" onclick="saveName()">บันทึก</button>
         </div>
         <button class="edit-btn" onclick="toggleEditUser()">แก้ไขชื่อผู้ใช้</button>
         <div class="edit-section" id="editUserSec">
             <div class="form-group">
-                <label class="form-label">ชื่อผู้ใช้ (ไม่ต้องใส่ @)</label>
+                <label class="form-label">ชื่อผู้ใช้</label>
                 <input class="form-input" id="inputUser" placeholder="thaipodee_new">
             </div>
-            <button class="post-btn" style="background:#ff2442;" onclick="saveUser()">บันทึกชื่อผู้ใช้</button>
+            <button class="post-btn" onclick="saveUser()">บันทึก</button>
         </div>
-        <button class="edit-btn" onclick="changeAvatar()">เปลี่ยนรูปโปรไฟล์</button>
     </div>
 </div>
 
-<!-- ===== แถบเมนูล่าง — ปุ่มกลางกดได้เลย ===== -->
+<!-- ===== แถบล่าง — ปุ่มกลางไม่ซ้อนกันแล้ว ===== -->
 <div class="nav-bottom">
     <div class="nav-col" onclick="goHome()">
         <span class="nav-icon">🏠</span>
@@ -268,9 +261,9 @@
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-col" onclick="goUpload()">
-        <div class="upload-center">
-            <input type="file" accept="video/*,image/*" onchange="handleFileSelect(event)">
+    <div class="nav-col upload-btn-wrap" onclick="goUpload()">
+        <div class="upload-btn-box">
+            <input type="file" id="file-input-hidden" accept="video/*,image/*" onchange="handleFileSelect(event)">
         </div>
         <span class="nav-label">อัปโหลด</span>
     </div>
@@ -286,11 +279,9 @@
 </div>
 
 <script>
-// ===== ตัวแปรกลาง =====
 let selectedFile = null;
 let selectedRatio = '9:16';
 
-// ===== สลับหน้า =====
 function goHome() {
     document.getElementById('homePage').classList.remove('page-hidden');
     document.getElementById('uploadPage').classList.add('page-hidden');
@@ -308,13 +299,11 @@ function goProfile() {
     document.getElementById('profilePage').classList.remove('page-hidden');
 }
 
-// ===== วิดีโอ =====
 function toggleAudio() {
     const v = document.getElementById('main-video');
     v.muted = !v.muted;
 }
 
-// ===== กดถูกใจ =====
 let liked = false, cnt = 0;
 function toggleLike() {
     liked = !liked;
@@ -323,123 +312,82 @@ function toggleLike() {
     document.getElementById('likeCount').textContent = cnt;
 }
 
-// ===== เลือกไฟล์วิดีโอ/รูป =====
 function handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
     selectedFile = file;
-
-    // เปลี่ยนไปหน้าอัปโหลด
     goUpload();
 
     const previewArea = document.getElementById('preview-area');
     const previewVideo = document.getElementById('preview-video');
     const previewImg = document.getElementById('preview-img');
-    const ratioGroup = document.getElementById('ratio-group');
-    const descGroup = document.getElementById('desc-group');
-    const postBtn = document.getElementById('post-btn');
 
     previewArea.style.display = 'flex';
-    ratioGroup.style.display = 'block';
-    descGroup.style.display = 'block';
-    postBtn.style.display = 'block';
+    document.getElementById('ratio-group').style.display = 'block';
+    document.getElementById('desc-group').style.display = 'block';
+    document.getElementById('post-btn').style.display = 'block';
 
-    // ตรวจชนิดไฟล์
     if (file.type.startsWith('video/')) {
         previewVideo.style.display = 'block';
         previewImg.style.display = 'none';
         previewVideo.src = URL.createObjectURL(file);
-        previewVideo.play();
-    } else if (file.type.startsWith('image/')) {
+    } else {
         previewImg.style.display = 'block';
         previewVideo.style.display = 'none';
         previewImg.src = URL.createObjectURL(file);
     }
-
-    // ตรวจอัตราส่วนอัตโนมัติ
-    setTimeout(() => {
-        let w, h;
-        if (file.type.startsWith('video/')) {
-            w = previewVideo.videoWidth;
-            h = previewVideo.videoHeight;
-        } else {
-            w = previewImg.naturalWidth;
-            h = previewImg.naturalHeight;
-        }
-        if (h > w) {
-            setRatio('9:16', null);
-        } else {
-            setRatio('16:9', null);
-        }
-    }, 500);
 }
 
-// ===== เลือกอัตราส่วน =====
-function setRatio(ratio, btnEl) {
+function setRatio(ratio, el) {
     selectedRatio = ratio;
-    if (btnEl) {
-        document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-        btnEl.classList.add('active');
-    }
+    document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
 }
 
-// ===== โพสต์เผยแพร่ =====
 function publishPost() {
-    if (!selectedFile) {
-        alert('กรุณาเลือกไฟล์ก่อนครับ');
-        return;
-    }
-    const desc = document.getElementById('post-desc').value.trim() || 'วิดีโอใหม่จาก ThaiPodee ✨';
-
-    // แจ้งสำเร็จ
-    alert('✅ โพสต์สำเร็จ!\n\n📝 คำอธิบาย: ' + desc + '\n📐 อัตราส่วน: ' + selectedRatio + '\n\n*ไฟล์จะแสดงที่หน้าหลักทันที*');
-
-    // กลับหน้าหลัก + รีเซ็ต
+    if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
+    alert('✅ โพสต์สำเร็จ!');
     goHome();
 }
 
-// ===== รีเซ็ตฟอร์ม =====
 function resetUploadForm() {
     selectedFile = null;
-    selectedRatio = '9:16';
     document.getElementById('preview-area').style.display = 'none';
     document.getElementById('ratio-group').style.display = 'none';
     document.getElementById('desc-group').style.display = 'none';
     document.getElementById('post-btn').style.display = 'none';
     document.getElementById('post-desc').value = '';
-    document.querySelectorAll('.ratio-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
 }
 
-// ===== แก้ไขชื่อ/ผู้ใช้/รูป =====
 function toggleEditName() {
     document.getElementById('editNameSec').classList.toggle('show');
     document.getElementById('editUserSec').classList.remove('show');
 }
 function saveName() {
-    const val = document.getElementById('inputName').value.trim();
-    if (!val) { alert('กรุณาใส่ชื่อ'); return; }
-    document.getElementById('dispName').textContent = val;
+    const v = document.getElementById('inputName').value.trim();
+    if (!v) { alert('กรุณาใส่ชื่อ'); return; }
+    document.getElementById('dispName').textContent = v;
     document.getElementById('editNameSec').classList.remove('show');
-    alert('✅ บันทึกชื่อเรียบร้อย');
+    alert('✅ บันทึกแล้ว');
 }
 function toggleEditUser() {
     document.getElementById('editUserSec').classList.toggle('show');
     document.getElementById('editNameSec').classList.remove('show');
 }
 function saveUser() {
-    let val = document.getElementById('inputUser').value.trim().replace(/^@/, '');
-    if (!val) { alert('กรุณาใส่ชื่อผู้ใช้'); return; }
-    document.getElementById('dispUser').textContent = '@' + val;
+    let v = document.getElementById('inputUser').value.trim().replace(/^@/, '');
+    if (!v) { alert('กรุณาใส่ชื่อผู้ใช้'); return; }
+    document.getElementById('dispUser').textContent = '@' + v;
     document.getElementById('editUserSec').classList.remove('show');
-    alert('✅ บันทึกชื่อผู้ใช้เรียบร้อย');
+    alert('✅ บันทึกแล้ว');
 }
-let avatarSeed = 1;
+let seed = 1;
 function changeAvatar() {
-    avatarSeed++;
-    const newSrc = 'https://picsum.photos/seed/user' + avatarSeed + '/100/100';
-    document.getElementById('profileAvatar').src = newSrc;
-    document.getElementById('homeAvatar').src = newSrc;
-    alert('✅ เปลี่ยนรูปโปรไฟล์เรียบร้อย');
+    seed++;
+    const src = 'https://picsum.photos/seed/u' + seed + '/100/100';
+    document.getElementById('profileAvatar').src = src;
+    document.getElementById('homeAvatar').src = src;
+    alert('✅ เปลี่ยนรูปแล้ว');
 }
 </script>
 </body>
