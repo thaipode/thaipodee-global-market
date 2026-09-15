@@ -13,8 +13,11 @@
         .page.active { display: block; }
 
         /* ===== หน้าหลัก ===== */
-        .center-area { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .center-area { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
         .center-text { color: #777; font-size: 14px; text-align: center; }
+
+        .video-container { position: absolute; inset: 0; background: #000; z-index: 1; }
+        .video-container video { width: 100%; height: 100%; object-fit: contain; }
 
         .info-left { position: absolute; left: 16px; bottom: 80px; right: 90px; z-index: 10; }
         .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
@@ -75,25 +78,32 @@
         .hidden-input { display: none; }
         .local-selected-list { margin-top: 12px; }
         .free-badge { display: inline-block; background: #10b981; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+        .success-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 30px 40px; border-radius: 12px; z-index: 100; text-align: center; display: none; }
+        .success-msg.show { display: block; }
     </style>
 </head>
 <body>
 
 <!-- ====================================== -->
-<!-- หน้า 1: หน้าหลัก -->
+<!-- หน้า 1: หน้าหลัก -- แก้ให้แสดงวิดีโอที่โพสต์ -->
 <!-- ====================================== -->
 <div id="p1" class="page active">
-    <div class="center-area">
+    <!-- พื้นที่แสดงวิดีโอ -->
+    <div class="video-container" id="posted-video-container" style="display:none;">
+        <video id="posted-video" autoplay loop muted playsinline></video>
+    </div>
+    
+    <div class="center-area" id="p1-welcome">
         <p class="center-text">กดปุ่ม + เพื่อเลือกวิดีโอ</p>
     </div>
 
-    <div class="info-left">
+    <div class="info-left" id="p1-info" style="display:none;">
         <div class="acc-name">@ThaiPodee_Master ✨</div>
-        <div class="desc-text">ยินดีต้อนรับสู่ ThaiPodee</div>
-        <div class="music-row">🎵 เสียงต้นฉบับจากวิดีโอ</div>
+        <div class="desc-text" id="p1-caption"></div>
+        <div class="music-row" id="p1-music"></div>
     </div>
 
-    <div class="menu-right">
+    <div class="menu-right" id="p1-menu" style="display:none;">
         <div class="menu-btn"><div class="avatar-box"><img class="avatar" src="https://picsum.photos/seed/tp2026/100/100" alt="โปรไฟล์"><span class="follow-plus">+</span></div></div>
         <div class="menu-btn"><span class="icon">🤍</span><span class="num">0</span></div>
         <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
@@ -134,15 +144,15 @@
     </div>
 
     <div class="video-area">
-        <video id="preview-video" controls autoplay loop muted></video>
+        <video id="preview-video" controls autoplay loop muted playsinline></video>
     </div>
 
-    <input type="text" class="post-input" placeholder="เขียนคำอธิบายวิดีโอ...">
+    <input type="text" id="caption-input" class="post-input" placeholder="เขียนคำอธิบายวิดีโอ...">
     <button class="post-btn" onclick="doPost()">โพสต์</button>
 </div>
 
 <!-- ====================================== -->
-<!-- หน้า 3: เลือกเสียง — ฟรีลิขสิทธิ์ ฟังได้จริง -->
+<!-- หน้า 3: เลือกเสียง -- ฟรีลิขสิทธิ์ ฟังได้จริง -->
 <!-- ====================================== -->
 <div id="p3" class="page sound-page">
     <div class="sound-header">
@@ -220,11 +230,19 @@
 
 </div>
 
+<!-- ข้อความแจ้งสำเร็จ -->
+<div id="success-overlay" class="success-msg">
+    <div style="font-size:40px;">✅</div>
+    <div style="font-size:18px; font-weight:bold; margin:10px 0;">โพสต์สำเร็จ!</div>
+    <div style="font-size:13px; color:#aaa;">กำลังแสดงวิดีโอ...</div>
+</div>
+
 <script>
     let history = ['p1'];
     let chosenSoundName = '';
     let currentPlayingId = null;
     let localAudioUrl = null;
+    let videoObjectUrl = null; // เก็บลิงก์วิดีโอไว้ไม่ให้หาย
 
     function goToPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -236,9 +254,14 @@
         if (history.length > 1) { history.pop(); goToPage(history[history.length - 1]); }
     }
 
+    // เลือกวิดีโอ
     document.getElementById('video-input').addEventListener('change', e => {
         if (e.target.files.length > 0) {
-            document.getElementById('preview-video').src = URL.createObjectURL(e.target.files[0]);
+            // เคลียร์เก่า
+            if (videoObjectUrl) URL.revokeObjectURL(videoObjectUrl);
+            // สร้างใหม่ เก็บไว้
+            videoObjectUrl = URL.createObjectURL(e.target.files[0]);
+            document.getElementById('preview-video').src = videoObjectUrl;
             chosenSoundName = '';
             if (localAudioUrl) URL.revokeObjectURL(localAudioUrl);
             localAudioUrl = null;
@@ -286,7 +309,7 @@
         if (audio.paused) {
             audio.play()
                 .then(() => { btn.textContent = '⏸'; btn.classList.add('playing'); currentPlayingId = 'local'; })
-                .catch(() => alert('🔊 ไม่สามารถเล่นเสียงได้ ลองเลือกไฟล์อื่น'));
+                .catch(() => alert('🔊 ไม่สามารถเล่นเสียงได้ แต่เลือกใช้ได้เลยครับ'));
         } else {
             audio.pause(); btn.textContent = '▶'; btn.classList.remove('playing'); currentPlayingId = null;
         }
@@ -299,31 +322,22 @@
         goToPage('p2');
     }
 
-    // ===== ฟังเสียงฟรีลิขสิทธิ์ =====
+    // ฟังเสียงฟรีลิขสิทธิ์
     function togglePlay(id) {
         const audio = document.getElementById(id);
         const btn = document.getElementById('play-' + id);
         if (!audio || !btn) return;
-
         stopAllPlaying();
-
         if (audio.paused) {
             btn.textContent = '⏳';
             audio.play()
-                .then(() => {
-                    btn.textContent = '⏸';
-                    btn.classList.add('playing');
-                    currentPlayingId = id;
-                })
+                .then(() => { btn.textContent = '⏸'; btn.classList.add('playing'); currentPlayingId = id; })
                 .catch(() => {
                     btn.textContent = '▶';
-                    alert('🔊 ไม่สามารถเล่นได้ · แต่ยังเลือกใช้ได้เลยครับ');
+                    alert('🔊 ไม่สามารถฟังได้ชั่วคราว · แต่กดเลือกใช้ได้เลยครับ');
                 });
         } else {
-            audio.pause();
-            btn.textContent = '▶';
-            btn.classList.remove('playing');
-            currentPlayingId = null;
+            audio.pause(); btn.textContent = '▶'; btn.classList.remove('playing'); currentPlayingId = null;
         }
     }
 
@@ -350,16 +364,42 @@
         goToPage('p2');
     }
 
+    // ===== โพสต์ -- แก้ให้วิดีโอไม่หาย =====
     function doPost() {
+        const caption = document.getElementById('caption-input').value || 'ยินดีต้อนรับสู่ ThaiPodee';
         const finalSound = chosenSoundName || 'เสียงต้นฉบับจากวิดีโอ';
-        alert('✅ โพสต์สำเร็จ!\n🎵 เสียงที่ใช้: ' + finalSound);
-        history = ['p1']; goToPage('p1');
-        document.getElementById('video-input').value = '';
-        document.getElementById('audio-local-input').value = '';
-        document.getElementById('local-sound-list').innerHTML = '';
-        chosenSoundName = '';
-        if (localAudioUrl) URL.revokeObjectURL(localAudioUrl);
-        localAudioUrl = null;
+
+        // แสดงข้อความสำเร็จ
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.add('show');
+
+        // แสดงวิดีโอที่โพสต์บนหน้าหลัก
+        setTimeout(() => {
+            // ซ่อนข้อความต้อนรับ
+            document.getElementById('p1-welcome').style.display = 'none';
+            // แสดงวิดีโอ
+            document.getElementById('posted-video-container').style.display = 'block';
+            document.getElementById('posted-video').src = videoObjectUrl;
+            // แสดงข้อมูล
+            document.getElementById('p1-info').style.display = 'block';
+            document.getElementById('p1-menu').style.display = 'block';
+            document.getElementById('p1-caption').textContent = caption;
+            document.getElementById('p1-music').innerHTML = '🎵 ' + finalSound;
+
+            // กลับหน้าหลัก
+            history = ['p1'];
+            goToPage('p1');
+
+            // ซ่อนข้อความแจ้งเตือน
+            setTimeout(() => { overlay.classList.remove('show'); }, 1500);
+
+            // เคลียร์ช่องกรอก เตรียมโพสต์ต่อไป
+            document.getElementById('caption-input').value = '';
+            document.getElementById('audio-local-input').value = '';
+            document.getElementById('local-sound-list').innerHTML = '';
+            chosenSoundName = '';
+            // ไม่ลบ videoObjectUrl ทันที — ให้แสดงผลก่อน
+        }, 800);
     }
 </script>
 
