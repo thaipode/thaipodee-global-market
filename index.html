@@ -9,42 +9,28 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; position: fixed; inset: 0; width: 100%; }
 
-        .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
-        .page-hidden { display: none; }
-
-        /* === วิดีโออยู่ตรงกลาง — เว้นที่ล่างเยอะ === */
+        /* === วิดีโอ — อยู่ตรงกลาง ขยับขึ้น === */
         .video-wrap {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 200px;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 220px;
             display: flex; align-items: center; justify-content: center;
             background: #000; overflow: hidden;
         }
         #main-video {
             width: 100%; height: 100%; object-fit: cover;
-        }
-
-        .progress-bar {
-            position: absolute; bottom: 200px; left: 12px; right: 12px; height: 2px;
-            background: rgba(255,255,255,0.2); border-radius: 2px; z-index: 15; cursor: pointer;
-        }
-        .progress-fill { height: 100%; background: #fff; border-radius: 2px; width: 0%; }
-
-        .shade-bottom {
-            position: absolute; bottom: 200px; left: 0; right: 0; height: 120px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-            z-index: 2; pointer-events: none;
+            background: #111;
         }
 
         /* === ข้อมูลซ้าย — ขยับขึ้น === */
         .info-left {
-            position: absolute; left: 16px; bottom: 215px; right: 90px; z-index: 10;
+            position: absolute; left: 16px; bottom: 235px; right: 90px; z-index: 10;
         }
-        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; cursor: pointer; }
+        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
         .desc-text { font-size: 13px; line-height: 1.4; margin-bottom: 6px; color: #eee; }
-        .music-row { font-size: 12px; color: #ddd; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .music-row { font-size: 12px; color: #ddd; display: flex; align-items: center; gap: 5px; }
 
         /* === เมนูขวา — ขยับขึ้น === */
         .menu-right {
-            position: absolute; right: 10px; bottom: 215px;
+            position: absolute; right: 10px; bottom: 235px;
             display: flex; flex-direction: column; gap: 20px; z-index: 10;
         }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
@@ -69,7 +55,7 @@
         .nav-bottom {
             position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
             background: #000; display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 8px 10px 15px; border-top: 1px solid #222; z-index: 50;
+            padding: 8px 10px 15px; border-top: 1px solid #222; z-index: 999;
         }
         .nav-col { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
         .nav-icon { font-size: 22px; }
@@ -92,87 +78,56 @@
             min-width: 14px; height: 14px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
-
-        /* ซ่อนไฟล์*/
-        #file-input { display: none; }
     </style>
 </head>
 <body>
 
-<!-- ===== หน้าวิดีโอหลัก ===== -->
-<div class="page video-page" id="videoPage">
-    <div class="video-wrap" onclick="toggleAudio()">
-        <video id="main-video" autoplay loop muted playsinline>
-            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
-        </video>
+<!-- วิดีโอ -->
+<div class="video-wrap" onclick="toggleAudio()">
+    <video id="main-video" autoplay loop muted playsinline>
+        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+    </video>
+</div>
+
+<!-- ข้อมูลซ้าย -->
+<div class="info-left">
+    <div class="acc-name">@ThaiPodee_Official</div>
+    <div class="desc-text">ยินดีต้อนรับสู่ ThaiPodee Global Market — แพลตฟอร์มของคนไทย ✨</div>
+    <div class="music-row">🎵 เสียงต้นฉบับ • ThaiPodee Original</div>
+</div>
+
+<!-- เมนูขวา -->
+<div class="menu-right">
+    <div class="menu-btn">
+        <div class="avatar-box">
+            <img class="avatar" src="https://picsum.photos/seed/thaipodee/100/100">
+            <span class="follow-plus">+</span>
+        </div>
     </div>
-
-    <div class="progress-bar" onclick="seekVideo(event)">
-        <div class="progress-fill" id="progressFill"></div>
+    <div class="menu-btn" onclick="toggleLike()">
+        <span class="icon" id="likeIcon">🤍</span>
+        <span class="num">0</span>
     </div>
-
-    <div class="shade-bottom"></div>
-
-    <div class="info-left">
-        <div class="acc-name" onclick="openProfile()">@ThaiPodee_Official</div>
-        <div class="desc-text">ยินดีต้อนรับสู่ ThaiPodee Global Market — แพลตฟอร์มของคนไทย ✨</div>
-        <div class="music-row">🎵 เสียงต้นฉบับ • ThaiPodee Original</div>
+    <div class="menu-btn">
+        <span class="icon">💬</span>
+        <span class="num">0</span>
     </div>
-
-    <div class="menu-right">
-        <div class="menu-btn" onclick="openProfile()">
-            <div class="avatar-box">
-                <img class="avatar" src="https://picsum.photos/seed/thaipodee/100/100">
-                <span class="follow-plus" onclick="event.stopPropagation();">+</span>
-            </div>
-        </div>
-        <div class="menu-btn" onclick="toggleLike()">
-            <span class="icon" id="likeIcon">❤️</span>
-            <span class="num" id="likeCount">0</span>
-        </div>
-        <div class="menu-btn">
-            <span class="icon">💬</span>
-            <span class="num">0</span>
-        </div>
-        <div class="menu-btn">
-            <span class="icon">⭐</span>
-            <span class="num">บันทึก</span>
-        </div>
-        <div class="menu-btn">
-            <span class="icon">➡️</span>
-            <span class="num">แชร์</span>
-        </div>
-        <div class="menu-btn">
-            <div class="music-disc">🎵</div>
-        </div>
+    <div class="menu-btn">
+        <span class="icon">⭐</span>
+        <span class="num">บันทึก</span>
+    </div>
+    <div class="menu-btn">
+        <span class="icon">➡️</span>
+        <span class="num">แชร์</span>
+    </div>
+    <div class="menu-btn">
+        <div class="music-disc">🎵</div>
     </div>
 </div>
 
-<!-- ===== หน้าโปรไฟล์ ===== -->
-<div class="page page-hidden" id="profilePage">
-    <button style="position:absolute; top:15px; left:15px; background:none; border:none; color:#fff; font-size:22px; cursor:pointer;" onclick="closeProfile()">←</button>
-    <div style="padding:60px 20px; text-align:center; color:#fff;">
-        <img style="width:90px; height:90px; border-radius:50%; border:3px solid #fff;" src="https://picsum.photos/seed/thaipodee/100/100">
-        <h3 style="margin:10px 0 5px;">ThaiPodee Global Market</h3>
-        <p style="color:#aaa; font-size:14px;">@ThaiPodee_Official</p>
-        <p style="margin-top:15px; font-size:13px; color:#ddd;">แพลตฟอร์มสำหรับคนไทย — แชร์ ขาย สร้างรายได้</p>
-    </div>
-</div>
-
-<!-- ===== หน้าอัปโหลด ===== -->
-<div class="page page-hidden" id="uploadPage">
-    <button style="position:absolute; top:15px; left:15px; background:none; border:none; color:#fff; font-size:22px; cursor:pointer;" onclick="closeUpload()">←</button>
-    <div style="padding:60px 20px; text-align:center;">
-        <h3 style="margin-bottom:20px;">อัปโหลด / ถ่ายภาพ</h3>
-        <p style="color:#aaa; font-size:13px; margin-bottom:20px;">กดเลือกไฟล์เพื่ออัปโหลดวิดีโอหรือรูปภาพ</p>
-        <input type="file" id="file-input" accept="video/*,image/*">
-        <button style="width:100%; padding:14px; background:#00f080; color:#000; border:none; border-radius:8px; font-size:16px; font-weight:bold; margin-top:20px; cursor:pointer;" onclick="alert('อัปโหลดสำเร็จ!')">เผยแพร่</button>
-    </div>
-</div>
-
-<!-- ===== แถบล่าง — ครบ 5 ปุ่ม ===== -->
+<!-- แถบล่าง — ต้องโผล่ตรงนี้! -->
 <div class="nav-bottom">
-    <div class="nav-col" onclick="showPage('video')">
+    <div class="nav-col">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">หน้าหลัก</span>
     </div>
@@ -180,7 +135,7 @@
         <span class="nav-icon">🔍</span>
         <span class="nav-label">ค้นหา</span>
     </div>
-    <div class="nav-col" onclick="showPage('upload')">
+    <div class="nav-col">
         <div class="nav-add"></div>
         <span class="nav-label">อัปโหลด</span>
     </div>
@@ -189,46 +144,20 @@
         <span class="nav-label">ข้อความ</span>
         <span class="badge">99+</span>
     </div>
-    <div class="nav-col" onclick="showPage('profile')">
+    <div class="nav-col">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-function showPage(name) {
-    ['videoPage','profilePage','uploadPage'].forEach(id => {
-        document.getElementById(id).classList.toggle('page-hidden', id !== `${name}Page`);
-    });
-}
-function openProfile() { showPage('profile'); }
-function closeProfile() { showPage('video'); }
-function closeUpload() { showPage('video'); }
-
 function toggleAudio() {
     const vid = document.getElementById('main-video');
     vid.muted = !vid.muted;
 }
-function seekVideo(e) {
-    const bar = e.currentTarget;
-    const rect = bar.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    const vid = document.getElementById('main-video');
-    if (vid.duration) vid.currentTime = pct * vid.duration;
-}
-setInterval(() => {
-    const vid = document.getElementById('main-video');
-    if (vid.duration) {
-        document.getElementById('progressFill').style.width = (vid.currentTime / vid.duration * 100) + '%';
-    }
-}, 200);
-
 function toggleLike() {
     const icon = document.getElementById('likeIcon');
-    const count = document.getElementById('likeCount');
-    const isLiked = icon.style.color === 'red';
-    icon.style.color = isLiked ? '' : '#ff2442';
-    count.textContent = isLiked ? '0' : '1';
+    icon.textContent = icon.textContent === '❤️' ? '🤍' : '❤️';
 }
 </script>
 
