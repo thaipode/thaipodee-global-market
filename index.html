@@ -59,9 +59,29 @@
         }
 
         /* ==============================================
-           วิดีโอ — เต็มจอพอดี ไม่ล้นจอ ทุกยี่ห้อ!
+           แถบแสดงขนาดจอ — บนสุดสุด
            ============================================== */
-        .video-container {
+        .screen-size-label {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: rgba(0,0,0,.75);
+            color: #00ff00;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            letter-spacing: 1px;
+        }
+
+        /* ==============================================
+           วิดีโอ/ภาพ — พอดีจอสุดขีด ไม่ถูกบัง
+           ============================================== */
+        .media-container {
             position: fixed;
             inset: 0;
             width: 100vw;
@@ -69,11 +89,12 @@
             overflow: hidden;
             z-index: 1;
         }
-        #main-video {
+        #main-media {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* ครอบพอดีจอ ไม่ล้น ไม่ขาด */
+            object-fit: contain; /* ✅ ย่อให้พอดีจอ ไม่บังส่วนไหน */
             object-position: center center;
+            background: #000;
         }
         .overlay {
             position: fixed;
@@ -102,6 +123,20 @@
             border: 2px solid #fff;
         }
 
+        /* ===== ข้อความซ้อนวิดีโอ ===== */
+        .text-overlay {
+            position: fixed;
+            bottom: 140px;
+            left: 16px;
+            right: 80px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,.8), -1px -1px 2px rgba(128,0,255,.8);
+            z-index: 9;
+            line-height: 1.6;
+        }
+
         /* ===== กลุ่มชื่อผู้ใช้ — LOCKED ===== */
         .user-info {
             position: fixed;
@@ -128,18 +163,6 @@
             border-radius: 4px;
             font-size: 11px;
             color: #ddd;
-        }
-        .text-overlay {
-            position: fixed;
-            bottom: 140px;
-            left: 16px;
-            right: 80px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,.8), -1px -1px 2px rgba(128,0,255,.8);
-            z-index: 9;
-            line-height: 1.6;
         }
 
         /* ===== เมนูด้านขวา 6 ตัว — LOCKED ===== */
@@ -273,12 +296,17 @@
 </div>
 
 <!-- ==============================================
-     วิดีโอ — เต็มจอพอดี + มีเสียง
+     แถบแสดงขนาดจอ — บนสุด
      ============================================== -->
-<div class="video-container">
-    <video id="main-video" autoplay loop muted playsinline webkit-playsinline>
-        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-    </video>
+<div class="screen-size-label" id="screenSizeLabel">
+    ขนาดจอ: กำลังตรวจสอบ...
+</div>
+
+<!-- ==============================================
+     วิดีโอ/ภาพ — พอดีจอ ไม่ถูกบัง
+     ============================================== -->
+<div class="media-container">
+    <img id="main-media" src="https://picsum.photos/seed/rockstage/720/1280" alt="ภาพ/วิดีโอ">
 </div>
 <div class="overlay"></div>
 
@@ -361,16 +389,49 @@
         document.getElementById('splash').classList.add('fade-out');
     }, 1500);
 
+    // ==============================================
+    // แสดงขนาดจอ 9:16 / 16:9 อัตโนมัติ
+    // ==============================================
+    function updateScreenSizeLabel() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const ratio = h / w;
+        let label = '';
+
+        if (ratio > 1.7) {
+            label = 'แนวตั้ง 9:16';
+        } else if (ratio > 1.3) {
+            label = 'แนวตั้ง 3:4';
+        } else if (ratio > 1.1) {
+            label = 'แนวตั้ง 4:5';
+        } else if (ratio > 0.9) {
+            label = 'จอสี่เหลี่ยม 1:1';
+        } else if (ratio > 0.65) {
+            label = 'แนวนอน 16:9';
+        } else {
+            label = 'แนวนอนกว้าง';
+        }
+
+        document.getElementById('screenSizeLabel').textContent = 
+            `ขนาดจอ: ${label} | ${Math.round(w)}×${Math.round(h)}`;
+    }
+
+    window.addEventListener('resize', updateScreenSizeLabel);
+    updateScreenSizeLabel();
+
     // 🔊 เปิด/ปิดเสียง
     let soundOn = false;
     function toggleSound() {
-        const video = document.getElementById('main-video');
+        const media = document.getElementById('main-media');
         const btn = document.getElementById('soundToggle');
-        soundOn = !soundOn;
-        video.muted = !soundOn;
-        btn.textContent = soundOn ? '🔊' : '🔇';
-        if (soundOn) {
-            video.play().catch(e => console.log('Autoplay blocked — กดเพื่อเล่นเสียง'));
+
+        if (media.tagName.toLowerCase() === 'video') {
+            soundOn = !soundOn;
+            media.muted = !soundOn;
+            btn.textContent = soundOn ? '🔊' : '🔇';
+            if (soundOn) {
+                media.play().catch(e => console.log('Autoplay blocked — กดเพื่อเล่นเสียง'));
+            }
         }
     }
 
@@ -393,28 +454,32 @@
         }
     }
 
-    // ➕ อัปโหลดวิดีโอ/ภาพ — พร้อมเสียง!
+    // ➕ อัปโหลดวิดีโอ/ภาพ — พอดีจอ ไม่ถูกบัง
     function handleUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = function(event) {
-            const container = document.querySelector('.video-container');
+            const container = document.querySelector('.media-container');
+            const btn = document.getElementById('soundToggle');
+
             if (file.type.startsWith('video/')) {
-                // วิดีโอ — มีเสียง!
+                // วิดีโอ — พอดีจอ + มีเสียง
                 container.innerHTML = `
-                    <video id="main-video" autoplay loop playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;">
+                    <video id="main-media" autoplay loop muted playsinline webkit-playsinline style="width:100%;height:100%;object-fit:contain;background:#000;">
                         <source src="${event.target.result}" type="${file.type}">
                     </video>`;
                 soundOn = true;
-                document.getElementById('soundToggle').textContent = '🔊';
+                btn.textContent = '🔊';
+                btn.style.display = 'flex';
             } else {
-                // รูปภาพ
-                container.innerHTML = `<img id="main-video" src="${event.target.result}" style="width:100%;height:100%;object-fit:cover;" alt="รูปภาพ">`;
-                document.getElementById('soundToggle').style.display = 'none';
+                // รูปภาพ — พอดีจอ
+                container.innerHTML = `<img id="main-media" src="${event.target.result}" style="width:100%;height:100%;object-fit:contain;background:#000;" alt="รูปภาพ">`;
+                btn.style.display = 'none';
             }
-            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name + '\n✅ เต็มจอพอดี + มีเสียงแล้ว!');
+
+            alert('อัปโหลดสำเร็จ! 🎉\nไฟล์: ' + file.name + '\n✅ พอดีจอทุกส่วน ไม่ถูกบังแล้ว!');
         };
         reader.readAsDataURL(file);
     }
