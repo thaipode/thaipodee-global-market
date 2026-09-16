@@ -1,9 +1,7 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market                              -->
-<!-- เวอร์ชัน: 1.3 | 2026-09-16                            -->
-<!-- ✅ แสดงชื่อผู้ใช้ที่หน้าแรกทันที                       -->
-<!-- ✅ ขยายพื้นที่กดเปลี่ยนรูปโปรไฟล์ให้ทำงานชัวร์       -->
-<!-- ✅ บันทึกในเครื่อง — ปิดเปิดไม่หาย                     -->
+<!-- Thaipodee Global Market v1.4 | 2026-09-16            -->
+<!-- ✅ ชื่อผู้ใช้โชว์ทันทีที่หน้าแรก ไม่ต้องรออัปโหลด       -->
+<!-- ✅ เปลี่ยนรูปได้แล้ว | บันทึกในเครื่อง | ปิดเปิดไม่หาย -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -35,7 +33,7 @@
         }
         .page.active { display: block; }
 
-        /* วิดีโอเต็มจอ */
+        /* วิดีโอ/รูป เต็มจอ */
         .media-area {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -59,14 +57,14 @@
             padding: 20px;
         }
 
-        /* ข้อมูลด้านล่างซ้าย — ไม่ให้โดนบัง */
+        /* ✅ บังคับแสดงตลอด ไม่ซ่อน */
         .info-left {
             position: absolute;
             left: 16px;
             bottom: calc(80px + env(safe-area-inset-bottom, 0px));
             right: 90px;
             z-index: 10;
-            display: none;
+            display: block !important; /* แก้จุดนี้ */
         }
         .username { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
         .caption { font-size: 13px; color: #fff; margin-bottom: 4px; }
@@ -204,7 +202,7 @@
             margin-top: 10px;
         }
 
-        /* หน้าแก้โปรไฟล์ — ขยายพื้นที่กดรูป */
+        /* หน้าแก้โปรไฟล์ */
         .profile-page {
             background: #000;
             padding: 20px 16px;
@@ -216,7 +214,7 @@
             display: block;
             cursor: pointer;
             text-align: center;
-            padding: 10px 0; /* ขยายพื้นที่กด */
+            padding: 10px 0;
         }
         .profile-avatar-preview {
             width: 100px;
@@ -275,6 +273,7 @@
         </div>
     </div>
 
+    <!-- ✅ แสดงชื่อตลอดเวลา -->
     <div class="info-left" id="info-area">
         <div class="username" id="display-username">@thaipodee_master</div>
         <div class="caption">ทดสอบ ✨</div>
@@ -312,7 +311,7 @@
     <button class="post-btn" id="confirm-btn">ยืนยัน → แสดงผล</button>
 </div>
 
-<!-- หน้าแก้โปรไฟล์ ✅ ขยายพื้นที่กดรูป -->
+<!-- หน้าแก้โปรไฟล์ -->
 <div id="page-profile" class="page profile-page">
     <span class="back-btn" id="back-from-profile">← กลับ</span>
     <h3 style="text-align:center;">แก้ไขโปรไฟล์</h3>
@@ -362,7 +361,7 @@ const STORAGE = {
     avatar: 'thaipodee_avatar'
 };
 
-// โหลดค่ามาแสดงทันที — ✅ แก้จุดนี้ให้แน่นอน
+// ✅ โหลดและแสดงทันที ไม่รออะไร
 function loadProfile() {
     const savedName = localStorage.getItem(STORAGE.username);
     const savedAvatar = localStorage.getItem(STORAGE.avatar);
@@ -399,7 +398,7 @@ document.getElementById('avatar-btn').onclick = () => showPage('page-profile');
 document.getElementById('profile-nav-btn').onclick = () => showPage('page-profile');
 document.getElementById('back-from-profile').onclick = () => showPage('page-feed');
 
-// อัปโหลดรูป ✅ ขยายพื้นที่กดแล้ว
+// อัปโหลดรูป
 document.getElementById('avatar-upload').onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -419,7 +418,7 @@ document.getElementById('save-profile').onclick = () => {
     saveProfile(name, window._tempAvatar || null);
     window._tempAvatar = null;
     
-    alert('บันทึกเรียบร้อย ✅\nชื่อของคุณจะอยู่ในเครื่องนี้ตลอดไป');
+    alert('บันทึกเรียบร้อย ✅');
     showPage('page-feed');
 };
 
@@ -500,7 +499,6 @@ document.getElementById('confirm-btn').onclick = () => {
         }
     }
 
-    document.getElementById('info-area').style.display = 'block';
     showPage('page-feed');
     
     document.getElementById('media-input').value = '';
@@ -517,11 +515,10 @@ document.getElementById('back-to-feed').onclick = () => {
     showPage('page-feed');
 };
 
-// โหลดชื่อ+รูปทันทีที่เปิดหน้า ✅
+// โหลดทันทีที่เปิด ✅
 loadProfile();
 
-console.log('✅ Thaipodee Global Market v1.3');
-console.log('✅ แสดงชื่อที่หน้าแรก | เปลี่ยนรูปได้ | บันทึกอัตโนมัติ');
+console.log('✅ Thaipodee v1.4 — ชื่อโชว์ทันที | รูปเปลี่ยนได้ | บันทึกค้าง');
 </script>
 </body>
 </html>
