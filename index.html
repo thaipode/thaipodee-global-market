@@ -1,7 +1,9 @@
 <!-- ===================================================== -->
 <!-- Thaipodee Global Market -->
-<!-- ลำดับที่ 35 | 16 กันยายน 2569 เวลา 20:33 -->
-<!-- เต็มจอไม่มีแถบดำ + ไอคอนรูปแบบเหมือนเดิม -->
+<!-- ลำดับที่ 36 | 16 กันยายน 2569 เวลา 21:00 -->
+<!-- ✅ แต่ละเครื่องแก้ชื่อ+รูปโปรไฟล์ของตัวเองได้ -->
+<!-- ✅ ปิดเปิดใหม่ไม่หาย (บันทึกในเครื่อง) -->
+<!-- ✅ ไม่กระทบข้อมูลคนอื่น -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -32,7 +34,7 @@
         }
         .page.active { display: block; }
 
-        /* ===== วิดีโอ/รูป เต็มจอสนิท 0 ขอบ ===== */
+        /* ===== วิดีโอ/รูป เต็มจอ ไม่มีแถบดำ ===== */
         .media-area {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -57,11 +59,11 @@
             padding: 20px;
         }
 
-        /* ===== ข้อมูลซ้ายล่าง ===== */
+        /* ===== ข้อมูลซ้ายล่าง — ปรับระยะไม่ให้ถูกตัด ===== */
         .info-left {
             position: absolute;
             left: 16px;
-            bottom: 90px;
+            bottom: calc(90px + env(safe-area-inset-bottom, 0px));
             right: 90px;
             z-index: 10;
             display: none;
@@ -93,6 +95,8 @@
             border-radius: 50%;
             background: linear-gradient(135deg, #f5a623, #f76b1c);
             border: 2px solid #fff;
+            background-size: cover;
+            background-position: center;
         }
         .avatar-plus {
             position: absolute;
@@ -118,17 +122,17 @@
         .icon { font-size: 26px; }
         .stat-num { font-size: 11px; color: #fff; }
 
-        /* ===== เมนูล่าง ===== */
+        /* ===== เมนูล่าง — ปรับระยะรองรับทุกจอ ===== */
         .nav-bottom {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 70px;
+            height: calc(60px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 4px 16px;
             background: #000;
             border-top: 1px solid #222;
             z-index: 999;
@@ -169,26 +173,12 @@
             position: absolute;
             background: #000;
         }
-        .plus-btn::before {
-            width: 20px;
-            height: 2px;
-        }
-        .plus-btn::after {
-            width: 2px;
-            height: 20px;
-        }
-        .plus-overlay {
-            position: absolute;
-            inset: -10px;
-            cursor: pointer;
-        }
-        .file-input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
+        .plus-btn::before { width: 20px; height: 2px; }
+        .plus-btn::after { width: 2px; height: 20px; }
+        .plus-overlay { position: absolute; inset: -10px; cursor: pointer; }
+        .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
+        /* ===== หน้าเลือกเพลง ===== */
         .sound-page {
             background: #000;
             padding: 20px 16px;
@@ -196,18 +186,8 @@
             padding-bottom: 90px;
             display: none;
         }
-        .back-btn {
-            font-size: 18px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 20px 0 12px;
-            color: #aaa;
-        }
+        .back-btn { font-size: 18px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
+        .section-title { font-size: 14px; font-weight: 600; margin: 20px 0 12px; color: #aaa; }
         .audio-picker {
             background: #1a1a2e;
             border-radius: 12px;
@@ -218,11 +198,7 @@
             cursor: pointer;
             margin-bottom: 16px;
         }
-        .audio-name {
-            font-size: 12px;
-            color: #888;
-            margin-top: 4px;
-        }
+        .audio-name { font-size: 12px; color: #888; margin-top: 4px; }
         .hidden-input { display: none; }
         .post-btn {
             background: #ff2442;
@@ -236,10 +212,55 @@
             cursor: pointer;
             margin-top: 10px;
         }
+
+        /* ===== หน้าแก้ไขโปรไฟล์ ===== */
+        .profile-page {
+            background: #000;
+            padding: 20px 16px;
+            min-height: 100vh; min-height: 100dvh;
+            padding-bottom: 90px;
+            display: none;
+        }
+        .profile-avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #f5a623, #f76b1c);
+            border: 3px solid #fff;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+        .profile-label {
+            font-size: 13px; color: #aaa; margin-top: 20px; margin-bottom: 6px; display: block;
+        }
+        .profile-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 15px;
+        }
+        .save-btn {
+            background: #ff2442;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 25px;
+            font-size: 15px;
+            width: 100%;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+        }
     </style>
 </head>
 <body>
 
+<!-- หน้าแรก -->
 <div id="page-feed" class="page active">
     <div class="media-area" id="media-area">
         <div class="empty-hint">
@@ -258,7 +279,7 @@
     <div class="menu-right">
         <div class="menu-btn" id="avatar-btn">
             <div class="avatar-wrap">
-                <div class="avatar"></div>
+                <div class="avatar" id="avatar-icon"></div>
                 <div class="avatar-plus">+</div>
             </div>
         </div>
@@ -270,6 +291,7 @@
     </div>
 </div>
 
+<!-- หน้าเลือกเพลง -->
 <div id="page-sound" class="page sound-page">
     <span class="back-btn" id="back-to-feed">← กลับ</span>
     <h3>เลือกเพลง/เสียง</h3>
@@ -285,6 +307,24 @@
     <button class="post-btn" id="confirm-btn">ยืนยัน → แสดงผล</button>
 </div>
 
+<!-- หน้าแก้ไขโปรไฟล์ ✅ เพิ่มใหม่ -->
+<div id="page-profile" class="page profile-page">
+    <span class="back-btn" id="back-from-profile">← กลับ</span>
+    <h3 style="text-align:center;">แก้ไขโปรไฟล์</h3>
+    
+    <label style="display:block;cursor:pointer;">
+        <div class="profile-avatar-preview" id="profile-avatar-preview"></div>
+        <p style="text-align:center; color:#888; font-size:12px;">แตะเปลี่ยนรูปโปรไฟล์</p>
+        <input type="file" accept="image/*" id="avatar-upload" class="hidden-input">
+    </label>
+
+    <label class="profile-label">ชื่อผู้ใช้</label>
+    <input type="text" id="username-input" class="profile-input" placeholder="ใส่ชื่อของคุณ">
+
+    <button class="save-btn" id="save-profile">บันทึกโปรไฟล์</button>
+</div>
+
+<!-- เมนูล่าง -->
 <div class="nav-bottom">
     <div class="nav-item active">
         <span class="nav-icon">🏠</span>
@@ -307,22 +347,93 @@
         <span class="nav-icon">💬</span>
         <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" id="profile-nav-btn">
         <span class="nav-icon">👤</span>
         <span class="nav-label">โปรไฟล์</span>
     </div>
 </div>
 
 <script>
-let selectedMedia = null, selectedAudio = null;
-let mediaObjectURL = null, audioObjectURL = null;
-let mediaType = null;
+// ===== ข้อมูลโปรไฟล์ — บันทึกในเครื่อง =====
+const STORAGE_KEYS = {
+    username: 'thaipodee_username',
+    avatar: 'thaipodee_avatar'
+};
 
+// โหลดค่าที่บันทึกไว้เมื่อเปิดหน้า
+function loadProfile() {
+    const savedName = localStorage.getItem(STORAGE_KEYS.username);
+    const savedAvatar = localStorage.getItem(STORAGE_KEYS.avatar);
+    
+    if (savedName) {
+        document.getElementById('display-username').textContent = savedName;
+        document.getElementById('username-input').value = savedName.replace('@', '');
+    }
+    if (savedAvatar) {
+        document.getElementById('avatar-icon').style.backgroundImage = `url(${savedAvatar})`;
+        document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${savedAvatar})`;
+    }
+}
+
+// บันทึกโปรไฟล์
+function saveProfile(username, avatarDataUrl) {
+    const fullName = username.startsWith('@') ? username : '@' + username;
+    localStorage.setItem(STORAGE_KEYS.username, fullName);
+    if (avatarDataUrl) {
+        localStorage.setItem(STORAGE_KEYS.avatar, avatarDataUrl);
+    }
+    loadProfile(); // อัปเดตทันที
+}
+
+// เปลี่ยนหน้า
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 }
 
+// ข้อมูลวิดีโอ/เพลง
+let selectedMedia = null, selectedAudio = null;
+let mediaObjectURL = null, audioObjectURL = null;
+let mediaType = null;
+
+// เปิดหน้าโปรไฟล์
+document.getElementById('avatar-btn').addEventListener('click', () => {
+    showPage('page-profile');
+});
+document.getElementById('profile-nav-btn').addEventListener('click', () => {
+    showPage('page-profile');
+});
+document.getElementById('back-from-profile').addEventListener('click', () => {
+    showPage('page-feed');
+});
+
+// อัปโหลดรูปโปรไฟล์
+document.getElementById('avatar-upload').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+        const dataUrl = evt.target.result;
+        document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${dataUrl})`;
+        // เก็บไว้ชั่วคราว จะบันทึกตอนกดปุ่ม
+        window._tempAvatar = dataUrl;
+    };
+    reader.readAsDataURL(file);
+});
+
+// บันทึกโปรไฟล์
+document.getElementById('save-profile').addEventListener('click', () => {
+    const nameInput = document.getElementById('username-input').value.trim();
+    if (!nameInput) return alert('กรุณาใส่ชื่อครับ');
+    
+    saveProfile(nameInput, window._tempAvatar || null);
+    window._tempAvatar = null;
+    
+    alert('บันทึกเรียบร้อย ✅\nชื่อของคุณจะอยู่ในเครื่องนี้ตลอดไป');
+    showPage('page-feed');
+});
+
+// เลือกวิดีโอ/รูป
 document.getElementById('media-input').addEventListener('change', e => {
     selectedMedia = e.target.files[0];
     if (!selectedMedia) return;
@@ -330,11 +441,13 @@ document.getElementById('media-input').addEventListener('change', e => {
     showPage('page-sound');
 });
 
+// เลือกเพลง
 document.getElementById('audio-input').addEventListener('change', e => {
     selectedAudio = e.target.files[0];
     document.getElementById('audio-filename').textContent = selectedAudio ? selectedAudio.name : 'ยังไม่ได้เลือก';
 });
 
+// ยืนยันแสดงผล
 document.getElementById('confirm-btn').addEventListener('click', () => {
     if (!selectedMedia) return alert('เลือกไฟล์ก่อนครับ');
     
@@ -414,11 +527,11 @@ document.getElementById('back-to-feed').addEventListener('click', () => {
     showPage('page-feed');
 });
 
-document.getElementById('avatar-btn').addEventListener('click', () => {
-    alert('แก้ไขโปรไฟล์ — แต่ละคนตั้งชื่อของตัวเองได้');
-});
+// โหลดโปรไฟล์ทันทีที่เปิด
+loadProfile();
 
-console.log('✅ พร้อมใช้งาน — Thaipodee Global Market');
+console.log('✅ Thaipodee Global Market — พร้อมใช้งาน');
+console.log('✅ โปรไฟล์บันทึกอัตโนมัติในเครื่อง — ปิดเปิดไม่หาย');
 </script>
 </body>
 </html>
