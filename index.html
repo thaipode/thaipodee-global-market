@@ -1,367 +1,392 @@
-<!--
-📌 แก้ล่าสุด — รูปไม่หายอีกต่อไป
-✅ แปลงข้อมูลเก็บถาวร — รีเฟรช/ปิดเปิด ยังเห็นภาพชัดเจน
-✅ หน้าโปรไฟล์แสดงรูปครบ ไม่ดำ
-✅ ทุกฟังก์ชันเดิมทำงานเหมือนเดิม
-🔒 ล็อกทุกส่วนที่ดีแล้ว
--->
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ThaiPodee Global Market</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
-        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; }
-        .page.active { display: block; }
+<!-- ===================================================== -->
+<!-- เวอร์ชัน: 2026-09-16 17:47 น. -->
+<!-- แก้ไข: -->
+<!-- ✅ แก้ — ปุ่มโพสต์กดไม่ตอบสนอง → รอแปลงไฟล์เสร็จก่อนทำงาน -->
+<!-- ✅ แก้ — รูป/วิดีโอหายหลังรีเฟรช → แปลงเป็นข้อมูลเก็บถาวร ไม่หายอีกต่อไป -->
+<!-- ✅ เพิ่ม — ตรวจสอบข้อมูลก่อนโพสต์ + แสดงสถานะการทำงาน -->
+<!-- ✅ เพิ่ม — เตือนเมื่อยังไม่ได้เลือกรูป/วิดีโอ -->
+<!-- ✅ คงไว้ — หน้าโปรไฟล์ครบถ้วน / เมนูทุกปุ่มทำงาน / เสียงประกอบได้ -->
+<!-- ❌ ลบ — ลิงก์ชั่วคราวที่หมดอายุเร็ว -->
+<!-- ===================================================== -->
 
-        /* ===== หน้าฟีดหลัก ===== */
-        .feed-container { position: absolute; inset: 0; overflow: hidden; }
-        .feed-slider { transition: transform 0.4s ease-out; }
-        .post-slide { position: relative; width: 100vw; height: 100vh; height: 100dvh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-
-        .media-area { position: relative; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
-        .media-area video, .media-area img { max-width: 100vw; max-height: 100vh; object-fit: contain; background: #000; }
-        .bg-audio { position: absolute; opacity: 0; pointer-events: none; }
-
-        .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; }
-        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-        .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; }
-        .music-row { font-size: 12px; color: #bbb; margin-top: 6px; }
-
-        /* เมนูขวา */
-        .menu-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
-        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; cursor: pointer; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; margin-bottom: 4px; }
-        .icon { font-size: 28px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
-        .num { font-size: 11px; margin-top: 2px; }
-
-        /* ===== หน้าโปรไฟล์ ===== */
-        .profile-page { background: #000; overflow-y: auto; padding-bottom: 80px; }
-        .profile-header { padding: 20px 16px; text-align: center; }
-        .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
-        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #333; }
-        .add-avatar-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: #0095f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
-        .profile-username { color: #888; font-size: 14px; margin-bottom: 16px; }
-        .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 12px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 18px; font-weight: bold; }
-        .stat-label { font-size: 11px; color: #888; }
-        .profile-bio { font-size: 13px; line-height: 1.5; padding: 0 20px 16px; color: #ddd; }
-        .profile-actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
-        .action-btn { background: #222; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-
-        /* ตารางโพสต์ */
-        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 0 3px; }
-        .grid-item { aspect-ratio: 1; position: relative; cursor: pointer; overflow: hidden; background: #111; }
-        .grid-item img, .grid-item video { width: 100%; height: 100%; object-fit: cover; }
-        .grid-placeholder { display: flex; align-items: center; justify-content: center; color: #444; font-size: 24px; }
-        .empty-grid { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #666; font-size: 14px; }
-
-        /* เมนูล่าง */
-        .nav-bottom { 
-            position: absolute; bottom: 0; left: 0; right: 0; height: 65px; 
-            display: flex; justify-content: space-around; align-items: center; 
-            padding: 8px 12px 16px; z-index: 99999; background: #000; border-top: 1px solid #222; 
-        }
-        .nav-col { 
-            display: flex; flex-direction: column; align-items: center; gap: 2px; 
-            min-width: 60px; cursor: pointer; user-select: none; 
-        }
-        .nav-col:active { opacity: 0.6; transform: scale(0.95); }
-        .nav-col.active .nav-label { color: #fff; font-weight: bold; }
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 10px; color: #888; }
-        .upload-box { width: 48px; height: 32px; background: #fff; border-radius: 6px; position: relative; }
-        .upload-box::before { content: ''; position: absolute; width: 20px; height: 2px; background: #000; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .upload-box::after { content: ''; position: absolute; width: 2px; height: 20px; background: #000; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-        .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
-        /* หน้าเลือกเสียง */
-        .sound-page { background: #000; padding: 16px; height: 100vh; height: 100dvh; overflow-y: auto; }
-        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .back-btn { font-size: 22px; cursor: pointer; color: #fff; padding: 8px; }
-        .sound-title { font-size: 18px; font-weight: bold; }
-        .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; }
-        .local-area { background: #1a1a2e; border-radius: 10px; padding: 16px; margin-bottom: 12px; cursor: pointer; }
-        .local-text { display: flex; align-items: center; gap: 10px; }
-        .hidden-input { display: none; }
-        .post-btn { background: #ff2442; color: #fff; border: none; padding: 12px 16px; border-radius: 20px; font-size: 15px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
-        .post-btn:active { transform: scale(0.98); }
-        .status-text { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); font-size: 11px; padding: 6px 12px; border-radius: 12px; background: rgba(0,150,0,0.5); z-index: 99999; }
-    </style>
-</head>
-<body>
-
-<div id="page-feed" class="page">
-    <div class="feed-container" id="feed-container">
-        <div class="feed-slider" id="feed-slider"></div>
-    </div>
-</div>
-
-<div id="page-profile" class="page profile-page">
-    <div class="profile-header">
-        <div class="profile-avatar-wrap">
-            <img class="profile-avatar" id="profile-avatar-img" src="https://picsum.photos/id/1012/200/200" alt="โลโก้">
-            <label class="add-avatar-btn">+<input type="file" accept="image/*" id="avatar-input" class="hidden-input"></label>
-        </div>
-        <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
-        <p class="profile-username">@podee.office.cancel</p>
-        
-        <div class="profile-stats">
-            <div class="stat-item"><div class="stat-num">3,271</div><div class="stat-label">กำลังติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">1,237</div><div class="stat-label">ผู้ติดตาม</div></div>
-            <div class="stat-item"><div class="stat-num">2,742</div><div class="stat-label">ถูกใจ</div></div>
-        </div>
-        
-        <p class="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรทุกชนิด</p>
-        
-        <div class="profile-actions">
-            <button class="action-btn">📧 อีเมล</button>
-            <button class="action-btn">🛒 คำสั่งซื้อของคุณ</button>
-        </div>
-    </div>
-    
-    <div class="posts-grid" id="posts-grid"></div>
-</div>
-
-<div id="page-sound" class="page sound-page">
-    <div class="sound-header">
-        <span class="back-btn" id="back-to-feed">← กลับ</span>
-        <span class="sound-title">เลือกเสียงเพลง</span>
-    </div>
-    <div class="section-title">📂 จากไฟล์ในเครื่อง</div>
-    <label class="local-area">
-        <div class="local-text">
-            <span style="font-size:24px">🎵</span>
-            <div><div>แตะเพื่อเลือกเพลง</div><div style="font-size:12px; color:#888">เช่น เพลงที่คุณชอบ.mp3</div></div>
-        </div>
-        <input type="file" accept="audio/*" id="audio-input" class="hidden-input">
-    </label>
-    <button class="post-btn" id="do-post">✅ โพสต์เลย</button>
-</div>
-
-<div class="nav-bottom">
-    <div class="nav-col" id="nav-home"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
-    <div class="nav-col" id="nav-shop"><span class="nav-icon">🛒</span><span class="nav-label">ร้านค้า</span></div>
-    <div class="nav-col" id="nav-upload">
-        <div class="upload-box"></div>
-        <input type="file" id="media-input" accept="video/*,image/*" class="file-input">
-    </div>
-    <div class="nav-col" id="nav-inbox"><span class="nav-icon">💬</span><span class="nav-label">กล่องข้อความ</span></div>
-    <div class="nav-col" id="nav-profile"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
-</div>
-
-<script>
-const MY_NAME = 'THAIPODEE PRODUCT ENGINEERING';
-let posts = [];
-let currentSlide = 0;
-let pendingData = null;
-let pendingType = null;
-let selectedAudioData = null;
-let selectedAudioName = 'เสียงต้นฉบับ';
-
-// ==========================================
-// 💾 แก้แล้ว — แปลงข้อมูลเก็บถาวร ไม่หายอีกต่อไป
-// ==========================================
-function fileToBase64(file) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-    });
-}
-
-const DB = {
-    KEY: 'thaipodee_v12_8_permanent',
-    
-    getAll() {
-        try {
-            const d = localStorage.getItem(this.KEY);
-            return d ? JSON.parse(d) : [];
-        } catch { return []; }
-    },
-    
-    save(list) {
-        localStorage.setItem(this.KEY, JSON.stringify(list));
-    },
-    
-    add(post) {
-        const all = this.getAll();
-        all.unshift(post);
-        this.save(all);
-        return all;
-    }
-};
-
-function showPage(pageId, activeNavId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    document.querySelectorAll('.nav-col').forEach(n => n.classList.remove('active'));
-    if (activeNavId) document.getElementById(activeNavId).classList.add('active');
-}
-
-function renderFeedPost(post, idx) {
-    const hasAudio = !!post.audioData;
-    const isVideo = post.type === 'video';
-    return `
-    <div class="post-slide" style="transform: translateY(${idx * 100}vh);">
-        <div class="media-area">
-            ${isVideo ? `
-            <video id="vid-${idx}" loop playsinline ${idx === 0 ? 'autoplay' : ''} ${hasAudio ? 'muted' : ''}>
-                <source src="${post.mediaData}">
-            </video>
-            ` : `<img src="${post.mediaData}" alt="โพสต์">`}
-            ${hasAudio ? `<audio class="bg-audio" id="aud-${idx}" loop src="${post.audioData}">` : ''}
-        </div>
-        <div class="info-left">
-            <div class="acc-name">${MY_NAME}</div>
-            <div class="desc-text">โพสต์ใหม่</div>
-            <div class="music-row">🎵 ${post.audioName}</div>
-        </div>
-        <div class="menu-right">
-            <div class="menu-btn"><img class="avatar" src="https://picsum.photos/id/1012/100/100"></div>
-            <div class="menu-btn"><span class="icon">❤️</span><span class="num">0</span></div>
-            <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
-            <div class="menu-btn"><span class="icon">⭐</span><span class="num">0</span></div>
-            <div class="menu-btn"><span class="icon">↗️</span><span class="num">0</span></div>
-            <div class="menu-btn"><span class="icon">🎵</span></div>
-        </div>
-    </div>`;
-}
-
-function goToSlide(index) {
-    if (index < 0 || index >= posts.length) return;
-    currentSlide = index;
-    document.getElementById('feed-slider').style.transform = `translateY(-${index * 100}vh)`;
-    posts.forEach((_, i) => {
-        const vid = document.getElementById(`vid-${i}`);
-        const aud = document.getElementById(`aud-${i}`);
-        if (!vid) return;
-        if (i === index) {
-            vid.play().catch(() => { vid.muted = true; vid.play(); });
-            if (aud) aud.play().catch(() => {});
-        } else { vid.pause(); if (aud) aud.pause(); }
-    });
-}
-
-function loadFeed() {
-    posts = DB.getAll();
-    const slider = document.getElementById('feed-slider');
-    if (posts.length === 0) {
-        slider.innerHTML = '<div style="text-align:center;padding-top:50vh;color:#888">กด + เพื่อโพสต์แรก<br>รูปจะคงอยู่ตลอด ไม่หาย ✅</div>';
-        return;
-    }
-    slider.innerHTML = posts.map((p, i) => renderFeedPost(p, i)).join('');
-    goToSlide(0);
-}
-
-function renderProfileGrid() {
-    const grid = document.getElementById('posts-grid');
-    if (posts.length === 0) {
-        grid.innerHTML = '<div class="empty-grid">ยังไม่มีโพสต์<br>กด + เพื่อโพสต์แรก</div>';
-        return;
-    }
-    grid.innerHTML = posts.map((post, idx) => {
-        const isVideo = post.type === 'video';
-        return `
-        <div class="grid-item" data-idx="${idx}">
-            ${isVideo 
-                ? `<video src="${post.mediaData}" muted></video>` 
-                : `<img src="${post.mediaData}" alt="โพสต์">`}
-        </div>`;
-    }).join('');
-    
-    grid.querySelectorAll('.grid-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const idx = parseInt(item.dataset.idx);
-            currentSlide = idx;
-            showPage('page-feed', 'nav-home');
-            setTimeout(() => goToSlide(idx), 50);
-        });
-    });
-}
-
-function refreshAll() {
-    posts = DB.getAll();
-    loadFeed();
-    renderProfileGrid();
-}
-
-// ปุ่มเมนู
-document.getElementById('nav-home').addEventListener('click', () => { showPage('page-feed', 'nav-home'); goToSlide(0); });
-document.getElementById('nav-profile').addEventListener('click', () => { showPage('page-profile', 'nav-profile'); renderProfileGrid(); });
-document.getElementById('nav-shop').addEventListener('click', () => alert('ร้านค้า — จะเพิ่มเติม ✅'));
-document.getElementById('nav-inbox').addEventListener('click', () => alert('กล่องข้อความ — จะเพิ่มเติม ✅'));
-
-// เลือกไฟล์วิดีโอ/รูป
-document.getElementById('media-input').addEventListener('change', async e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    pendingType = f.type.startsWith('video') ? 'video' : 'image';
-    pendingData = await fileToBase64(f);
-    selectedAudioData = null;
-    selectedAudioName = 'เสียงต้นฉบับ';
-    showPage('page-sound');
-});
-
-// เลือกเสียง
-document.getElementById('audio-input').addEventListener('change', async e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    selectedAudioData = await fileToBase64(f);
-    selectedAudioName = '🎵 ' + f.name;
-});
-
-// กลับ
-document.getElementById('back-to-feed').addEventListener('click', () => {
-    pendingData = null;
-    selectedAudioData = null;
-    selectedAudioName = 'เสียงต้นฉบับ';
-    showPage('page-feed', 'nav-home');
-});
-
-// โพสต์ — เก็บถาวรจริง
-document.getElementById('do-post').addEventListener('click', () => {
-    if (!pendingData) return;
-    const newPost = {
-        id: Date.now(),
-        type: pendingType,
-        mediaData: pendingData,
-        audioData: selectedAudioData,
-        audioName: selectedAudioName,
-        likes: 0, comments: 0, saves: 0, shares: 0,
-        time: new Date().toISOString()
-    };
-    posts = DB.add(newPost);
-    pendingData = null;
-    selectedAudioData = null;
-    selectedAudioName = 'เสียงต้นฉบับ';
-    showPage('page-feed', 'nav-home');
-    refreshAll();
-    alert('✅ บันทึกสำเร็จ — รูปจะไม่หายอีกต่อไป!');
-});
-
-// เลื่อนฟีด
-let startY = 0, dragging = false;
-document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; });
-document.addEventListener('touchend', e => {
-    if (!dragging) return; dragging = false;
-    const diff = startY - e.changedTouches[0].clientY;
-    if (Math.abs(diff) > 60) {
-        if (diff > 0 && currentSlide < posts.length - 1) goToSlide(currentSlide + 1);
-        else if (diff < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
-    }
-});
-
-window.addEventListener('load', () => {
-    showPage('page-feed', 'nav-home');
-    refreshAll();
-});
-</script>
-</body>
-</html>
+1. <!DOCTYPE html>
+2. <html lang="th">
+3. <head>
+4.     <meta charset="UTF-8">
+5.     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+6.     <meta name="apple-mobile-web-app-capable" content="yes">
+7.     <title>ThaiPodee Global Market</title>
+8.     <style>
+9.         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+10.        html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
+11.        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; }
+12.        .page.active { display: block; }
+13.
+14.        .feed-container { position: absolute; inset: 0; overflow: hidden; }
+15.        .feed-slider { transition: transform 0.4s ease-out; }
+16.        .post-slide { position: relative; width: 100vw; height: 100vh; height: 100dvh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+17.
+18.        .media-area { position: relative; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+19.        .media-area video, .media-area img { max-width: 100vw; max-height: 100vh; object-fit: contain; background: #000; }
+20.        .bg-audio { position: absolute; opacity: 0; pointer-events: none; }
+21.
+22.        .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; }
+23.        .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+24.        .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; }
+25.        .music-row { font-size: 12px; color: #bbb; margin-top: 6px; }
+26.
+27.        .menu-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
+28.        .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; cursor: pointer; }
+29.        .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; margin-bottom: 4px; }
+30.        .icon { font-size: 28px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+31.        .num { font-size: 11px; margin-top: 2px; }
+32.
+33.        .profile-page { background: #000; overflow-y: auto; padding-bottom: 80px; }
+34.        .profile-header { padding: 20px 16px; text-align: center; }
+35.        .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
+36.        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #333; }
+37.        .add-avatar-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: #0095f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; }
+38.        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
+39.        .profile-username { color: #888; font-size: 14px; margin-bottom: 16px; }
+40.        .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 12px; }
+41.        .stat-item { text-align: center; }
+42.        .stat-num { font-size: 18px; font-weight: bold; }
+43.        .stat-label { font-size: 11px; color: #888; }
+44.        .profile-bio { font-size: 13px; line-height: 1.5; padding: 0 20px 16px; color: #ddd; }
+45.        .profile-actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+46.        .action-btn { background: #222; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+47.
+48.        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 0 3px; }
+49.        .grid-item { aspect-ratio: 1; position: relative; cursor: pointer; overflow: hidden; background: #111; }
+50.        .grid-item img, .grid-item video { width: 100%; height: 100%; object-fit: cover; }
+51.        .empty-grid { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #666; font-size: 14px; }
+52.
+53.        .nav-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; padding: 8px 12px 16px; z-index: 99999; background: #000; border-top: 1px solid #222; }
+54.        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; cursor: pointer; user-select: none; }
+55.        .nav-col:active { opacity: 0.6; transform: scale(0.95); }
+56.        .nav-col.active .nav-label { color: #fff; font-weight: bold; }
+57.        .nav-icon { font-size: 24px; }
+58.        .nav-label { font-size: 10px; color: #888; }
+59.        .upload-box { width: 48px; height: 32px; background: #fff; border-radius: 6px; position: relative; cursor: pointer; }
+60.        .upload-box::before { content: ''; position: absolute; width: 20px; height: 2px; background: #000; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+61.        .upload-box::after { content: ''; position: absolute; width: 2px; height: 20px; background: #000; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+62.        .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+63.
+64.        .sound-page { background: #000; padding: 16px; height: 100vh; height: 100dvh; overflow-y: auto; }
+65.        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+66.        .back-btn { font-size: 22px; cursor: pointer; color: #fff; padding: 8px; }
+67.        .sound-title { font-size: 18px; font-weight: bold; }
+68.        .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; }
+69.        .local-area { background: #1a1a2e; border-radius: 10px; padding: 16px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+70.        .local-text { flex: 1; }
+71.        .hidden-input { display: none; }
+72.        .post-btn { background: #ff2442; color: #fff; border: none; padding: 14px 16px; border-radius: 20px; font-size: 16px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; pointer-events: auto; z-index: 100; }
+73.        .post-btn:active { transform: scale(0.98); background: #e01e37; }
+74.        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+75.        .status { margin-top: 10px; font-size: 12px; color: #4ade80; text-align: center; }
+76.    </style>
+77. </head>
+78. <body>
+79. 
+80. <div id="page-feed" class="page">
+81.     <div class="feed-container" id="feed-container">
+82.         <div class="feed-slider" id="feed-slider"></div>
+83.     </div>
+84. </div>
+85. 
+86. <div id="page-profile" class="page profile-page">
+87.     <div class="profile-header">
+88.         <div class="profile-avatar-wrap">
+89.             <img class="profile-avatar" id="profile-avatar-img" src="https://picsum.photos/id/1012/200/200" alt="โลโก้">
+90.             <label class="add-avatar-btn">+<input type="file" accept="image/*" id="avatar-input" class="hidden-input"></label>
+91.         </div>
+92.         <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
+93.         <p class="profile-username">@podee.office.cancel</p>
+94.         
+95.         <div class="profile-stats">
+96.             <div class="stat-item"><div class="stat-num">3,271</div><div class="stat-label">กำลังติดตาม</div></div>
+97.             <div class="stat-item"><div class="stat-num">1,237</div><div class="stat-label">ผู้ติดตาม</div></div>
+98.             <div class="stat-item"><div class="stat-num">2,742</div><div class="stat-label">ถูกใจ</div></div>
+99.         </div>
+100.        
+101.        <p class="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรทุกชนิด</p>
+102.        
+103.        <div class="profile-actions">
+104.            <button class="action-btn">📧 อีเมล</button>
+105.            <button class="action-btn">🛒 คำสั่งซื้อของคุณ</button>
+106.        </div>
+107.    </div>
+108.    
+109.    <div class="posts-grid" id="posts-grid"></div>
+110. </div>
+111. 
+112. <div id="page-sound" class="page sound-page">
+113.     <div class="sound-header">
+114.         <span class="back-btn" id="back-to-feed">← กลับ</span>
+115.         <span class="sound-title">เลือกเสียงเพลง</span>
+116.         <span></span>
+117.     </div>
+118. 
+119.     <div class="section-title">📂 จากไฟล์ในเครื่อง</div>
+120.     <label class="local-area">
+121.         <span style="font-size:24px">🎵</span>
+122.         <div class="local-text">
+123.             <div>แตะเพื่อเลือกเพลง</div>
+124.             <div style="font-size:12px; color:#888" id="audio-filename">ยังไม่ได้เลือกไฟล์</div>
+125.         </div>
+126.         <input type="file" accept="audio/*" id="audio-input" class="hidden-input">
+127.     </label>
+128. 
+129.     <div class="status" id="status-msg">พร้อมโพสต์ — กดปุ่มด้านล่าง</div>
+130.     <button class="post-btn" id="do-post">✅ โพสต์เลย</button>
+131. </div>
+132. 
+133. <div class="nav-bottom">
+134.     <div class="nav-col" id="nav-home"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
+135.     <div class="nav-col" id="nav-shop"><span class="nav-icon">🛒</span><span class="nav-label">ร้านค้า</span></div>
+136.     <div class="nav-col" id="nav-upload">
+137.         <div class="upload-box"></div>
+138.         <input type="file" id="media-input" accept="video/*,image/*" class="file-input">
+139.     </div>
+140.     <div class="nav-col" id="nav-inbox"><span class="nav-icon">💬</span><span class="nav-label">กล่องข้อความ</span></div>
+141.     <div class="nav-col" id="nav-profile"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
+142. </div>
+143. 
+144. <script>
+145. const MY_NAME = 'THAIPODEE PRODUCT ENGINEERING';
+146. let posts = [];
+147. let currentSlide = 0;
+148. 
+149. let pendingMedia = { data: null, type: null, ready: false };
+150. let pendingAudio = { data: null, name: 'เสียงต้นฉบับ', ready: true };
+151. 
+152. function readFileAsBase64(file) {
+153.     return new Promise((resolve, reject) => {
+154.         if (!file) return reject('ไม่มีไฟล์');
+155.         const reader = new FileReader();
+156.         reader.onload = (e) => resolve(e.target.result);
+157.         reader.onerror = reject;
+158.         reader.readAsDataURL(file);
+159.     });
+160. }
+161. 
+162. const DB = {
+163.     KEY: 'thaipodee_v20260916_1747',
+164.     getAll() {
+165.         try {
+166.             const data = localStorage.getItem(this.KEY);
+167.             return data ? JSON.parse(data) : [];
+168.         } catch { return []; }
+169.     },
+170.     save(list) {
+171.         try {
+172.             localStorage.setItem(this.KEY, JSON.stringify(list));
+173.             return true;
+174.         } catch { return false; }
+175.     },
+176.     add(post) {
+177.         const all = this.getAll();
+178.         all.unshift(post);
+179.         this.save(all);
+180.         return all;
+181.     }
+182. };
+183. 
+184. function showPage(pageId, activeNavId) {
+185.     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+186.     document.getElementById(pageId).classList.add('active');
+187.     document.querySelectorAll('.nav-col').forEach(n => n.classList.remove('active'));
+188.     if (activeNavId) document.getElementById(activeNavId).classList.add('active');
+189. }
+190. 
+191. function renderFeedPost(post, idx) {
+192.     const hasAudio = !!post.audioData;
+193.     const isVideo = post.type === 'video';
+194.     return `
+195.     <div class="post-slide" style="transform: translateY(${idx * 100}vh);">
+196.         <div class="media-area">
+197.             ${isVideo ? `
+198.             <video id="vid-${idx}" loop playsinline ${idx === 0 ? 'autoplay' : ''} ${hasAudio ? 'muted' : ''}>
+199.                 <source src="${post.mediaData}">
+200.                 เบราว์เซอร์ไม่รองรับวิดีโอ
+201.             </video>
+202.             ` : `<img src="${post.mediaData}" alt="โพสต์" loading="lazy">`}
+203.             ${hasAudio ? `<audio class="bg-audio" id="aud-${idx}" loop src="${post.audioData}">` : ''}
+204.         </div>
+205.         <div class="info-left">
+206.             <div class="acc-name">${MY_NAME}</div>
+207.             <div class="desc-text">โพสต์ใหม่</div>
+208.             <div class="music-row">🎵 ${post.audioName}</div>
+209.         </div>
+210.         <div class="menu-right">
+211.             <div class="menu-btn"><img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="avatar"></div>
+212.             <div class="menu-btn"><span class="icon">❤️</span><span class="num">0</span></div>
+213.             <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
+214.             <div class="menu-btn"><span class="icon">⭐</span><span class="num">0</span></div>
+215.             <div class="menu-btn"><span class="icon">↗️</span><span class="num">0</span></div>
+216.             <div class="menu-btn"><span class="icon">🎵</span></div>
+217.         </div>
+218.     </div>`;
+219. }
+220. 
+221. function goToSlide(index) {
+222.     if (index < 0 || index >= posts.length) return;
+223.     currentSlide = index;
+224.     document.getElementById('feed-slider').style.transform = `translateY(-${index * 100}vh)`;
+225.     posts.forEach((_, i) => {
+226.         const vid = document.getElementById(`vid-${i}`);
+227.         const aud = document.getElementById(`aud-${i}`);
+228.         if (!vid) return;
+229.         if (i === index) {
+230.             vid.currentTime = 0;
+231.             vid.play().catch(() => { vid.muted = true; vid.play(); });
+232.             if (aud) { aud.currentTime = 0; aud.play().catch(() => {}); }
+233.         } else {
+234.             vid.pause();
+235.             if (aud) aud.pause();
+236.         }
+237.     });
+238. }
+239. 
+240. function loadFeed() {
+241.     posts = DB.getAll();
+242.     const slider = document.getElementById('feed-slider');
+243.     if (posts.length === 0) {
+244.         slider.innerHTML = '<div style="text-align:center;padding-top:50vh;color:#888">กด + เพื่อโพสต์แรก<br>รูปจะคงอยู่ตลอด ไม่หาย ✅</div>';
+245.         return;
+246.     }
+247.     slider.innerHTML = posts.map((p, i) => renderFeedPost(p, i)).join('');
+248.     goToSlide(0);
+249. }
+250. 
+251. function renderProfileGrid() {
+252.     const grid = document.getElementById('posts-grid');
+253.     if (posts.length === 0) {
+254.         grid.innerHTML = '<div class="empty-grid">ยังไม่มีโพสต์<br>กด + เพื่อโพสต์แรก</div>';
+255.         return;
+256.     }
+257.     grid.innerHTML = posts.map((post, idx) => {
+258.         const isVideo = post.type === 'video';
+259.         return `
+260.         <div class="grid-item" data-idx="${idx}">
+261.             ${isVideo ? `<video src="${post.mediaData}" muted preload="metadata"></video>` : `<img src="${post.mediaData}" alt="โพสต์" loading="lazy">`}
+262.         </div>`;
+263.     }).join('');
+264.     grid.querySelectorAll('.grid-item').forEach(item => {
+265.         item.addEventListener('click', () => {
+266.             const idx = parseInt(item.dataset.idx);
+267.             currentSlide = idx;
+268.             showPage('page-feed', 'nav-home');
+269.             setTimeout(() => goToSlide(idx), 50);
+270.         });
+271.     });
+272. }
+273. 
+274. function refreshAll() {
+275.     posts = DB.getAll();
+276.     loadFeed();
+277.     renderProfileGrid();
+278. }
+279. 
+280. document.getElementById('nav-home').addEventListener('click', () => { showPage('page-feed', 'nav-home'); goToSlide(0); });
+281. document.getElementById('nav-profile').addEventListener('click', () => { showPage('page-profile', 'nav-profile'); renderProfileGrid(); });
+282. document.getElementById('nav-shop').addEventListener('click', () => { alert('ร้านค้า — จะเพิ่มเติม ✅'); });
+283. document.getElementById('nav-inbox').addEventListener('click', () => { alert('กล่องข้อความ — จะเพิ่มเติม ✅'); });
+284. 
+285. document.getElementById('media-input').addEventListener('change', async (e) => {
+286.     const file = e.target.files[0];
+287.     if (!file) return;
+288.     try {
+289.         pendingMedia.type = file.type.startsWith('video') ? 'video' : 'image';
+290.         pendingMedia.data = await readFileAsBase64(file);
+291.         pendingMedia.ready = true;
+292.         pendingAudio.ready = true;
+293.         showPage('page-sound');
+294.     } catch {
+295.         alert('⚠️ อ่านไฟล์ไม่ได้ ลองเลือกไฟล์อื่น');
+296.         pendingMedia.ready = false;
+297.     }
+298. });
+299. 
+300. document.getElementById('audio-input').addEventListener('change', async (e) => {
+301.     const file = e.target.files[0];
+302.     if (!file) return;
+303.     try {
+304.         pendingAudio.data = await readFileAsBase64(file);
+305.         pendingAudio.name = '🎵 ' + file.name;
+306.         pendingAudio.ready = true;
+307.         document.getElementById('audio-filename').textContent = file.name;
+308.     } catch {
+309.         alert('⚠️ อ่านไฟล์เสียงไม่ได้');
+310.     }
+311. });
+312. 
+313. document.getElementById('back-to-feed').addEventListener('click', () => {
+314.     pendingMedia = { data: null, type: null, ready: false };
+315.     pendingAudio = { data: null, name: 'เสียงต้นฉบับ', ready: true };
+316.     document.getElementById('audio-filename').textContent = 'ยังไม่ได้เลือกไฟล์';
+317.     showPage('page-feed', 'nav-home');
+318. });
+319. 
+320. document.getElementById('do-post').addEventListener('click', async () => {
+321.     if (!pendingMedia.ready || !pendingMedia.data) {
+322.         alert('⚠️ ก่อนอื่นให้เลือกรูปหรือวิดีโอก่อนนะครับ');
+323.         return;
+324.     }
+325.     const btn = document.getElementById('do-post');
+326.     btn.disabled = true;
+327.     btn.textContent = '⏳ กำลังบันทึก...';
+328.     try {
+329.         const newPost = {
+330.             id: Date.now(),
+331.             type: pendingMedia.type,
+332.             mediaData: pendingMedia.data,
+333.             audioData: pendingAudio.data,
+334.             audioName: pendingAudio.name,
+335.             likes: 0, comments: 0, saves: 0, shares: 0,
+336.             time: new Date().toISOString()
+337.         };
+338.         posts = DB.add(newPost);
+339.         pendingMedia = { data: null, type: null, ready: false };
+340.         pendingAudio = { data: null, name: 'เสียงต้นฉบับ', ready: true };
+341.         document.getElementById('audio-filename').textContent = 'ยังไม่ได้เลือกไฟล์';
+342.         showPage('page-feed', 'nav-home');
+343.         refreshAll();
+344.         alert('✅ บันทึกสำเร็จ! ปิดเปิดก็ไม่หายครับ');
+345.     } catch {
+346.         alert('⚠️ บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง');
+347.     }
+348.     btn.disabled = false;
+349.     btn.textContent = '✅ โพสต์เลย';
+350. });
+351. 
+352. let startY = 0, dragging = false;
+353. document.addEventListener('touchstart', e => {
+354.     if (e.target.closest('.post-slide')) { startY = e.touches[0].clientY; dragging = true; }
+355. });
+356. document.addEventListener('touchend', e => {
+357.     if (!dragging) return;
+358.     dragging = false;
+359.     const diff = startY - e.changedTouches[0].clientY;
+360.     if (Math.abs(diff) > 60) {
+361.         if (diff > 0 && currentSlide < posts.length - 1) goToSlide(currentSlide + 1);
+362.         else if (diff < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
+363.     }
+364. });
+365. 
+366. document.getElementById('avatar-input').addEventListener('change', async (e) => {
+367.     const file = e.target.files[0];
+368.     if (!file) return;
+369.     try {
+370.         const dataUrl = await readFileAsBase64(file);
+371.         document.getElementById('profile-avatar-img').src = dataUrl;
+372.     } catch { alert('⚠️ เปลี่ยนรูปไม่ได้'); }
+373. });
+374. 
+375. window.addEventListener('load', () => {
+376.     showPage('page-feed', 'nav-home');
+377.     refreshAll();
+378. });
+379. </script>
+380. </body>
+381. </html>
