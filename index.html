@@ -1,8 +1,8 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market v2.1 | 2026-09-16            -->
-<!-- ✅ แก้เมนูด้านขวาหาย → แสดงครบทุกปุ่ม                  -->
-<!-- ✅ ชื่อ+ข้อมูลโพสต์ขึ้นชัดเจนทุกโพสต์                    -->
-<!-- ✅ ทุกเครื่องเห็นตรงกัน เลื่อนดูได้                      -->
+<!-- Thaipodee Global Market v2.2 | 2026-09-16            -->
+<!-- ✅ ปุ่มด้านขวาครบ: รูปคน, ถูกใจ, คอมเมนต์, บันทึก, แชร์, เพลง -->
+<!-- ✅ ชื่อผู้ใช้ + คำบรรยาย + ชื่อเพลง ขึ้นมุมล่างซ้ายชัดเจน -->
+<!-- ✅ ทุกเครื่องเห็นตรงกัน เลื่อนดูได้ -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -35,7 +35,6 @@
             z-index: 9999;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             display: none;
-            text-align: center;
         }
         .update-notice button {
             background: #fff;
@@ -92,7 +91,7 @@
         }
         .empty-state .cloud-icon { font-size: 32px; margin-bottom: 12px; }
 
-        /* ข้อมูลเจ้าของโพสต์ — มุมล่างซ้าย */
+        /* ===== ข้อมูลเจ้าของโพสต์ — มุมล่างซ้าย ===== */
         .post-info {
             position: absolute;
             left: 16px;
@@ -124,7 +123,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.7);
         }
 
-        /* ปุ่มด้านขวา — แก้ให้แสดงแน่นอน */
+        /* ===== ปุ่มด้านขวา — แสดงแน่นอนครบทุกอัน ===== */
         .side-buttons {
             position: absolute;
             right: 12px;
@@ -201,9 +200,7 @@
         .nav-item.active .nav-label { color: #fff; font-weight: 600; }
         
         /* ปุ่มกลาง + */
-        .center-plus {
-            position: relative;
-        }
+        .center-plus { position: relative; }
         .plus-btn {
             width: 48px;
             height: 32px;
@@ -259,9 +256,7 @@
             margin: 20px 16px;
             display: inline-block;
         }
-        .form-wrap {
-            padding: 0 16px 100px;
-        }
+        .form-wrap { padding: 0 16px 100px; }
         .form-title {
             text-align: center;
             margin: 20px 0;
@@ -283,6 +278,7 @@
             color: #aaa;
             font-size: 12px;
             margin-bottom: 24px;
+            cursor: pointer;
         }
         .field-label {
             font-size: 13px;
@@ -334,9 +330,7 @@
 </div>
 
 <!-- พื้นที่แสดงโพสต์ -->
-<div class="feed-container" id="feed-container">
-    <!-- เติมด้วย JS อัตโนมัติ -->
-</div>
+<div class="feed-container" id="feed-container"></div>
 
 <!-- หน้าเลือกเพลง -->
 <div class="page" id="page-sound">
@@ -396,7 +390,7 @@
 </div>
 
 <script>
-const VER = '2.1';
+const VER = '2.2';
 
 // ==================== ระบบจัดเก็บข้อมูล ====================
 const DB = {
@@ -464,7 +458,7 @@ let pendingMedia = null;
 let pendingAudio = null;
 let tempAvatar = null;
 
-// ==================== แสดงผลทั้งหมด ====================
+// ==================== แสดงผลทั้งหมด — ปุ่ม+ชื่อครบ ====================
 function renderFeed() {
     const box = document.getElementById('feed-container');
     const posts = DB.listPosts();
@@ -502,12 +496,14 @@ function renderFeed() {
         el.innerHTML = `
             <div class="media-area">${media}</div>
             
+            <!-- ชื่อ+ข้อมูล มุมล่างซ้าย -->
             <div class="post-info">
                 <div class="post-username">${author.name}</div>
                 <div class="post-caption">${post.caption}</div>
                 <div class="post-music">🎵 ${post.music}</div>
             </div>
             
+            <!-- ปุ่มด้านขวา — ครบทุกอัน -->
             <div class="side-buttons">
                 <div class="side-btn">
                     <div class="avatar-holder">
@@ -583,12 +579,12 @@ document.getElementById('save-profile').onclick = () => {
     if (!name) return alert('กรุณาใส่ชื่อครับ');
     DB.saveUser(ME, name, tempAvatar);
     tempAvatar = null;
-    alert('✅ บันทึกแล้ว — ทุกคนเห็นทันที');
+    alert('✅ บันทึกแล้ว — ทุกคนเห็นชื่อใหม่ทันที!');
     renderFeed();
     showPage('feed');
 };
 
-// ==================== อัปโหลด ====================
+// ==================== อัปโหลดโพสต์ ====================
 document.getElementById('media-file').onchange = e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -606,12 +602,12 @@ document.getElementById('audio-file').onchange = e => {
 };
 
 document.getElementById('do-post').onclick = async () => {
-    if (!pendingMedia) return alert('เลือกไฟล์ก่อนครับ');
+    if (!pendingMedia) return alert('เลือกไฟล์ภาพ/วิดีโอก่อนครับ');
     
-    const reader = new FileReader();
     const dataUrl = await new Promise(res => {
-        reader.onload = e => res(e.target.result);
-        reader.readAsDataURL(pendingMedia.file);
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(pendingMedia.file);
     });
     
     DB.addPost(
@@ -674,13 +670,13 @@ async function checkUpdate() {
     } catch (e) {}
 }
 
-// ==================== เริ่มทำงาน ====================
+// ==================== เริ่มทำงานทันที ====================
 renderFeed();
 loadMyProfile();
 checkUpdate();
 setInterval(checkUpdate, 30000);
 
-console.log('✅ Thaipodee v2.1 — ปุ่มครบ ชื่อขึ้น ทุกคนเห็นตรงกัน!');
+console.log('✅ Thaipodee v2.2 — ปุ่มด้านขวาครบ + ชื่อขึ้นชัดเจนแล้ว!');
 </script>
 </body>
 </html>
