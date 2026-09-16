@@ -1,10 +1,11 @@
 <!--
-📌 โค้ดลำดับที่ 3
-📅 วันที่ 16 กันยายน 2569 เวลา 12:20 น.
+📌 โค้ดลำดับที่ 4
+📅 วันที่ 16 กันยายน 2569 เวลา 12:25 น.
 📝 แก้ไข/เพิ่ม:
-- เพิ่มแถบความคืบหน้า/เส้นเวลาวิดีโอ แสดงชัดเจน แตะข้ามได้
-- รักษาเต็มจอ ไม่มีขอบดำ จากลำดับที่ 2
-- ครบทุกปุ่ม ฟังก์ชันเหมือนเดิม
+- เพิ่มปุ่มขยาย/ลดขนาดจอวิดีโอ สลับเต็มจอ/ปกติได้
+- รักษาแถบความคืบหน้าจากลำดับที่ 3
+- รักษาไม่มีขอบดำ เต็มพื้นที่จอ
+- ครบทุกฟังก์ชันเดิม ไม่ตัดอะไรออก
 ✅ ล็อก: ส่วนอื่นที่ทำเสร็จแล้วไม่แตะต้อง
 -->
 <!DOCTYPE html>
@@ -34,12 +35,19 @@
             z-index: 1; background: #000;
             display: none; cursor: pointer;
             margin: 0; padding: 0;
+            transition: all 0.3s ease;
         }
         .video-container.show { display: block; }
+        /* โหมดปกติ — ครอบคลุมเต็มจอ ไม่มีขอบดำ */
         .video-container video { 
             width: 100vw; height: 100vh; height: 100dvh;
             object-fit: cover; background: #000;
             margin: 0; padding: 0; border: none;
+            transition: all 0.3s ease;
+        }
+        /* โหมดพอดีภาพ — ไม่ตัดขอบ */
+        .video-container.fit-mode video {
+            object-fit: contain;
         }
 
         /* แถบความคืบหน้า */
@@ -60,6 +68,16 @@
         }
         .progress-bar-container:hover .progress-thumb,
         .progress-bar-container:active .progress-thumb { opacity: 1; }
+
+        /* ปุ่มขยาย/ลดขนาดจอ */
+        .fullscreen-toggle {
+            position: absolute; bottom: 85px; right: 16px;
+            width: 40px; height: 40px;
+            background: rgba(0,0,0,0.5); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; z-index: 16; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
 
         .play-toggle {
             position: absolute; top: 50%; left: 50%;
@@ -212,6 +230,8 @@
                 <div class="progress-thumb"></div>
             </div>
         </div>
+        <!-- ปุ่มขยาย/ลดขนาดจอ -->
+        <div class="fullscreen-toggle" id="fullscreen-toggle">⛶</div>
     </div>
 
     <div class="center-area" id="welcome-area">
@@ -319,6 +339,7 @@ let selectedSound = { name: 'เสียงต้นฉบับวิดีโ
 let videoFile = null;
 let previewAudio = null;
 let bgAudio = null;
+let isFitMode = false; // สถานะ: false=เต็มจอครอบคลุม, true=พอดีภาพ
 
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -363,6 +384,21 @@ function seekVideo(e) {
     updateProgress();
 }
 
+// สลับโหมดขยาย/ลดจอ
+function toggleFitMode() {
+    const container = document.getElementById('video-container');
+    const btn = document.getElementById('fullscreen-toggle');
+    isFitMode = !isFitMode;
+    
+    if (isFitMode) {
+        container.classList.add('fit-mode');
+        btn.textContent = '⛶'; // พอดีภาพ — ไม่ตัดขอบ
+    } else {
+        container.classList.remove('fit-mode');
+        btn.textContent = '⛶'; // เต็มจอ — ครอบคลุม ไม่มีขอบดำ
+    }
+}
+
 document.getElementById('video-input').addEventListener('change', e => {
     videoFile = e.target.files[0];
     if (!videoFile) return;
@@ -374,6 +410,7 @@ document.getElementById('change-sound').addEventListener('click', () => showPage
 document.getElementById('music-icon-btn').addEventListener('click', () => showPage('page-sound'));
 document.getElementById('back-to-post').addEventListener('click', () => showPage('page-post'));
 document.getElementById('back-to-home').addEventListener('click', () => showPage('page-home'));
+document.getElementById('fullscreen-toggle').addEventListener('click', toggleFitMode);
 
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
@@ -452,7 +489,10 @@ document.getElementById('submit-post').addEventListener('click', async () => {
     showPage('page-home');
 });
 
-document.getElementById('video-container').addEventListener('click', togglePlayPause);
+document.getElementById('video-container').addEventListener('click', (e) => {
+    if (e.target.closest('.fullscreen-toggle') || e.target.closest('.progress-bar-container')) return;
+    togglePlayPause();
+});
 document.getElementById('main-video').addEventListener('timeupdate', updateProgress);
 document.getElementById('progress-container').addEventListener('click', seekVideo);
 </script>
