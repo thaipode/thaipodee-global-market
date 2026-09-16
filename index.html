@@ -1,11 +1,11 @@
 <!--
-📌 โค้ดลำดับที่ 5
-📅 16 กันยายน 2569 เวลา 12:35 น.
+📌 โค้ดลำดับที่ 6
+📅 16 กันยายน 2569 เวลา 12:55 น.
 📝 แก้ไข:
-- ยึดอัตราส่วน 9:16 แนวตั้ง พอดีจอ ไม่ตัดส่วนบน-ล่าง
-- ขยายซ้าย-ขวาเต็มจอ ไม่มีขอบดำ
-- โลโก้และเนื้อหาไม่ถูกบังทั้งสองโหมด
-- รักษาแถบเวลา + ปุ่มขยายเหมือนเดิม
+- ทั้งโหมดปกติและฟูลสกรีน → ไม่ตัดโลโก้บน-ล่าง แสดงครบทุกส่วน
+- ยึดอัตราส่วน 9:16 ตลอด เวลาขยายก็ไม่ตัด
+- ปรับขนาดอัตโนมัติตามจอแต่ละเครื่อง
+- รักษาแถบเวลา + ปุ่มสลับเหมือนเดิม
 ✅ ล็อก: ส่วนอื่นไม่แตะต้อง
 -->
 <!DOCTYPE html>
@@ -35,28 +35,29 @@
             z-index: 1; background: #000;
             display: none; cursor: pointer;
             margin: 0; padding: 0;
+            overflow: hidden;
         }
         .video-container.show { display: block; }
 
-        /* โหมดปกติ — ยึด 9:16 ไม่ตัดส่วนสำคัญ เต็มซ้าย-ขวา */
+        /* วิดีโอ — ยึด 9:16 ไม่ตัดส่วนไหนเลย ทุกโหมด */
         .video-container video { 
             position: absolute;
             left: 50%; top: 50%;
             transform: translate(-50%, -50%);
             width: 100vw;
-            height: calc(100vw * 16 / 9); /* อัตราส่วน 9:16 */
+            height: calc(100vw * 16 / 9); /* 9:16 แนวตั้ง */
             max-height: 100vh; max-height: 100dvh;
-            object-fit: contain; /* แสดงทั้งภาพ ไม่ตัด */
+            object-fit: contain; /* แสดงทั้งภาพ ไม่ตัดเด็ดขาด */
             background: #000;
             border: none;
             transition: all 0.3s ease;
         }
 
-        /* โหมดเต็มจอ — ขยายให้พอดีจอแต่ยังรักษา 9:16 */
-        .video-container.full-expand video {
-            width: 100vw;
-            height: 100vh; height: 100dvh;
-            object-fit: cover;
+        /* โหมดขยาย — ขยายใหญ่ขึ้นแต่ยังไม่ตัด */
+        .video-container.zoomed video {
+            width: min(100vw, calc(100dvh * 9 / 16));
+            height: min(100dvh, calc(100vw * 16 / 9));
+            object-fit: contain; /* ยังไม่ตัด */
         }
 
         /* แถบความคืบหน้า */
@@ -78,7 +79,7 @@
         .progress-bar-container:hover .progress-thumb,
         .progress-bar-container:active .progress-thumb { opacity: 1; }
 
-        /* ปุ่มขยาย/ลดขนาดจอ */
+        /* ปุ่มขยาย/ลด */
         .fullscreen-toggle {
             position: absolute; bottom: 85px; right: 16px;
             width: 40px; height: 40px;
@@ -233,13 +234,11 @@
     <div class="video-container" id="video-container">
         <video id="main-video" loop playsinline preload="auto"></video>
         <div class="play-toggle" id="play-toggle">⏸</div>
-        <!-- แถบความคืบหน้า -->
         <div class="progress-bar-container" id="progress-container">
             <div class="progress-bar" id="progress-bar">
                 <div class="progress-thumb"></div>
             </div>
         </div>
-        <!-- ปุ่มขยาย/ลดขนาดจอ -->
         <div class="fullscreen-toggle" id="fullscreen-toggle">⛶</div>
     </div>
 
@@ -348,7 +347,7 @@ let selectedSound = { name: 'เสียงต้นฉบับวิดีโ
 let videoFile = null;
 let previewAudio = null;
 let bgAudio = null;
-let isExpandMode = false; // false=พอดี9:16, true=ขยายเต็มจอ
+let isZoomed = false; // false=ปกติ, true=ขยาย — ทั้งคู่ไม่ตัด
 
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -372,7 +371,6 @@ function togglePlayPause() {
     window._toggleTimer = setTimeout(() => toggle.classList.remove('show'), 1200);
 }
 
-// อัปเดตแถบความคืบหน้า
 function updateProgress() {
     const mainVideo = document.getElementById('main-video');
     const progressBar = document.getElementById('progress-bar');
@@ -381,7 +379,6 @@ function updateProgress() {
     progressBar.style.width = pct + '%';
 }
 
-// แตะเพื่อข้ามเวลา
 function seekVideo(e) {
     const mainVideo = document.getElementById('main-video');
     const container = document.getElementById('progress-container');
@@ -393,15 +390,14 @@ function seekVideo(e) {
     updateProgress();
 }
 
-// สลับโหมด — พอดี9:16 / ขยายเต็มจอ
-function toggleExpandMode() {
+// สลับขยาย — ไม่ตัดโลโก้ ไม่ตัดส่วนไหนเลย
+function toggleZoom() {
     const container = document.getElementById('video-container');
-    isExpandMode = !isExpandMode;
-    
-    if (isExpandMode) {
-        container.classList.add('full-expand');
+    isZoomed = !isZoomed;
+    if (isZoomed) {
+        container.classList.add('zoomed');
     } else {
-        container.classList.remove('full-expand');
+        container.classList.remove('zoomed');
     }
 }
 
@@ -416,7 +412,7 @@ document.getElementById('change-sound').addEventListener('click', () => showPage
 document.getElementById('music-icon-btn').addEventListener('click', () => showPage('page-sound'));
 document.getElementById('back-to-post').addEventListener('click', () => showPage('page-post'));
 document.getElementById('back-to-home').addEventListener('click', () => showPage('page-home'));
-document.getElementById('fullscreen-toggle').addEventListener('click', toggleExpandMode);
+document.getElementById('fullscreen-toggle').addEventListener('click', toggleZoom);
 
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
