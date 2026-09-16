@@ -1,10 +1,9 @@
 <!--
-📌 โค้ดลำดับที่ 10 แก้ไข
-📅 16 กันยายน 2569 เวลา 14:25 น.
-✅ ไม่มีข้อความกวนใจ
-✅ อัปโหลดเสร็จ → ส่งส่วนกลางอัตโนมัติ
-✅ เมนูขึ้นเฉพาะตอนมีวิดีโอ
-✅ ทุกอย่างเดิมล็อกไว้แล้ว
+📌 โค้ดลำดับที่ 10 แก้ไขปัญหาเสียงไม่เปลี่ยน
+📅 16 กันยายน 2569 เวลา 14:57 น.
+✅ เพิ่มเพลง: กำลังใจจากแนวหลัง
+✅ เลือกเพลง → ปิดเสียงวิดีโอ → เปิดเสียงเพลงใหม่ทันที
+✅ ซิงค์เวลาเสียงกับวิดีโอเสมอ
 -->
 <!DOCTYPE html>
 <html lang="th">
@@ -25,30 +24,19 @@
         }
         .page.active { display: block; }
 
-        /* ===== หน้าฟีดหลัก ===== */
-        .feed-container {
-            position: absolute; inset: 0;
-            overflow: hidden;
-        }
-        .feed-slider {
-            transition: transform 0.4s ease-out;
-        }
+        .feed-container { position: absolute; inset: 0; overflow: hidden; }
+        .feed-slider { transition: transform 0.4s ease-out; }
         .post-slide {
-            position: relative;
-            width: 100vw; height: 100vh; height: 100dvh;
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; width: 100vw; height: 100vh; height: 100dvh;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
         }
 
         .video-wrapper {
-            position: relative;
-            width: 100vw; height: 100vh; height: 100dvh;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+            position: relative; width: 100vw; height: 100vh; height: 100dvh;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
         .video-wrapper video {
-            width: 100vw;
-            height: calc(100vw * 16 / 9);
+            width: 100vw; height: calc(100vw * 16 / 9);
             max-height: 100vh; max-height: 100dvh;
             object-fit: contain; background: #000;
         }
@@ -56,15 +44,14 @@
             width: min(100vw, calc(100dvh * 9 / 16));
             height: min(100dvh, calc(100vw * 16 / 9));
         }
+        .bg-audio { position: absolute; opacity: 0; pointer-events: none; }
 
         .progress-bar-container {
             position: absolute; bottom: 70px; left: 12px; right: 12px;
             height: 4px; background: rgba(255,255,255,0.2);
             border-radius: 2px; z-index: 15; cursor: pointer;
         }
-        .progress-bar {
-            height: 100%; width: 0%; background: #fff; border-radius: 2px;
-        }
+        .progress-bar { height: 100%; width: 0%; background: #fff; border-radius: 2px; }
         .fullscreen-toggle {
             position: absolute; bottom: 85px; right: 16px;
             width: 40px; height: 40px; background: rgba(0,0,0,0.5);
@@ -80,9 +67,7 @@
         }
         .play-toggle.show { opacity: 1; }
 
-        .info-left {
-            position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10;
-        }
+        .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; }
         .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
         .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
@@ -129,7 +114,6 @@
         }
         .new-badge.show { display: block; }
 
-        /* ===== หน้าเลือกเสียง ===== */
         .sound-page { 
             background: #000; padding: 16px; overflow-y: auto;
             height: 100vh; height: 100dvh; width: 100vw;
@@ -164,23 +148,15 @@
         .local-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .local-icon { font-size: 24px; }
         .hidden-input { display: none; }
-        .auto-save-note {
-            position: absolute; top: 12px; right: 12px;
-            font-size: 11px; color: #4ade80; background: rgba(0,0,0,0.5);
-            padding: 4px 8px; border-radius: 10px; z-index: 30;
-        }
     </style>
 </head>
 <body>
 
-<!-- ===== หน้าฟีดหลัก — ไม่มีข้อความกวนใจ ===== -->
 <div id="page-feed" class="page active">
     <div class="new-badge" id="new-badge">✅ มีโพสต์ใหม่</div>
-
     <div class="feed-container" id="feed-container">
         <div class="feed-slider" id="feed-slider"></div>
     </div>
-
     <div class="nav-bottom">
         <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
@@ -194,14 +170,13 @@
     </div>
 </div>
 
-<!-- ===== หน้าเลือกเสียง ===== -->
 <div id="page-sound" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" id="back-skip">← ข้าม ใช้เสียงเดิม</span>
         <span class="sound-title">เลือกเสียง</span>
         <span></span>
     </div>
-    <p class="tip-text">💡 เลือกเสียงหรือข้าม → บันทึกอัตโนมัติทันที</p>
+    <p class="tip-text">💡 เลือกเพลงใหม่ → เสียงจะเปลี่ยนทันที</p>
 
     <div class="section-title">📂 เสียงในเครื่อง</div>
     <div class="local-upload-area">
@@ -209,14 +184,23 @@
             <span class="local-icon">📁</span>
             <div class="sound-info">
                 <div class="sound-name">เลือกไฟล์เสียงจากเครื่อง</div>
-                <div class="sound-desc">MP3, WAV — เสียงของคุณ</div>
+                <div class="sound-desc">MP3, WAV — รวม "กำลังใจจากแนวหลัง"</div>
             </div>
             <input type="file" accept="audio/*" id="audio-local-input" class="hidden-input">
         </label>
     </div>
 
-    <div class="section-title">🎵 เสียงฟรี</div>
+    <div class="section-title">🎵 เพลงแนะนำ</div>
     
+    <div class="sound-row" data-id="song-klang" data-name="กำลังใจจากแนวหลัง" data-url="">
+        <div class="play-btn" data-id="song-klang">▶</div>
+        <div class="sound-info">
+            <div class="sound-name">🎵 กำลังใจจากแนวหลัง</div>
+            <div class="sound-desc">เพลงประจำ — เลือกจากไฟล์ของคุณเอง</div>
+        </div>
+        <button class="select-btn" data-id="song-klang">เลือก</button>
+    </div>
+
     <div class="sound-row" data-id="s1" data-name="จังหวะสดใส - เช้าวันใหม่" data-url="https://cdn.pixabay.com/download/audio/2022/03/15/audio_94d14034c0.mp3?filename=upbeat-1122.mp3">
         <div class="play-btn" data-id="s1">▶</div>
         <div class="sound-info">
@@ -234,23 +218,11 @@
         </div>
         <button class="select-btn" data-id="s2">เลือก</button>
     </div>
-
-    <div class="sound-row" data-id="s3" data-name="ผ่อนคลาย - ธรรมชาติ" data-url="https://cdn.pixabay.com/download/audio/2022/10/25/audio_215924936f.mp3?filename=relaxing-ambient-122146.mp3">
-        <div class="play-btn" data-id="s3">▶</div>
-        <div class="sound-info">
-            <div class="sound-name">ผ่อนคลาย - ธรรมชาติ</div>
-            <div class="sound-desc">สงบ สบายใจ · ฟรีลิขสิทธิ์</div>
-        </div>
-        <button class="select-btn" data-id="s3">เลือก</button>
-    </div>
 </div>
 
 <script>
-// ===== ตัวแปรหลัก =====
-let selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
-let videoFile = null;
+let selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
 let pendingVideoUrl = null;
-let pendingCaption = '';
 let previewAudio = null;
 let isZoomed = false;
 let currentSlide = 0;
@@ -258,124 +230,89 @@ let touchStartY = 0;
 let isDragging = false;
 const MY_ACCOUNT = '@ThaiPodee_Master ✨';
 
-// ===== ระบบส่วนกลาง =====
 const CLOUD = {
     KEY: 'thaipodee_feed_v10',
-    
-    getAll() {
-        try {
-            const data = localStorage.getItem(this.KEY);
-            return data ? JSON.parse(data) : [];
-        } catch { return []; }
-    },
-    
-    saveAll(list) {
-        localStorage.setItem(this.KEY, JSON.stringify(list));
-        return true;
-    },
-    
-    addPost(post) {
-        const all = this.getAll();
-        all.unshift(post);
-        this.saveAll(all);
-        return all;
-    }
+    getAll() { try { const d = localStorage.getItem(this.KEY); return d ? JSON.parse(d) : []; } catch { return []; } },
+    saveAll(list) { localStorage.setItem(this.KEY, JSON.stringify(list)); return true; },
+    addPost(post) { const a = this.getAll(); a.unshift(post); this.saveAll(a); return a; }
 };
-
 let allPosts = CLOUD.getAll();
 
-// ===== เปลี่ยนหน้า =====
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
 
-// ===== สร้างโพสต์แต่ละอัน — แสดงเมนูเฉพาะตอนมีวิดีโอ =====
 function buildPostSlide(post, index) {
     const isActive = index === currentSlide;
+    const hasNewAudio = !!post.soundUrl;
     return `
     <div class="post-slide" data-index="${index}" style="transform: translateY(${index * 100}vh);">
         <div class="video-wrapper ${isZoomed ? 'zoomed' : ''}" id="video-wrap-${index}">
-            <video id="video-${index}" loop playsinline preload="auto" ${isActive ? 'autoplay' : ''} muted>
+            <video id="video-${index}" loop playsinline preload="auto" ${isActive ? 'autoplay' : ''} ${hasNewAudio ? 'muted' : ''}>
                 <source src="${post.videoUrl}" type="video/mp4">
             </video>
+            ${hasNewAudio ? `<audio class="bg-audio" id="audio-${index}" loop src="${post.soundUrl}">` : ''}
             <div class="play-toggle" id="play-toggle-${index}">⏸</div>
             <div class="progress-bar-container" data-index="${index}">
                 <div class="progress-bar" id="progress-${index}"></div>
             </div>
             <div class="fullscreen-toggle" data-index="${index}">⛶</div>
-            <div class="auto-save-note">บันทึกอัตโนมัติ ✅</div>
         </div>
-        
         <div class="info-left">
             <div class="acc-name">${post.author}</div>
             <div class="desc-text">${post.caption}</div>
             <div class="music-row">🎵 ${post.soundName}</div>
         </div>
-        
         <div class="menu-right">
-            <div class="menu-btn">
-                <div class="avatar-box">
-                    <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
-                    <span class="follow-plus">+</span>
-                </div>
-            </div>
-            <div class="menu-btn" data-action="like" data-index="${index}">
-                <span class="icon">❤️</span>
-                <span class="num">${post.likes || 0}</span>
-            </div>
+            <div class="menu-btn"><div class="avatar-box"><img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์"><span class="follow-plus">+</span></div></div>
+            <div class="menu-btn"><span class="icon">❤️</span><span class="num">${post.likes || 0}</span></div>
             <div class="menu-btn"><span class="icon">💬</span><span class="num">${post.comments || 0}</span></div>
-            <div class="menu-btn" data-action="save" data-index="${index}">
-                <span class="icon">⭐</span>
-                <span class="num">${post.saves || 0}</span>
-            </div>
+            <div class="menu-btn"><span class="icon">⭐</span><span class="num">${post.saves || 0}</span></div>
             <div class="menu-btn"><span class="icon">↗️</span><span class="num">${post.shares || 0}</span></div>
             <div class="menu-btn"><span class="icon">🎵</span></div>
         </div>
     </div>`;
 }
 
-// ===== แสดงฟีด — ถ้าไม่มีโพสต์ = ว่างเลย ไม่มีข้อความ =====
 function renderFeed() {
     allPosts = CLOUD.getAll();
     const slider = document.getElementById('feed-slider');
-    const feedContainer = document.getElementById('feed-container');
     const newBadge = document.getElementById('new-badge');
-    
-    if (allPosts.length === 0) {
-        slider.innerHTML = '';
-        newBadge.classList.remove('show');
-        return;
-    }
-    
+    if (allPosts.length === 0) { slider.innerHTML = ''; newBadge.classList.remove('show'); return; }
     newBadge.classList.remove('show');
     slider.innerHTML = allPosts.map((p, i) => buildPostSlide(p, i)).join('');
     updateSliderPosition();
     attachVideoEvents();
 }
 
-// ===== เลื่อนฟีดขึ้นลง =====
 function updateSliderPosition() {
     const slider = document.getElementById('feed-slider');
     slider.style.transform = `translateY(-${currentSlide * 100}vh)`;
     
     allPosts.forEach((_, i) => {
         const video = document.getElementById(`video-${i}`);
+        const audio = document.getElementById(`audio-${i}`);
         if (!video) return;
+        
         if (i === currentSlide) {
-            video.muted = false;
             video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
+            if (audio) {
+                audio.currentTime = video.currentTime;
+                audio.play().catch(() => {});
+            }
         } else {
             video.pause();
+            if (audio) audio.pause();
         }
     });
 }
 
-// ===== จับเหตุการณ์วิดีโอ =====
 function attachVideoEvents() {
     allPosts.forEach((_, i) => {
         const wrap = document.getElementById(`video-wrap-${i}`);
         const video = document.getElementById(`video-${i}`);
+        const audio = document.getElementById(`audio-${i}`);
         const toggle = document.getElementById(`play-toggle-${i}`);
         if (!wrap || !video) return;
         
@@ -383,9 +320,11 @@ function attachVideoEvents() {
             if (e.target.closest('.fullscreen-toggle') || e.target.closest('.progress-bar-container')) return;
             if (video.paused) {
                 video.play();
+                if (audio) audio.play().catch(() => {});
                 toggle.textContent = '⏸';
             } else {
                 video.pause();
+                if (audio) audio.pause();
                 toggle.textContent = '▶';
             }
             toggle.classList.add('show');
@@ -397,32 +336,24 @@ function attachVideoEvents() {
             const bar = document.getElementById(`progress-${i}`);
             if (!bar || !video.duration) return;
             bar.style.width = ((video.currentTime / video.duration) * 100) + '%';
+            if (audio && Math.abs(audio.currentTime - video.currentTime) > 0.1) {
+                audio.currentTime = video.currentTime;
+            }
         };
     });
 }
 
-// ===== จับนิ้วเลื่อน =====
-document.addEventListener('touchstart', e => {
-    touchStartY = e.touches[0].clientY;
-    isDragging = true;
-});
+document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; isDragging = true; });
 document.addEventListener('touchend', e => {
-    if (!isDragging) return;
-    isDragging = false;
-    const endY = e.changedTouches[0].clientY;
-    const diff = touchStartY - endY;
-    
+    if (!isDragging) return; isDragging = false;
+    const diff = touchStartY - e.changedTouches[0].clientY;
     if (Math.abs(diff) > 50) {
-        if (diff > 0 && currentSlide < allPosts.length - 1) {
-            currentSlide++;
-        } else if (diff < 0 && currentSlide > 0) {
-            currentSlide--;
-        }
+        if (diff > 0 && currentSlide < allPosts.length - 1) currentSlide++;
+        else if (diff < 0 && currentSlide > 0) currentSlide--;
         updateSliderPosition();
     }
 });
 
-// ===== ขยายจอ =====
 document.addEventListener('click', e => {
     if (e.target.classList.contains('fullscreen-toggle')) {
         isZoomed = !isZoomed;
@@ -430,36 +361,40 @@ document.addEventListener('click', e => {
     }
 });
 
-// ===== กดอัปโหลดวิดีโอ =====
 document.getElementById('video-input').addEventListener('change', e => {
-    videoFile = e.target.files[0];
-    if (!videoFile) return;
-    
-    // ถ้ามีวิดีโอ → ไปเลือกเสียง หรือข้ามเลย
-    pendingVideoUrl = URL.createObjectURL(videoFile);
+    const f = e.target.files[0];
+    if (!f) return;
+    pendingVideoUrl = URL.createObjectURL(f);
     showPage('page-sound');
 });
 
-// ===== ข้ามเลือกเสียง → ใช้เสียงเดิม บันทึกเลย =====
 document.getElementById('back-skip').addEventListener('click', () => {
-    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
+    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
     autoPublish();
 });
 
-// ===== เลือกเสียงจากเครื่อง =====
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
-    selectedSound = { name: '📁 ' + f.name, url: URL.createObjectURL(f) };
+    selectedSound = { 
+        name: '🎵 ' + f.name, 
+        url: URL.createObjectURL(f),
+        isLocal: true
+    };
     autoPublish();
 });
 
-// ===== เลือกเสียงจากรายการ =====
 document.querySelectorAll('.play-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
-        const url = row.dataset.url;
+        let url = row.dataset.url;
         const id = row.dataset.id;
+        
+        if (id === 'song-klang' && !url) {
+            alert('📁 กรุณาเลือกไฟล์ "กำลังใจจากแนวหลัง" จากปุ่มด้านบนก่อนครับ');
+            return;
+        }
+        
         if (previewAudio && previewAudio.datasetPlaying === id) {
             previewAudio.pause(); previewAudio = null;
             document.querySelectorAll('.play-btn').forEach(b => b.textContent = '▶');
@@ -477,12 +412,20 @@ document.querySelectorAll('.play-btn').forEach(btn => {
 document.querySelectorAll('.select-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
-        selectedSound = { name: row.dataset.name, url: row.dataset.url };
+        let url = row.dataset.url;
+        const id = row.dataset.id;
+        const name = row.dataset.name;
+        
+        if (id === 'song-klang' && !url) {
+            alert('📁 กรุณาเลือกไฟล์ "กำลังใจจากแนวหลัง" จากปุ่มด้านบนก่อนครับ');
+            return;
+        }
+        
+        selectedSound = { name, url, isLocal: false };
         autoPublish();
     });
 });
 
-// ===== ⭐ ส่งขึ้นส่วนกลางอัตโนมัติ ไม่ต้องกดอะไรอีก =====
 function autoPublish() {
     const newPost = {
         id: Date.now(),
@@ -491,28 +434,17 @@ function autoPublish() {
         videoUrl: pendingVideoUrl,
         soundName: selectedSound.name,
         soundUrl: selectedSound.url,
-        likes: 0,
-        comments: 0,
-        saves: 0,
-        shares: 0,
+        likes: 0, comments: 0, saves: 0, shares: 0,
         createdAt: new Date().toISOString()
     };
-    
-    // บันทึกส่วนกลางทันที
     allPosts = CLOUD.addPost(newPost);
     currentSlide = 0;
-    
-    // รีเซ็ต
-    videoFile = null;
     pendingVideoUrl = null;
-    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
-    
-    // กลับไปหน้าแรก → เห็นวิดีโอทันที
+    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
     showPage('page-feed');
     renderFeed();
 }
 
-// ===== ตรวจสอบโพสต์ใหม่จากเครื่องอื่น =====
 setInterval(() => {
     const latest = CLOUD.getAll();
     if (JSON.stringify(latest) !== JSON.stringify(allPosts)) {
@@ -522,9 +454,7 @@ setInterval(() => {
     }
 }, 3000);
 
-// ===== เริ่มทำงาน =====
 window.addEventListener('load', renderFeed);
 </script>
-
 </body>
 </html>
