@@ -11,71 +11,117 @@ html,body{height:100vh;overflow:hidden;background:#000;color:#fff;}
 .page{display:none;position:absolute;inset:0;}
 .page.active{display:block;}
 
-/* พื้นที่วิดีโอ */
-.video-wrap{position:absolute;inset:0;z-index:1;display:none;}
+/* ===== หน้าหลัก ===== */
+/* วิดีโอ */
+.video-wrap{position:absolute;inset:0;z-index:1;display:none;background:#000;}
 video{width:100%;height:100%;object-fit:contain;}
 
-/* ข้อความต้อนรับตรงกลาง */
+/* ข้อความต้อนรับ */
 .welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:24px;}
 .welcome-txt{color:#fff;font-size:16px;text-align:center;line-height:2;}
 
-/* ข้อมูลด้านซ้ายล่าง */
+/* ข้อมูลซ้ายล่าง */
 .info-left{position:absolute;left:16px;bottom:90px;right:90px;z-index:8;display:none;}
 .acc-name{font-weight:700;font-size:15px;margin-bottom:4px;}
 .desc-txt{font-size:13px;color:#ddd;margin-bottom:6px;}
 .music-line{font-size:12px;color:#aaa;display:flex;align-items:center;gap:6px;}
 
-/* เมนูด้านขวา */
-.menu-right{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;align-items:center;z-index:15;}
+/* เมนูด้านขวา — 6 อันครบ */
+.menu-right{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;
+  gap:22px;align-items:center;z-index:15;
+  display:none;
+}
 .menu-btn{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.icon{font-size:28px;color:#fff;}
+/* 1. โปรไฟล์ */
+.avatar-box{position:relative;width:48px;height:48px;margin-bottom:2px;}
+.avatar{width:100%;height:100%;border-radius:50%;border:2px solid #fff;background:#555;object-fit:cover;}
+.follow-plus{
+  position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  width:20px;height:20px;background:#ff2442;border-radius:50%;
+  font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;
+}
+.icon{font-size:28px;color:#fff;line-height:1;}
 .num{font-size:11px;color:#fff;}
 
-/* แถบเมนูด้านล่าง */
-.nav-bottom{position:absolute;bottom:0;left:0;right:0;height:65px;display:flex;justify-content:space-around;align-items:flex-end;padding:8px 12px 16px;z-index:20;}
+/* แถบเมนูล่าง */
+.nav-bottom{
+  position:absolute;bottom:0;left:0;right:0;height:65px;
+  display:flex;justify-content:space-around;align-items:flex-end;
+  padding:8px 12px 16px;z-index:20;
+}
 .nav-col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:60px;}
 .nav-icon{font-size:24px;color:#fff;}
 .nav-label{font-size:10px;color:#aaa;}
 
-/* ปุ่มอัปโหลดตรงกลางล่าง */
+/* ปุ่มอัปโหลดตรงกลาง */
 .upload-wrap{position:relative;cursor:pointer;}
 .upload-btn{width:48px;height:32px;background:#fff;border-radius:6px;position:relative;}
 .upload-btn::before{content:'';position:absolute;width:20px;height:2px;background:#000;top:50%;left:50%;transform:translate(-50%,-50%);}
 .upload-btn::after{content:'';position:absolute;width:2px;height:20px;background:#000;left:50%;top:50%;transform:translate(-50%,-50%);}
 #file-input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+/* ===== หน้าเลือกเพลง ===== */
+.sound-page{background:#000;padding:16px;overflow-y:auto;height:100vh;}
+.back-btn{position:absolute;top:12px;left:12px;font-size:22px;color:#fff;cursor:pointer;z-index:50;}
+.sound-title{text-align:center;font-size:18px;font-weight:bold;margin:12px 0 24px;}
+.sound-section-title{font-size:14px;color:#888;margin:20px 0 10px;}
+/* รายการเพลงตัวอย่าง */
+.sound-box{background:#1e1e1e;border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;}
+.sound-box:hover{background:#2a2a2a;}
+.sound-name{font-weight:bold;margin-bottom:3px;}
+.sound-artist{font-size:12px;color:#888;}
+/* เลือกไฟล์เพลงจากเครื่อง */
+.music-upload{background:#1e1e1e;border-radius:10px;padding:16px;text-align:center;margin:20px 0;cursor:pointer;}
+.music-upload-text{font-size:14px;color:#ccc;}
+#music-file{display:none;}
 </style>
 </head>
 <body>
 
-<!-- หน้าหลัก -->
+<!-- ===== หน้าหลัก ===== -->
 <div id="page-home" class="page active">
   <!-- พื้นที่วิดีโอ -->
   <div class="video-wrap" id="video-container">
-    <video id="main-video" autoplay playsinline muted></video>
+    <video id="main-video" controls playsinline></video>
   </div>
 
-  <!-- ข้อความต้อนรับ -->
+  <!-- ข้อความต้อนรับ — แสดงก่อนเลือกวิดีโอ -->
   <div class="welcome" id="welcome-box">
     <p class="welcome-txt">🎥 กดปุ่ม + เพื่อเลือกวิดีโอ<br>เริ่มใช้งาน ThaiPodee Market</p>
   </div>
 
-  <!-- ข้อมูลด้านซ้ายล่าง -->
+  <!-- ข้อมูลด้านซ้ายล่าง — แสดงหลังเลือกวิดีโอ -->
   <div class="info-left" id="info-box">
     <div class="acc-name">@ThaiPodee_Master</div>
     <div class="desc-txt" id="caption">ยินดีต้อนรับสู่ ThaiPodee Market</div>
-    <div class="music-line">🎵 เสียงต้นฉบับวิดีโอ</div>
+    <div class="music-line" id="music-display">🎵 เสียงต้นฉบับวิดีโอ</div>
   </div>
 
-  <!-- เมนูด้านขวา -->
+  <!-- เมนูด้านขวา — 6 อัน ครบถ้วน -->
   <div class="menu-right" id="right-menu">
+    <!-- 1. โปรไฟล์ -->
+    <div class="menu-btn">
+      <div class="avatar-box">
+        <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
+        <span class="follow-plus">+</span>
+      </div>
+    </div>
+    <!-- 2. ถูกใจ -->
     <div class="menu-btn"><span class="icon">❤️</span><span class="num">0</span></div>
+    <!-- 3. คอมเมนต์ -->
     <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
+    <!-- 4. บันทึก -->
     <div class="menu-btn"><span class="icon">⭐</span><span class="num">บันทึก</span></div>
+    <!-- 5. แชร์ -->
     <div class="menu-btn"><span class="icon">↗️</span><span class="num">แชร์</span></div>
-    <div class="menu-btn"><span class="icon">🎵</span></div>
+    <!-- 6. เลือกเพลง -->
+    <div class="menu-btn" id="open-sound-btn"><span class="icon">🎵</span></div>
   </div>
 
-  <!-- แถบเมนูล่าง -->
+  <!-- แถบเมนูด้านล่าง -->
   <div class="nav-bottom">
     <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
     <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
@@ -89,32 +135,96 @@ video{width:100%;height:100%;object-fit:contain;}
   </div>
 </div>
 
+<!-- ===== หน้าเลือกเพลง ===== -->
+<div id="page-sound" class="page sound-page">
+  <span class="back-btn" id="back-to-home">←</span>
+  <h2 class="sound-title">เลือกเพลงประกอบ</h2>
+
+  <p class="sound-section-title">เพลงยอดนิยม</p>
+  <div class="sound-box" data-name="เพลงที่ 1" data-artist="ศิลปิน A">
+    <div class="sound-name">เพลงที่ 1 — ตัวอย่างเสียงบรรเลง</div>
+    <div class="sound-artist">ศิลปิน A · ไม่มีลิขสิทธิ์</div>
+  </div>
+  <div class="sound-box" data-name="เพลงที่ 2" data-artist="ศิลปิน B">
+    <div class="sound-name">เพลงที่ 2 — จังหวะสนุกสนาน</div>
+    <div class="sound-artist">ศิลปิน B · ไม่มีลิขสิทธิ์</div>
+  </div>
+  <div class="sound-box" data-name="เพลงที่ 3" data-artist="ศิลปิน C">
+    <div class="sound-name">เพลงที่ 3 — เพลงบรรเลงเบาๆ</div>
+    <div class="sound-artist">ศิลปิน C · ไม่มีลิขสิทธิ์</div>
+  </div>
+
+  <p class="sound-section-title">เลือกจากไฟล์ในเครื่อง</p>
+  <label class="music-upload">
+    <span class="music-upload-text">📂 กดเพื่อเลือกไฟล์เพลงของคุณ (.mp3, .wav)</span>
+    <input type="file" id="music-file" accept="audio/*">
+  </label>
+</div>
+
 <script>
-// ตัวแปร
-const fileInput = document.getElementById('file-input');
+// ===== ตัวแปรทั้งหมด =====
+const pageHome = document.getElementById('page-home');
+const pageSound = document.getElementById('page-sound');
+const welcomeBox = document.getElementById('welcome-box');
 const videoContainer = document.getElementById('video-container');
 const mainVideo = document.getElementById('main-video');
-const welcomeBox = document.getElementById('welcome-box');
 const infoBox = document.getElementById('info-box');
 const rightMenu = document.getElementById('right-menu');
+const musicDisplay = document.getElementById('music-display');
 
-// เมื่อเลือกวิดีโอ
+const fileInput = document.getElementById('file-input');
+const openSoundBtn = document.getElementById('open-sound-btn');
+const backToHome = document.getElementById('back-to-home');
+const soundBoxes = document.querySelectorAll('.sound-box');
+const musicFileInput = document.getElementById('music-file');
+
+// ===== 1. เลือกวิดีโอ =====
 fileInput.addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  
-  // สร้างลิงก์ไฟล์
-  const videoURL = URL.createObjectURL(file);
-  
+
   // แสดงวิดีโอ ซ่อนข้อความต้อนรับ
-  mainVideo.src = videoURL;
-  videoContainer.style.display = 'block';
+  mainVideo.src = URL.createObjectURL(file);
   welcomeBox.style.display = 'none';
+  videoContainer.style.display = 'block';
   infoBox.style.display = 'block';
   rightMenu.style.display = 'flex';
-  
-  // เล่นวิดีโอ
-  mainVideo.play().catch(err => console.log('Autoplay blocked:', err));
+
+  // เล่นอัตโนมัติ
+  mainVideo.play().catch(() => {});
+});
+
+// ===== 2. เปิดหน้าเลือกเพลง =====
+openSoundBtn.addEventListener('click', function() {
+  pageHome.classList.remove('active');
+  pageSound.classList.add('active');
+});
+
+// ===== 3. กลับจากหน้าเลือกเพลง =====
+backToHome.addEventListener('click', function() {
+  pageSound.classList.remove('active');
+  pageHome.classList.add('active');
+});
+
+// ===== 4. เลือกเพลงจากรายการ =====
+soundBoxes.forEach(box => {
+  box.addEventListener('click', function() {
+    const name = this.getAttribute('data-name');
+    const artist = this.getAttribute('data-artist');
+    musicDisplay.textContent = '🎵 ' + name + ' — ' + artist;
+    // กลับไปหน้าวิดีโอ
+    pageSound.classList.remove('active');
+    pageHome.classList.add('active');
+  });
+});
+
+// ===== 5. เลือกเพลงจากไฟล์ในเครื่อง =====
+musicFileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  musicDisplay.textContent = '🎵 ' + file.name;
+  pageSound.classList.remove('active');
+  pageHome.classList.add('active');
 });
 </script>
 
