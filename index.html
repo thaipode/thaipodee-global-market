@@ -8,10 +8,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
-        .page { display: none; position: absolute; inset: 0; background: #000; }
+        .page { display: none; position: absolute; inset: 0; }
         .page.active { display: block; }
 
-        .video-container { position: absolute; inset: 0; background: #000; z-index: 1; display: none; }
+        .video-container { position: absolute; inset: 0; z-index: 1; display: none; background: #000; }
         .video-container video { width: 100%; height: 100%; object-fit: contain; }
 
         .center-area { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
@@ -22,19 +22,30 @@
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
         .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 
-        /* ===== เมนูด้านขวา — แก้ให้แสดงชัดเจน ===== */
+        /* ==========================================
+           เมนูด้านขวา — แสดงตลอดเวลาเลย!
+           ========================================== */
         .menu-right {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-            z-index: 20;
-            align-items: center;
-            /* เริ่มต้นซ่อน — แสดงเมื่อโหลดวิดีโอแล้ว */
-            display: none;
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 20px !important;
+            z-index: 99999 !important; /* สูงที่สุดเท่าที่จะทำได้ */
+            align-items: center !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        /* ก่อนโพสต์ — ทึบเล็กน้อย เพื่อไม่กวนสายตา */
+        .menu-right.before-post {
+            opacity: 0.3 !important;
+        }
+        /* หลังโพสต์ — ชัดเจนเต็มที่ */
+        .menu-right.after-post {
+            opacity: 1 !important;
         }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .avatar-box { position: relative; width: 48px; height: 48px; margin-bottom: 4px; }
@@ -44,13 +55,13 @@
             width: 20px; height: 20px; background: #ff2442; border-radius: 50%;
             font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
         }
-        .icon { font-size: 28px; line-height: 1; color: #fff; }
-        .num { font-size: 11px; margin-top: 2px; color: #fff; }
+        .icon { font-size: 28px; line-height: 1; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .num { font-size: 11px; margin-top: 2px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
         .nav-bottom {
             position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
             display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 8px 12px 16px; z-index: 25; background: transparent;
+            padding: 8px 12px 16px; z-index: 100;
         }
         .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; position: relative; }
         .nav-icon { font-size: 24px; }
@@ -78,7 +89,7 @@
         .change-link { color: #ff2442; font-size: 14px; padding: 2px 8px; cursor: pointer; font-weight: 600; }
         .video-area { 
             position: absolute; top: 60px; bottom: 140px; left: 0; right: 0;
-            display: flex; align-items: center; justify-content: center; background: #000;
+            display: flex; align-items: center; justify-content: center;
         }
         .video-area video { max-width: 100%; max-height: 100%; object-fit: contain; }
         .post-input { 
@@ -136,8 +147,23 @@
 
 <!-- หน้าหลัก -->
 <div id="page-home" class="page active">
+    <!-- เมนูด้านขวา — แสดงทันทีตั้งแต่เปิดหน้า! -->
+    <div class="menu-right before-post" id="menu-right">
+        <div class="menu-btn">
+            <div class="avatar-box">
+                <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
+                <span class="follow-plus">+</span>
+            </div>
+        </div>
+        <div class="menu-btn"><span class="icon">❤️</span><span class="num">0</span></div>
+        <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
+        <div class="menu-btn"><span class="icon">⭐</span><span class="num">บันทึก</span></div>
+        <div class="menu-btn"><span class="icon">↗️</span><span class="num">แชร์</span></div>
+        <div class="menu-btn" id="music-icon-btn"><span class="icon">🎵</span></div>
+    </div>
+
     <div class="video-container" id="video-container">
-        <video id="main-video" loop playsinline></video>
+        <video id="main-video" loop playsinline muted></video>
     </div>
 
     <div class="center-area" id="welcome-area">
@@ -148,27 +174,6 @@
         <div class="acc-name">@ThaiPodee_Master ✨</div>
         <div class="desc-text" id="caption-text">ยินดีต้อนรับสู่ ThaiPodee</div>
         <div class="music-row" id="music-text">🎵 เสียงต้นฉบับวิดีโอ</div>
-    </div>
-
-    <!-- ===== เมนูด้านขวา — 6 อัน ครบ ===== -->
-    <div class="menu-right" id="menu-right">
-        <!-- 1. โปรไฟล์ -->
-        <div class="menu-btn">
-            <div class="avatar-box">
-                <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
-                <span class="follow-plus">+</span>
-            </div>
-        </div>
-        <!-- 2. ถูกใจ -->
-        <div class="menu-btn"><span class="icon">❤️</span><span class="num">0</span></div>
-        <!-- 3. คอมเมนต์ -->
-        <div class="menu-btn"><span class="icon">💬</span><span class="num">0</span></div>
-        <!-- 4. บันทึก -->
-        <div class="menu-btn"><span class="icon">⭐</span><span class="num">บันทึก</span></div>
-        <!-- 5. แชร์ -->
-        <div class="menu-btn"><span class="icon">↗️</span><span class="num">แชร์</span></div>
-        <!-- 6. เลือกเพลง -->
-        <div class="menu-btn" id="music-icon-btn"><span class="icon">🎵</span></div>
     </div>
 
     <div class="nav-bottom">
@@ -184,7 +189,7 @@
     </div>
 </div>
 
-<!-- หน้าเตรียมโพสต์ -->
+<!-- หน้าโพสต์ -->
 <div id="page-post" class="page">
     <span class="back-btn" id="back-to-home">←</span>
     <div class="sound-bar">
@@ -225,7 +230,7 @@
         <div class="play-btn" data-id="s1">▶</div>
         <div class="sound-info">
             <div class="sound-name">จังหวะสดใส - เช้าวันใหม่</div>
-            <div class="sound-desc">จังหวะสนุก · ฟรีลิขสิทธิ์ · มีเสียงจริง ✅</div>
+            <div class="sound-desc">จังหวะสนุก · ฟรีลิขสิทธิ์</div>
         </div>
         <button class="select-btn" data-id="s1">เลือก</button>
     </div>
@@ -234,7 +239,7 @@
         <div class="play-btn" data-id="s2">▶</div>
         <div class="sound-info">
             <div class="sound-name">สนุกสนาน - กีตาร์</div>
-            <div class="sound-desc">เบา สบาย · ฟรีลิขสิทธิ์ · มีเสียงจริง ✅</div>
+            <div class="sound-desc">เบา สบาย · ฟรีลิขสิทธิ์</div>
         </div>
         <button class="select-btn" data-id="s2">เลือก</button>
     </div>
@@ -243,7 +248,7 @@
         <div class="play-btn" data-id="s3">▶</div>
         <div class="sound-info">
             <div class="sound-name">ผ่อนคลาย - ธรรมชาติ</div>
-            <div class="sound-desc">สงบ สบายใจ · ฟรีลิขสิทธิ์ · มีเสียงจริง ✅</div>
+            <div class="sound-desc">สงบ สบายใจ · ฟรีลิขสิทธิ์</div>
         </div>
         <button class="select-btn" data-id="s3">เลือก</button>
     </div>
@@ -260,7 +265,6 @@ function showPage(id) {
     document.getElementById(id).classList.add('active');
 }
 
-// เลือกวิดีโอ → ไปหน้าโพสต์
 document.getElementById('video-input').addEventListener('change', e => {
     videoFile = e.target.files[0];
     if (!videoFile) return;
@@ -268,17 +272,11 @@ document.getElementById('video-input').addEventListener('change', e => {
     showPage('page-post');
 });
 
-// เปลี่ยนเพลง → ไปหน้าเลือกเพลง
 document.getElementById('change-sound').addEventListener('click', () => showPage('page-sound'));
 document.getElementById('music-icon-btn').addEventListener('click', () => showPage('page-sound'));
-
-// กลับไปหน้าโพสต์
 document.getElementById('back-to-post').addEventListener('click', () => showPage('page-post'));
-
-// กลับไปหน้าหลัก
 document.getElementById('back-to-home').addEventListener('click', () => showPage('page-home'));
 
-// เลือกจากไฟล์ในเครื่อง
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -287,48 +285,32 @@ document.getElementById('audio-local-input').addEventListener('change', e => {
     showPage('page-post');
 });
 
-// ฟังตัวอย่าง
 document.querySelectorAll('.play-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
         const url = row.dataset.url;
         const id = row.dataset.id;
-
         if (previewAudio && previewAudio.datasetPlaying === id) {
-            previewAudio.pause();
-            previewAudio = null;
+            previewAudio.pause(); previewAudio = null;
             document.querySelectorAll('.play-btn').forEach(b => b.textContent = '▶');
             return;
         }
-
         document.querySelectorAll('.play-btn').forEach(b => b.textContent = '▶');
         if (previewAudio) previewAudio.pause();
-
         previewAudio = new Audio(url);
         previewAudio.datasetPlaying = id;
-        previewAudio.play().catch(() => alert('อาจไม่สามารถฟังตัวอย่างได้ แต่กดเลือกใช้ได้เลยครับ'));
+        previewAudio.play().catch(() => alert('ฟังตัวอย่างไม่ได้ แต่เลือกใช้ได้เลยครับ'));
         btn.textContent = '⏸';
     });
 });
 
-// กดเลือกเพลง
 document.querySelectorAll('.select-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
-        selectedSound = {
-            name: row.dataset.name,
-            url: row.dataset.url
-        };
-
+        selectedSound = { name: row.dataset.name, url: row.dataset.url };
         document.querySelectorAll('.sound-row').forEach(r => r.classList.remove('selected'));
-        document.querySelectorAll('.select-btn').forEach(b => {
-            b.classList.remove('selected');
-            b.textContent = 'เลือก';
-        });
-        row.classList.add('selected');
-        btn.textContent = 'เลือกแล้ว ✅';
-        btn.classList.add('selected');
-
+        document.querySelectorAll('.select-btn').forEach(b => { b.classList.remove('selected'); b.textContent = 'เลือก'; });
+        row.classList.add('selected'); btn.textContent = 'เลือกแล้ว ✅'; btn.classList.add('selected');
         updateSoundDisplay();
         setTimeout(() => showPage('page-post'), 300);
     });
@@ -338,24 +320,23 @@ function updateSoundDisplay() {
     document.getElementById('sound-name-display').textContent = '✅ ' + selectedSound.name;
 }
 
-// กดโพสต์ — แก้ให้เมนูขวาแสดงชัดเจน
+// กดโพสต์ — ทำให้เมนูขวาชัดเจนเต็มที่
 document.getElementById('submit-post').addEventListener('click', () => {
     const caption = document.getElementById('caption-input').value || 'ยินดีต้อนรับสู่ ThaiPodee';
 
-    // แสดงวิดีโอ
     document.getElementById('main-video').src = URL.createObjectURL(videoFile);
     document.getElementById('video-container').style.display = 'block';
     document.getElementById('welcome-area').style.display = 'none';
     document.getElementById('info-area').style.display = 'block';
     
-    // ✅ แก้ตรงนี้ — บังคับแสดงเมนูด้านขวา
-    document.getElementById('menu-right').style.display = 'flex';
+    // เมนูขวา — จากทึบเป็นชัดเจน
+    const menuRight = document.getElementById('menu-right');
+    menuRight.classList.remove('before-post');
+    menuRight.classList.add('after-post');
 
-    // แสดงข้อความและชื่อเพลง
     document.getElementById('caption-text').textContent = caption;
     document.getElementById('music-text').textContent = '🎵 ' + selectedSound.name;
 
-    // เล่นเสียงประกอบ
     if (selectedSound.url) {
         if (!bgAudio) bgAudio = new Audio();
         bgAudio.src = selectedSound.url;
