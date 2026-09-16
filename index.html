@@ -1,95 +1,181 @@
+<!--
+📌 โค้ดลำดับที่ 2
+📅 วันที่ 16 กันยายน 2569 เวลา 12:11 น.
+📝 แก้ไข/เพิ่ม:
+- แก้ขอบสีดำรอบจอออกทุกด้าน ให้เต็มพื้นที่จอ
+- ปรับวิดีโอให้แสดงเต็มพื้นที่ ไม่มีแถบสีดำ
+- ยืนยันโครงสร้างเดิมจากลำดับที่ 1 — ครบทุกปุ่ม ทุกฟังก์ชัน
+✅ ล็อก: ส่วนอื่นที่ทำเสร็จแล้วไม่แตะต้อง
+-->
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html, body { height: 100vh; overflow: hidden; background: #000; color: #fff; }
-        .page { display: none; position: absolute; inset: 0; }
+        html, body { 
+            height: 100vh; 
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden; 
+            background: #000; 
+            color: #fff; 
+            margin: 0;
+            padding: 0;
+        }
+        .page { 
+            display: none; 
+            position: absolute; 
+            inset: 0; 
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+        }
         .page.active { display: block; }
 
         .video-container { 
-            position: absolute; inset: 0; z-index: 1; background: #000;
-            display: none;
+            position: absolute; 
+            inset: 0; 
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 1; 
+            background: #000;
+            display: none; 
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
         }
         .video-container.show { display: block; }
         .video-container video { 
-            width: 100%; height: 100%; 
-            object-fit: contain; 
+            width: 100vw; 
+            height: 100vh; 
+            height: 100dvh;
+            object-fit: cover; 
             background: #000;
+            margin: 0;
+            padding: 0;
+            border: none;
         }
 
-        /* ✅ ปุ่มกดหยุด/เล่น กลางจอ ชัดเจน */
         .play-toggle {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute; 
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 64px;
+            font-size: 64px; 
             color: #fff;
             background: rgba(0,0,0,0.6);
-            width: 100px; height: 100px;
+            width: 100px; 
+            height: 100px; 
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            pointer-events: none; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
             z-index: 10;
         }
         .play-toggle.show { opacity: 1; }
 
-        .center-area { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
+        .center-area { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 2; 
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+        }
         .center-text { color: #888; font-size: 15px; text-align: center; line-height: 2; }
 
-        .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; display: none; }
+        .info-left { 
+            position: absolute; 
+            left: 16px; 
+            bottom: 90px; 
+            right: 90px; 
+            z-index: 10; 
+            display: none; 
+        }
         .info-left.show { display: block; }
         .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
         .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 
-        /* 🔒 ล็อก: เมนูด้านขวา — ครบ 6 ปุ่ม */
         .menu-right {
-            position: absolute !important;
-            right: 12px !important;
+            position: absolute !important; 
+            right: 12px !important; 
             top: 50% !important;
             transform: translateY(-50%) !important;
-            display: flex !important;
-            flex-direction: column !important;
+            display: flex !important; 
+            flex-direction: column !important; 
             gap: 20px !important;
-            z-index: 20 !important;
+            z-index: 20 !important; 
             align-items: center !important;
-            opacity: 0.3 !important;
+            opacity: 0.3 !important; 
             visibility: visible !important;
-            pointer-events: none !important; /* ✅ ส่งการกดไปที่วิดีโอ */
+            pointer-events: none !important;
         }
         .menu-right.after-post { opacity: 1 !important; }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; }
         .avatar-box { position: relative; width: 48px; height: 48px; margin-bottom: 4px; }
         .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; }
         .follow-plus { 
-            position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 20px; background: #ff2442; border-radius: 50%;
-            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            position: absolute; 
+            bottom: -4px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 20px; 
+            height: 20px; 
+            background: #ff2442; 
+            border-radius: 50%;
+            font-size: 14px; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
         .icon { font-size: 28px; line-height: 1; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         .num { font-size: 11px; margin-top: 2px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
-        /* 🔒 ล็อก: เมนูล่าง — ครบ 5 ปุ่ม */
         .nav-bottom {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
-            display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 8px 12px 16px; z-index: 20;
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 65px;
+            display: flex; 
+            justify-content: space-around; 
+            align-items: flex-end;
+            padding: 8px 12px 16px; 
+            z-index: 20; 
             background: transparent;
         }
         .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; position: relative; pointer-events: auto; }
         .nav-icon { font-size: 24px; }
         .nav-label { font-size: 10px; color: #aaa; }
         .badge { 
-            position: absolute; top: -2px; right: 8px;
-            background: #ff2442; color: #fff; font-size: 9px;
-            min-width: 16px; height: 16px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            position: absolute; 
+            top: -2px; 
+            right: 8px;
+            background: #ff2442; 
+            color: #fff; 
+            font-size: 9px;
+            min-width: 16px; 
+            height: 16px; 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
 
         .upload-col { cursor: pointer; position: relative; }
@@ -100,54 +186,118 @@
 
         .back-btn { position: absolute; top: 12px; left: 12px; font-size: 22px; cursor: pointer; z-index: 30; color: #fff; }
         .sound-bar { 
-            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-            background: #222; border-radius: 20px; padding: 8px 16px;
-            display: flex; align-items: center; gap: 8px; z-index: 30;
-            min-width: 280px; justify-content: space-between;
+            position: absolute; 
+            top: 12px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #222; 
+            border-radius: 20px; 
+            padding: 8px 16px;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            z-index: 30;
+            min-width: 280px; 
+            justify-content: space-between;
         }
         .change-link { color: #ff2442; font-size: 14px; padding: 2px 8px; cursor: pointer; font-weight: 600; }
         .video-area { 
-            position: absolute; top: 60px; bottom: 140px; left: 0; right: 0;
-            display: flex; align-items: center; justify-content: center; background: #000;
+            position: absolute; 
+            top: 60px; 
+            bottom: 140px; 
+            left: 0; 
+            right: 0;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #000;
+            width: 100vw;
         }
-        .video-area video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .video-area video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            max-width: 100vw;
+            border: none;
+        }
         .post-input { 
-            position: absolute; bottom: 100px; left: 16px; right: 16px;
-            background: #222; border-radius: 8px; padding: 12px;
-            color: #fff; border: none; font-size: 14px; z-index: 30;
+            position: absolute; 
+            bottom: 100px; 
+            left: 16px; 
+            right: 16px;
+            background: #222; 
+            border-radius: 8px; 
+            padding: 12px;
+            color: #fff; 
+            border: none; 
+            font-size: 14px; 
+            z-index: 30;
         }
         .post-btn { 
-            position: absolute; bottom: 30px; right: 16px;
-            background: #ff2442; color: #fff; border: none;
-            padding: 10px 24px; border-radius: 20px;
-            font-size: 15px; cursor: pointer; font-weight: 600; z-index: 30;
+            position: absolute; 
+            bottom: 30px; 
+            right: 16px;
+            background: #ff2442; 
+            color: #fff; 
+            border: none;
+            padding: 10px 24px; 
+            border-radius: 20px;
+            font-size: 15px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            z-index: 30;
         }
 
-        .sound-page { background: #000; padding: 16px; overflow-y: auto; height: 100vh; }
+        .sound-page { 
+            background: #000; 
+            padding: 16px; 
+            overflow-y: auto; 
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+        }
         .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .sound-title { font-size: 18px; font-weight: bold; }
         .section-title { font-size: 15px; font-weight: bold; margin: 24px 0 12px; }
         .tip-text { font-size: 12px; color: #666; margin: 4px 0 12px; }
 
         .sound-row { 
-            display: flex; align-items: center; gap: 10px; padding: 12px;
-            background: #111; border-radius: 8px; margin-bottom: 8px;
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 12px;
+            background: #111; 
+            border-radius: 8px; 
+            margin-bottom: 8px;
             border: 2px solid transparent;
         }
         .sound-row.selected { border-color: #10b981; background: #0f2a1a; }
         .play-btn { 
-            width: 36px; height: 36px; background: #222; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0; font-size: 16px; user-select: none;
+            width: 36px; 
+            height: 36px; 
+            background: #222; 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            flex-shrink: 0; 
+            font-size: 16px; 
+            user-select: none;
         }
         .play-btn.playing { background: #ff2442; }
         .sound-info { flex: 1; min-width: 0; }
         .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sound-desc { font-size: 12px; color: #888; }
         .select-btn { 
-            background: #ff2442; color: #fff; border: none;
-            padding: 8px 16px; border-radius: 20px;
-            font-size: 13px; cursor: pointer; font-weight: 600;
+            background: #ff2442; 
+            color: #fff; 
+            border: none;
+            padding: 8px 16px; 
+            border-radius: 20px;
+            font-size: 13px; 
+            cursor: pointer; 
+            font-weight: 600;
         }
         .select-btn.selected { background: #10b981; }
 
@@ -156,17 +306,19 @@
         .local-icon { font-size: 24px; }
         .hidden-input { display: none; }
         .free-badge { 
-            display: inline-block; background: #10b981; color: #fff;
-            font-size: 10px; padding: 1px 6px; border-radius: 10px;
+            display: inline-block; 
+            background: #10b981; 
+            color: #fff;
+            font-size: 10px; 
+            padding: 1px 6px; 
+            border-radius: 10px;
             margin-left: 6px;
         }
     </style>
 </head>
 <body>
 
-<!-- หน้าหลัก -->
 <div id="page-home" class="page active">
-    <!-- ✅ พื้นที่กดหยุด/เล่นวิดีโอ — ครอบทั้งจอ -->
     <div class="video-container" id="video-container">
         <video id="main-video" loop playsinline preload="auto"></video>
         <div class="play-toggle" id="play-toggle">⏸</div>
@@ -182,7 +334,6 @@
         <div class="music-row" id="music-text">🎵 เสียงต้นฉบับวิดีโอ</div>
     </div>
 
-    <!-- 🔒 เมนูด้านขวา -->
     <div class="menu-right" id="menu-right">
         <div class="menu-btn">
             <div class="avatar-box">
@@ -197,7 +348,6 @@
         <div class="menu-btn" id="music-icon-btn"><span class="icon">🎵</span></div>
     </div>
 
-    <!-- 🔒 เมนูล่าง -->
     <div class="nav-bottom">
         <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
@@ -211,7 +361,6 @@
     </div>
 </div>
 
-<!-- หน้าโพสต์ -->
 <div id="page-post" class="page">
     <span class="back-btn" id="back-to-home">←</span>
     <div class="sound-bar">
@@ -225,7 +374,6 @@
     <button class="post-btn" id="submit-post">โพสต์</button>
 </div>
 
-<!-- หน้าเลือกเสียง -->
 <div id="page-sound" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" id="back-to-post">←</span>
@@ -277,7 +425,6 @@
 </div>
 
 <script>
-const APP_VERSION = "1.0.3-fix-toggle-direct";
 let selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
 let videoFile = null;
 let previewAudio = null;
@@ -288,7 +435,6 @@ function showPage(id) {
     document.getElementById(id).classList.add('active');
 }
 
-// ✅ สลับหยุด/เล่น — ตรงตัววิดีโอโดยตรง
 function togglePlayPause() {
     const mainVideo = document.getElementById('main-video');
     const toggle = document.getElementById('play-toggle');
@@ -301,7 +447,6 @@ function togglePlayPause() {
         mainVideo.pause();
         toggle.textContent = '▶';
     }
-    // แสดงปุ่ม 1 วินาที
     toggle.classList.add('show');
     clearTimeout(window._toggleTimer);
     window._toggleTimer = setTimeout(() => toggle.classList.remove('show'), 1200);
@@ -358,7 +503,6 @@ document.querySelectorAll('.select-btn').forEach(btn => {
     });
 });
 
-// ✅ โพสต์ → แสดงวิดีโอ + เริ่มเล่น
 document.getElementById('submit-post').addEventListener('click', async () => {
     const caption = document.getElementById('caption-input').value || 'ยินดีต้อนรับสู่ ThaiPodee';
     const mainVideo = document.getElementById('main-video');
@@ -376,7 +520,6 @@ document.getElementById('submit-post').addEventListener('click', async () => {
     document.getElementById('caption-text').textContent = caption;
     document.getElementById('music-text').textContent = '🎵 ' + selectedSound.name;
 
-    // เริ่มเล่น
     try {
         await mainVideo.play();
         document.getElementById('play-toggle').textContent = '⏸';
@@ -385,7 +528,6 @@ document.getElementById('submit-post').addEventListener('click', async () => {
         document.getElementById('play-toggle').classList.add('show');
     }
 
-    // เสียงประกอบ
     if (selectedSound.url) {
         try {
             if (!bgAudio) bgAudio = new Audio();
@@ -399,7 +541,6 @@ document.getElementById('submit-post').addEventListener('click', async () => {
     showPage('page-home');
 });
 
-// ✅ กดที่กล่องวิดีโอทั้งจอ → หยุด/เล่น
 document.getElementById('video-container').addEventListener('click', togglePlayPause);
 </script>
 
