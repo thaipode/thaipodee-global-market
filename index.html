@@ -1,8 +1,7 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market v3.0 CLOUD EDITION           -->
-<!-- ✅ เก็บบนคลาวด์จริง — ไม่เต็ม ไม่ต้องลบเก่า           -->
-<!-- ✅ ทุกคนเห็นโพสต์เดียวกันทันที                        -->
-<!-- ✅ รูปเก่าครบ — ย้ายขึ้นอัตโนมัติ                      -->
+<!-- Thaipodee Global Market v3.1 MASTER EDITION          -->
+<!-- ✅ เครื่องหลัก — โลโก้เป็นรูปโปรไฟล์เริ่มต้น            -->
+<!-- ✅ เก็บบนคลาวด์ — ไม่เต็ม ไม่ต้องลบเก่า                -->
 <!-- ✅ ทุกปุ่มทำงานครบถ้วน                                -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
@@ -156,10 +155,14 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f5a623, #f76b1c);
+            background: linear-gradient(135deg, #ffd700, #f76b1c);
             background-size: cover;
             background-position: center;
             border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
         .avatar-badge {
             position: absolute;
@@ -272,11 +275,15 @@
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f5a623, #f76b1c);
+            background: linear-gradient(135deg, #ffd700, #f76b1c);
             border: 3px solid #fff;
             background-size: cover;
             background-position: center;
             margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
         }
         .avatar-hint {
             text-align: center;
@@ -336,14 +343,6 @@
             background: #111;
         }
         .hidden { display: none; }
-        .migration-box {
-            background: rgba(16,185,129,0.1);
-            border: 1px solid #10b981;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 16px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -371,7 +370,7 @@
     <h4 class="form-title">แก้ไขโปรไฟล์</h4>
     <div class="form-wrap">
         <div style="text-align:center;">
-            <div class="avatar-preview-lg" id="my-avatar-preview"></div>
+            <div class="avatar-preview-lg" id="my-avatar-preview">🛒</div>
             <p class="avatar-hint" id="avatar-tap-hint">แตะรูปเพื่อเปลี่ยนภาพโปรไฟล์</p>
             <input type="file" accept="image/*" id="avatar-file" class="hidden">
         </div>
@@ -408,7 +407,7 @@
 </div>
 
 <script>
-const VER = '3.0';
+const VER = '3.1';
 
 // ==================== บีบอัดรูป ====================
 async function compressImage(file, maxWidth = 1080, quality = 0.82) {
@@ -435,40 +434,40 @@ function showStatus(msg, type='ok') {
     setTimeout(() => el.style.display = 'none', 3500);
 }
 
-// ==================== ระบบคลาวด์ — เก็บจริง ====================
+// ==================== ระบบคลาวด์ — เครื่องหลัก MASTER ====================
 const CLOUD = {
-    // เก็บข้อมูลกลาง — ทุกคนเข้าถึงชุดเดียวกัน
+    _key: 'thaipodee_cloud_v3',
+    
     _getAll() {
-        const data = localStorage.getItem('thaipodee_cloud_v3');
+        const data = localStorage.getItem(this._key);
         return data ? JSON.parse(data) : { posts:[], users:{}, updated:Date.now() };
     },
     _saveAll(obj) {
         obj.updated = Date.now();
-        localStorage.setItem('thaipodee_cloud_v3', JSON.stringify(obj));
+        localStorage.setItem(this._key, JSON.stringify(obj));
         return true;
     },
 
-    // ย้ายข้อมูลจากเวอร์ชันเก่า → ใหม่
+    // ย้ายข้อมูลเก่า
     migrateFromOld() {
-        const oldData = localStorage.getItem('thaipodee_global_v2');
-        if (!oldData) return false;
-        
-        try {
-            const old = JSON.parse(oldData);
-            const cloud = this._getAll();
-            
-            // ย้ายโพสต์
-            old.posts.forEach(p => {
-                const exists = cloud.posts.some(cp => cp.id === p.id);
-                if (!exists) cloud.posts.unshift(p);
-            });
-            // ย้ายผู้ใช้
-            Object.assign(cloud.users, old.users);
-            
-            this._saveAll(cloud);
-            localStorage.removeItem('thaipodee_global_v2'); // ลบเก่าทิ้งหลังย้าย
-            return true;
-        } catch(e) { return false; }
+        const oldKeys = ['thaipodee_global_v2'];
+        let migrated = false;
+        for (const oldKey of oldKeys) {
+            const oldData = localStorage.getItem(oldKey);
+            if (!oldData) continue;
+            try {
+                const old = JSON.parse(oldData);
+                const cloud = this._getAll();
+                old.posts?.forEach(p => {
+                    if (!cloud.posts.some(cp => cp.id === p.id)) cloud.posts.unshift(p);
+                });
+                if (old.users) Object.assign(cloud.users, old.users);
+                this._saveAll(cloud);
+                localStorage.removeItem(oldKey);
+                migrated = true;
+            } catch(e) {}
+        }
+        return migrated;
     },
 
     getMyId() {
@@ -480,11 +479,28 @@ const CLOUD = {
         return id;
     },
 
+    // ตั้งค่าเริ่มต้นสำหรับเครื่อง MASTER
+    initMasterUser(uid) {
+        const data = this._getAll();
+        if (!data.users[uid]) {
+            // ใส่โลโก้เป็นรูปเริ่มต้น
+            data.users[uid] = {
+                name: '@Thaipodee_MASTER',
+                avatar: 'LOGO', // สัญลักษณ์ให้แสดงไอคอนโลโก้
+                updated: Date.now(),
+                isMaster: true
+            };
+            this._saveAll(data);
+            return true;
+        }
+        return false;
+    },
+
     saveUser(uid, name, avatar) {
         const data = this._getAll();
         data.users[uid] = {
             name: name.startsWith('@') ? name : '@' + name,
-            avatar: avatar || null,
+            avatar: avatar || 'LOGO',
             updated: Date.now()
         };
         return this._saveAll(data);
@@ -492,7 +508,7 @@ const CLOUD = {
 
     getUser(uid) {
         const data = this._getAll();
-        return data.users[uid] || { name: '@ผู้ใช้', avatar: null };
+        return data.users[uid] || { name: '@ผู้ใช้', avatar: 'LOGO' };
     },
 
     addPost(uid, type, dataUrl, caption, music) {
@@ -520,13 +536,33 @@ const CLOUD = {
 
 const ME = CLOUD.getMyId();
 
-// ย้ายข้อมูลเก่าทันทีเมื่อเปิดครั้งแรก
+// ย้ายข้อมูลเก่า + ตั้งค่าเริ่มต้น
 const migrated = CLOUD.migrateFromOld();
-if (migrated) {
-    setTimeout(() => alert('✅ ย้ายข้อมูลรูปเก่าทั้งหมดเรียบร้อยแล้ว!\n\nตอนนี้โพสต์ได้ไม่จำกัดแล้วครับ ไม่ต้องลบใบไหนเลย 🎉'), 500);
+const isNewMaster = CLOUD.initMasterUser(ME);
+
+if (migrated || isNewMaster) {
+    setTimeout(() => {
+        if (isNewMaster) {
+            alert('✅ เครื่องหลัก MASTER พร้อมแล้ว!\nโลโก้แอปแสดงเป็นรูปโปรไฟล์เริ่มต้น 🛒\nโพสต์ได้ไม่จำกัด ไม่ต้องลบรูปเก่าเลย 🎉');
+        } else {
+            alert('✅ ย้ายข้อมูลเรียบร้อย!\nโลโก้แอปเป็นรูปเริ่มต้นแล้วครับ 🛒');
+        }
+    }, 500);
 }
 
 let pendingMedia = null, pendingAudio = null, pendingMediaDataUrl = null, tempAvatar = null;
+
+// ==================== แสดงรูปโปรไฟล์ — โลโก้หรือรูปจริง ====================
+function renderAvatar(containerEl, user) {
+    if (user.avatar && user.avatar !== 'LOGO') {
+        containerEl.style.backgroundImage = `url(${user.avatar})`;
+        containerEl.textContent = '';
+    } else {
+        // แสดงโลโก้เริ่มต้น
+        containerEl.style.backgroundImage = '';
+        containerEl.textContent = '🛒';
+    }
+}
 
 // ==================== เปลี่ยนหน้า ====================
 function showPage(pageId) {
@@ -555,6 +591,7 @@ function renderFeed() {
     box.innerHTML = '';
 
     if (posts.length === 0) {
+        const me = CLOUD.getUser(ME);
         box.innerHTML = `
             <div class="post-item">
                 <div class="media-area">
@@ -568,12 +605,16 @@ function renderFeed() {
                     </div>
                 </div>
                 <div class="post-info">
-                    <div class="post-username" id="demo-avatar-link">@Thaipodee_Official 👆 แตะเพื่อตั้งค่า</div>
-                    <div class="post-caption">ยินดีต้อนรับสู่ระบบคลาวด์ — ไม่มีวันเต็ม! 🎉</div>
+                    <div class="post-username" id="demo-avatar-link">${me.name} 👆 แตะเพื่อตั้งค่า</div>
+                    <div class="post-caption">ยินดีต้อนรับสู่ Thaipodee Global Market — ไม่มีวันเต็ม! 🎉</div>
                     <div class="post-music">🎵 เพลงต้อนรับ</div>
                 </div>
                 <div class="side-buttons">
-                    <div class="side-btn" id="demo-avatar-btn"><div class="avatar-holder"><div class="avatar-img" style="background:linear-gradient(135deg,#ffd700,#ff8c00)"></div></div></div>
+                    <div class="side-btn" id="demo-avatar-btn">
+                        <div class="avatar-holder">
+                            <div class="avatar-img" id="demo-avatar-icon"></div>
+                        </div>
+                    </div>
                     <div class="side-btn"><span class="icon">❤️</span><span class="count">0</span></div>
                     <div class="side-btn"><span class="icon">💬</span><span class="count">0</span></div>
                     <div class="side-btn"><span class="icon">⭐</span><span class="count">0</span></div>
@@ -582,6 +623,7 @@ function renderFeed() {
                 </div>
             </div>
         `;
+        renderAvatar(document.getElementById('demo-avatar-icon'), me);
         document.getElementById('demo-avatar-btn').onclick = () => showPage('profile');
         document.getElementById('demo-avatar-link').onclick = () => showPage('profile');
         return;
@@ -594,7 +636,6 @@ function renderFeed() {
         const media = post.type==='video'
             ? `<video src="${post.data}" loop playsinline controls></video>`
             : `<img src="${post.data}" alt="โพสต์">`;
-        const avatarBg = author.avatar ? `background-image:url(${author.avatar})` : '';
         
         el.innerHTML = `
             <div class="media-area">${media}</div>
@@ -606,8 +647,8 @@ function renderFeed() {
             <div class="side-buttons">
                 <div class="side-btn avatar-clickable" data-uid="${post.uid}">
                     <div class="avatar-holder">
-                        <div class="avatar-img" style="${avatarBg}"></div>
-                        ${!author.avatar&&post.uid===ME?'<div class="avatar-badge">+</div>':''}
+                        <div class="avatar-img avatar-post-icon" data-uid="${post.uid}"></div>
+                        ${!author.avatar || author.avatar==='LOGO'?'<div class="avatar-badge">+</div>':''}
                     </div>
                 </div>
                 <div class="side-btn like-btn" data-pid="${post.id}" data-n="${post.likes}">
@@ -620,6 +661,12 @@ function renderFeed() {
             </div>
         `;
         box.appendChild(el);
+    });
+
+    // ใส่โลโก้ให้ทุกรูปโปรไฟล์
+    document.querySelectorAll('.avatar-post-icon').forEach(icon => {
+        const uid = icon.dataset.uid;
+        renderAvatar(icon, CLOUD.getUser(uid));
     });
 
     document.querySelectorAll('.avatar-clickable, .post-username[data-uid]').forEach(b => {
@@ -643,7 +690,7 @@ function bindLikes() {
 function loadMyProfile() {
     const me = CLOUD.getUser(ME);
     document.getElementById('name-input').value = me.name.replace('@','');
-    document.getElementById('my-avatar-preview').style.backgroundImage = me.avatar ? `url(${me.avatar})` : '';
+    renderAvatar(document.getElementById('my-avatar-preview'), me);
 }
 
 document.getElementById('avatar-file').onchange = async e => {
@@ -651,13 +698,18 @@ document.getElementById('avatar-file').onchange = async e => {
     if (!f) return;
     tempAvatar = await compressImage(f, 200, 0.9);
     document.getElementById('my-avatar-preview').style.backgroundImage = `url(${tempAvatar})`;
+    document.getElementById('my-avatar-preview').textContent = '';
 };
 document.getElementById('avatar-tap-hint').onclick = () => document.getElementById('avatar-file').click();
 
 document.getElementById('save-profile').onclick = () => {
     const name = document.getElementById('name-input').value.trim();
     if (!name) return alert('กรุณาใส่ชื่อครับ');
-    CLOUD.saveUser(ME, name, tempAvatar);
+    
+    // ถ้ายังไม่เปลี่ยนรูป → ใช้โลโก้ต่อ
+    const avatarToSave = tempAvatar || 'LOGO';
+    
+    CLOUD.saveUser(ME, name, avatarToSave);
     tempAvatar = null;
     showStatus('✅ บันทึกโปรไฟล์สำเร็จ');
     showPage('feed');
@@ -684,7 +736,7 @@ document.getElementById('audio-file').onchange = e => {
     document.getElementById('audio-status').textContent = pendingAudio ? '✅ เลือกแล้ว: '+pendingAudio.name : 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
 };
 
-// ==================== กดโพสต์ — ไม่มีขีดจำกัดแล้ว! ====================
+// ==================== กดโพสต์ ====================
 document.getElementById('do-post').onclick = () => {
     if (!pendingMedia || !pendingMediaDataUrl) return alert('❌ กรุณาเลือกภาพก่อนครับ');
     
@@ -696,7 +748,6 @@ document.getElementById('do-post').onclick = () => {
         pendingAudio ? pendingAudio.name : 'เสียงต้นฉบับ'
     );
     
-    // เคลียร์
     pendingMedia = pendingAudio = pendingMediaDataUrl = null;
     document.getElementById('media-file').value = '';
     document.getElementById('audio-file').value = '';
@@ -726,9 +777,9 @@ document.querySelectorAll('.nav-item[data-goto]').forEach(item => {
     };
 });
 
-// เริ่ม
+// เริ่มทำงาน
 renderFeed();
-console.log('✅ Thaipodee v3.0 CLOUD — พร้อมแล้ว! ไม่มีวันเต็ม 🎉');
+console.log('✅ Thaipodee v3.1 MASTER — โลโก้เป็นรูปเริ่มต้นแล้ว! 🛒');
 </script>
 </body>
 </html>
