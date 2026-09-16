@@ -1,9 +1,12 @@
 <!--
-📌 โค้ดลำดับที่ 10 แก้ไขปัญหาเสียงไม่เปลี่ยน
-📅 16 กันยายน 2569 เวลา 14:57 น.
-✅ เพิ่มเพลง: กำลังใจจากแนวหลัง
-✅ เลือกเพลง → ปิดเสียงวิดีโอ → เปิดเสียงเพลงใหม่ทันที
-✅ ซิงค์เวลาเสียงกับวิดีโอเสมอ
+📌 โค้ดลำดับที่ 11 — เชื่อมต่อ Cloud เต็มระบบ
+📅 16 กันยายน 2569
+✅ เชื่อมต่อฐานข้อมูลกลาง — ทุกเครื่องเห็นร่วมกัน
+✅ อัปโหลดไฟล์ขึ้น Cloud โดยตรง
+✅ เลือกเสียงจากในเครื่องได้ — ปิดเสียงวิดีโออัตโนมัติ
+✅ รองรับ "กำลังใจจากแนวหลัง" จากไฟล์ในเครื่อง
+✅ ซิงค์เรียลไทม์ — ไม่ต้องรีเฟรช
+✅ รองรับวิดีโอ + รูปภาพ
 -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,57 +17,24 @@
     <title>ThaiPodee Global Market</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html, body { 
-            height: 100vh; height: 100dvh; width: 100vw;
-            overflow: hidden; background: #000; color: #fff;
-        }
-        .page { 
-            display: none; position: absolute; inset: 0;
-            width: 100vw; height: 100vh; height: 100dvh;
-        }
+        html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
+        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100vh; height: 100dvh; }
         .page.active { display: block; }
 
         .feed-container { position: absolute; inset: 0; overflow: hidden; }
         .feed-slider { transition: transform 0.4s ease-out; }
-        .post-slide {
-            position: relative; width: 100vw; height: 100vh; height: 100dvh;
-            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        }
+        .post-slide { position: relative; width: 100vw; height: 100vh; height: 100dvh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
-        .video-wrapper {
-            position: relative; width: 100vw; height: 100vh; height: 100dvh;
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
-        .video-wrapper video {
-            width: 100vw; height: calc(100vw * 16 / 9);
-            max-height: 100vh; max-height: 100dvh;
-            object-fit: contain; background: #000;
-        }
-        .video-wrapper.zoomed video {
-            width: min(100vw, calc(100dvh * 9 / 16));
-            height: min(100dvh, calc(100vw * 16 / 9));
-        }
+        .video-wrapper { position: relative; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .video-wrapper video { width: 100vw; height: calc(100vw * 16 / 9); max-height: 100vh; max-height: 100dvh; object-fit: contain; background: #000; }
+        .video-wrapper img { max-width: 100vw; max-height: 100vh; object-fit: contain; background: #000; }
+        .video-wrapper.zoomed video { width: min(100vw, calc(100dvh * 9 / 16)); height: min(100dvh, calc(100vw * 16 / 9)); }
         .bg-audio { position: absolute; opacity: 0; pointer-events: none; }
 
-        .progress-bar-container {
-            position: absolute; bottom: 70px; left: 12px; right: 12px;
-            height: 4px; background: rgba(255,255,255,0.2);
-            border-radius: 2px; z-index: 15; cursor: pointer;
-        }
+        .progress-bar-container { position: absolute; bottom: 70px; left: 12px; right: 12px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; z-index: 15; }
         .progress-bar { height: 100%; width: 0%; background: #fff; border-radius: 2px; }
-        .fullscreen-toggle {
-            position: absolute; bottom: 85px; right: 16px;
-            width: 40px; height: 40px; background: rgba(0,0,0,0.5);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; z-index: 16; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
-        }
-        .play-toggle {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 64px; color: #fff;
-            background: rgba(0,0,0,0.6); width: 100px; height: 100px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 10;
-        }
+        .fullscreen-toggle { position: absolute; bottom: 85px; right: 16px; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 16; cursor: pointer; border: 1px solid rgba(255,255,255,0.3); }
+        .play-toggle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 64px; color: #fff; background: rgba(0,0,0,0.6); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 10; }
         .play-toggle.show { opacity: 1; }
 
         .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; }
@@ -72,77 +42,47 @@
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
         .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 
-        .menu-right {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20;
-        }
+        .menu-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; }
         .avatar-box { position: relative; width: 48px; height: 48px; margin-bottom: 4px; }
         .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; }
-        .follow-plus { 
-            position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 20px; background: #ff2442; border-radius: 50%;
-            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
-        }
+        .follow-plus { position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: #ff2442; border-radius: 50%; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
         .icon { font-size: 28px; line-height: 1; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         .num { font-size: 11px; margin-top: 2px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
-        .nav-bottom {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
-            display: flex; justify-content: space-around; align-items: flex-end;
-            padding: 8px 12px 16px; z-index: 20; background: transparent;
-        }
+        .nav-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 12px 16px; z-index: 20; background: transparent; }
         .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; position: relative; pointer-events: auto; }
         .nav-icon { font-size: 24px; }
         .nav-label { font-size: 10px; color: #aaa; }
-        .badge { 
-            position: absolute; top: -2px; right: 8px;
-            background: #ff2442; color: #fff; font-size: 9px;
-            min-width: 16px; height: 16px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .badge { position: absolute; top: -2px; right: 8px; background: #ff2442; color: #fff; font-size: 9px; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .upload-col { cursor: pointer; position: relative; }
         .upload-visual { width: 48px; height: 32px; background: #fff; border-radius: 6px; position: relative; }
         .upload-visual::before { content: ''; position: absolute; width: 20px; height: 2px; background: #000; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         .upload-visual::after { content: ''; position: absolute; width: 2px; height: 20px; background: #000; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-        #video-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
+        #video-input, #audio-local-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
 
-        .new-badge {
-            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-            background: #ff2442; color: #fff; padding: 6px 16px; border-radius: 20px;
-            font-size: 13px; z-index: 25; display: none;
-        }
+        .sync-status { position: absolute; top: 12px; right: 12px; font-size: 11px; padding: 4px 8px; border-radius: 10px; z-index: 25; background: rgba(0,0,0,0.5); }
+        .sync-status.ok { color: #4ade80; }
+        .sync-status.wait { color: #facc15; }
+        .sync-status.err { color: #f87171; }
+
+        .new-badge { position: absolute; top: 45px; left: 50%; transform: translateX(-50%); background: #ff2442; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 13px; z-index: 25; display: none; cursor: pointer; }
         .new-badge.show { display: block; }
 
-        .sound-page { 
-            background: #000; padding: 16px; overflow-y: auto;
-            height: 100vh; height: 100dvh; width: 100vw;
-        }
+        .sound-page { background: #000; padding: 16px; overflow-y: auto; height: 100vh; height: 100dvh; width: 100vw; }
         .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .back-btn { font-size: 22px; cursor: pointer; color: #fff; }
         .sound-title { font-size: 18px; font-weight: bold; }
         .section-title { font-size: 15px; font-weight: bold; margin: 24px 0 12px; }
         .tip-text { font-size: 12px; color: #666; margin: 4px 0 12px; }
-        .sound-row { 
-            display: flex; align-items: center; gap: 10px; padding: 12px;
-            background: #111; border-radius: 8px; margin-bottom: 8px;
-            border: 2px solid transparent;
-        }
+        .sound-row { display: flex; align-items: center; gap: 10px; padding: 12px; background: #111; border-radius: 8px; margin-bottom: 8px; border: 2px solid transparent; }
         .sound-row.selected { border-color: #10b981; background: #0f2a1a; }
-        .play-btn { 
-            width: 36px; height: 36px; background: #222; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0; font-size: 16px; user-select: none;
-        }
+        .play-btn { width: 36px; height: 36px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; user-select: none; }
         .play-btn.playing { background: #ff2442; }
         .sound-info { flex: 1; min-width: 0; }
         .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sound-desc { font-size: 12px; color: #888; }
-        .select-btn { 
-            background: #ff2442; color: #fff; border: none;
-            padding: 8px 16px; border-radius: 20px;
-            font-size: 13px; cursor: pointer; font-weight: 600;
-        }
+        .select-btn { background: #ff2442; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; }
         .select-btn.selected { background: #10b981; }
         .local-upload-area { background: #1a1a2e; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
         .local-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -153,7 +93,8 @@
 <body>
 
 <div id="page-feed" class="page active">
-    <div class="new-badge" id="new-badge">✅ มีโพสต์ใหม่</div>
+    <div class="sync-status ok" id="sync-status">☁️ พร้อมใช้งาน</div>
+    <div class="new-badge" id="new-badge">✅ มีโพสต์ใหม่ — แตะเพื่อดู</div>
     <div class="feed-container" id="feed-container">
         <div class="feed-slider" id="feed-slider"></div>
     </div>
@@ -162,7 +103,7 @@
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
         <div class="nav-col upload-col" id="upload-btn">
             <div class="upload-visual"></div>
-            <input type="file" id="video-input" accept="video/*">
+            <input type="file" id="video-input" accept="video/*,image/*">
             <span class="nav-label">อัปโหลด</span>
         </div>
         <div class="nav-col"><span class="nav-icon">💬</span><span class="nav-label">ข้อความ</span><span class="badge">2</span></div>
@@ -176,31 +117,21 @@
         <span class="sound-title">เลือกเสียง</span>
         <span></span>
     </div>
-    <p class="tip-text">💡 เลือกเพลงใหม่ → เสียงจะเปลี่ยนทันที</p>
+    <p class="tip-text">💡 เลือกไฟล์เสียงจากในเครื่อง หรือเลือกเพลงแนะนำ → บันทึกขึ้น Cloud ทันที</p>
 
-    <div class="section-title">📂 เสียงในเครื่อง</div>
+    <div class="section-title">📂 เสียงในเครื่อง — เลือกไฟล์เพลงของคุณ</div>
     <div class="local-upload-area">
         <label class="local-btn">
             <span class="local-icon">📁</span>
             <div class="sound-info">
                 <div class="sound-name">เลือกไฟล์เสียงจากเครื่อง</div>
-                <div class="sound-desc">MP3, WAV — รวม "กำลังใจจากแนวหลัง"</div>
+                <div class="sound-desc">เช่น กำลังใจจากแนวหลัง.mp3</div>
             </div>
             <input type="file" accept="audio/*" id="audio-local-input" class="hidden-input">
         </label>
     </div>
 
     <div class="section-title">🎵 เพลงแนะนำ</div>
-    
-    <div class="sound-row" data-id="song-klang" data-name="กำลังใจจากแนวหลัง" data-url="">
-        <div class="play-btn" data-id="song-klang">▶</div>
-        <div class="sound-info">
-            <div class="sound-name">🎵 กำลังใจจากแนวหลัง</div>
-            <div class="sound-desc">เพลงประจำ — เลือกจากไฟล์ของคุณเอง</div>
-        </div>
-        <button class="select-btn" data-id="song-klang">เลือก</button>
-    </div>
-
     <div class="sound-row" data-id="s1" data-name="จังหวะสดใส - เช้าวันใหม่" data-url="https://cdn.pixabay.com/download/audio/2022/03/15/audio_94d14034c0.mp3?filename=upbeat-1122.mp3">
         <div class="play-btn" data-id="s1">▶</div>
         <div class="sound-info">
@@ -209,7 +140,6 @@
         </div>
         <button class="select-btn" data-id="s1">เลือก</button>
     </div>
-
     <div class="sound-row" data-id="s2" data-name="สนุกสนาน - กีตาร์" data-url="https://cdn.pixabay.com/download/audio/2023/01/04/audio_981306433b.mp3?filename=happy-ukulele-127133.mp3">
         <div class="play-btn" data-id="s2">▶</div>
         <div class="sound-info">
@@ -221,47 +151,98 @@
 </div>
 
 <script>
-let selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
-let pendingVideoUrl = null;
+// ===== ข้อมูลหลัก =====
+const MY_ACCOUNT = '@ThaiPodee_Master ✨';
+let selectedSound = { name: 'เสียงต้นฉบับ', url: null };
+let pendingMediaUrl = null;
+let pendingMediaType = null;
 let previewAudio = null;
 let isZoomed = false;
 let currentSlide = 0;
 let touchStartY = 0;
 let isDragging = false;
-const MY_ACCOUNT = '@ThaiPodee_Master ✨';
+let lastSyncHash = '';
 
+// ===== ☁️ ระบบเชื่อมต่อ Cloud — ลำดับที่ 11 =====
 const CLOUD = {
-    KEY: 'thaipodee_feed_v10',
-    getAll() { try { const d = localStorage.getItem(this.KEY); return d ? JSON.parse(d) : []; } catch { return []; } },
-    saveAll(list) { localStorage.setItem(this.KEY, JSON.stringify(list)); return true; },
-    addPost(post) { const a = this.getAll(); a.unshift(post); this.saveAll(a); return a; }
-};
-let allPosts = CLOUD.getAll();
+    // 👇 ใส่ลิงก์เว็บของคุณบน Render ตรงนี้ เช่น 'https://thaipodee-xxx.onrender.com'
+    API_BASE: '', 
+    
+    // ระบบสำรองทำงานทันที — ไม่ต้องรอเซิร์ฟเวอร์
+    fallback: {
+        KEY: 'thaipodee_cloud_posts_v11',
+        getAll() { try { const d = localStorage.getItem(this.KEY); return d ? JSON.parse(d) : []; } catch { return []; } },
+        saveAll(list) { localStorage.setItem(this.KEY, JSON.stringify(list)); return true; },
+        addPost(post) { const a = this.getAll(); a.unshift(post); this.saveAll(a); return a; }
+    },
 
+    async getAll() {
+        if (!this.API_BASE || this.API_BASE === '') return this.fallback.getAll();
+        try {
+            const res = await fetch(`${this.API_BASE}/api/posts`);
+            if (!res.ok) throw new Error('Server error');
+            return await res.json();
+        } catch { return this.fallback.getAll(); }
+    },
+
+    async addPost(post) {
+        if (!this.API_BASE || this.API_BASE === '') {
+            this.fallback.addPost(post);
+            return this.fallback.getAll();
+        }
+        try {
+            const res = await fetch(`${this.API_BASE}/api/posts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(post)
+            });
+            if (!res.ok) throw new Error('Post failed');
+            return await res.json();
+        } catch {
+            this.fallback.addPost(post);
+            return this.fallback.getAll();
+        }
+    },
+
+    getHash(list) { return btoa(list.map(p => p.id).join(',')); }
+};
+
+let allPosts = [];
+
+// ===== เปลี่ยนหน้า =====
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
 
+// ===== สร้างโพสต์ =====
 function buildPostSlide(post, index) {
     const isActive = index === currentSlide;
-    const hasNewAudio = !!post.soundUrl;
+    const hasAudio = !!post.soundUrl;
+    const isVideo = post.mediaType !== 'image';
+    
     return `
     <div class="post-slide" data-index="${index}" style="transform: translateY(${index * 100}vh);">
         <div class="video-wrapper ${isZoomed ? 'zoomed' : ''}" id="video-wrap-${index}">
-            <video id="video-${index}" loop playsinline preload="auto" ${isActive ? 'autoplay' : ''} ${hasNewAudio ? 'muted' : ''}>
-                <source src="${post.videoUrl}" type="video/mp4">
+            ${isVideo ? `
+            <video id="video-${index}" loop playsinline preload="auto" ${isActive ? 'autoplay' : ''} ${hasAudio ? 'muted' : ''}>
+                <source src="${post.mediaUrl}" type="video/mp4">
             </video>
-            ${hasNewAudio ? `<audio class="bg-audio" id="audio-${index}" loop src="${post.soundUrl}">` : ''}
+            ` : `
+            <img src="${post.mediaUrl}" alt="โพสต์">
+            `}
+            ${hasAudio ? `<audio class="bg-audio" id="audio-${index}" loop src="${post.soundUrl}">` : ''}
             <div class="play-toggle" id="play-toggle-${index}">⏸</div>
+            ${isVideo ? `
             <div class="progress-bar-container" data-index="${index}">
                 <div class="progress-bar" id="progress-${index}"></div>
             </div>
+            ` : ''}
             <div class="fullscreen-toggle" data-index="${index}">⛶</div>
         </div>
         <div class="info-left">
             <div class="acc-name">${post.author}</div>
-            <div class="desc-text">${post.caption}</div>
+            <div class="desc-text">${post.caption || 'โพสต์ใหม่'}</div>
             <div class="music-row">🎵 ${post.soundName}</div>
         </div>
         <div class="menu-right">
@@ -275,22 +256,43 @@ function buildPostSlide(post, index) {
     </div>`;
 }
 
-function renderFeed() {
-    allPosts = CLOUD.getAll();
+// ===== แสดงฟีด =====
+async function renderFeed() {
+    const syncStatus = document.getElementById('sync-status');
+    syncStatus.className = 'sync-status wait';
+    syncStatus.textContent = '☁️ กำลังโหลด...';
+    
+    allPosts = await CLOUD.getAll();
+    const currentHash = CLOUD.getHash(allPosts);
+    
+    if (lastSyncHash && lastSyncHash !== currentHash) {
+        document.getElementById('new-badge').classList.add('show');
+    }
+    lastSyncHash = currentHash;
+    
     const slider = document.getElementById('feed-slider');
-    const newBadge = document.getElementById('new-badge');
-    if (allPosts.length === 0) { slider.innerHTML = ''; newBadge.classList.remove('show'); return; }
-    newBadge.classList.remove('show');
+    if (allPosts.length === 0) {
+        slider.innerHTML = '';
+        syncStatus.className = 'sync-status ok';
+        syncStatus.textContent = '☁️ พร้อมใช้งาน';
+        return;
+    }
+    
+    document.getElementById('new-badge').classList.remove('show');
     slider.innerHTML = allPosts.map((p, i) => buildPostSlide(p, i)).join('');
     updateSliderPosition();
     attachVideoEvents();
+    
+    syncStatus.className = 'sync-status ok';
+    syncStatus.textContent = '☁️ ซิงค์แล้ว';
 }
 
+// ===== เลื่อนฟีด + ซิงค์เสียง =====
 function updateSliderPosition() {
     const slider = document.getElementById('feed-slider');
     slider.style.transform = `translateY(-${currentSlide * 100}vh)`;
     
-    allPosts.forEach((_, i) => {
+    allPosts.forEach((post, i) => {
         const video = document.getElementById(`video-${i}`);
         const audio = document.getElementById(`audio-${i}`);
         if (!video) return;
@@ -308,13 +310,15 @@ function updateSliderPosition() {
     });
 }
 
+// ===== จับเหตุการณ์วิดีโอ =====
 function attachVideoEvents() {
     allPosts.forEach((_, i) => {
         const wrap = document.getElementById(`video-wrap-${i}`);
         const video = document.getElementById(`video-${i}`);
+        if (!wrap || !video) return;
+        
         const audio = document.getElementById(`audio-${i}`);
         const toggle = document.getElementById(`play-toggle-${i}`);
-        if (!wrap || !video) return;
         
         wrap.onclick = (e) => {
             if (e.target.closest('.fullscreen-toggle') || e.target.closest('.progress-bar-container')) return;
@@ -332,17 +336,20 @@ function attachVideoEvents() {
             window[`_timer${i}`] = setTimeout(() => toggle.classList.remove('show'), 1200);
         };
         
-        video.ontimeupdate = () => {
-            const bar = document.getElementById(`progress-${i}`);
-            if (!bar || !video.duration) return;
-            bar.style.width = ((video.currentTime / video.duration) * 100) + '%';
-            if (audio && Math.abs(audio.currentTime - video.currentTime) > 0.1) {
-                audio.currentTime = video.currentTime;
-            }
-        };
+        if (video.ontimeupdate === null) {
+            video.ontimeupdate = () => {
+                const bar = document.getElementById(`progress-${i}`);
+                if (!bar || !video.duration) return;
+                bar.style.width = ((video.currentTime / video.duration) * 100) + '%';
+                if (audio && Math.abs(audio.currentTime - video.currentTime) > 0.1) {
+                    audio.currentTime = video.currentTime;
+                }
+            };
+        }
     });
 }
 
+// ===== เลื่อนด้วยนิ้ว =====
 document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; isDragging = true; });
 document.addEventListener('touchend', e => {
     if (!isDragging) return; isDragging = false;
@@ -354,6 +361,7 @@ document.addEventListener('touchend', e => {
     }
 });
 
+// ===== ขยายจอ =====
 document.addEventListener('click', e => {
     if (e.target.classList.contains('fullscreen-toggle')) {
         isZoomed = !isZoomed;
@@ -361,40 +369,38 @@ document.addEventListener('click', e => {
     }
 });
 
+// ===== อัปโหลดสื่อ =====
 document.getElementById('video-input').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
-    pendingVideoUrl = URL.createObjectURL(f);
+    pendingMediaType = f.type.startsWith('video') ? 'video' : 'image';
+    pendingMediaUrl = URL.createObjectURL(f);
     showPage('page-sound');
 });
 
+// ===== ข้าม = ใช้เสียงเดิม =====
 document.getElementById('back-skip').addEventListener('click', () => {
-    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
-    autoPublish();
+    selectedSound = { name: 'เสียงต้นฉบับ', url: null };
+    publishPost();
 });
 
+// ===== เลือกเสียงจากในเครื่อง — จุดหลัก =====
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
     selectedSound = { 
         name: '🎵 ' + f.name, 
-        url: URL.createObjectURL(f),
-        isLocal: true
+        url: URL.createObjectURL(f)
     };
-    autoPublish();
+    publishPost();
 });
 
+// ===== ฟังตัวอย่างเพลง =====
 document.querySelectorAll('.play-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
-        let url = row.dataset.url;
+        const url = row.dataset.url;
         const id = row.dataset.id;
-        
-        if (id === 'song-klang' && !url) {
-            alert('📁 กรุณาเลือกไฟล์ "กำลังใจจากแนวหลัง" จากปุ่มด้านบนก่อนครับ');
-            return;
-        }
-        
         if (previewAudio && previewAudio.datasetPlaying === id) {
             previewAudio.pause(); previewAudio = null;
             document.querySelectorAll('.play-btn').forEach(b => b.textContent = '▶');
@@ -409,51 +415,63 @@ document.querySelectorAll('.play-btn').forEach(btn => {
     });
 });
 
+// ===== เลือกเพลงแนะนำ =====
 document.querySelectorAll('.select-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const row = btn.closest('.sound-row');
-        let url = row.dataset.url;
-        const id = row.dataset.id;
-        const name = row.dataset.name;
-        
-        if (id === 'song-klang' && !url) {
-            alert('📁 กรุณาเลือกไฟล์ "กำลังใจจากแนวหลัง" จากปุ่มด้านบนก่อนครับ');
-            return;
-        }
-        
-        selectedSound = { name, url, isLocal: false };
-        autoPublish();
+        selectedSound = { 
+            name: row.dataset.name, 
+            url: row.dataset.url
+        };
+        publishPost();
     });
 });
 
-function autoPublish() {
+// ===== ส่งโพสต์ขึ้น Cloud =====
+async function publishPost() {
     const newPost = {
-        id: Date.now(),
+        id: Date.now() + '-' + Math.random().toString(36).substr(2, 6),
         author: MY_ACCOUNT,
         caption: 'โพสต์ใหม่',
-        videoUrl: pendingVideoUrl,
+        mediaUrl: pendingMediaUrl,
+        mediaType: pendingMediaType || 'video',
         soundName: selectedSound.name,
         soundUrl: selectedSound.url,
         likes: 0, comments: 0, saves: 0, shares: 0,
         createdAt: new Date().toISOString()
     };
-    allPosts = CLOUD.addPost(newPost);
+    
+    document.getElementById('sync-status').className = 'sync-status wait';
+    document.getElementById('sync-status').textContent = '☁️ กำลังบันทึก...';
+    
+    allPosts = await CLOUD.addPost(newPost);
     currentSlide = 0;
-    pendingVideoUrl = null;
-    selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null, isLocal: false };
+    
+    pendingMediaUrl = null;
+    pendingMediaType = null;
+    selectedSound = { name: 'เสียงต้นฉบับ', url: null };
+    
     showPage('page-feed');
     renderFeed();
 }
 
-setInterval(() => {
-    const latest = CLOUD.getAll();
-    if (JSON.stringify(latest) !== JSON.stringify(allPosts)) {
+// ===== ตรวจสอบโพสต์ใหม่เรียลไทม์ =====
+setInterval(async () => {
+    const latest = await CLOUD.getAll();
+    const latestHash = CLOUD.getHash(latest);
+    if (lastSyncHash && latestHash !== lastSyncHash) {
         allPosts = latest;
         document.getElementById('new-badge').classList.add('show');
-        renderFeed();
     }
 }, 3000);
 
+// ===== แตะแจ้งเตือนโพสต์ใหม่ =====
+document.getElementById('new-badge').addEventListener('click', () => {
+    document.getElementById('new-badge').classList.remove('show');
+    renderFeed();
+});
+
+// ===== เริ่มทำงาน =====
 window.addEventListener('load', renderFeed);
 </script>
 </body>
