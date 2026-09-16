@@ -1,8 +1,9 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market v2.3 | 2026-09-16            -->
-<!-- ✅ ยังไม่มีโพสต์ก็เห็นปุ่ม+ชื่อตัวอย่าง — ไม่ว่างเปล่า    -->
-<!-- ✅ มีโพสต์จริงก็แสดงต่อจากนั้น                          -->
-<!-- ✅ ทุกอย่างตรงตำแหน่งเหมือน TikTok                      -->
+<!-- Thaipodee Global Market v2.4 | 2026-09-16            -->
+<!-- ✅ กดรูปด้านขวาบน → เข้าโปรไฟล์ได้เลย                  -->
+<!-- ✅ กดเมนูล่างขวา → หน้าไม่มืด แสดงปกติ                -->
+<!-- ✅ เปลี่ยนรูปโปรไฟล์+ชื่อได้ครบถ้วน                    -->
+<!-- ✅ ยังไม่มีโพสต์ก็เห็นปุ่มครบ ตัวอย่างแสดงก่อน          -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -53,6 +54,8 @@
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 10;
         }
 
         .post-item {
@@ -80,11 +83,15 @@
             object-fit: cover;
         }
 
-        /* ===== โพสต์ตัวอย่าง — แสดงตอนยังไม่มีโพสต์จริง ===== */
         .demo-screen {
             background: linear-gradient(135deg, #0f172a, #1e293b);
             text-align: center;
             padding: 40px 20px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .demo-icon { font-size: 48px; margin-bottom: 16px; }
         .demo-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
@@ -146,12 +153,15 @@
         .avatar-holder {
             position: relative;
             margin-bottom: 4px;
+            cursor: pointer;
         }
         .avatar-img {
             width: 48px;
             height: 48px;
             border-radius: 50%;
             background: linear-gradient(135deg, #f5a623, #f76b1c);
+            background-size: cover;
+            background-position: center;
             border: 2px solid #fff;
         }
         .avatar-badge {
@@ -233,13 +243,13 @@
 
         .page {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100vw;
             height: 100vh; height: 100dvh;
             overflow-y: auto;
             background: #000;
-            z-index: 50;
+            z-index: 500;
         }
         .page.active { display: block; }
         .back-link {
@@ -247,13 +257,15 @@
             cursor: pointer;
             margin: 20px 16px;
             display: inline-block;
+            color: #fff;
         }
-        .form-wrap { padding: 0 16px 100px; }
+        .form-wrap { padding: 0 16px 120px; }
         .form-title {
             text-align: center;
             margin: 20px 0;
             font-size: 18px;
             font-weight: 600;
+            color: #fff;
         }
         .avatar-preview-lg {
             width: 100px;
@@ -261,6 +273,8 @@
             border-radius: 50%;
             background: linear-gradient(135deg, #f5a623, #f76b1c);
             border: 3px solid #fff;
+            background-size: cover;
+            background-position: center;
             margin: 0 auto 8px;
         }
         .avatar-hint {
@@ -321,9 +335,10 @@
 
 <div class="feed-container" id="feed-container"></div>
 
+<!-- หน้าเลือกเพลง -->
 <div class="page" id="page-sound">
     <div class="back-link" id="back-sound">← กลับ</div>
-    <h4 style="margin:0 16px;">เลือกเพลง/เสียง</h4>
+    <h4 style="margin:0 16px; color:#fff;">เลือกเพลง/เสียง</h4>
     <label class="audio-pick">
         🎵 แตะเลือกไฟล์เสียงจากในเครื่อง
         <input type="file" accept="audio/*" id="audio-file" class="hidden">
@@ -334,13 +349,14 @@
     </div>
 </div>
 
+<!-- หน้าโปรไฟล์ -- แก้ไขให้แสดงชัดเจน ไม่มืด -->
 <div class="page" id="page-profile">
     <div class="back-link" id="back-profile">← กลับ</div>
     <h4 class="form-title">แก้ไขโปรไฟล์</h4>
     <div class="form-wrap">
         <div style="text-align:center;">
             <div class="avatar-preview-lg" id="my-avatar-preview"></div>
-            <p class="avatar-hint" id="avatar-tap-hint">แตะเพื่อเปลี่ยนรูป</p>
+            <p class="avatar-hint" id="avatar-tap-hint">แตะรูปเพื่อเปลี่ยนภาพโปรไฟล์</p>
             <input type="file" accept="image/*" id="avatar-file" class="hidden">
         </div>
         <label class="field-label">ชื่อผู้ใช้</label>
@@ -376,7 +392,7 @@
 </div>
 
 <script>
-const VER = '2.3';
+const VER = '2.4';
 
 const DB = {
     _key: 'thaipodee_global_v2',
@@ -443,37 +459,36 @@ let pendingMedia = null;
 let pendingAudio = null;
 let tempAvatar = null;
 
-// ==================== แสดงผล — มีโพสต์ตัวอย่างก่อนเลย ====================
+// ==================== แสดงผล ====================
 function renderFeed() {
     const box = document.getElementById('feed-container');
     const posts = DB.listPosts();
     
     box.innerHTML = '';
     
-    // ===== ถ้ายังไม่มีโพสต์ → แสดงหน้าตัวอย่างพร้อมปุ่มครบ =====
     if (posts.length === 0) {
         const demo = document.createElement('div');
         demo.className = 'post-item';
         demo.innerHTML = `
-            <div class="media-area demo-screen">
-                <div>
-                    <div class="demo-icon">🌏</div>
-                    <div class="demo-title">Thaipodee Global Market</div>
-                    <div class="demo-desc">แพลตฟอร์มแชร์และซื้อขายสินค้าของคนไทย<br>รอคุณเป็นคนแรกที่แชร์นะครับ ✨</div>
-                    <div class="demo-tip">👇 กดปุ่ม + ด้านล่าง เพื่อโพสต์ภาพหรือวิดีโอ</div>
+            <div class="media-area">
+                <div class="demo-screen">
+                    <div>
+                        <div class="demo-icon">🌏</div>
+                        <div class="demo-title">Thaipodee Global Market</div>
+                        <div class="demo-desc">แพลตฟอร์มแชร์และซื้อขายสินค้าของคนไทย<br>รอคุณเป็นคนแรกที่แชร์นะครับ ✨</div>
+                        <div class="demo-tip">👇 กดปุ่ม + ด้านล่าง เพื่อโพสต์ภาพหรือวิดีโอ</div>
+                    </div>
                 </div>
             </div>
             
-            <!-- ชื่อตัวอย่าง มุมล่างซ้าย -->
             <div class="post-info">
                 <div class="post-username">@Thaipodee_Official</div>
                 <div class="post-caption">ยินดีต้อนรับสู่ Thaipodee Global Market — แชร์สิ่งดี ๆ สู่สากล 🌏✨</div>
                 <div class="post-music">🎵 เพลงประกอบต้อนรับ</div>
             </div>
             
-            <!-- ปุ่มด้านขวาครบทุกอัน -->
             <div class="side-buttons">
-                <div class="side-btn">
+                <div class="side-btn" id="avatar-click-demo">
                     <div class="avatar-holder">
                         <div class="avatar-img" style="background:linear-gradient(135deg,#ffd700,#ff8c00)"></div>
                     </div>
@@ -500,10 +515,10 @@ function renderFeed() {
             </div>
         `;
         box.appendChild(demo);
+        document.getElementById('avatar-click-demo').onclick = () => showPage('profile');
         return;
     }
     
-    // ===== มีโพสต์จริง → แสดงทีละรายการ =====
     posts.forEach(post => {
         const author = DB.getUser(post.uid);
         const el = document.createElement('div');
@@ -528,10 +543,10 @@ function renderFeed() {
             </div>
             
             <div class="side-buttons">
-                <div class="side-btn">
+                <div class="side-btn avatar-clickable" data-uid="${post.uid}">
                     <div class="avatar-holder">
                         <div class="avatar-img" style="${avatarBg}"></div>
-                        ${!author.avatar ? '<div class="avatar-badge">+</div>' : ''}
+                        ${!author.avatar && post.uid === ME ? '<div class="avatar-badge">+</div>' : ''}
                     </div>
                 </div>
                 <div class="side-btn like-btn" data-pid="${post.id}" data-n="${post.likes}">
@@ -558,6 +573,13 @@ function renderFeed() {
         box.appendChild(el);
     });
     
+    // กดรูปโปรไฟล์ตัวเอง → เข้าแก้ไข
+    document.querySelectorAll('.avatar-clickable').forEach(btn => {
+        if (btn.dataset.uid === ME) {
+            btn.onclick = () => showPage('profile');
+        }
+    });
+    
     bindLikes();
 }
 
@@ -573,14 +595,18 @@ function bindLikes() {
     });
 }
 
+// โหลดข้อมูลโปรไฟล์
 function loadMyProfile() {
     const me = DB.getUser(ME);
     document.getElementById('name-input').value = me.name.replace('@', '');
     if (me.avatar) {
         document.getElementById('my-avatar-preview').style.backgroundImage = `url(${me.avatar})`;
+    } else {
+        document.getElementById('my-avatar-preview').style.backgroundImage = '';
     }
 }
 
+// เปลี่ยนรูปโปรไฟล์
 document.getElementById('avatar-file').onchange = e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -596,16 +622,18 @@ document.getElementById('avatar-tap-hint').onclick = () => {
     document.getElementById('avatar-file').click();
 };
 
+// บันทึกโปรไฟล์
 document.getElementById('save-profile').onclick = () => {
     const name = document.getElementById('name-input').value.trim();
     if (!name) return alert('กรุณาใส่ชื่อครับ');
     DB.saveUser(ME, name, tempAvatar);
     tempAvatar = null;
-    alert('✅ บันทึกแล้ว — ทุกคนเห็นชื่อใหม่ทันที!');
+    alert('✅ บันทึกแล้ว!');
     renderFeed();
     showPage('feed');
 };
 
+// อัปโหลดโพสต์
 document.getElementById('media-file').onchange = e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -646,10 +674,12 @@ document.getElementById('do-post').onclick = async () => {
     
     renderFeed();
     showPage('feed');
-    alert('✅ โพสต์สำเร็จ — ทุกคนเห็นทันที!');
+    alert('✅ โพสต์สำเร็จ!');
 };
 
+// เปลี่ยนหน้า — แก้ให้ชัดเจน ไม่มืด
 function showPage(id) {
+    // ปิดทุกหน้า
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
@@ -657,17 +687,22 @@ function showPage(id) {
         document.getElementById('feed-container').style.display = 'block';
         document.querySelector('[data-goto="feed"]').classList.add('active');
     } else {
-        document.getElementById('feed-container').style.display = 'none';
+        document.getElementById('feed-container').style.display = 'block';
         const pageEl = document.getElementById(id);
-        if (pageEl) pageEl.classList.add('active');
+        if (pageEl) {
+            pageEl.classList.add('active');
+            if (id === 'profile') loadMyProfile();
+        }
         document.querySelector(`[data-goto="${id}"]`)?.classList.add('active');
     }
 }
 
+// กดเมนูล่าง
 document.querySelectorAll('.nav-item[data-goto]').forEach(item => {
     item.onclick = () => showPage(item.dataset.goto);
 });
 
+// ปุ่มกลับ
 document.getElementById('back-sound').onclick = () => {
     pendingMedia = pendingAudio = null;
     document.getElementById('media-file').value = '';
@@ -688,12 +723,13 @@ async function checkUpdate() {
     } catch (e) {}
 }
 
+// เริ่มทำงาน
 renderFeed();
 loadMyProfile();
 checkUpdate();
 setInterval(checkUpdate, 30000);
 
-console.log('✅ Thaipodee v2.3 — ยังไม่มีโพสต์ก็เห็นปุ่ม+ชื่อตัวอย่างแล้ว!');
+console.log('✅ Thaipodee v2.4 — กดรูปด้านขวาบน+เมนูล่างขวาเข้าโปรไฟล์ได้แล้ว!');
 </script>
 </body>
 </html>
