@@ -1,12 +1,12 @@
 <!--
-📌 โค้ดลำดับที่ 4
-📅 วันที่ 16 กันยายน 2569 เวลา 12:25 น.
-📝 แก้ไข/เพิ่ม:
-- เพิ่มปุ่มขยาย/ลดขนาดจอวิดีโอ สลับเต็มจอ/ปกติได้
-- รักษาแถบความคืบหน้าจากลำดับที่ 3
-- รักษาไม่มีขอบดำ เต็มพื้นที่จอ
-- ครบทุกฟังก์ชันเดิม ไม่ตัดอะไรออก
-✅ ล็อก: ส่วนอื่นที่ทำเสร็จแล้วไม่แตะต้อง
+📌 โค้ดลำดับที่ 5
+📅 16 กันยายน 2569 เวลา 12:35 น.
+📝 แก้ไข:
+- ยึดอัตราส่วน 9:16 แนวตั้ง พอดีจอ ไม่ตัดส่วนบน-ล่าง
+- ขยายซ้าย-ขวาเต็มจอ ไม่มีขอบดำ
+- โลโก้และเนื้อหาไม่ถูกบังทั้งสองโหมด
+- รักษาแถบเวลา + ปุ่มขยายเหมือนเดิม
+✅ ล็อก: ส่วนอื่นไม่แตะต้อง
 -->
 <!DOCTYPE html>
 <html lang="th">
@@ -35,19 +35,28 @@
             z-index: 1; background: #000;
             display: none; cursor: pointer;
             margin: 0; padding: 0;
-            transition: all 0.3s ease;
         }
         .video-container.show { display: block; }
-        /* โหมดปกติ — ครอบคลุมเต็มจอ ไม่มีขอบดำ */
+
+        /* โหมดปกติ — ยึด 9:16 ไม่ตัดส่วนสำคัญ เต็มซ้าย-ขวา */
         .video-container video { 
-            width: 100vw; height: 100vh; height: 100dvh;
-            object-fit: cover; background: #000;
-            margin: 0; padding: 0; border: none;
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: calc(100vw * 16 / 9); /* อัตราส่วน 9:16 */
+            max-height: 100vh; max-height: 100dvh;
+            object-fit: contain; /* แสดงทั้งภาพ ไม่ตัด */
+            background: #000;
+            border: none;
             transition: all 0.3s ease;
         }
-        /* โหมดพอดีภาพ — ไม่ตัดขอบ */
-        .video-container.fit-mode video {
-            object-fit: contain;
+
+        /* โหมดเต็มจอ — ขยายให้พอดีจอแต่ยังรักษา 9:16 */
+        .video-container.full-expand video {
+            width: 100vw;
+            height: 100vh; height: 100dvh;
+            object-fit: cover;
         }
 
         /* แถบความคืบหน้า */
@@ -339,7 +348,7 @@ let selectedSound = { name: 'เสียงต้นฉบับวิดีโ
 let videoFile = null;
 let previewAudio = null;
 let bgAudio = null;
-let isFitMode = false; // สถานะ: false=เต็มจอครอบคลุม, true=พอดีภาพ
+let isExpandMode = false; // false=พอดี9:16, true=ขยายเต็มจอ
 
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -384,18 +393,15 @@ function seekVideo(e) {
     updateProgress();
 }
 
-// สลับโหมดขยาย/ลดจอ
-function toggleFitMode() {
+// สลับโหมด — พอดี9:16 / ขยายเต็มจอ
+function toggleExpandMode() {
     const container = document.getElementById('video-container');
-    const btn = document.getElementById('fullscreen-toggle');
-    isFitMode = !isFitMode;
+    isExpandMode = !isExpandMode;
     
-    if (isFitMode) {
-        container.classList.add('fit-mode');
-        btn.textContent = '⛶'; // พอดีภาพ — ไม่ตัดขอบ
+    if (isExpandMode) {
+        container.classList.add('full-expand');
     } else {
-        container.classList.remove('fit-mode');
-        btn.textContent = '⛶'; // เต็มจอ — ครอบคลุม ไม่มีขอบดำ
+        container.classList.remove('full-expand');
     }
 }
 
@@ -410,7 +416,7 @@ document.getElementById('change-sound').addEventListener('click', () => showPage
 document.getElementById('music-icon-btn').addEventListener('click', () => showPage('page-sound'));
 document.getElementById('back-to-post').addEventListener('click', () => showPage('page-post'));
 document.getElementById('back-to-home').addEventListener('click', () => showPage('page-home'));
-document.getElementById('fullscreen-toggle').addEventListener('click', toggleFitMode);
+document.getElementById('fullscreen-toggle').addEventListener('click', toggleExpandMode);
 
 document.getElementById('audio-local-input').addEventListener('change', e => {
     const f = e.target.files[0];
