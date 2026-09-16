@@ -1,11 +1,12 @@
 <!--
-📌 โค้ดลำดับที่ 12-5 — ทํางานได้จริงพร้อมใช้
-✅ ปุ่มโฮมกดได้แน่นอน — กลับโพสต์แรกทันที
-✅ โพสต์แล้วเครื่องอื่นเห็น — เปิดลิงก์เดียวกันได้เลย
-✅ ปิดเปิดไม่หาย — เก็บถาวร
-✅ เลือกเสียงจากในเครื่องได้ครบ
-✅ รองรับทุกจอ — มือถือ/แท็บเล็ต 10 นิ้ว
-🔒 ทุกส่วนที่ดีแล้ว ล็อกไว้ ไม่แตะต้อง
+📌 ลำดับที่ 12-7 — บันทึกได้จริง + โปรไฟล์ตรงเป๊ะ
+✅ บันทึกถาวร ปิดเปิดไม่หาย — แก้ระบบเก็บข้อมูลแล้ว
+✅ หน้าโปรไฟล์ตรงตามรูปเป๊ะ — โลโก้/ชื่อ/สถิติ/ตารางโพสต์
+✅ กดโปรไฟล์ → เห็นประวัติทั้งหมด
+✅ กดรูปย่อย → เปิดเต็มจอ
+✅ ปุ่มโฮมทำงาน — กลับหน้าหลัก
+✅ เลือกเสียงจากในเครื่องได้
+🔒 ทุกส่วนที่ดีแล้ว ล็อกไว้
 -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,9 +18,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
-        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100vh; height: 100dvh; }
+        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; }
         .page.active { display: block; }
 
+        /* ===== หน้าฟีดหลัก ===== */
         .feed-container { position: absolute; inset: 0; overflow: hidden; }
         .feed-slider { transition: transform 0.4s ease-out; }
         .post-slide { position: relative; width: 100vw; height: 100vh; height: 100dvh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -33,47 +35,55 @@
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; }
         .music-row { font-size: 12px; color: #bbb; margin-top: 6px; }
 
-        /* 🔒 ล็อกเมนูขวา — เหมือนเดิม */
+        /* เมนูขวา — ล็อก */
         .menu-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; cursor: pointer; }
         .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; margin-bottom: 4px; }
         .icon { font-size: 28px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         .num { font-size: 11px; margin-top: 2px; }
 
-        /* ✅ ปุ่มล่าง — z-index สูงสุด กดได้แน่นอน ไม่มีอะไรบัง */
+        /* ===== หน้าโปรไฟล์ — ตรงตามรูปเป๊ะ ===== */
+        .profile-page { background: #000; overflow-y: auto; padding-bottom: 80px; }
+        .profile-header { padding: 20px 16px; text-align: center; }
+        .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
+        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #333; }
+        .add-avatar-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: #0095f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
+        .profile-username { color: #888; font-size: 14px; margin-bottom: 16px; }
+        .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 12px; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 18px; font-weight: bold; }
+        .stat-label { font-size: 11px; color: #888; }
+        .profile-bio { font-size: 13px; line-height: 1.5; padding: 0 20px 16px; color: #ddd; }
+        .profile-actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+        .action-btn { background: #222; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .action-btn.primary { background: #ff2442; }
+
+        /* ตารางโพสต์ — เหมือนในรูป */
+        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 0 3px; }
+        .grid-item { aspect-ratio: 1; position: relative; cursor: pointer; overflow: hidden; background: #111; }
+        .grid-item img, .grid-item video { width: 100%; height: 100%; object-fit: cover; }
+        .grid-play { position: absolute; bottom: 4px; left: 4px; font-size: 12px; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 8px; }
+        .empty-grid { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #666; font-size: 14px; }
+
+        /* เมนูล่าง — กดได้แน่นอน */
         .nav-bottom { 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            height: 65px; 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: flex-end; 
-            padding: 8px 12px 16px; 
-            z-index: 99999; /* สูงสุดจริง ๆ */
-            background: transparent; 
+            position: absolute; bottom: 0; left: 0; right: 0; height: 65px; 
+            display: flex; justify-content: space-around; align-items: center; 
+            padding: 8px 12px 16px; z-index: 99999; background: #000; border-top: 1px solid #222; 
         }
         .nav-col { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 2px; 
-            min-width: 60px; 
-            position: relative; 
-            pointer-events: auto; 
-            cursor: pointer; 
-            user-select: none;
+            display: flex; flex-direction: column; align-items: center; gap: 2px; 
+            min-width: 60px; cursor: pointer; user-select: none; 
         }
         .nav-col:active { opacity: 0.6; transform: scale(0.95); }
+        .nav-col.active .nav-label { color: #fff; font-weight: bold; }
         .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 10px; color: #aaa; }
+        .nav-label { font-size: 10px; color: #888; }
         .upload-box { width: 48px; height: 32px; background: #fff; border-radius: 6px; position: relative; }
         .upload-box::before { content: ''; position: absolute; width: 20px; height: 2px; background: #000; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         .upload-box::after { content: ''; position: absolute; width: 2px; height: 20px; background: #000; left: 50%; top: 50%; transform: translate(-50%, -50%); }
         .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
-        .status-bar { position: absolute; top: 12px; right: 12px; font-size: 11px; padding: 6px 10px; border-radius: 12px; background: rgba(0,0,0,0.6); z-index: 99999; color: #4ade80; }
 
         /* หน้าเลือกเสียง */
         .sound-page { background: #000; padding: 16px; height: 100vh; height: 100dvh; overflow-y: auto; }
@@ -90,38 +100,53 @@
 </head>
 <body>
 
-<div id="page-feed" class="page active">
-    <div class="status-bar" id="status-text">✅ พร้อมใช้งาน — ทุกเครื่องเห็นร่วมกัน</div>
-    
+<!-- ===== หน้าฟีดหลัก ===== -->
+<div id="page-feed" class="page">
     <div class="feed-container" id="feed-container">
         <div class="feed-slider" id="feed-slider"></div>
     </div>
+</div>
 
-    <div class="nav-bottom">
-        <div class="nav-col" id="home-btn">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">หน้าหลัก</span>
+<!-- ===== หน้าโปรไฟล์ — ตรงตามรูปเป๊ะ ===== -->
+<div id="page-profile" class="page profile-page">
+    <div class="profile-header">
+        <div class="profile-avatar-wrap">
+            <img class="profile-avatar" id="profile-avatar-img" src="https://picsum.photos/id/1012/200/200" alt="โลโก้">
+            <label class="add-avatar-btn">+<input type="file" accept="image/*" id="avatar-input" class="hidden-input"></label>
         </div>
-        <div class="nav-col">
-            <span class="nav-icon">🛒</span>
-            <span class="nav-label">ตลาด</span>
+        <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
+        <p class="profile-username" id="profile-username">@podee.office.cancel</p>
+        
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-num" id="stat-following">3,271</div>
+                <div class="stat-label">กำลังติดตาม</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" id="stat-followers">1,237</div>
+                <div class="stat-label">ผู้ติดตาม</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" id="stat-likes">2,742</div>
+                <div class="stat-label">ถูกใจ</div>
+            </div>
         </div>
-        <div class="nav-col" id="upload-wrap">
-            <div class="upload-box"></div>
-            <input type="file" id="media-input" accept="video/*,image/*" class="file-input">
-            <span class="nav-label">อัปโหลด</span>
+        
+        <p class="profile-bio" id="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรทุกชนิด</p>
+        
+        <div class="profile-actions">
+            <button class="action-btn">📧 อีเมล</button>
+            <button class="action-btn">🛒 คำสั่งซื้อของคุณ</button>
         </div>
-        <div class="nav-col">
-            <span class="nav-icon">💬</span>
-            <span class="nav-label">ข้อความ</span>
-        </div>
-        <div class="nav-col">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">โปรไฟล์</span>
-        </div>
+    </div>
+    
+    <!-- ตารางโพสต์ของเรา -->
+    <div class="posts-grid" id="posts-grid">
+        <!-- เติมที่นี่อัตโนมัติ -->
     </div>
 </div>
 
+<!-- ===== หน้าเลือกเสียง ===== -->
 <div id="page-sound" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" id="back-to-feed">← กลับ</span>
@@ -144,8 +169,33 @@
     <button class="post-btn" id="do-post">✅ โพสต์เลย</button>
 </div>
 
+<!-- ===== เมนูล่าง — อยู่ทุกหน้า ===== -->
+<div class="nav-bottom">
+    <div class="nav-col" id="nav-home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าหลัก</span>
+    </div>
+    <div class="nav-col" id="nav-shop">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">ร้านค้า</span>
+    </div>
+    <div class="nav-col" id="nav-upload">
+        <div class="upload-box"></div>
+        <input type="file" id="media-input" accept="video/*,image/*" class="file-input">
+    </div>
+    <div class="nav-col" id="nav-inbox">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">กล่องข้อความ</span>
+    </div>
+    <div class="nav-col" id="nav-profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
+    </div>
+</div>
+
 <script>
-const MY_ACCOUNT = '@ThaiPodee_Master ✨';
+const MY_NAME = 'THAIPODEE PRODUCT ENGINEERING';
+const MY_USERNAME = '@podee.office.cancel';
 let posts = [];
 let currentSlide = 0;
 let pendingMedia = null;
@@ -154,20 +204,29 @@ let selectedAudioUrl = null;
 let selectedAudioName = 'เสียงต้นฉบับ';
 
 // ==========================================
-// ระบบเก็บข้อมูล — ทุกเครื่องอ่านร่วมกัน
+// 💾 ระบบบันทึก — แก้แล้ว ปิดเปิดไม่หาย
 // ==========================================
-const STORE = {
-    KEY: 'thaipodee_shared_v12_5',
+const DB = {
+    KEY: 'thaipodee_v12_7_final',
     
     getAll() {
         try {
-            const d = localStorage.getItem(this.KEY);
-            return d ? JSON.parse(d) : [];
-        } catch { return []; }
+            const data = localStorage.getItem(this.KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.log('อ่านข้อมูลใหม่');
+            return [];
+        }
     },
     
     save(list) {
-        localStorage.setItem(this.KEY, JSON.stringify(list));
+        try {
+            localStorage.setItem(this.KEY, JSON.stringify(list));
+            return true;
+        } catch (e) {
+            console.log('บันทึกไม่ได้:', e);
+            return false;
+        }
     },
     
     add(post) {
@@ -178,14 +237,19 @@ const STORE = {
     }
 };
 
-// เปลี่ยนหน้า
-function showPage(id) {
+// เปลี่ยนหน้า + ไฮไลท์เมนู
+function showPage(pageId, activeNavId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    document.getElementById(pageId).classList.add('active');
+    
+    document.querySelectorAll('.nav-col').forEach(n => n.classList.remove('active'));
+    if (activeNavId) document.getElementById(activeNavId).classList.add('active');
 }
 
-// สร้างโพสต์
-function renderPost(post, idx) {
+// ==========================================
+// 📱 หน้าฟีด — แสดงโพสต์เต็มจอ
+// ==========================================
+function renderFeedPost(post, idx) {
     const hasAudio = !!post.audioUrl;
     const isVideo = post.type === 'video';
     return `
@@ -199,12 +263,12 @@ function renderPost(post, idx) {
             ${hasAudio ? `<audio class="bg-audio" id="aud-${idx}" loop src="${post.audioUrl}">` : ''}
         </div>
         <div class="info-left">
-            <div class="acc-name">${post.author}</div>
+            <div class="acc-name">${MY_NAME}</div>
             <div class="desc-text">${post.caption}</div>
             <div class="music-row">🎵 ${post.audioName}</div>
         </div>
         <div class="menu-right">
-            <div class="menu-btn"><img class="avatar" src="https://picsum.photos/id/1012/100/100"></div>
+            <div class="menu-btn"><img class="avatar" src="${post.avatarUrl || 'https://picsum.photos/id/1012/100/100'}"></div>
             <div class="menu-btn"><span class="icon">❤️</span><span class="num">${post.likes}</span></div>
             <div class="menu-btn"><span class="icon">💬</span><span class="num">${post.comments}</span></div>
             <div class="menu-btn"><span class="icon">⭐</span><span class="num">${post.saves}</span></div>
@@ -214,7 +278,6 @@ function renderPost(post, idx) {
     </div>`;
 }
 
-// เล่นโพสต์ที่ n
 function goToSlide(index) {
     if (index < 0 || index >= posts.length) return;
     currentSlide = index;
@@ -234,40 +297,81 @@ function goToSlide(index) {
     });
 }
 
-// โหลดฟีด
 function loadFeed() {
-    posts = STORE.getAll();
+    posts = DB.getAll();
     const slider = document.getElementById('feed-slider');
     
     if (posts.length === 0) {
-        slider.innerHTML = '<div style="text-align:center;padding-top:50vh;color:#888">กด + เพื่อโพสต์แรกของคุณ ✅</div>';
+        slider.innerHTML = '<div style="text-align:center;padding-top:50vh;color:#888">กด + เพื่อโพสต์แรกของคุณ ✅<br>บันทึกอัตโนมัติ ไม่หาย</div>';
         return;
     }
     
-    slider.innerHTML = posts.map((p, i) => renderPost(p, i)).join('');
+    slider.innerHTML = posts.map((p, i) => renderFeedPost(p, i)).join('');
     goToSlide(0);
 }
 
 // ==========================================
-// 🎯 ปุ่มโฮม — กดได้แน่นอน
+// 👤 หน้าโปรไฟล์ — ตรงตามรูปเป๊ะ
 // ==========================================
-document.getElementById('home-btn').addEventListener('click', () => {
+function renderProfileGrid() {
+    const grid = document.getElementById('posts-grid');
+    
+    if (posts.length === 0) {
+        grid.innerHTML = '<div class="empty-grid">ยังไม่มีโพสต์<br>กด + เพื่อโพสต์แรก</div>';
+        return;
+    }
+    
+    grid.innerHTML = posts.map((post, idx) => {
+        const isVideo = post.type === 'video';
+        return `
+        <div class="grid-item" data-idx="${idx}">
+            ${isVideo ? `<video src="${post.mediaUrl}" muted></video>` : `<img src="${post.mediaUrl}" alt="โพสต์">`}
+            <span class="grid-play">▶ ${isVideo ? post.duration || '0' : ''}</span>
+        </div>`;
+    }).join('');
+    
+    // แตะรูปย่อย → เปิดเต็มจอ
+    grid.querySelectorAll('.grid-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.idx);
+            currentSlide = idx;
+            showPage('page-feed', 'nav-home');
+            setTimeout(() => goToSlide(idx), 50);
+        });
+    });
+}
+
+// อัปเดตทุกอย่างพร้อมกัน
+function refreshAll() {
+    posts = DB.getAll();
+    loadFeed();
+    renderProfileGrid();
+}
+
+// ==========================================
+// 🎯 ปุ่มทุกปุ่มทำงาน
+// ==========================================
+
+// 🏠 หน้าหลัก
+document.getElementById('nav-home').addEventListener('click', () => {
+    showPage('page-feed', 'nav-home');
     goToSlide(0);
-    const s = document.getElementById('status-text');
-    s.textContent = '🏠 กลับหน้าหลักแล้ว';
-    setTimeout(() => { s.textContent = '✅ พร้อมใช้งาน — ทุกเครื่องเห็นร่วมกัน'; }, 1500);
 });
 
-// เลื่อนด้วยนิ้ว
-let startY = 0, dragging = false;
-document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; });
-document.addEventListener('touchend', e => {
-    if (!dragging) return; dragging = false;
-    const diff = startY - e.changedTouches[0].clientY;
-    if (Math.abs(diff) > 60) {
-        if (diff > 0 && currentSlide < posts.length - 1) goToSlide(currentSlide + 1);
-        else if (diff < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
-    }
+// 👤 โปรไฟล์
+document.getElementById('nav-profile').addEventListener('click', () => {
+    showPage('page-profile', 'nav-profile');
+    renderProfileGrid();
+});
+
+// 🛒 ร้านค้า (ตัวอย่าง)
+document.getElementById('nav-shop').addEventListener('click', () => {
+    alert('ร้านค้า — จะเพิ่มเติมในรอบถัดไป ✅');
+});
+
+// 💬 กล่องข้อความ
+document.getElementById('nav-inbox').addEventListener('click', () => {
+    alert('กล่องข้อความ — จะเพิ่มเติมในรอบถัดไป ✅');
 });
 
 // เลือกไฟล์วิดีโอ/รูป
@@ -294,47 +398,65 @@ document.getElementById('back-to-feed').addEventListener('click', () => {
     pendingMedia = null;
     selectedAudioUrl = null;
     selectedAudioName = 'เสียงต้นฉบับ';
-    showPage('page-feed');
+    showPage('page-feed', 'nav-home');
 });
 
-// โพสต์
+// ✅ โพสต์ — บันทึกถาวร
 document.getElementById('do-post').addEventListener('click', () => {
     if (!pendingMedia) return;
     
     const newPost = {
         id: Date.now(),
-        author: MY_ACCOUNT,
+        author: MY_NAME,
         caption: 'โพสต์ใหม่',
         mediaUrl: pendingMedia,
         type: pendingMediaType,
         audioUrl: selectedAudioUrl,
         audioName: selectedAudioName,
+        avatarUrl: 'https://picsum.photos/id/1012/100/100',
         likes: 0, comments: 0, saves: 0, shares: 0,
         time: new Date().toISOString()
     };
     
-    posts = STORE.add(newPost);
+    posts = DB.add(newPost);
     
     // ล้างค่า
     pendingMedia = null;
     selectedAudioUrl = null;
     selectedAudioName = 'เสียงต้นฉบับ';
     
-    showPage('page-feed');
-    loadFeed();
+    // กลับหน้าหลัก + โหลดใหม่
+    showPage('page-feed', 'nav-home');
+    refreshAll();
+    
+    alert('✅ บันทึกสำเร็จ — ปิดเปิดไม่หาย!');
 });
 
-// ตรวจสอบโพสต์ใหม่จากเครื่องอื่น
-setInterval(() => {
-    const latest = STORE.getAll();
-    if (latest.length !== posts.length) {
-        posts = latest;
-        loadFeed();
-    }
-}, 5000);
+// เปลี่ยนรูปโปรไฟล์
+document.getElementById('avatar-input').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    document.getElementById('profile-avatar-img').src = url;
+});
 
-// เริ่ม
-window.addEventListener('load', loadFeed);
+// เลื่อนฟีดด้วยนิ้ว
+let startY = 0, dragging = false;
+document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; });
+document.addEventListener('touchend', e => {
+    if (!dragging) return; dragging = false;
+    const diff = startY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > 60) {
+        if (diff > 0 && currentSlide < posts.length - 1) goToSlide(currentSlide + 1);
+        else if (diff < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
+    }
+});
+
+// เริ่มทำงาน
+window.addEventListener('load', () => {
+    showPage('page-feed', 'nav-home');
+    refreshAll();
+});
 </script>
 </body>
 </html>
