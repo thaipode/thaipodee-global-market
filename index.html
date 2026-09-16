@@ -1,9 +1,8 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market v2.5 | 2026-09-16            -->
-<!-- ✅ กดรูปด้านขวาบน → เข้าโปรไฟล์ได้แน่นอน                -->
-<!-- ✅ กดเมนูโปรไฟล์ล่างขวา → ทำงานปกติ                      -->
-<!-- ✅ เลือกภาพ+กดโพสต์ → บันทึกและแสดงใหม่ทันที             -->
-<!-- ✅ ทุกปุ่มตอบสนองชัดเจน ไม่นิ่งเฉย                       -->
+<!-- Thaipodee Global Market v2.6 | 2026-09-16            -->
+<!-- ✅ บีบอัดรูปอัตโนมัติ — เล็ก+ชัด ไม่เต็มพื้นที่       -->
+<!-- ✅ แก้ปัญหา "บันทึกไม่สำเร็จ"                          -->
+<!-- ✅ ทุกปุ่มทำงาน — โปรไฟล์+โพสต์ปกติ                    -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -80,7 +79,8 @@
         .media-area video, .media-area img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            background: #000;
         }
 
         .demo-screen {
@@ -112,6 +112,7 @@
             color: #ffffff;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             word-break: break-all;
+            cursor: pointer;
         }
         .post-caption {
             font-size: 14px;
@@ -333,14 +334,20 @@
             color: #888;
             margin-top: 6px;
         }
-        .hidden { display: none; }
         .preview-img {
             width: 100%;
-            max-height: 400px;
+            max-height: 350px;
             object-fit: contain;
             margin: 16px 0;
             border-radius: 8px;
             background: #111;
+        }
+        .hidden { display: none; }
+        .storage-info {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -353,13 +360,10 @@
 
 <div class="feed-container" id="feed-container"></div>
 
-<!-- หน้าเลือกเพลง+โพสต์ -- เพิ่มตัวอย่างภาพ -->
 <div class="page" id="page-sound">
     <div class="back-link" id="back-sound">← กลับ</div>
-    <h4 style="margin:16px; color:#fff;">ตรวจสอบก่อนโพสต์</h4>
-    <div id="media-preview-area" style="padding:0 16px; text-align:center;">
-        <!-- ตัวอย่างภาพจะแสดงที่นี่ -->
-    </div>
+    <h4 style="margin:16px; color:#fff;">ตรวจสอบก่อนเผยแพร่</h4>
+    <div id="media-preview-area" style="padding:0 16px; text-align:center;"></div>
     <label class="audio-pick">
         🎵 แตะเลือกไฟล์เสียง (ถ้ามี)
         <input type="file" accept="audio/*" id="audio-file" class="hidden">
@@ -368,9 +372,9 @@
     <div style="padding:0 16px;">
         <button class="action-btn" id="do-post">✅ ยืนยันและเผยแพร่</button>
     </div>
+    <p class="storage-info">💡 ระบบบีบอัดภาพอัตโนมัติเพื่อประหยัดพื้นที่</p>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
 <div class="page" id="page-profile">
     <div class="back-link" id="back-profile">← กลับ</div>
     <h4 class="form-title">แก้ไขโปรไฟล์</h4>
@@ -413,9 +417,37 @@
 </div>
 
 <script>
-const VER = '2.5';
+const VER = '2.6';
 
-// ==================== ระบบจัดเก็บข้อมูล ====================
+// ==================== บีบอัดรูปอัตโนมัติ — กุญแจสำคัญ ====================
+async function compressImage(file, maxWidth = 1080, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+            
+            // ปรับขนาดไม่ให้กว้างเกินไป
+            if (w > maxWidth) {
+                h = Math.round(h * maxWidth / w);
+                w = maxWidth;
+            }
+            
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            
+            // แปลงเป็น JPG บีบอัด
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+// ==================== ระบบจัดเก็บ ====================
 const DB = {
     _key: 'thaipodee_global_v2',
     
@@ -428,12 +460,14 @@ const DB = {
             return { posts:[], users:{} }; 
         }
     },
+    
     _write(obj) {
         try {
             localStorage.setItem(this._key, JSON.stringify(obj));
             return true;
         } catch (e) {
-            console.error('บันทึกไม่ได้:', e);
+            console.error('บันทึกไม่ได้:', e.name, e.message);
+            alert('❌ พื้นที่เต็ม! ลองลบโพสต์เก่าบางรายการหรือใช้รูปขนาดเล็กลงครับ');
             return false;
         }
     },
@@ -498,11 +532,10 @@ let pendingAudio = null;
 let pendingMediaDataUrl = null;
 let tempAvatar = null;
 
-// ==================== เปลี่ยนหน้า — แก้ไขให้ชัดเจนที่สุด ====================
+// ==================== เปลี่ยนหน้า ====================
 function showPage(pageId) {
     console.log('ไปที่หน้า:', pageId);
     
-    // ซ่อนทุกหน้า
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
@@ -518,12 +551,6 @@ function showPage(pageId) {
     } else if (pageId === 'page-sound') {
         document.getElementById('feed-container').style.display = 'block';
         document.getElementById('page-sound').classList.add('active');
-    } else {
-        document.getElementById('feed-container').style.display = 'block';
-        const pageEl = document.getElementById(pageId);
-        if (pageEl) {
-            pageEl.classList.add('active');
-        }
     }
 }
 
@@ -550,47 +577,31 @@ function renderFeed() {
             </div>
             
             <div class="post-info">
-                <div class="post-username" id="demo-avatar-link" style="cursor:pointer;">@Thaipodee_Official 👆 แตะเพื่อตั้งค่าโปรไฟล์</div>
+                <div class="post-username" id="demo-avatar-link">@Thaipodee_Official 👆 แตะเพื่อตั้งค่าโปรไฟล์</div>
                 <div class="post-caption">ยินดีต้อนรับสู่ Thaipodee Global Market — แชร์สิ่งดี ๆ สู่สากล 🌏✨</div>
                 <div class="post-music">🎵 เพลงประกอบต้อนรับ</div>
             </div>
             
             <div class="side-buttons">
-                <div class="side-btn" id="demo-avatar-btn" style="cursor:pointer;">
+                <div class="side-btn" id="demo-avatar-btn">
                     <div class="avatar-holder">
                         <div class="avatar-img" style="background:linear-gradient(135deg,#ffd700,#ff8c00)"></div>
                     </div>
                 </div>
-                <div class="side-btn">
-                    <span class="icon">❤️</span>
-                    <span class="count">0</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">💬</span>
-                    <span class="count">0</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">⭐</span>
-                    <span class="count">0</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">↗️</span>
-                    <span class="count">0</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">🎵</span>
-                </div>
+                <div class="side-btn"><span class="icon">❤️</span><span class="count">0</span></div>
+                <div class="side-btn"><span class="icon">💬</span><span class="count">0</span></div>
+                <div class="side-btn"><span class="icon">⭐</span><span class="count">0</span></div>
+                <div class="side-btn"><span class="icon">↗️</span><span class="count">0</span></div>
+                <div class="side-btn"><span class="icon">🎵</span></div>
             </div>
         `;
         box.appendChild(demo);
         
-        // กดรูป/ชื่อตัวอย่าง → เข้าโปรไฟล์
         document.getElementById('demo-avatar-btn').onclick = () => showPage('profile');
         document.getElementById('demo-avatar-link').onclick = () => showPage('profile');
         return;
     }
     
-    // มีโพสต์จริง
     posts.forEach(post => {
         const author = DB.getUser(post.uid);
         const el = document.createElement('div');
@@ -609,7 +620,7 @@ function renderFeed() {
             <div class="media-area">${media}</div>
             
             <div class="post-info">
-                <div class="post-username" data-uid="${post.uid}" style="cursor:pointer;">
+                <div class="post-username" data-uid="${post.uid}">
                     ${author.name} ${post.uid === ME ? '👆' : ''}
                 </div>
                 <div class="post-caption">${post.caption}</div>
@@ -624,39 +635,22 @@ function renderFeed() {
                     </div>
                 </div>
                 <div class="side-btn like-btn" data-pid="${post.id}" data-n="${post.likes}">
-                    <span class="icon">❤️</span>
-                    <span class="count">${post.likes}</span>
+                    <span class="icon">❤️</span><span class="count">${post.likes}</span>
                 </div>
-                <div class="side-btn">
-                    <span class="icon">💬</span>
-                    <span class="count">${post.comments}</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">⭐</span>
-                    <span class="count">${post.saves}</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">↗️</span>
-                    <span class="count">${post.shares}</span>
-                </div>
-                <div class="side-btn">
-                    <span class="icon">🎵</span>
-                </div>
+                <div class="side-btn"><span class="icon">💬</span><span class="count">${post.comments}</span></div>
+                <div class="side-btn"><span class="icon">⭐</span><span class="count">${post.saves}</span></div>
+                <div class="side-btn"><span class="icon">↗️</span><span class="count">${post.shares}</span></div>
+                <div class="side-btn"><span class="icon">🎵</span></div>
             </div>
         `;
         box.appendChild(el);
     });
     
-    // กดรูป/ชื่อตัวเอง → เข้าโปรไฟล์
     document.querySelectorAll('.avatar-clickable').forEach(btn => {
-        if (btn.dataset.uid === ME) {
-            btn.onclick = () => showPage('profile');
-        }
+        if (btn.dataset.uid === ME) btn.onclick = () => showPage('profile');
     });
     document.querySelectorAll('.post-username[data-uid]').forEach(btn => {
-        if (btn.dataset.uid === ME) {
-            btn.onclick = () => showPage('profile');
-        }
+        if (btn.dataset.uid === ME) btn.onclick = () => showPage('profile');
     });
     
     bindLikes();
@@ -685,15 +679,12 @@ function loadMyProfile() {
     }
 }
 
-document.getElementById('avatar-file').onchange = e => {
+document.getElementById('avatar-file').onchange = async e => {
     const f = e.target.files[0];
     if (!f) return;
-    const r = new FileReader();
-    r.onload = ev => {
-        tempAvatar = ev.target.result;
-        document.getElementById('my-avatar-preview').style.backgroundImage = `url(${tempAvatar})`;
-    };
-    r.readAsDataURL(f);
+    // บีบอัดรูปโปรไฟล์ด้วย
+    tempAvatar = await compressImage(f, 200, 0.9);
+    document.getElementById('my-avatar-preview').style.backgroundImage = `url(${tempAvatar})`;
 };
 
 document.getElementById('avatar-tap-hint').onclick = () => {
@@ -705,40 +696,36 @@ document.getElementById('save-profile').onclick = () => {
     if (!name) return alert('กรุณาใส่ชื่อครับ');
     
     const ok = DB.saveUser(ME, name, tempAvatar);
-    if (!ok) return alert('❌ บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง');
+    if (!ok) return;
     
     tempAvatar = null;
     alert('✅ บันทึกสำเร็จ!');
     showPage('feed');
 };
 
-// ==================== เลือกไฟล์เพื่อโพสต์ ====================
+// ==================== เลือกไฟล์โพสต์ — บีบอัดอัตโนมัติ ====================
 document.getElementById('media-file').onchange = async e => {
     const f = e.target.files[0];
     if (!f) return;
-    
-    console.log('เลือกไฟล์:', f.name, f.type);
     
     pendingMedia = {
         type: f.type.startsWith('video') ? 'video' : 'image',
         file: f
     };
     
-    // แสดงตัวอย่าง
-    const reader = new FileReader();
-    reader.onload = ev => {
-        pendingMediaDataUrl = ev.target.result;
-        const previewArea = document.getElementById('media-preview-area');
-        
-        if (pendingMedia.type === 'video') {
-            previewArea.innerHTML = `<video src="${pendingMediaDataUrl}" class="preview-img" controls autoplay muted loop style="max-height:300px;"></video>`;
-        } else {
-            previewArea.innerHTML = `<img src="${pendingMediaDataUrl}" class="preview-img" alt="ตัวอย่าง">`;
-        }
-        
-        showPage('page-sound');
-    };
-    reader.readAsDataURL(f);
+    const previewArea = document.getElementById('media-preview-area');
+    
+    if (pendingMedia.type === 'image') {
+        // บีบอัดรูปก่อนเก็บ — สำคัญมาก!
+        pendingMediaDataUrl = await compressImage(f, 1280, 0.85);
+        previewArea.innerHTML = `<img src="${pendingMediaDataUrl}" class="preview-img" alt="ตัวอย่าง">`;
+    } else {
+        // วิดีโอเก็บตามเดิม
+        pendingMediaDataUrl = URL.createObjectURL(f);
+        previewArea.innerHTML = `<video src="${pendingMediaDataUrl}" class="preview-img" controls autoplay muted loop style="max-height:300px;"></video>`;
+    }
+    
+    showPage('page-sound');
 };
 
 document.getElementById('audio-file').onchange = e => {
@@ -747,45 +734,34 @@ document.getElementById('audio-file').onchange = e => {
     document.getElementById('audio-status').textContent = f ? '✅ เลือกแล้ว: ' + f.name : 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
 };
 
-// ==================== กดโพสต์ — แก้ให้ทำงานแน่นอน ====================
-document.getElementById('do-post').onclick = async () => {
-    console.log('กดปุ่มโพสต์');
-    
+// ==================== กดโพสต์ ====================
+document.getElementById('do-post').onclick = () => {
     if (!pendingMedia || !pendingMediaDataUrl) {
         alert('❌ กรุณาเลือกภาพหรือวิดีโอก่อนครับ');
         return;
     }
     
-    try {
-        const ok = DB.addPost(
-            ME,
-            pendingMedia.type,
-            pendingMediaDataUrl,
-            null,
-            pendingAudio ? pendingAudio.name : 'เสียงต้นฉบับ'
-        );
-        
-        if (!ok) {
-            alert('❌ บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง');
-            return;
-        }
-        
-        // เคลียร์ค่า
-        pendingMedia = null;
-        pendingAudio = null;
-        pendingMediaDataUrl = null;
-        document.getElementById('media-file').value = '';
-        document.getElementById('audio-file').value = '';
-        document.getElementById('audio-status').textContent = 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
-        document.getElementById('media-preview-area').innerHTML = '';
-        
-        alert('✅ โพสต์สำเร็จ! เลื่อนดูข้างบนนะครับ');
-        showPage('feed');
-        
-    } catch (err) {
-        console.error('โพสต์ผิดพลาด:', err);
-        alert('❌ เกิดข้อผิดพลาด: ' + err.message);
-    }
+    const ok = DB.addPost(
+        ME,
+        pendingMedia.type,
+        pendingMediaDataUrl,
+        null,
+        pendingAudio ? pendingAudio.name : 'เสียงต้นฉบับ'
+    );
+    
+    if (!ok) return; // แจ้งเตือนจากระบบแล้ว
+    
+    // เคลียร์
+    pendingMedia = null;
+    pendingAudio = null;
+    pendingMediaDataUrl = null;
+    document.getElementById('media-file').value = '';
+    document.getElementById('audio-file').value = '';
+    document.getElementById('audio-status').textContent = 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
+    document.getElementById('media-preview-area').innerHTML = '';
+    
+    alert('✅ โพสต์สำเร็จ! เลื่อนขึ้นดูข้างบนนะครับ');
+    showPage('feed');
 };
 
 // ==================== ปุ่มกลับ ====================
@@ -802,7 +778,6 @@ document.getElementById('back-sound').onclick = () => {
 
 document.getElementById('back-profile').onclick = () => showPage('feed');
 
-// กดเมนูล่าง — ติดตั้งใหม่ทั้งหมด
 document.querySelectorAll('.nav-item[data-goto]').forEach(item => {
     item.onclick = () => {
         const target = item.dataset.goto;
@@ -814,7 +789,6 @@ document.querySelectorAll('.nav-item[data-goto]').forEach(item => {
     };
 });
 
-// ตรวจอัปเดต
 async function checkUpdate() {
     try {
         const res = await fetch(location.href, { cache: 'no-store' });
@@ -822,19 +796,14 @@ async function checkUpdate() {
         if (!text.includes(`v${VER}`)) {
             document.getElementById('update-notice').style.display = 'block';
         }
-    } catch (e) {
-        console.log('ตรวจอัปเดตไม่ได้');
-    }
+    } catch (e) {}
 }
 
-// เริ่มทำงานทันที
 renderFeed();
 checkUpdate();
 setInterval(checkUpdate, 30000);
 
-console.log('✅ Thaipodee v2.5 — ทุกปุ่มทำงานชัดเจนแล้ว!');
-console.log('👉 กดรูปด้านขวาบน / เมนูล่างขวา → เข้าโปรไฟล์');
-console.log('👉 เลือกภาพ → กดยืนยัน → โพสต์สำเร็จทันที');
+console.log('✅ Thaipodee v2.6 — บีบอัดรูปอัตโนมัติ ปัญหาพื้นที่ลดลงแล้ว!');
 </script>
 </body>
 </html>
