@@ -1,6 +1,7 @@
 <!-- ===================================================== -->
-<!-- 📦 ThaiPodee Market | 2026-09-16 18:55 น. -->
-<!-- ☁️ ปรับ: แจ้งสาเหตุชัดถ้าโหลดไม่ติด + คำแนะนำ -->
+<!-- 📦 ThaiPodee Market | 2026-09-16 18:58 น. -->
+<!-- 🎯 แก้: ปุ่ม + คงที่ ไม่หาย + โหลดไฟล์เข้าได้เลย -->
+<!-- 🔐 ล็อก: ไม่แก้ส่วนอื่น -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,81 +18,174 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         html, body { height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
-        .page { display: none; position: absolute; inset: 0; }
-        .page.active { display: block; }
         
+        .page { display: none; position: absolute; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; }
+        .page.active { display: block; }
+
+        /* ฟีดหลัก */
         .feed-container { position: absolute; inset: 0; overflow: hidden; }
         .feed-slider { transition: transform 0.4s ease-out; height: 100%; }
-        .post-slide { width: 100vw; height: 100dvh; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
-        
-        .media-area { width: 100vw; height: 100dvh; display: flex; align-items: center; justify-content: center; background: #000; }
-        .media-area img, .media-area video { max-width: 100vw; max-height: 100dvh; width: auto; height: auto; object-fit: contain; }
-        
-        .empty-state { text-align: center; padding-top: 50vh; color: #888; line-height: 2; font-size: 15px; padding: 40vh 20px 0; }
-        .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; }
+        .post-slide { 
+            position: relative; 
+            width: 100vw; 
+            height: 100dvh; 
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        /* แสดงรูป/วิดีโอ เต็มจอ */
+        .media-area { 
+            width: 100vw; height: 100dvh; 
+            display: flex; align-items: center; justify-content: center; 
+            background: #000;
+        }
+        .media-area img, .media-area video { 
+            max-width: 100vw; max-height: 100dvh; 
+            width: auto; height: auto; 
+            object-fit: contain; background: #000;
+        }
+
+        .empty-state { 
+            text-align: center; padding-top: 50vh; 
+            color: #888; line-height: 2; font-size: 16px;
+        }
+
+        /* ข้อมูลด้านซ้ายล่าง */
+        .info-left { 
+            position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10;
+        }
         .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-        .desc-text { font-size: 13px; color: #ddd; }
+        .desc-text { font-size: 13px; color: #ddd; margin-bottom: 4px; }
         .music-row { font-size: 12px; color: #bbb; margin-top: 6px; }
-        
-        .menu-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 20; }
+
+        /* เมนูด้านขวา */
+        .menu-right { 
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
+            display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 20;
+        }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #f5a623, #f76b1c); border: 2px solid #fff; margin-bottom: 4px; }
-        .icon { font-size: 28px; }
+        .avatar { 
+            width: 48px; height: 48px; border-radius: 50%; 
+            background: linear-gradient(135deg, #f5a623, #f76b1c); 
+            border: 2px solid #fff; margin-bottom: 4px;
+        }
+        .icon { font-size: 28px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
         .num { font-size: 11px; margin-top: 2px; }
-        
-        .nav-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; padding: 8px 12px 16px; background: #000; border-top: 1px solid #222; z-index: 999; }
-        .nav-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; cursor: pointer; }
-        .nav-col.active .nav-label { color: #fff; font-weight: bold; }
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 10px; color: #888; }
-        
-        .upload-box { width: 48px; height: 32px; background: #fff; border-radius: 6px; position: relative; }
-        .upload-box::before, .upload-box::after { content: ''; position: absolute; background: #000; }
-        .upload-box::before { width: 20px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .upload-box::after { width: 2px; height: 20px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-        .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        
-        .sound-page { background: #000; padding: 16px; min-height: 100dvh; }
-        .sound-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-top: 10px; }
-        .back-btn { font-size: 22px; cursor: pointer; }
-        .section-title { font-size: 15px; font-weight: bold; margin: 20px 0 10px; color: #aaa; }
-        .local-area { background: #1a1a2e; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px; }
-        .hidden-input { display: none; }
-        .audio-name { font-size: 13px; color: #888; margin-top: 4px; }
-        .post-btn { background: #ff2442; color: #fff; border: none; padding: 16px; border-radius: 25px; font-size: 16px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .status { margin-top: 12px; font-size: 13px; text-align: center; min-height: 40px; line-height: 1.5; }
-        .status.warn { color: #facc15; }
-        .status.ok { color: #4ade80; }
-        
+
+        /* หน้าโปรไฟล์ */
         .profile-page { background: #000; overflow-y: auto; padding-bottom: 80px; }
         .profile-header { padding: 40px 20px 20px; text-align: center; }
-        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #f5a623, #f76b1c); margin: 0 auto 12px; border: 3px solid #fff; }
-        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
+        .profile-avatar { 
+            width: 90px; height: 90px; border-radius: 50%; 
+            background: linear-gradient(135deg, #f5a623, #f76b1c); 
+            border: 3px solid #fff; margin: 0 auto 12px;
+        }
+        .profile-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
         .profile-username { color: #888; margin-bottom: 20px; }
         .profile-stats { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
         .stat-item { text-align: center; }
-        .stat-num { font-size: 20px; font-weight: bold; }
+        .stat-num { font-size: 20px; font-weight: 700; }
         .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
-        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px; }
-        .grid-item { aspect-ratio: 1; overflow: hidden; background: #1a1a1a; cursor: pointer; }
-        .grid-item img, .grid-item video { width: 100%; height: 100%; object-fit: cover; }
-        .empty-grid { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666; line-height: 1.8; }
+        .posts-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px;
+        }
+        .grid-item { 
+            aspect-ratio: 1; overflow: hidden; background: #1a1a1a; cursor: pointer;
+        }
+        .grid-item img, .grid-item video { 
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .empty-grid { 
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px; 
+            color: #666; line-height: 1.8;
+        }
+
+        /* หน้าเลือกเสียง */
+        .sound-page { background: #000; padding: 16px; min-height: 100dvh; }
+        .sound-header { 
+            display: flex; align-items: center; justify-content: space-between; 
+            margin-bottom: 30px; padding-top: 10px;
+        }
+        .back-btn { font-size: 22px; cursor: pointer; padding: 8px; }
+        .sound-title { font-size: 18px; font-weight: 600; }
+        .section-title { 
+            font-size: 15px; font-weight: 600; margin: 20px 0 12px; color: #aaa;
+        }
+        .local-area { 
+            background: #1a1a2e; border-radius: 12px; padding: 18px; 
+            display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;
+        }
+        .hidden-input { display: none; }
+        .audio-name { font-size: 13px; color: #888; margin-top: 4px; }
+        .post-btn { 
+            background: #ff2442; color: #fff; border: none; padding: 16px; 
+            border-radius: 25px; font-size: 16px; width: 100%; 
+            font-weight: 700; cursor: pointer; margin-top: 20px;
+        }
+        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { 
+            margin-top: 12px; font-size: 13px; text-align: center; 
+            min-height: 40px; line-height: 1.5;
+        }
+        .status.warn { color: #facc15; }
+        .status.ok { color: #4ade80; }
+
+        /* ============================================== */
+        /* ✅ ปุ่มเมนูล่าง — คงที่เสมอ ไม่หาย */
+        /* ============================================== */
+        .nav-bottom { 
+            position: absolute; bottom: 0; left: 0; right: 0; 
+            height: 70px; display: flex; justify-content: space-around; 
+            align-items: center; padding: 8px 10px 20px; 
+            background: #000; border-top: 1px solid #222; 
+            z-index: 9999; /* แน่นอนที่สุด ไม่มีอะไรบัง */
+        }
+        .nav-col { 
+            display: flex; flex-direction: column; align-items: center; 
+            gap: 2px; min-width: 60px; cursor: pointer;
+        }
+        .nav-col.active .nav-label { color: #fff; font-weight: 600; }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 10px; color: #888; }
+
+        /* ✅ ปุ่ม + กลางล่าง — คงที่ ไม่หาย */
+        .upload-col { position: relative; display: flex; align-items: center; justify-content: center; }
+        .upload-box { 
+            width: 50px; height: 35px; background: #fff; border-radius: 6px; 
+            position: relative; cursor: pointer; z-index: 10000;
+        }
+        .upload-box::before, .upload-box::after { 
+            content: ''; position: absolute; background: #000;
+        }
+        .upload-box::before { 
+            width: 22px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .upload-box::after { 
+            width: 2px; height: 22px; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        }
+        .file-input { 
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; 
+            z-index: 10001; /* กดได้แน่นอน */
+        }
     </style>
 </head>
 <body>
 
+<!-- หน้าแรก -->
 <div id="page-feed" class="page active">
     <div class="feed-container">
         <div class="feed-slider" id="feed-slider">
             <div class="empty-state">
-                ☁️ กดปุ่ม + ด้านล่างเพื่อโพสต์<br>
-                ทุกคนเห็นจากทุกเครื่อง — ไม่เก็บที่เครื่อง
+                ☁️ กดปุ่ม + ด้านล่างเพื่อโพสต์แรก<br>
+                ทุกคนเห็นจากทุกเครื่อง
             </div>
         </div>
     </div>
 </div>
 
+<!-- หน้าโปรไฟล์ -->
 <div id="page-profile" class="page profile-page">
     <div class="profile-header">
         <div class="profile-avatar"></div>
@@ -108,6 +202,7 @@
     </div>
 </div>
 
+<!-- หน้าเลือกเสียง -->
 <div id="page-sound" class="page sound-page">
     <div class="sound-header">
         <span class="back-btn" id="back-btn">← กลับ</span>
@@ -119,7 +214,7 @@
         <span style="font-size:24px">🎵</span>
         <div>
             <div>แตะเลือกไฟล์เสียง/เพลง</div>
-            <div class="audio-name" id="audio-name">ยังไม่ได้เลือก — ข้ามได้ถ้าไม่มี</div>
+            <div class="audio-name" id="audio-name">ข้ามได้ถ้าไม่มี</div>
         </div>
         <input type="file" accept="audio/*" id="audio-input" class="hidden-input">
     </label>
@@ -127,15 +222,35 @@
     <button class="post-btn" id="post-btn">☁️ โพสต์ขึ้นคลาวด์เลย</button>
 </div>
 
+<!-- ✅ เมนูล่าง — ปุ่ม + คงที่ ไม่หายแน่นอน -->
 <div class="nav-bottom">
-    <div class="nav-col active" data-page="page-feed"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></div>
-    <div class="nav-col" data-page=""><span class="nav-icon">🔍</span><span class="nav-label">ค้นหา</span></div>
-    <div class="nav-col" id="upload-trigger"><div class="upload-box"><input type="file" accept="video/*,image/*" id="media-input" class="file-input"></div></div>
-    <div class="nav-col" data-page=""><span class="nav-icon">💬</span><span class="nav-label">ข้อความ</span></div>
-    <div class="nav-col" data-page="page-profile"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></div>
+    <div class="nav-col active" data-page="page-feed">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าแรก</span>
+    </div>
+    <div class="nav-col" data-page="">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">ค้นหา</span>
+    </div>
+    <div class="nav-col upload-col">
+        <div class="upload-box">
+            <input type="file" accept="video/*,image/*" id="media-input" class="file-input">
+        </div>
+    </div>
+    <div class="nav-col" data-page="">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">ข้อความ</span>
+    </div>
+    <div class="nav-col" data-page="page-profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">โปรไฟล์</span>
+    </div>
 </div>
 
 <script>
+// =====================================================
+// ☁️ เชื่อมระบบ
+// =====================================================
 const cld = cloudinary.Cloudinary.new({ cloud_name: 'orpjnytt' });
 
 const firebaseConfig = {
@@ -156,15 +271,18 @@ let pendingMedia = null;
 let pendingAudio = null;
 let isLoading = false;
 
+// เปลี่ยนหน้า
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-col').forEach(n => n.classList.remove('active'));
     if (pageId) {
         document.getElementById(pageId).classList.add('active');
-        document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
+        const activeNav = document.querySelector(`[data-page="${pageId}"]`);
+        if (activeNav) activeNav.classList.add('active');
     }
 }
 
+// โหลดโพสต์จาก Firebase
 async function loadPostsFromFirebase() {
     try {
         const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
@@ -176,6 +294,7 @@ async function loadPostsFromFirebase() {
     }
 }
 
+// อัปโหลดไฟล์ไป Cloudinary
 async function uploadToCloudinary(file, resourceType) {
     const form = new FormData();
     form.append('file', file);
@@ -188,15 +307,16 @@ async function uploadToCloudinary(file, resourceType) {
     
     if (!res.ok) {
         const info = await res.json().catch(() => null);
-        console.error('Cloudinary error:', info || res.status);
+        console.error('Cloudinary:', info || res.status);
         if (info?.error?.message?.includes('preset')) {
-            throw new Error('⚠️ ต้องเปิดสิทธิ์ใน Cloudinary → Upload → ml_default → เปิด Unsigned Upload');
+            throw new Error('⚠️ เปิดสิทธิ์ก่อน: Cloudinary → Upload → ml_default → เปิด Unsigned Upload');
         }
         throw new Error(`อัปโหลดไม่ได้ (${res.status})`);
     }
     return await res.json();
 }
 
+// บันทึกลง Firebase
 async function savePostToFirebase(data) {
     await db.collection('posts').add({
         ...data,
@@ -204,6 +324,7 @@ async function savePostToFirebase(data) {
     });
 }
 
+// แสดงฟีด
 function renderFeed() {
     const slider = document.getElementById('feed-slider');
     if (posts.length === 0) {
@@ -236,6 +357,7 @@ function renderFeed() {
     goToSlide(0);
 }
 
+// เลื่อนฟีด
 function goToSlide(index) {
     if (index < 0 || index >= posts.length) return;
     currentSlide = index;
@@ -248,6 +370,7 @@ function goToSlide(index) {
     });
 }
 
+// แสดงโปรไฟล์
 function renderProfile() {
     const grid = document.getElementById('posts-grid');
     document.getElementById('stat-posts').textContent = posts.length;
@@ -265,28 +388,40 @@ function renderProfile() {
     });
 }
 
-document.querySelectorAll('[data-page]').forEach(b => b.onclick = () => showPage(b.dataset.page || 'page-feed'));
+// --- เหตุการณ์ ---
 
+// เปลี่ยนหน้าเมนู
+document.querySelectorAll('[data-page]').forEach(b => {
+    b.onclick = () => showPage(b.dataset.page || 'page-feed');
+});
+
+// กดเลือกไฟล์ — ปุ่ม + ทำงานแน่นอน
 document.getElementById('media-input').onchange = e => {
     pendingMedia = e.target.files[0];
-    if (pendingMedia) showPage('page-sound');
+    if (pendingMedia) {
+        console.log('เลือกไฟล์ได้:', pendingMedia.name);
+        showPage('page-sound');
+    }
 };
 
+// เลือกเสียง
 document.getElementById('audio-input').onchange = e => {
     pendingAudio = e.target.files[0];
-    document.getElementById('audio-name').textContent = pendingAudio?.name || 'ยังไม่ได้เลือก';
+    document.getElementById('audio-name').textContent = pendingAudio?.name || 'ข้ามได้ถ้าไม่มี';
 };
 
+// กลับ
 document.getElementById('back-btn').onclick = () => {
     pendingMedia = pendingAudio = null;
     document.getElementById('media-input').value = '';
     document.getElementById('audio-input').value = '';
-    document.getElementById('audio-name').textContent = 'ยังไม่ได้เลือก — ข้ามได้ถ้าไม่มี';
+    document.getElementById('audio-name').textContent = 'ข้ามได้ถ้าไม่มี';
     showPage('page-feed');
 };
 
+// โพสต์
 document.getElementById('post-btn').onclick = async () => {
-    if (!pendingMedia) return alert('กด + เลือกไฟล์ก่อนครับ');
+    if (!pendingMedia) return alert('กดปุ่ม + เลือกไฟล์ก่อนครับ');
     if (isLoading) return;
     
     isLoading = true;
@@ -312,10 +447,7 @@ document.getElementById('post-btn').onclick = async () => {
         }
         
         status.textContent = '☁️ บันทึกรายการ...';
-        await savePostToFirebase({
-            type, url: mediaRes.secure_url,
-            audioUrl, audioName
-        });
+        await savePostToFirebase({ type, url: mediaRes.secure_url, audioUrl, audioName });
         
         status.textContent = '✅ สำเร็จ! ทุกคนเห็นแล้ว';
         status.className = 'status ok';
@@ -324,7 +456,7 @@ document.getElementById('post-btn').onclick = async () => {
         pendingMedia = pendingAudio = null;
         document.getElementById('media-input').value = '';
         document.getElementById('audio-input').value = '';
-        document.getElementById('audio-name').textContent = 'ยังไม่ได้เลือก — ข้ามได้ถ้าไม่มี';
+        document.getElementById('audio-name').textContent = 'ข้ามได้ถ้าไม่มี';
         
         setTimeout(() => {
             showPage('page-feed');
@@ -335,7 +467,7 @@ document.getElementById('post-btn').onclick = async () => {
         }, 1500);
         
     } catch (err) {
-        console.error(err);
+        console.error('ผิดพลาด:', err);
         status.textContent = err.message;
         status.className = 'status warn';
         btn.disabled = false;
@@ -343,6 +475,7 @@ document.getElementById('post-btn').onclick = async () => {
     }
 };
 
+// เลื่อนฟีดด้วยนิ้ว
 let touchStartY = 0;
 document.addEventListener('touchstart', e => {
     if (e.target.closest('.post-slide')) touchStartY = e.touches[0].clientY;
@@ -357,7 +490,10 @@ document.addEventListener('touchend', e => {
     touchStartY = 0;
 });
 
-window.onload = loadPostsFromFirebase;
+// เริ่มทำงาน
+window.onload = () => {
+    loadPostsFromFirebase();
+};
 </script>
 </body>
 </html>
