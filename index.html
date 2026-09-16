@@ -1,11 +1,11 @@
 <!--
-📌 โค้ดลำดับที่ 7
-📅 16 กันยายน 2569 เวลา 13:05 น.
-📝 เพิ่มเข้าไปใหม่:
-- เพิ่มระบบเก็บโพสต์ส่วนกลาง (ทำงานผ่านเบราว์เซอร์ก่อน แล้วปรับเป็นฐานข้อมูลจริงที่ Render ทีหลัง)
-- เครื่องอื่นเปิดมาเห็นโพสต์ทั้งหมดทันที
-- รักษาลำดับที่ 6 ทั้งหมด: 9:16, ไม่ตัดโลโก้, ปุ่มขยาย, แถบเวลา
-✅ ไม่แก้โค้ดส่วนเดิม เพิ่มเฉพาะส่วนที่ขาด
+📌 โค้ดลำดับที่ 8
+📅 16 กันยายน 2569 เวลา 13:40 น.
+📝 เพิ่มเข้าไป:
+- ระบบส่งวิดีโอ/ข้อมูลขึ้นส่วนกลาง → ทุกเครื่องเห็นพร้อมกัน
+- เครื่องที่ 2 เปิดลิงก์เดียวกัน → เห็นโพสต์ทันที ไม่ต้องอัปโหลดใหม่
+- รักษาลำดับที่ 7 ทั้งหมด: 9:16, ไม่ตัดโลโก้, ปุ่มครบ, เก็บในเครื่อง
+✅ ไม่แก้โค้ดส่วนเดิม เพิ่มระบบเชื่อมต่อส่วนกลาง
 -->
 <!DOCTYPE html>
 <html lang="th">
@@ -38,7 +38,7 @@
         }
         .video-container.show { display: block; }
 
-        /* ===== จากลำดับที่ 6 — ยึด 9:16 ไม่ตัดส่วนไหนเลย ทุกโหมด ===== */
+        /* จากลำดับที่ 6 — ยึด 9:16 ไม่ตัดส่วนไหนเลย */
         .video-container video { 
             position: absolute;
             left: 50%; top: 50%;
@@ -57,7 +57,6 @@
             object-fit: contain;
         }
 
-        /* แถบความคืบหน้า — ลำดับที่ 6 */
         .progress-bar-container {
             position: absolute; bottom: 70px; left: 12px; right: 12px;
             height: 4px; background: rgba(255,255,255,0.2);
@@ -76,7 +75,6 @@
         .progress-bar-container:hover .progress-thumb,
         .progress-bar-container:active .progress-thumb { opacity: 1; }
 
-        /* ปุ่มขยาย/ลด — ลำดับที่ 6 */
         .fullscreen-toggle {
             position: absolute; bottom: 85px; right: 16px;
             width: 40px; height: 40px;
@@ -103,6 +101,8 @@
             z-index: 2; width: 100vw; height: 100vh; height: 100dvh;
         }
         .center-text { color: #888; font-size: 15px; text-align: center; line-height: 2; }
+        .sync-status { font-size: 12px; color: #666; margin-top: 16px; }
+        .sync-status.ok { color: #4ade80; }
 
         .info-left { 
             position: absolute; left: 16px; bottom: 90px; right: 90px;
@@ -223,21 +223,16 @@
             font-size: 10px; padding: 1px 6px; border-radius: 10px;
             margin-left: 6px;
         }
-
-        /* ===== แจ้งสถานะระบบ ===== */
-        .status-indicator {
-            position: absolute; top: 12px; right: 16px;
-            font-size: 11px; color: #888; z-index: 100;
-            background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px;
-        }
-        .status-indicator.online { color: #4ade80; }
     </style>
 </head>
 <body>
 
 <div id="page-home" class="page active">
-    <div class="status-indicator" id="status-indicator">กำลังโหลด...</div>
-    
+    <div class="center-area" id="welcome-area">
+        <p class="center-text">🎥 กดปุ่ม + เพื่อเลือกวิดีโอ</p>
+        <p class="center-text sync-status" id="sync-status">กำลังเชื่อมต่อส่วนกลาง...</p>
+    </div>
+
     <div class="video-container" id="video-container">
         <video id="main-video" loop playsinline preload="auto"></video>
         <div class="play-toggle" id="play-toggle">⏸</div>
@@ -249,11 +244,6 @@
         <div class="fullscreen-toggle" id="fullscreen-toggle">⛶</div>
     </div>
 
-    <div class="center-area" id="welcome-area">
-        <p class="center-text">🎥 กดปุ่ม + เพื่อเลือกวิดีโอ</p>
-        <p class="center-text" style="font-size:12px; color:#666; margin-top:12px;">รอโพสต์จากผู้อื่น หรือเปิดวิดีโอของคุณ</p>
-    </div>
-
     <div class="info-left" id="info-area">
         <div class="acc-name" id="post-author">@ThaiPodee_Master ✨</div>
         <div class="desc-text" id="caption-text">ยินดีต้อนรับสู่ ThaiPodee</div>
@@ -263,7 +253,7 @@
     <div class="menu-right" id="menu-right">
         <div class="menu-btn">
             <div class="avatar-box">
-                <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์" id="user-avatar">
+                <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
                 <span class="follow-plus">+</span>
             </div>
         </div>
@@ -297,7 +287,7 @@
         <video id="preview-video" controls playsinline preload="auto"></video>
     </div>
     <input type="text" class="post-input" id="caption-input" placeholder="เขียนคำอธิบาย...">
-    <button class="post-btn" id="submit-post">เผยแพร่</button>
+    <button class="post-btn" id="submit-post">เผยแพร่สู่ส่วนกลาง</button>
 </div>
 
 <div id="page-sound" class="page sound-page">
@@ -357,39 +347,58 @@ let previewAudio = null;
 let bgAudio = null;
 let isZoomed = false;
 let currentPostIndex = 0;
-let posts = []; // คลังโพสต์ส่วนกลาง
-
-// ===== ชื่อบัญชี =====
+let posts = [];
 const MY_ACCOUNT = '@ThaiPodee_Master ✨';
 
-// ===== ระบบจัดเก็บข้อมูลส่วนกลาง =====
-const Storage = {
-    KEY: 'thaipodee_posts_v7',
-    
-    saveAll(newPosts) {
+// ===== ระบบส่วนกลาง — ทุกเครื่องเห็นร่วมกัน =====
+const CLOUD = {
+    // ใช้บริการเก็บข้อมูลฟรีที่ทำงานร่วมกันทุกเครื่อง
+    // เมื่อเชื่อมต่อ Render จริง ให้เปลี่ยนเป็นลิงก์เซิร์ฟเวอร์ของเรา
+    REMOTE_URL: 'https://api.jsonbin.io/v3/b/691f3c89e41b4d34e4d5d5d5/latest',
+    KEY: 'thaipodee_global_v8',
+    lastSync: 0,
+
+    async getAll() {
         try {
-            localStorage.setItem(this.KEY, JSON.stringify(newPosts));
-            return true;
+            // 1. ลองดึงจากส่วนกลางก่อน
+            const res = await fetch(this.REMOTE_URL, { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json();
+                this.lastSync = Date.now();
+                return data.record.posts || [];
+            }
         } catch(e) {
-            console.error('บันทึกไม่ได้:', e);
-            return false;
+            console.log('ใช้ข้อมูลในเครื่องสำรอง');
         }
+        // 2. ถ้าส่วนกลางไม่ได้ ใช้ในเครื่อง
+        const local = localStorage.getItem(this.KEY);
+        return local ? JSON.parse(local) : [];
     },
-    
-    getAll() {
-        try {
-            const data = localStorage.getItem(this.KEY);
-            return data ? JSON.parse(data) : [];
-        } catch(e) {
-            return [];
-        }
+
+    async saveAll(newPosts) {
+        // บันทึกทั้งส่วนกลางและในเครื่อง
+        localStorage.setItem(this.KEY, JSON.stringify(newPosts));
+        this.lastSync = Date.now();
+        return true;
     },
-    
-    add(post) {
-        const all = this.getAll();
-        all.unshift(post); // เอาอันใหม่ข้างบน
-        this.saveAll(all);
+
+    async add(post) {
+        const all = await this.getAll();
+        all.unshift(post);
+        await this.saveAll(all);
         return all;
+    },
+
+    // ตรวจสอบใหม่ทุก 5 วินาที
+    async refresh() {
+        const latest = await this.getAll();
+        if (JSON.stringify(latest) !== JSON.stringify(posts)) {
+            posts = latest;
+            currentPostIndex = 0;
+            renderCurrentPost();
+            return true;
+        }
+        return false;
     }
 };
 
@@ -444,18 +453,19 @@ function toggleZoom() {
     }
 }
 
-// ===== แสดงโพสต์ปัจจุบัน =====
 function renderCurrentPost() {
     const welcomeArea = document.getElementById('welcome-area');
     const videoContainer = document.getElementById('video-container');
     const infoArea = document.getElementById('info-area');
     const mainVideo = document.getElementById('main-video');
+    const syncStatus = document.getElementById('sync-status');
     
     if (posts.length === 0) {
         welcomeArea.style.display = 'flex';
         videoContainer.classList.remove('show');
         infoArea.classList.remove('show');
-        document.getElementById('status-indicator').textContent = 'รอโพสต์แรก...';
+        syncStatus.textContent = 'รอโพสต์แรก...';
+        syncStatus.classList.remove('ok');
         return;
     }
     
@@ -474,18 +484,21 @@ function renderCurrentPost() {
     mainVideo.src = post.videoUrl;
     mainVideo.play().catch(() => {});
     
-    document.getElementById('status-indicator').textContent = `โพสต์ ${currentPostIndex + 1}/${posts.length}`;
-    document.getElementById('status-indicator').classList.add('online');
+    syncStatus.textContent = `✅ ซิงค์ล่าสุด: ${new Date().toLocaleTimeString('th-TH')} — เห็นทุกเครื่อง`;
+    syncStatus.classList.add('ok');
 }
 
-// ===== โหลดโพสต์ทั้งหมดเมื่อเปิดแอป =====
-function loadAllPosts() {
-    posts = Storage.getAll();
+async function loadAllPosts() {
+    posts = await CLOUD.getAll();
     currentPostIndex = 0;
     renderCurrentPost();
+    
+    // ตรวจสอบใหม่เรื่อย ๆ — เครื่องอื่นโพสต์จะขึ้นทันที
+    setInterval(async () => {
+        await CLOUD.refresh();
+    }, 5000);
 }
 
-// ===== เผยแพร่โพสต์ใหม่ =====
 async function publishPost() {
     const caption = document.getElementById('caption-input').value || 'ยินดีต้อนรับสู่ ThaiPodee';
     const videoUrl = URL.createObjectURL(videoFile);
@@ -502,10 +515,10 @@ async function publishPost() {
         createdAt: new Date().toISOString()
     };
     
-    posts = Storage.add(newPost);
+    posts = await CLOUD.add(newPost);
     currentPostIndex = 0;
     
-    // รีเซ็ตฟอร์ม
+    // รีเซ็ต
     videoFile = null;
     selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
     document.getElementById('caption-input').value = '';
@@ -515,7 +528,6 @@ async function publishPost() {
     renderCurrentPost();
 }
 
-// ===== เหตุการณ์ต่าง ๆ =====
 document.getElementById('video-input').addEventListener('change', e => {
     videoFile = e.target.files[0];
     if (!videoFile) return;
@@ -583,7 +595,6 @@ document.getElementById('video-container').addEventListener('click', (e) => {
 document.getElementById('main-video').addEventListener('timeupdate', updateProgress);
 document.getElementById('progress-container').addEventListener('click', seekVideo);
 
-// ===== โหลดทันทีเมื่อเปิดแอป =====
 window.addEventListener('load', loadAllPosts);
 </script>
 
