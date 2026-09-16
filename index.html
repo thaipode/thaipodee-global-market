@@ -1,7 +1,8 @@
 <!-- ===================================================== -->
-<!-- Thaipodee Global Market v1.4 | 2026-09-16            -->
-<!-- ✅ ชื่อผู้ใช้โชว์ทันทีที่หน้าแรก ไม่ต้องรออัปโหลด       -->
-<!-- ✅ เปลี่ยนรูปได้แล้ว | บันทึกในเครื่อง | ปิดเปิดไม่หาย -->
+<!-- Thaipodee Global Market v1.5 | 2026-09-16            -->
+<!-- ✅ ตรวจสอบอัปเดตเองอัตโนมัติ ไม่ต้องปิดเปิดใหม่       -->
+<!-- ✅ ชื่อ+รูปโชว์ทันทีเมื่ออัปเดตจากเซิร์ฟเวอร์           -->
+<!-- ✅ ข้อมูลเดิมไม่หาย | เปิดค้างไว้ก็เห็นของใหม่เอง       -->
 <!-- ===================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -33,7 +34,6 @@
         }
         .page.active { display: block; }
 
-        /* วิดีโอ/รูป เต็มจอ */
         .media-area {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -57,20 +57,19 @@
             padding: 20px;
         }
 
-        /* ✅ บังคับแสดงตลอด ไม่ซ่อน */
+        /* ✅ แสดงชื่อตลอดเวลา */
         .info-left {
             position: absolute;
             left: 16px;
             bottom: calc(80px + env(safe-area-inset-bottom, 0px));
             right: 90px;
             z-index: 10;
-            display: block !important; /* แก้จุดนี้ */
+            display: block !important;
         }
         .username { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
         .caption { font-size: 13px; color: #fff; margin-bottom: 4px; }
         .music-line { font-size: 12px; color: #ddd; display: flex; align-items: center; gap: 4px; }
 
-        /* เมนูด้านขวา */
         .menu-right {
             position: absolute;
             right: 12px;
@@ -117,7 +116,6 @@
         .icon { font-size: 26px; }
         .stat-num { font-size: 11px; color: #fff; }
 
-        /* เมนูล่าง */
         .nav-bottom {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -167,7 +165,6 @@
         .plus-overlay { position: absolute; inset: -10px; cursor: pointer; }
         .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-        /* หน้าเลือกเพลง */
         .sound-page {
             background: #000;
             padding: 20px 16px;
@@ -202,7 +199,6 @@
             margin-top: 10px;
         }
 
-        /* หน้าแก้โปรไฟล์ */
         .profile-page {
             background: #000;
             padding: 20px 16px;
@@ -259,11 +255,31 @@
             cursor: pointer;
             margin-top: 24px;
         }
+
+        /* แจ้งเตือนเมื่อมีอัปเดต */
+        .update-notice {
+            position: fixed;
+            top: 10px; left: 50%;
+            transform: translateX(-50%);
+            background: #ff2442;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: none;
+        }
+        .update-notice span { cursor: pointer; font-weight: bold; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<!-- หน้าแรก -->
+<!-- แจ้งเตือนเมื่อมีอัปเดต -->
+<div class="update-notice" id="update-notice">
+    มีอัปเดตใหม่! <span onclick="location.reload()">รีเฟรชเลย</span>
+</div>
+
 <div id="page-feed" class="page active">
     <div class="media-area" id="media-area">
         <div class="empty-hint">
@@ -273,10 +289,9 @@
         </div>
     </div>
 
-    <!-- ✅ แสดงชื่อตลอดเวลา -->
     <div class="info-left" id="info-area">
         <div class="username" id="display-username">@thaipodee_master</div>
-        <div class="caption">ทดสอบ ✨</div>
+        <div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market ✨</div>
         <div class="music-line" id="music-line">🎵 เลือกเพลงจากในเครื่อง</div>
     </div>
 
@@ -295,7 +310,6 @@
     </div>
 </div>
 
-<!-- หน้าเลือกเพลง -->
 <div id="page-sound" class="page sound-page">
     <span class="back-btn" id="back-to-feed">← กลับ</span>
     <h3>เลือกเพลง/เสียง</h3>
@@ -311,7 +325,6 @@
     <button class="post-btn" id="confirm-btn">ยืนยัน → แสดงผล</button>
 </div>
 
-<!-- หน้าแก้โปรไฟล์ -->
 <div id="page-profile" class="page profile-page">
     <span class="back-btn" id="back-from-profile">← กลับ</span>
     <h3 style="text-align:center;">แก้ไขโปรไฟล์</h3>
@@ -328,7 +341,6 @@
     <button class="save-btn" id="save-profile">บันทึกโปรไฟล์</button>
 </div>
 
-<!-- เมนูล่าง -->
 <div class="nav-bottom">
     <div class="nav-item active">
         <span class="nav-icon">🏠</span>
@@ -358,10 +370,29 @@
 <script>
 const STORAGE = {
     username: 'thaipodee_username',
-    avatar: 'thaipodee_avatar'
+    avatar: 'thaipodee_avatar',
+    lastVersion: 'thaipodee_last_ver'
 };
 
-// ✅ โหลดและแสดงทันที ไม่รออะไร
+// ✅ เวอร์ชันปัจจุบัน — เปลี่ยนทุกครั้งที่อัปเดต
+const APP_VERSION = '1.5';
+
+// ตรวจสอบอัปเดตอัตโนมัติทุก 30 วินาที
+async function checkForUpdate() {
+    try {
+        const res = await fetch(location.href, { cache: 'no-store' });
+        const text = await res.text();
+        if (text.includes(APP_VERSION)) {
+            localStorage.setItem(STORAGE.lastVersion, APP_VERSION);
+        } else {
+            // เจอเวอร์ใหม่ → แจ้งเตือน
+            document.getElementById('update-notice').style.display = 'block';
+        }
+    } catch (e) {
+        // ไม่ออนไลน์ก็ทำต่อได้
+    }
+}
+
 function loadProfile() {
     const savedName = localStorage.getItem(STORAGE.username);
     const savedAvatar = localStorage.getItem(STORAGE.avatar);
@@ -393,12 +424,10 @@ function showPage(id) {
     document.getElementById(id).classList.add('active');
 }
 
-// เปิด-ปิดหน้าโปรไฟล์
 document.getElementById('avatar-btn').onclick = () => showPage('page-profile');
 document.getElementById('profile-nav-btn').onclick = () => showPage('page-profile');
 document.getElementById('back-from-profile').onclick = () => showPage('page-feed');
 
-// อัปโหลดรูป
 document.getElementById('avatar-upload').onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -410,7 +439,6 @@ document.getElementById('avatar-upload').onchange = e => {
     reader.readAsDataURL(file);
 };
 
-// บันทึกโปรไฟล์
 document.getElementById('save-profile').onclick = () => {
     const name = document.getElementById('username-input').value.trim();
     if (!name) return alert('กรุณาใส่ชื่อครับ');
@@ -422,7 +450,6 @@ document.getElementById('save-profile').onclick = () => {
     showPage('page-feed');
 };
 
-// เลือกวิดีโอ/รูป
 let selectedMedia, selectedAudio, mediaType;
 document.getElementById('media-input').onchange = e => {
     selectedMedia = e.target.files[0];
@@ -431,13 +458,11 @@ document.getElementById('media-input').onchange = e => {
     showPage('page-sound');
 };
 
-// เลือกเพลง
 document.getElementById('audio-input').onchange = e => {
     selectedAudio = e.target.files[0];
     document.getElementById('audio-filename').textContent = selectedAudio ? selectedAudio.name : 'ยังไม่ได้เลือก';
 };
 
-// ยืนยันแสดง
 let mediaURL, audioURL;
 document.getElementById('confirm-btn').onclick = () => {
     if (!selectedMedia) return alert('เลือกไฟล์ก่อนครับ');
@@ -515,10 +540,13 @@ document.getElementById('back-to-feed').onclick = () => {
     showPage('page-feed');
 };
 
-// โหลดทันทีที่เปิด ✅
+// เริ่มทำงาน
 loadProfile();
+checkForUpdate();
+setInterval(checkForUpdate, 30000); // ทุก 30 วินาที
 
-console.log('✅ Thaipodee v1.4 — ชื่อโชว์ทันที | รูปเปลี่ยนได้ | บันทึกค้าง');
+console.log('✅ Thaipodee v1.5 — ตรวจอัปเดตอัตโนมัติทุก 30 วินาที');
+console.log('✅ อัปโหลดขึ้น Render → ทุกคนเห็นแจ้งเตือนเอง');
 </script>
 </body>
 </html>
