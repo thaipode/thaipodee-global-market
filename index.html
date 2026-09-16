@@ -21,8 +21,7 @@
         .info-left { position: absolute; left: 16px; bottom: 90px; right: 90px; z-index: 10; display: none; }
         .acc-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
-        .music-row { font-size: 12px; color: #fff; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-        .music-artist { color: #aaa; font-size: 11px; margin-left: 6px; }
+        .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 
         .menu-right {
             position: absolute;
@@ -67,7 +66,8 @@
         #video-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
 
         .back-btn { position: absolute; top: 12px; left: 12px; font-size: 22px; cursor: pointer; z-index: 50; color: #fff; }
-        .sound-bar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: #222; border-radius: 20px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; z-index: 50; min-width: 300px; justify-content: space-between; }
+        .sound-bar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: #222; border-radius: 20px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; z-index: 50; min-width: 280px; justify-content: space-between; }
+        .sound-bar.hidden { display: none; }
         .change-link { color: #fff; font-size: 14px; padding: 2px 8px; cursor: pointer; }
         .change-link:hover { color: #ff2442; }
         .video-area { position: absolute; top: 60px; bottom: 140px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; background: #000; }
@@ -86,8 +86,8 @@
         .play-btn { width: 36px; height: 36px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; user-select: none; }
         .play-btn.playing { background: #ff2442; }
         .sound-info { flex: 1; min-width: 0; }
-        .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
-        .sound-artist { font-size: 11px; color: #888; }
+        .sound-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sound-desc { font-size: 12px; color: #888; }
         .select-btn { background: #ff2442; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; }
         .select-btn.selected { background: #10b981; }
 
@@ -113,11 +113,7 @@
     <div class="info-left" id="info-area">
         <div class="acc-name">@ThaiPodee_Master ✨</div>
         <div class="desc-text" id="caption-text">ยินดีต้อนรับสู่ ThaiPodee</div>
-        <div class="music-row" id="music-display">
-            <span>🎵</span>
-            <span id="music-name">เสียงต้นฉบับวิดีโอ</span>
-            <span class="music-artist" id="artist-name"></span>
-        </div>
+        <div class="music-row" id="music-text">🎵 เสียงตัวอย่างจากระบบ</div>
     </div>
 
     <div class="menu-right" id="menu-right">
@@ -163,8 +159,8 @@
 <!-- หน้าเตรียมโพสต์ -->
 <div id="page-post" class="page">
     <span class="back-btn" id="back-to-home">←</span>
-    <div class="sound-bar">
-        <span id="sound-bar-name">🎵 เสียงต้นฉบับวิดีโอ</span>
+    <div class="sound-bar" id="sound-bar">
+        <span id="sound-name-display">เสียงต้นฉบับวิดีโอ</span>
         <span class="change-link" id="change-sound">เปลี่ยน</span>
     </div>
     <div class="video-area">
@@ -181,7 +177,7 @@
         <span class="sound-title">เลือกเสียง</span>
         <span></span>
     </div>
-    <p class="tip-text">💡 กด ▶ เพื่อฟัง · กดเลือกเพื่อนำไปใช้ — จาก Pixabay Music ฟรี</p>
+    <p class="tip-text">💡 กด ▶ เพื่อฟัง · กดเลือกเพื่อนำไปใช้ — เลือกได้ทันทีแม้ยังไม่ได้ฟัง</p>
 
     <div class="section-title">📂 เสียงในเครื่อง (แนะนำ)</div>
     <div class="local-upload-area">
@@ -189,46 +185,54 @@
             <span class="local-icon">📁</span>
             <div class="sound-info">
                 <div class="sound-name">เลือกไฟล์เสียงจากเครื่อง</div>
-                <div class="sound-artist">MP3, WAV, OGG — แน่นอน 100%</div>
+                <div class="sound-desc">MP3, WAV, OGG — แน่นอนที่สุด ✅</div>
             </div>
             <input type="file" accept="audio/*" id="audio-local-input" class="hidden-input">
         </label>
     </div>
+    <div id="local-sound-list"></div>
 
-    <div class="section-title">🎵 เพลงจาก Pixabay <span class="free-badge">ฟรี ไม่มีลิขสิทธิ์</span></div>
+    <div class="section-title">🎵 เสียงฟรีจากอินเทอร์เน็ต <span class="free-badge">ฟรี</span></div>
     
-    <div class="sound-row" data-song="Comedy Cartoon Funny Background Music" data-artist="STAROSTIN">
-        <div class="play-btn" onclick="togglePlay(this, 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c2c5c3d4d6.mp3?filename=upbeat-1122.mp3')">▶</div>
+    <div class="sound-row" data-sound-id="s1" data-sound-name="จังหวะสดใส - เช้าวันใหม่">
+        <div class="play-btn" onclick="togglePlay('s1', 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_94d14034c0.mp3?filename=upbeat-1122.mp3')">▶</div>
         <div class="sound-info">
-            <div class="sound-name">🎵 Comedy Cartoon Funny Background Music</div>
-            <div class="sound-artist">โดย STAROSTIN</div>
+            <div class="sound-name">จังหวะสดใส - เช้าวันใหม่</div>
+            <div class="sound-desc">เหมาะกับวิดีโอทั่วไป · ฟรีลิขสิทธิ์</div>
         </div>
-        <button class="select-btn" onclick="selectSound(this)">เลือก</button>
+        <div class="select-col">
+            <button class="select-btn" onclick="selectSound('จังหวะสดใส - เช้าวันใหม่', this)">เลือก</button>
+        </div>
     </div>
 
-    <div class="sound-row" data-song="Video Editing Edit" data-artist="Monume">
-        <div class="play-btn" onclick="togglePlay(this, 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_981306433b.mp3?filename=happy-ukulele-127133.mp3')">▶</div>
+    <div class="sound-row" data-sound-id="s2" data-sound-name="สนุกสนาน - กีตาร์">
+        <div class="play-btn" onclick="togglePlay('s2', 'https://cdn.pixabay.com/download/audio/2023/01/04/audio_981306433b.mp3?filename=happy-ukulele-127133.mp3')">▶</div>
         <div class="sound-info">
-            <div class="sound-name">🎵 Video Editing Edit</div>
-            <div class="sound-artist">โดย Monume</div>
+            <div class="sound-name">สนุกสนาน - กีตาร์</div>
+            <div class="sound-desc">บรรยากาศเบา ๆ · ฟรีลิขสิทธิ์</div>
         </div>
-        <button class="select-btn" onclick="selectSound(this)">เลือก</button>
+        <div class="select-col">
+            <button class="select-btn" onclick="selectSound('สนุกสนาน - กีตาร์', this)">เลือก</button>
+        </div>
     </div>
 
-    <div class="sound-row" data-song="Video Editing Edit Background Music" data-artist="APALONBeats">
-        <div class="play-btn" onclick="togglePlay(this, 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_215924936f.mp3?filename=relaxing-ambient-122146.mp3')">▶</div>
+    <div class="sound-row" data-sound-id="s3" data-sound-name="ผ่อนคลาย - ธรรมชาติ">
+        <div class="play-btn" onclick="togglePlay('s3', 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_215924936f.mp3?filename=relaxing-ambient-122146.mp3')">▶</div>
         <div class="sound-info">
-            <div class="sound-name">🎵 Video Editing Edit Background Music</div>
-            <div class="sound-artist">โดย APALONBeats</div>
+            <div class="sound-name">ผ่อนคลาย - ธรรมชาติ</div>
+            <div class="sound-desc">สงบ สบายใจ · ฟรีลิขสิทธิ์</div>
         </div>
-        <button class="select-btn" onclick="selectSound(this)">เลือก</button>
+        <div class="select-col">
+            <button class="select-btn" onclick="selectSound('ผ่อนคลาย - ธรรมชาติ', this)">เลือก</button>
+        </div>
     </div>
 </div>
 
 <script>
-let selectedSong = null;
-let selectedArtist = null;
+let selectedSoundName = null;
+let selectedSoundUrl = null;
 let videoFile = null;
+let audioPlaying = null;
 let currentAudio = null;
 
 function showPage(pageId) {
@@ -261,38 +265,45 @@ document.getElementById('audio-local-input').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
     
-    selectedSong = file.name;
-    selectedArtist = 'ไฟล์ในเครื่อง';
-    document.getElementById('sound-bar-name').textContent = '🎵 ' + selectedSong;
+    selectedSoundName = file.name;
+    selectedSoundUrl = URL.createObjectURL(file);
+    
+    document.getElementById('sound-name-display').textContent = '✅ ' + selectedSoundName;
     showPage('page-post');
 });
 
-function togglePlay(btn, url) {
+function togglePlay(id, url) {
+    const btn = event.currentTarget;
+    
+    if (currentAudio && audioPlaying === id) {
+        currentAudio.pause();
+        currentAudio = null;
+        audioPlaying = null;
+        btn.textContent = '▶';
+        btn.classList.remove('playing');
+        return;
+    }
+    
     document.querySelectorAll('.play-btn').forEach(b => {
         b.textContent = '▶';
         b.classList.remove('playing');
     });
     
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-        if (btn.textContent === '⏸') return;
-    }
-    
     try {
+        if (currentAudio) currentAudio.pause();
         currentAudio = new Audio(url);
         currentAudio.play();
+        audioPlaying = id;
         btn.textContent = '⏸';
         btn.classList.add('playing');
     } catch (err) {
-        alert('ฟังตัวอย่างไม่ได้ แต่กดเลือกใช้ได้เลยครับ');
+        alert('ฟังไม่ได้ แต่กดเลือกใช้ได้เลยครับ');
     }
 }
 
-function selectSound(btn) {
-    const row = btn.closest('.sound-row');
-    selectedSong = row.dataset.song;
-    selectedArtist = row.dataset.artist;
+function selectSound(name, btnEl) {
+    selectedSoundName = name;
+    selectedSoundUrl = null;
     
     document.querySelectorAll('.sound-row').forEach(r => r.classList.remove('selected'));
     document.querySelectorAll('.select-btn').forEach(b => {
@@ -300,13 +311,15 @@ function selectSound(btn) {
         b.textContent = 'เลือก';
     });
     
-    btn.textContent = 'เลือกแล้ว ✅';
-    btn.classList.add('selected');
-    row.classList.add('selected');
+    btnEl.textContent = 'เลือกแล้ว ✅';
+    btnEl.classList.add('selected');
+    btnEl.closest('.sound-row').classList.add('selected');
     
-    document.getElementById('sound-bar-name').textContent = '🎵 ' + selectedSong;
+    document.getElementById('sound-name-display').textContent = '✅ ' + name;
     
-    setTimeout(() => showPage('page-post'), 300);
+    setTimeout(() => {
+        showPage('page-post');
+    }, 300);
 }
 
 document.getElementById('submit-post').addEventListener('click', () => {
@@ -320,8 +333,7 @@ document.getElementById('submit-post').addEventListener('click', () => {
     document.getElementById('menu-right').style.display = 'flex';
     
     document.getElementById('caption-text').textContent = caption;
-    document.getElementById('music-name').textContent = selectedSong || 'เสียงต้นฉบับวิดีโอ';
-    document.getElementById('artist-name').textContent = selectedArtist ? '· ' + selectedArtist : '';
+    document.getElementById('music-text').textContent = '🎵 ' + (selectedSoundName || 'เสียงต้นฉบับวิดีโอ');
     
     showPage('page-home');
 });
