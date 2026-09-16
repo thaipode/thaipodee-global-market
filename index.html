@@ -12,7 +12,11 @@
         .page.active { display: block; }
 
         .video-container { position: absolute; inset: 0; z-index: 1; display: none; background: #000; }
-        .video-container video { width: 100%; height: 100%; object-fit: contain; }
+        .video-container video { 
+            width: 100%; height: 100%; 
+            object-fit: contain; 
+            background: #000;
+        }
 
         .center-area { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
         .center-text { color: #888; font-size: 15px; text-align: center; line-height: 2; }
@@ -22,9 +26,7 @@
         .desc-text { font-size: 13px; margin-bottom: 4px; color: #ddd; line-height: 1.4; }
         .music-row { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 
-        /* ==========================================
-           เมนูด้านขวา — แสดงตลอดเวลาเลย!
-           ========================================== */
+        /* 🔒 ล็อก: เมนูด้านขวา — ครบ 6 ปุ่ม */
         .menu-right {
             position: absolute !important;
             right: 12px !important;
@@ -33,20 +35,13 @@
             display: flex !important;
             flex-direction: column !important;
             gap: 20px !important;
-            z-index: 99999 !important; /* สูงที่สุดเท่าที่จะทำได้ */
+            z-index: 99999 !important;
             align-items: center !important;
-            opacity: 1 !important;
+            opacity: 0.3 !important;
             visibility: visible !important;
             pointer-events: auto !important;
         }
-        /* ก่อนโพสต์ — ทึบเล็กน้อย เพื่อไม่กวนสายตา */
-        .menu-right.before-post {
-            opacity: 0.3 !important;
-        }
-        /* หลังโพสต์ — ชัดเจนเต็มที่ */
-        .menu-right.after-post {
-            opacity: 1 !important;
-        }
+        .menu-right.after-post { opacity: 1 !important; }
         .menu-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .avatar-box { position: relative; width: 48px; height: 48px; margin-bottom: 4px; }
         .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #555; }
@@ -58,6 +53,7 @@
         .icon { font-size: 28px; line-height: 1; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         .num { font-size: 11px; margin-top: 2px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
+        /* 🔒 ล็อก: เมนูล่าง — ครบ 5 ปุ่ม */
         .nav-bottom {
             position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
             display: flex; justify-content: space-around; align-items: flex-end;
@@ -89,7 +85,7 @@
         .change-link { color: #ff2442; font-size: 14px; padding: 2px 8px; cursor: pointer; font-weight: 600; }
         .video-area { 
             position: absolute; top: 60px; bottom: 140px; left: 0; right: 0;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; background: #000;
         }
         .video-area video { max-width: 100%; max-height: 100%; object-fit: contain; }
         .post-input { 
@@ -147,8 +143,8 @@
 
 <!-- หน้าหลัก -->
 <div id="page-home" class="page active">
-    <!-- เมนูด้านขวา — แสดงทันทีตั้งแต่เปิดหน้า! -->
-    <div class="menu-right before-post" id="menu-right">
+    <!-- 🔒 เมนูด้านขวา -->
+    <div class="menu-right" id="menu-right">
         <div class="menu-btn">
             <div class="avatar-box">
                 <img class="avatar" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
@@ -163,7 +159,8 @@
     </div>
 
     <div class="video-container" id="video-container">
-        <video id="main-video" loop playsinline muted></video>
+        <!-- ✅ แก้: เพิ่ม autoplay + ไม่ใช่ muted เพื่อเล่นเสียงได้ -->
+        <video id="main-video" loop playsinline preload="auto"></video>
     </div>
 
     <div class="center-area" id="welcome-area">
@@ -176,6 +173,7 @@
         <div class="music-row" id="music-text">🎵 เสียงต้นฉบับวิดีโอ</div>
     </div>
 
+    <!-- 🔒 เมนูล่าง -->
     <div class="nav-bottom">
         <div class="nav-col"><span class="nav-icon">🏠</span><span class="nav-label">หน้าหลัก</span></div>
         <div class="nav-col"><span class="nav-icon">🛒</span><span class="nav-label">ตลาด</span></div>
@@ -197,7 +195,7 @@
         <span class="change-link" id="change-sound">เปลี่ยน</span>
     </div>
     <div class="video-area">
-        <video id="preview-video" controls playsinline></video>
+        <video id="preview-video" controls playsinline preload="auto"></video>
     </div>
     <input type="text" class="post-input" id="caption-input" placeholder="เขียนคำอธิบาย...">
     <button class="post-btn" id="submit-post">โพสต์</button>
@@ -255,6 +253,7 @@
 </div>
 
 <script>
+const APP_VERSION = "1.0.1-fix-video-audio";
 let selectedSound = { name: 'เสียงต้นฉบับวิดีโอ', url: null };
 let videoFile = null;
 let previewAudio = null;
@@ -320,33 +319,70 @@ function updateSoundDisplay() {
     document.getElementById('sound-name-display').textContent = '✅ ' + selectedSound.name;
 }
 
-// กดโพสต์ — ทำให้เมนูขวาชัดเจนเต็มที่
-document.getElementById('submit-post').addEventListener('click', () => {
+// ✅ แก้: กดโพสต์ → เล่นวิดีโอ+เสียงให้แน่นอน
+document.getElementById('submit-post').addEventListener('click', async () => {
     const caption = document.getElementById('caption-input').value || 'ยินดีต้อนรับสู่ ThaiPodee';
-
-    document.getElementById('main-video').src = URL.createObjectURL(videoFile);
-    document.getElementById('video-container').style.display = 'block';
-    document.getElementById('welcome-area').style.display = 'none';
-    document.getElementById('info-area').style.display = 'block';
-    
-    // เมนูขวา — จากทึบเป็นชัดเจน
+    const mainVideo = document.getElementById('main-video');
+    const videoContainer = document.getElementById('video-container');
+    const welcomeArea = document.getElementById('welcome-area');
+    const infoArea = document.getElementById('info-area');
     const menuRight = document.getElementById('menu-right');
-    menuRight.classList.remove('before-post');
+
+    // ตั้งค่าวิดีโอ
+    mainVideo.src = URL.createObjectURL(videoFile);
+    videoContainer.style.display = 'block';
+    welcomeArea.style.display = 'none';
+    infoArea.style.display = 'block';
     menuRight.classList.add('after-post');
 
+    // แสดงข้อความ
     document.getElementById('caption-text').textContent = caption;
     document.getElementById('music-text').textContent = '🎵 ' + selectedSound.name;
 
+    // ✅ บังคับเล่นวิดีโอ — ไม่ใช่ muted
+    try {
+        await mainVideo.play();
+        console.log('✅ วิดีโอเล่นแล้ว');
+    } catch (err) {
+        console.log('⚠️ ต้องแตะหน้าจอก่อนเล่น — กดที่หน้าจอเพื่อเริ่ม');
+        // เพิ่มปุ่มกดเริ่มถ้าจำเป็น
+        const startHint = document.createElement('div');
+        startHint.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);padding:16px 24px;border-radius:30px;z-index:999;cursor:pointer;';
+        startHint.textContent = '▶ แตะเพื่อเล่น';
+        startHint.onclick = async () => {
+            await mainVideo.play();
+            startHint.remove();
+        };
+        videoContainer.appendChild(startHint);
+    }
+
+    // ✅ เล่นเสียงประกอบ (ถ้ามี)
     if (selectedSound.url) {
-        if (!bgAudio) bgAudio = new Audio();
-        bgAudio.src = selectedSound.url;
-        bgAudio.loop = true;
-        bgAudio.volume = 0.5;
-        bgAudio.play().catch(() => {});
+        try {
+            if (!bgAudio) bgAudio = new Audio();
+            bgAudio.src = selectedSound.url;
+            bgAudio.loop = true;
+            bgAudio.volume = 0.5;
+            await bgAudio.play();
+            console.log('✅ เสียงประกอบเล่นแล้ว');
+        } catch (err) {
+            console.log('⚠️ เสียงประกอบ: ต้องแตะหน้าจอก่อน', err);
+        }
     }
 
     showPage('page-home');
 });
+
+// ✅ แตะหน้าจอที่ไหนก็ได้ → ปลดล็อกเสียง
+document.getElementById('page-home').addEventListener('click', async () => {
+    const mainVideo = document.getElementById('main-video');
+    if (mainVideo.paused && mainVideo.src) {
+        try { await mainVideo.play(); } catch (e) {}
+    }
+    if (bgAudio && bgAudio.paused && selectedSound.url) {
+        try { await bgAudio.play(); } catch (e) {}
+    }
+}, { once: false });
 </script>
 
 </body>
