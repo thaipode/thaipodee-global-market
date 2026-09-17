@@ -41,7 +41,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; }
 .post-item:hover { background: #111; }
 .post-thumb { width: 90px; height: 120px; background: #222; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.post-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .post-thumb .placeholder { color: #555; font-size: 24px; }
 .post-content { flex: 1; min-width: 0; }
 .post-file-info { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.5; }
@@ -220,41 +220,9 @@ async function generateThumbnail(fileObj, isVideo) {
   });
 }
 
-async function rebuildOldThumbs() {
-  posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
-  let changed = false;
-  
-  for (let i = 0; i < posts.length; i++) {
-    const p = posts[i];
-    if (!p.thumbnail && p.url) {
-      try {
-        const video = document.createElement('video');
-        video.crossOrigin = 'anonymous';
-        video.preload = 'metadata';
-        video.src = p.url;
-        video.currentTime = 1;
-        
-        await new Promise((resolve) => {
-          video.onseeked = () => {
-            const c = document.createElement('canvas');
-            c.width = video.videoWidth / 2 || 160;
-            c.height = video.videoHeight / 2 || 213;
-            c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-            p.thumbnail = c.toDataURL('image/jpeg', 0.5);
-            changed = true;
-            resolve();
-          };
-          video.onerror = () => resolve();
-          setTimeout(resolve, 3000);
-        });
-      } catch (e) { /* ข้ามถ้าไม่ได้ */ }
-    }
-  }
-  
-  if (changed) {
-    localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-  }
-  renderPosts();
+function getCloudThumbnailUrl(videoUrl) {
+  if (!videoUrl || !videoUrl.includes('cloudinary.com')) return '';
+  return videoUrl.replace('/video/upload/', '/video/upload/w_180,h_240,c_fill,so_1/');
 }
 
 function showPost(post) {
@@ -376,8 +344,12 @@ document.getElementById('pubBtn').onclick = async () => {
           type: type,
           title: title,
           sound: soundDisplay,
-          thumbnail: thumbnailUrl,
-          fileMeta: { ...fileMeta },
+          thumbnail: '', // ให้ Cloudinary สร้างเอง
+          fileMeta: { 
+            ...fileMeta,
+            duration: data.duration || fileMeta.duration,
+            resolution: data.width && data.height ? `${data.width}×${data.height}` : fileMeta.resolution
+          },
           time: new Date().toLocaleString('th-TH')
         };
         
@@ -481,10 +453,15 @@ function renderPosts() {
     const sizeCheck = checkSizeAdvice(m.sizeMB);
     
     let thumbHtml = '';
-    if (p.thumbnail) {
+    if (p.thumbnail && p.thumbnail.startsWith('data:')) {
       thumbHtml = `<img src="${p.thumbnail}" alt="">`;
     } else {
-      thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
+      const cloudThumb = getCloudThumbnailUrl(p.url);
+      if (cloudThumb) {
+        thumbHtml = `<img src="${cloudThumb}" alt="" loading="lazy">`;
+      } else {
+        thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
+      }
     }
     
     return `
@@ -510,7 +487,6 @@ function renderPosts() {
 }
 
 renderPosts();
-rebuildOldThumbs();
 </script>
 </body>
 </html>
