@@ -29,15 +29,16 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .nav span { font-size: 10px; margin-top: 2px; }
 .btn { background: linear-gradient(90deg, #ff2e55, #ff6b4a); border: none; padding: 12px; border-radius: 6px; color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 15px; }
 .inp { background: #222; border: none; padding: 12px; border-radius: 6px; color: white; width: 100%; margin-bottom: 10px; font-size: 14px; }
-.progress { height: 6px; background: #333; border-radius: 3px; margin: 15px 0; display: none; }
-.prog-bar { height: 100%; background: #ff2e55; border-radius: 3px; width: 0%; transition: width 0.2s; }
-.status { text-align: center; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; margin: 10px 0; white-space: pre-wrap; }
+.progress { height: 10px; background: #333; border-radius: 5px; margin: 15px 0; display: none; overflow: hidden; }
+.prog-bar { height: 100%; background: linear-gradient(90deg, #ff2e55, #ff6b4a); border-radius: 5px; width: 0%; transition: width 0.3s; }
+.status { text-align: center; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; margin: 10px 0; white-space: pre-wrap; line-height: 1.5; }
 .status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
 .status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
 .status.info { color: #facc15; background: rgba(250,204,21,0.15); }
 .post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; }
 .post-item:hover { background: #111; }
 .post-item:last-child { border-bottom: none; }
+.size-note { font-size: 12px; color: #888; margin-top: -8px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -84,6 +85,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     </button>
     <h3 style="margin-bottom:15px;">อัปโหลดสื่อ</h3>
     <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
+    <p class="size-note">💡 รองรับไฟล์ยาวได้เลย — รอจนกว่าจะเสร็จนะ</p>
     <input type="text" class="inp" id="titleInp" placeholder="ชื่อสินค้า/คำอธิบาย...">
     <input type="text" class="inp" id="soundInp" placeholder="เสียงประกอบ...">
     <button class="btn" id="pubBtn">เผยแพร่ขึ้นคลาวด์</button>
@@ -151,6 +153,9 @@ document.getElementById('fileInp').onchange = e => {
   file = e.target.files[0];
   if (!file) return;
   type = file.type.startsWith('video') ? 'video' : 'image';
+  const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+  showStatus(`📂 ไฟล์: ${file.name}\nขนาด: ${sizeMB} MB\nกำลังแสดงตัวอย่าง...`, 'info');
+  
   const tempUrl = URL.createObjectURL(file);
   mediaArea.innerHTML = '';
   if (type === 'video') {
@@ -172,7 +177,7 @@ document.getElementById('pubBtn').onclick = () => {
   
   progWrap.style.display = 'block';
   progBar.style.width = '0%';
-  showStatus('⏳ กำลังส่งขึ้นคลาวด์...', 'info');
+  showStatus('⏳ กำลังส่งขึ้นคลาวด์...\nไฟล์ยาวต้องรอนานหน่อย อย่าปิดหน้านี้!', 'info');
   
   const formData = new FormData();
   formData.append('file', file);
@@ -180,12 +185,16 @@ document.getElementById('pubBtn').onclick = () => {
   
   const xhr = new XMLHttpRequest();
   xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
+  xhr.timeout = 600000; // ⏱️ รอได้นานสุด 10 นาที
+  xhr.withCredentials = false;
   
   xhr.upload.onprogress = e => {
     if (e.lengthComputable) {
       const pct = Math.round((e.loaded / e.total) * 100);
       progBar.style.width = pct + '%';
-      showStatus(`⏳ กำลังส่ง... ${pct}%`, 'info');
+      const loadedMB = (e.loaded / (1024 * 1024)).toFixed(1);
+      const totalMB = (e.total / (1024 * 1024)).toFixed(1);
+      showStatus(`⏳ กำลังส่ง... ${pct}%\n${loadedMB} / ${totalMB} MB`, 'info');
     }
   };
   
@@ -212,7 +221,7 @@ document.getElementById('pubBtn').onclick = () => {
         
         currentPost = newPost;
         updateMainDisplay(title, sound);
-        showStatus('✅ อัปโหลดสำเร็จ!', 'success');
+        showStatus('✅ อัปโหลดสำเร็จ!\nไฟล์อยู่ในคลาวด์แล้ว', 'success');
         
         file = null;
         document.getElementById('fileInp').value = '';
@@ -220,19 +229,26 @@ document.getElementById('pubBtn').onclick = () => {
         document.getElementById('soundInp').value = '';
         
         renderPosts();
-        setTimeout(() => show('page1'), 1500);
+        setTimeout(() => show('page1'), 2000);
       } catch (err) {
         showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
       }
+    } else if (xhr.status === 413) {
+      showStatus('❌ ไฟล์ใหญ่เกินไป\nต้องลดขนาดหรือตัดแบ่ง', 'error');
     } else {
       showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
       console.log('Error:', xhr.responseText);
     }
   };
   
+  xhr.ontimeout = () => {
+    progWrap.style.display = 'none';
+    showStatus('⏰ หมดเวลา\nอินเทอร์เน็ตช้า → ลองไฟล์สั้นกว่า หรือรอสัญญาณดีขึ้น', 'error');
+  };
+  
   xhr.onerror = () => {
     progWrap.style.display = 'none';
-    showStatus('❌ ไม่เชื่อมต่อ', 'error');
+    showStatus('❌ ขาดการเชื่อมต่อ\nตรวจอินเทอร์เน็ต แล้วลองใหม่', 'error');
   };
   
   xhr.send(formData);
@@ -263,16 +279,12 @@ function updateMainDisplay(title, sound) {
     v.autoplay = true; 
     v.loop = true;
     v.muted = true;
-    v.onerror = () => {
-      mediaArea.innerHTML += `<p style="color:red;">❌ โหลดวิดีโอไม่ได้: ${cloudUrl}</p>`;
-    };
+    v.preload = 'metadata';
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
     img.src = cloudUrl;
-    img.onerror = () => {
-      mediaArea.innerHTML += `<p style="color:red;">❌ โหลดรูปไม่ได้: ${cloudUrl}</p>`;
-    };
+    img.loading = 'lazy';
     mediaArea.appendChild(img);
   }
 }
