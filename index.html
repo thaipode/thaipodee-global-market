@@ -15,10 +15,13 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .media video, .media img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .ui { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 .ui * { pointer-events: auto; }
-.top { position: absolute; top: 40px; left: 16px; }
+.top { position: absolute; top: 40px; left: 16px; right: 16px; }
 .username { font-weight: bold; font-size: 15px; }
 .desc { font-size: 12px; margin-top: 4px; opacity: 0.9; }
-.sound { display: flex; align-items: center; gap: 4px; margin-top: 8px; }
+.sound { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; flex-wrap: wrap; }
+.sound-original { color: #22d369; font-weight: 500; }
+.file-info { font-size: 11px; color: #888; margin-top: 4px; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; }
+.file-info-item { display: inline-block; margin-right: 12px; }
 .right { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; }
 .icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
 .icon i { font-size: 24px; }
@@ -38,7 +41,9 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; }
 .post-item:hover { background: #111; }
 .post-item:last-child { border-bottom: none; }
-.size-note { font-size: 12px; color: #888; margin-top: -8px; margin-bottom: 10px; }
+.post-file-info { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.5; }
+.size-warning { color: #ffd700; }
+.size-ok { color: #4ade80; }
 </style>
 </head>
 <body>
@@ -54,9 +59,16 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     <div class="top" id="postInfo" style="display:none;">
       <p class="username">ThaiPodee Master</p>
       <p class="desc" id="dispDesc"></p>
-      <div class="sound">
+      <div class="sound" id="soundInfo">
         <i class="fa-solid fa-music fa-xs"></i>
-        <span id="dispSound" style="font-size:12px;"></span>
+        <span class="sound-original" id="dispSoundType"></span>
+      </div>
+      <div class="file-info" id="fileInfoBlock" style="display:none;">
+        <span class="file-info-item"><strong>📄 ชื่อ:</strong> <span id="fnName"></span></span>
+        <span class="file-info-item"><strong>📦 ขนาด:</strong> <span id="fnSize"></span></span>
+        <span class="file-info-item"><strong>⏱️ เวลา:</strong> <span id="fnDur"></span></span>
+        <span class="file-info-item"><strong>📐 ภาพ:</strong> <span id="fnRes"></span></span>
+        <span class="file-info-item" id="fnSizeCheck"></span>
       </div>
     </div>
     <div class="right">
@@ -85,9 +97,16 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     </button>
     <h3 style="margin-bottom:15px;">อัปโหลดสื่อ</h3>
     <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
-    <p class="size-note">💡 รองรับไฟล์ยาวได้เลย — รอจนกว่าจะเสร็จนะ</p>
+    <div id="previewFileInfo" style="background:rgba(255,255,255,0.05);padding:12px;border-radius:6px;margin-bottom:12px;display:none;font-size:12px;line-height:1.8;">
+      <strong>📋 ข้อมูลไฟล์:</strong><br>
+      ชื่อ: <span id="pName"></span><br>
+      ขนาด: <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
+      เวลา: <span id="pDur"></span><br>
+      ความละเอียด: <span id="pRes"></span>
+    </div>
+    <p style="font-size:12px;color:#888;margin-bottom:10px;">💡 ปล่อยช่องเสียงว่าง = ใช้เสียงต้นฉบับจากวิดีโอ</p>
     <input type="text" class="inp" id="titleInp" placeholder="ชื่อสินค้า/คำอธิบาย...">
-    <input type="text" class="inp" id="soundInp" placeholder="เสียงประกอบ...">
+    <input type="text" class="inp" id="soundInp" placeholder="เสียงประกอบ (ปล่อยว่างถ้าใช้เสียงต้นฉบับ)...">
     <button class="btn" id="pubBtn">เผยแพร่ขึ้นคลาวด์</button>
     <div id="progWrap" class="progress"><div id="progBar" class="prog-bar"></div></div>
     <p id="statusMsg" class="status" style="display:none;"></p>
@@ -120,8 +139,11 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 <script>
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
+const MAX_RECOMMENDED_MB = 100; // ขนาดแนะนำสูงสุด
+const TARGET_DURATION_SEC = 180; // 3 นาที เป้าหมาย
 
 let file, type, cloudUrl = '';
+let fileMeta = {}; // เก็บข้อมูลทั้งหมดของไฟล์
 let currentPost = null;
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
@@ -136,10 +158,40 @@ function show(id) {
   }
 }
 
+function formatTime(sec) {
+  if (!sec) return '-';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,'0')} นาที`;
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '-';
+  const mb = (bytes / (1024 * 1024)).toFixed(1);
+  return `${mb} MB`;
+}
+
+function checkSizeAdvice(mb) {
+  if (!mb) return { text: '', ok: true };
+  if (mb > MAX_RECOMMENDED_MB) {
+    return { text: `⚠️ ใหญ่เกิน ${MAX_RECOMMENDED_MB}MB — อาจส่งไม่จบ`, ok: false };
+  }
+  return { text: '✅ ขนาดเหมาะสม', ok: true };
+}
+
+function checkDurationAdvice(sec) {
+  if (!sec) return '';
+  const diff = Math.abs(sec - TARGET_DURATION_SEC);
+  if (diff < 10) return ' ✅ ตรงเป้าหมาย 3 นาที';
+  if (sec < TARGET_DURATION_SEC) return ` (สั้นกว่าเป้าหมาย ${Math.round((TARGET_DURATION_SEC-sec)/60)} นาที)`;
+  return ` (ยาวกว่าเป้าหมาย ${Math.round((sec-TARGET_DURATION_SEC)/60)} นาที)`;
+}
+
 function showPost(post) {
   currentPost = post;
   cloudUrl = post.url;
   type = post.type;
+  fileMeta = post.fileMeta || {};
   updateMainDisplay(post.title, post.sound);
   show('page1');
 }
@@ -149,13 +201,52 @@ document.querySelectorAll('[data-goto]').forEach(b =>
 );
 document.getElementById('uploadBtn').onclick = () => show('pageUpload');
 
-document.getElementById('fileInp').onchange = e => {
+document.getElementById('fileInp').onchange = async e => {
   file = e.target.files[0];
   if (!file) return;
-  type = file.type.startsWith('video') ? 'video' : 'image';
-  const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-  showStatus(`📂 ไฟล์: ${file.name}\nขนาด: ${sizeMB} MB\nกำลังแสดงตัวอย่าง...`, 'info');
   
+  type = file.type.startsWith('video') ? 'video' : 'image';
+  const sizeMB = parseFloat((file.size / (1024 * 1024)).toFixed(1));
+  const sizeCheck = checkSizeAdvice(sizeMB);
+  
+  fileMeta = {
+    name: file.name,
+    sizeMB: sizeMB,
+    type: type,
+    duration: null,
+    resolution: null
+  };
+  
+  // ดึงข้อมูลวิดีโอเพิ่มเติม
+  if (type === 'video') {
+    const tempUrl = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    v.src = tempUrl;
+    
+    await new Promise(res => {
+      v.onloadedmetadata = () => {
+        fileMeta.duration = v.duration;
+        fileMeta.resolution = `${v.videoWidth}×${v.videoHeight}`;
+        URL.revokeObjectURL(tempUrl);
+        res();
+      };
+      v.onerror = () => res();
+    });
+  }
+  
+  // แสดงข้อมูลที่หน้าเลือกไฟล์
+  const previewBlock = document.getElementById('previewFileInfo');
+  previewBlock.style.display = 'block';
+  document.getElementById('pName').textContent = fileMeta.name;
+  document.getElementById('pSize').textContent = formatSize(file.size);
+  const sizeCheckEl = document.getElementById('pSizeCheck');
+  sizeCheckEl.textContent = sizeCheck.text;
+  sizeCheckEl.className = sizeCheck.ok ? 'size-ok' : 'size-warning';
+  document.getElementById('pDur').textContent = formatTime(fileMeta.duration) + checkDurationAdvice(fileMeta.duration);
+  document.getElementById('pRes').textContent = fileMeta.resolution || '-';
+  
+  // แสดงตัวอย่าง
   const tempUrl = URL.createObjectURL(file);
   mediaArea.innerHTML = '';
   if (type === 'video') {
@@ -177,7 +268,7 @@ document.getElementById('pubBtn').onclick = () => {
   
   progWrap.style.display = 'block';
   progBar.style.width = '0%';
-  showStatus('⏳ กำลังส่งขึ้นคลาวด์...\nไฟล์ยาวต้องรอนานหน่อย อย่าปิดหน้านี้!', 'info');
+  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อ: ${fileMeta.name}\nขนาด: ${formatSize(file.size)}`, 'info');
   
   const formData = new FormData();
   formData.append('file', file);
@@ -185,8 +276,7 @@ document.getElementById('pubBtn').onclick = () => {
   
   const xhr = new XMLHttpRequest();
   xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
-  xhr.timeout = 600000; // ⏱️ รอได้นานสุด 10 นาที
-  xhr.withCredentials = false;
+  xhr.timeout = 600000;
   
   xhr.upload.onprogress = e => {
     if (e.lengthComputable) {
@@ -206,13 +296,15 @@ document.getElementById('pubBtn').onclick = () => {
         cloudUrl = data.secure_url;
         
         const title = document.getElementById('titleInp').value || 'ไม่มีชื่อ';
-        const sound = document.getElementById('soundInp').value || 'เสียงต้นฉบับ';
+        const soundInput = document.getElementById('soundInp').value.trim();
+        const soundDisplay = soundInput === '' ? 'เสียงต้นฉบับ' : soundInput;
         
         const newPost = {
-          url: cloudUrl, 
-          type: type, 
-          title: title, 
-          sound: sound,
+          url: cloudUrl,
+          type: type,
+          title: title,
+          sound: soundDisplay,
+          fileMeta: { ...fileMeta }, // บันทึกข้อมูลทั้งหมด
           time: new Date().toLocaleString('th-TH')
         };
         
@@ -220,35 +312,36 @@ document.getElementById('pubBtn').onclick = () => {
         localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
         
         currentPost = newPost;
-        updateMainDisplay(title, sound);
-        showStatus('✅ อัปโหลดสำเร็จ!\nไฟล์อยู่ในคลาวด์แล้ว', 'success');
+        updateMainDisplay(title, soundDisplay);
+        showStatus('✅ อัปโหลดสำเร็จ!', 'success');
         
+        // เคลียร์
         file = null;
+        fileMeta = {};
+        cloudUrl = '';
         document.getElementById('fileInp').value = '';
         document.getElementById('titleInp').value = '';
         document.getElementById('soundInp').value = '';
+        document.getElementById('previewFileInfo').style.display = 'none';
         
         renderPosts();
         setTimeout(() => show('page1'), 2000);
       } catch (err) {
         showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
       }
-    } else if (xhr.status === 413) {
-      showStatus('❌ ไฟล์ใหญ่เกินไป\nต้องลดขนาดหรือตัดแบ่ง', 'error');
     } else {
       showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
-      console.log('Error:', xhr.responseText);
     }
   };
   
   xhr.ontimeout = () => {
     progWrap.style.display = 'none';
-    showStatus('⏰ หมดเวลา\nอินเทอร์เน็ตช้า → ลองไฟล์สั้นกว่า หรือรอสัญญาณดีขึ้น', 'error');
+    showStatus('⏰ หมดเวลา\n- ลดขนาดไฟล์ลง\n- หรือส่งที่ Cloudinary โดยตรง', 'error');
   };
   
   xhr.onerror = () => {
     progWrap.style.display = 'none';
-    showStatus('❌ ขาดการเชื่อมต่อ\nตรวจอินเทอร์เน็ต แล้วลองใหม่', 'error');
+    showStatus('❌ ขาดการเชื่อมต่อ', 'error');
   };
   
   xhr.send(formData);
@@ -261,31 +354,38 @@ function showStatus(text, type) {
   el.style.display = 'block';
 }
 
-function updateMainDisplay(title, sound) {
+function updateMainDisplay(title, soundText) {
   document.getElementById('postInfo').style.display = 'block';
   document.getElementById('dispDesc').textContent = title;
-  document.getElementById('dispSound').textContent = sound;
-  mediaArea.innerHTML = '';
   
-  if (!cloudUrl) {
-    mediaArea.innerHTML = '<div style="text-align:center;color:#888;"><i class="fa-solid fa-image fa-2x"></i><p style="margin-top:10px;">ไม่มีรูป</p></div>';
-    return;
+  const isOriginal = soundText === 'เสียงต้นฉบับ' || soundText === '';
+  document.getElementById('dispSoundType').textContent = isOriginal ? '🎵 เสียงต้นฉบับ' : soundText;
+  
+  // แสดงข้อมูลไฟล์
+  if (fileMeta.name) {
+    document.getElementById('fileInfoBlock').style.display = 'block';
+    document.getElementById('fnName').textContent = fileMeta.name;
+    document.getElementById('fnSize').textContent = formatSize(file.size || fileMeta.sizeMB * 1024 * 1024);
+    document.getElementById('fnDur').textContent = formatTime(fileMeta.duration);
+    document.getElementById('fnRes').textContent = fileMeta.resolution || '-';
+    const check = checkSizeAdvice(fileMeta.sizeMB);
+    document.getElementById('fnSizeCheck').textContent = check.text;
+    document.getElementById('fnSizeCheck').className = check.ok ? 'size-ok' : 'size-warning';
+  } else {
+    document.getElementById('fileInfoBlock').style.display = 'none';
   }
+  
+  mediaArea.innerHTML = '';
+  if (!cloudUrl && !currentPost?.url) return;
+  const src = cloudUrl || currentPost.url;
   
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = cloudUrl; 
-    v.controls = true; 
-    v.autoplay = true; 
-    v.loop = true;
-    v.muted = true;
-    v.preload = 'metadata';
+    v.src = src; v.controls = true; v.autoplay = true; v.loop = true; v.muted = true;
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
-    img.src = cloudUrl;
-    img.loading = 'lazy';
-    mediaArea.appendChild(img);
+    img.src = src; mediaArea.appendChild(img);
   }
 }
 
@@ -300,19 +400,25 @@ function renderPosts() {
   }
   
   document.getElementById('emptyMsg').style.display = 'none';
-  list.innerHTML = posts.map((p, i) => `
-    <div class="post-item" data-index="${i}">
-      <strong>${p.title}</strong><br>
-      <small style="color:#888;">${p.time}</small><br>
-      <small style="color:#aaa;">🎵 ${p.sound}</small>
-    </div>
-  `).join('');
+  list.innerHTML = posts.map((p, i) => {
+    const m = p.fileMeta || {};
+    const sizeCheck = checkSizeAdvice(m.sizeMB);
+    return `
+      <div class="post-item" data-index="${i}">
+        <strong>${p.title}</strong><br>
+        <small style="color:#90ee90;">${p.sound}</small><br>
+        <div class="post-file-info">
+          📄 ${m.name || 'ไม่ระบุ'}<br>
+          📦 ${m.sizeMB || '?'} MB — <span class="${sizeCheck.ok ? 'size-ok' : 'size-warning'}">${sizeCheck.text}</span><br>
+          ⏱️ ${formatTime(m.duration)}${checkDurationAdvice(m.duration)} | 📐 ${m.resolution || '-'}
+        </div>
+        <small style="color:#555;margin-top:4px;display:block;">${p.time}</small>
+      </div>
+    `;
+  }).join('');
   
   document.querySelectorAll('.post-item').forEach(item => {
-    item.onclick = () => {
-      const idx = parseInt(item.dataset.index);
-      showPost(posts[idx]);
-    };
+    item.onclick = () => showPost(posts[parseInt(item.dataset.index)]);
   });
 }
 </script>
