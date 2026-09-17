@@ -130,41 +130,31 @@
   </div>
 
   <script>
-    // ค่าตั้งต้น Cloudinary
+    // === ตรงนี้ตั้งค่าเสร็จแล้ว ใช้ได้เลย ===
     const CLOUD_NAME = 'orjpnytt';
-    const UPLOAD_PRESET = 'Thaipodee';
+    const API_KEY = '116196539331667';
+    // ไม่ต้องใช้ Upload Preset แล้วครับ ✅
 
-    // ตัวแปรกลาง
     let selectedFile = null;
-    let uploadedUrl = '';
     let isMuted = true;
 
-    // เปลี่ยนหน้า
     function showPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
     }
 
-    // กดเมนูด้านล่าง
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
         const target = item.dataset.target;
-        if (target === 'upload') {
-          showPage('uploadPage');
-        } else {
-          showPage('homePage');
-        }
+        if (target === 'upload') showPage('uploadPage');
+        else showPage('homePage');
       });
     });
 
-    // ปุ่มย้อนกลับ
     document.querySelectorAll('.back-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        showPage(btn.dataset.back + 'Page');
-      });
+      btn.addEventListener('click', () => showPage(btn.dataset.back + 'Page'));
     });
 
-    // เลือกไฟล์
     document.getElementById('previewBox').addEventListener('click', () => {
       document.getElementById('fileInput').click();
     });
@@ -190,7 +180,6 @@
       }
     });
 
-    // อัปโหลดขึ้น Cloudinary
     document.getElementById('publishBtn').addEventListener('click', async () => {
       if (!selectedFile) {
         alert('กรุณาเลือกไฟล์ก่อน');
@@ -199,7 +188,8 @@
 
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('api_key', API_KEY);
+      formData.append('timestamp', Math.floor(Date.now() / 1000));
 
       const progressFill = document.getElementById('progressFill');
       const progressContainer = document.getElementById('progressContainer');
@@ -208,33 +198,31 @@
 
       try {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`);
-        
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`);
+
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            progressFill.style.width = percent + '%';
+            progressFill.style.width = Math.round((e.loaded / e.total) * 100) + '%';
           }
         };
 
         xhr.onload = () => {
           if (xhr.status === 200) {
             const res = JSON.parse(xhr.responseText);
-            uploadedUrl = res.secure_url;
             
-            // แสดงผลที่หน้าหลัก
-            document.getElementById('displayDesc').textContent = document.getElementById('descInput').value || 'ยินดีต้อนรับสู่ ThaiPodee Market';
-            document.getElementById('displaySound').textContent = document.getElementById('soundInput').value || 'เสียงต้นฉบับ';
+            document.getElementById('displayDesc').textContent = 
+              document.getElementById('descInput').value || 'ยินดีต้อนรับสู่ ThaiPodee Market';
+            document.getElementById('displaySound').textContent = 
+              document.getElementById('soundInput').value || 'เสียงต้นฉบับ';
             
             const video = document.getElementById('mainVideo');
-            video.src = uploadedUrl;
+            video.src = res.secure_url;
             video.play().catch(() => {});
             
             alert('✅ เผยแพร่สำเร็จ!');
             progressContainer.style.display = 'none';
             showPage('homePage');
             
-            // เคลียร์ค่า
             selectedFile = null;
             document.getElementById('fileInput').value = '';
             document.getElementById('descInput').value = '';
@@ -253,7 +241,6 @@
       }
     });
 
-    // เปิด/ปิดเสียง
     document.getElementById('soundToggle').addEventListener('click', () => {
       const video = document.getElementById('mainVideo');
       isMuted = !isMuted;
@@ -263,11 +250,9 @@
         : 'fa-solid fa-volume-high';
     });
 
-    // กดวิดีโอเพื่อเล่น/หยุด
     document.querySelector('.video-container').addEventListener('click', () => {
       const video = document.getElementById('mainVideo');
-      if (video.paused) video.play();
-      else video.pause();
+      video.paused ? video.play() : video.pause();
     });
   </script>
 </body>
