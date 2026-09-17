@@ -12,7 +12,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .page { position: absolute; inset: 0; z-index: 1; overflow-y: auto; }
 .page.hidden { display: none; }
 .media { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: #000; }
-.media video, .media img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.media video, .media img { width: 100%; height: 100%; object-fit: contain; }
 .ui { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 .ui * { pointer-events: auto; }
 .top { position: absolute; top: 40px; left: 16px; right: 16px; }
@@ -38,9 +38,12 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
 .status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
 .status.info { color: #facc15; background: rgba(250,204,21,0.15); }
-.post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; }
+.post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; }
 .post-item:hover { background: #111; }
-.post-item:last-child { border-bottom: none; }
+.post-thumb { width: 90px; height: 120px; background: #222; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.post-thumb .placeholder { color: #555; font-size: 24px; }
+.post-content { flex: 1; min-width: 0; }
 .post-file-info { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.5; }
 .size-warning { color: #ffd700; }
 .size-ok { color: #4ade80; }
@@ -146,6 +149,7 @@ const TARGET_DURATION_SEC = 180;
 
 let file, type, cloudUrl = '';
 let fileMeta = {};
+let thumbnailUrl = '';
 let currentPost = null;
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
@@ -164,7 +168,7 @@ function formatTime(sec) {
   if (!sec) return '-';
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2,'0')} นาที`;
+  return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
 function formatSize(bytes) {
@@ -176,7 +180,7 @@ function formatSize(bytes) {
 function checkSizeAdvice(mb) {
   if (!mb) return { text: '', ok: true };
   if (mb > MAX_RECOMMENDED_MB) {
-    return { text: `⚠️ ใหญ่เกิน ${MAX_RECOMMENDED_MB}MB — อาจส่งไม่จบ`, ok: false };
+    return { text: `⚠️ ใหญ่เกิน ${MAX_RECOMMENDED_MB}MB`, ok: false };
   }
   return { text: '✅ ขนาดเหมาะสม', ok: true };
 }
@@ -189,11 +193,40 @@ function checkDurationAdvice(sec) {
   return ` (ยาวกว่าเป้าหมาย ${Math.round((sec-TARGET_DURATION_SEC)/60)} นาที)`;
 }
 
+async function generateThumbnail(fileObj, isVideo) {
+  return new Promise(res => {
+    if (!isVideo) {
+      const url = URL.createObjectURL(fileObj);
+      res(url);
+      return;
+    }
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.src = URL.createObjectURL(fileObj);
+    video.currentTime = 1; // จับภาพวินาทีที่ 1
+    video.onseeked = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth / 2;
+      canvas.height = video.videoHeight / 2;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const thumbUrl = canvas.toDataURL('image/jpeg', 0.6);
+      URL.revokeObjectURL(video.src);
+      res(thumbUrl);
+    };
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      res('');
+    };
+  });
+}
+
 function showPost(post) {
   currentPost = post;
   cloudUrl = post.url;
   type = post.type;
   fileMeta = post.fileMeta || {};
+  thumbnailUrl = post.thumbnail || '';
   updateMainDisplay(post.title, post.sound);
   show('page1');
 }
@@ -236,6 +269,9 @@ document.getElementById('fileInp').onchange = async e => {
     });
   }
   
+  // สร้างภาพตัวอย่าง
+  thumbnailUrl = await generateThumbnail(file, type === 'video');
+  
   const previewBlock = document.getElementById('previewFileInfo');
   previewBlock.style.display = 'block';
   document.getElementById('pName').textContent = fileMeta.name;
@@ -254,7 +290,7 @@ document.getElementById('fileInp').onchange = async e => {
     v.controls = true; 
     v.autoplay = true; 
     v.loop = true; 
-    v.muted = false; // ✅ เปิดเสียงไว้เลย
+    v.muted = false;
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
@@ -262,7 +298,7 @@ document.getElementById('fileInp').onchange = async e => {
   }
 };
 
-document.getElementById('pubBtn').onclick = () => {
+document.getElementById('pubBtn').onclick = async () => {
   if (!file) return showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
   
   const statusMsg = document.getElementById('statusMsg');
@@ -289,7 +325,7 @@ document.getElementById('pubBtn').onclick = () => {
     }
   };
   
-  xhr.onload = () => {
+  xhr.onload = async () => {
     progWrap.style.display = 'none';
     if (xhr.status === 200) {
       try {
@@ -305,6 +341,7 @@ document.getElementById('pubBtn').onclick = () => {
           type: type,
           title: title,
           sound: soundDisplay,
+          thumbnail: thumbnailUrl, // เก็บภาพตัวอย่างไว้
           fileMeta: { ...fileMeta },
           time: new Date().toLocaleString('th-TH')
         };
@@ -319,6 +356,7 @@ document.getElementById('pubBtn').onclick = () => {
         file = null;
         fileMeta = {};
         cloudUrl = '';
+        thumbnailUrl = '';
         document.getElementById('fileInp').value = '';
         document.getElementById('titleInp').value = '';
         document.getElementById('soundInp').value = '';
@@ -384,7 +422,7 @@ function updateMainDisplay(title, soundText) {
     v.controls = true; 
     v.autoplay = true; 
     v.loop = true; 
-    v.muted = false; // ✅ ไม่ปิดเสียง
+    v.muted = false;
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
@@ -406,16 +444,28 @@ function renderPosts() {
   list.innerHTML = posts.map((p, i) => {
     const m = p.fileMeta || {};
     const sizeCheck = checkSizeAdvice(m.sizeMB);
+    
+    // ส่วนภาพตัวอย่าง
+    let thumbHtml = '';
+    if (p.thumbnail) {
+      thumbHtml = `<img src="${p.thumbnail}" alt="">`;
+    } else {
+      thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
+    }
+    
     return `
       <div class="post-item" data-index="${i}">
-        <strong>${p.title}</strong><br>
-        <small style="color:#90ee90;">${p.sound}</small><br>
-        <div class="post-file-info">
-          📄 ${m.name || 'ไม่ระบุ'}<br>
-          📦 ${m.sizeMB || '?'} MB — <span class="${sizeCheck.ok ? 'size-ok' : 'size-warning'}">${sizeCheck.text}</span><br>
-          ⏱️ ${formatTime(m.duration)}${checkDurationAdvice(m.duration)} | 📐 ${m.resolution || '-'}
+        <div class="post-thumb">${thumbHtml}</div>
+        <div class="post-content">
+          <strong>${p.title}</strong><br>
+          <small style="color:#90ee90;">${p.sound}</small><br>
+          <div class="post-file-info">
+            📄 ${m.name || 'ไม่ระบุ'}<br>
+            📦 ${m.sizeMB || '?'} MB — <span class="${sizeCheck.ok ? 'size-ok' : 'size-warning'}">${sizeCheck.text}</span><br>
+            ⏱️ ${formatTime(m.duration)}${checkDurationAdvice(m.duration)} | 📐 ${m.resolution || '-'}
+          </div>
+          <small style="color:#555;margin-top:4px;display:block;">${p.time}</small>
         </div>
-        <small style="color:#555;margin-top:4px;display:block;">${p.time}</small>
       </div>
     `;
   }).join('');
