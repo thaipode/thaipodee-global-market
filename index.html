@@ -118,9 +118,6 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 
-console.log('✅ Cloud Name:', CLOUD_NAME);
-console.log('✅ Upload Preset:', UPLOAD_PRESET);
-
 let file, type, cloudUrl = '';
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
@@ -156,8 +153,8 @@ document.getElementById('fileInp').onchange = e => {
   }
 };
 
-document.getElementById('pubBtn').onclick = async () => {
-  if (!file) return showStatus('⚠️ เลือกไฟล์ก่อนนะ', 'error');
+document.getElementById('pubBtn').onclick = () => {
+  if (!file) return showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
   
   const statusMsg = document.getElementById('statusMsg');
   const progWrap = document.getElementById('progWrap');
@@ -171,55 +168,58 @@ document.getElementById('pubBtn').onclick = async () => {
   formData.append('file', file);
   formData.append('upload_preset', UPLOAD_PRESET);
   
-  const targetUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
-  console.log('📤 ส่งไปที่:', targetUrl);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
   
-  try {
-    const response = await fetch(targetUrl, {
-      method: 'POST',
-      body: formData
-    });
-    
-    console.log('📥 สถานะตอบกลับ:', response.status);
-    
-    if (!response.ok) {
-      const errText = await response.text();
-      console.log('❌ ผิดพลาด:', errText);
-      progWrap.style.display = 'none';
-      return showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${response.status}\nตรวจ: Upload Preset ชื่อ "${UPLOAD_PRESET}" มีอยู่จริงไหม?\nCloud Name: ${CLOUD_NAME}`, 'error');
+  xhr.upload.onprogress = e => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      progBar.style.width = pct + '%';
+      showStatus(`⏳ กำลังส่ง... ${pct}%`, 'info');
     }
-    
-    const data = await response.json();
-    console.log('✅ สำเร็จ:', data);
-    cloudUrl = data.secure_url;
-    
+  };
+  
+  xhr.onload = () => {
     progWrap.style.display = 'none';
-    
-    const title = document.getElementById('titleInp').value || 'ไม่มีชื่อ';
-    const sound = document.getElementById('soundInp').value || 'เสียงต้นฉบับ';
-    
-    posts.unshift({
-      url: cloudUrl, type, title, sound,
-      time: new Date().toLocaleString('th-TH')
-    });
-    localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-    
-    updateMainDisplay(title, sound);
-    showStatus('✅ อัปโหลดสำเร็จ! บันทึกแล้ว', 'success');
-    
-    file = null;
-    document.getElementById('fileInp').value = '';
-    document.getElementById('titleInp').value = '';
-    document.getElementById('soundInp').value = '';
-    
-    renderPosts();
-    setTimeout(() => show('page1'), 1500);
-    
-  } catch (err) {
+    if (xhr.status === 200) {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        cloudUrl = data.secure_url;
+        
+        const title = document.getElementById('titleInp').value || 'ไม่มีชื่อ';
+        const sound = document.getElementById('soundInp').value || 'เสียงต้นฉบับ';
+        
+        posts.unshift({
+          url: cloudUrl, type, title, sound,
+          time: new Date().toLocaleString('th-TH')
+        });
+        localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+        
+        updateMainDisplay(title, sound);
+        showStatus('✅ อัปโหลดสำเร็จ!', 'success');
+        
+        file = null;
+        document.getElementById('fileInp').value = '';
+        document.getElementById('titleInp').value = '';
+        document.getElementById('soundInp').value = '';
+        
+        renderPosts();
+        setTimeout(() => show('page1'), 1500);
+      } catch (err) {
+        showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
+      }
+    } else {
+      showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}\nตรวจ Upload Preset ชื่อ "${UPLOAD_PRESET}" ใน Cloudinary`, 'error');
+      console.log('Error response:', xhr.responseText);
+    }
+  };
+  
+  xhr.onerror = () => {
     progWrap.style.display = 'none';
-    console.error('❌ Error:', err);
-    showStatus(`❌ ขัดข้อง: ${err.message}\nตรวจอินเทอร์เน็ต หรือชื่อ Cloud/Upload Preset`, 'error');
-  }
+    showStatus('❌ ไม่เชื่อมต่อ\nตรวจอินเทอร์เน็ต หรือเปิดหน้านี้ผ่าน https', 'error');
+  };
+  
+  xhr.send(formData);
 };
 
 function showStatus(text, type) {
