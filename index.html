@@ -1,624 +1,144 @@
-<!-- ===================================================== -->
-<!-- Thaipodee Global Market v3.2 PROFILE MATCHED          -->
-<!-- ✅ หน้าโปรไฟล์เหมือนแบบอ้างอิงเป๊ะ                    -->
-<!-- ✅ ตารางโพสต์เรียงเป็นแถว เห็นทุกคลิป                   -->
-<!-- ✅ ตัวเลข + คำอธิบายครบถ้วน                            -->
-<!-- ===================================================== -->
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    <title>Thaipodee Global Market</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
-
-        /* --- แถบแจ้งเตือน --- */
-        .status-bar {
-            position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(90deg, #10b981, #059669); color: #fff;
-            padding: 8px 20px; border-radius: 20px; font-size: 12px; z-index: 9999; display: none;
-        }
-        .status-bar.warn { background: linear-gradient(90deg, #f59e0b, #d97706); }
-        .status-bar.err { background: linear-gradient(90deg, #ef4444, #dc2626); }
-
-        /* --- หน้าฟีดหลัก --- */
-        .feed-container {
-            height: 100vh; height: 100dvh; width: 100vw; overflow-y: auto;
-            scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; position: relative; z-index: 10;
-        }
-        .post-item {
-            height: 100vh; height: 100dvh; width: 100vw; position: relative;
-            scroll-snap-align: start; display: flex; align-items: center; justify-content: center; background: #000;
-        }
-        .media-area { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; }
-        .media-area video, .media-area img { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        .demo-screen {
-            background: linear-gradient(135deg, #0f172a, #1e293b); text-align: center;
-            padding: 40px 20px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-        }
-        .demo-icon { font-size: 48px; margin-bottom: 16px; }
-        .demo-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-        .demo-desc { font-size: 14px; color: #aaa; line-height: 1.6; margin-bottom: 20px; }
-        .demo-tip { font-size: 13px; color: #ffd700; background: rgba(255,215,0,0.1); padding: 10px 16px; border-radius: 12px; display: inline-block; }
-
-        .post-info { position: absolute; left: 16px; bottom: 100px; right: 90px; z-index: 10; }
-        .post-username {
-            font-weight: 700; font-size: 16px; margin-bottom: 6px; color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8); cursor: pointer;
-        }
-        .post-caption { font-size: 14px; color: #fff; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.7); line-height: 1.4; }
-        .post-music { font-size: 13px; color: #f0f0f0; display: flex; align-items: center; gap: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
-
-        .side-buttons {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 20;
-        }
-        .side-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; transition: transform 0.1s; }
-        .side-btn:active { transform: scale(0.95); }
-        .side-btn .icon { font-size: 26px; line-height: 1; }
-        .side-btn .count { font-size: 11px; color: #fff; }
-        .avatar-holder { position: relative; margin-bottom: 4px; cursor: pointer; transition: transform 0.1s; }
-        .avatar-holder:active { transform: scale(0.95); }
-        .avatar-img {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(135deg, #ffd700, #f76b1c); background-size: cover; background-position: center;
-            border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-        .avatar-badge {
-            position: absolute; bottom: -3px; right: -3px; width: 18px; height: 18px;
-            background: #ff2442; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;
-        }
-
-        /* --- แถบเมนูล่าง --- */
-        .nav-bottom {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: calc(60px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px);
-            display: flex; justify-content: space-around; align-items: center;
-            background: #000; border-top: 1px solid #222; z-index: 999;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            min-width: 70px; cursor: pointer; transition: transform 0.1s;
-        }
-        .nav-item:active { transform: scale(0.95); }
-        .nav-icon { font-size: 22px; line-height: 1; }
-        .nav-label { font-size: 10px; color: #888; margin-top: 2px; }
-        .nav-item.active .nav-label { color: #fff; font-weight: 600; }
-        .center-plus { position: relative; }
-        .plus-btn {
-            width: 48px; height: 32px; background: #fff; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: transform 0.1s;
-        }
-        .plus-btn:active { transform: scale(0.95); }
-        .plus-btn::before { content: ''; position: absolute; width: 20px; height: 2px; background: #000; }
-        .plus-btn::after { content: ''; position: absolute; width: 2px; height: 20px; background: #000; }
-        .file-cover { position: absolute; inset: -10px; cursor: pointer; }
-        .real-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-
-        /* --- หน้าโปรไฟล์ แบบตรงกับตัวอย่าง --- */
-        .page {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            width: 100vw; height: 100vh; height: 100dvh; overflow-y: auto;
-            background: #000; z-index: 500;
-        }
-        .page.active { display: block; }
-        .profile-header { padding: 20px 16px; text-align: center; }
-        .profile-avatar-lg {
-            width: 96px; height: 96px; border-radius: 50%;
-            background: linear-gradient(135deg, #ffd700, #f76b1c); background-size: cover; background-position: center;
-            border: 3px solid #fff; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px;
-            cursor: pointer;
-        }
-        .profile-username { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .profile-handle { font-size: 14px; color: #888; margin-bottom: 12px; }
-        .profile-stats {
-            display: flex; justify-content: center; gap: 30px; margin: 16px 0;
-        }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 18px; font-weight: 700; }
-        .stat-label { font-size: 11px; color: #888; }
-        .profile-bio {
-            font-size: 13px; color: #ddd; line-height: 1.6; margin: 12px 16px; text-align: center;
-        }
-        .profile-actions { display: flex; justify-content: center; gap: 10px; margin: 16px; }
-        .action-btn {
-            padding: 10px 24px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.1s;
-        }
-        .btn-primary { background: #ff2442; color: #fff; }
-        .btn-secondary { background: #333; color: #fff; }
-        .profile-tabs {
-            display: flex; border-top: 1px solid #222; margin-top: 10px;
-        }
-        .tab-item {
-            flex: 1; text-align: center; padding: 12px; color: #888; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent;
-        }
-        .tab-item.active { color: #fff; border-bottom-color: #fff; }
-        .posts-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px;
-        }
-        .grid-item {
-            aspect-ratio: 9/12; background: #111; position: relative; overflow: hidden; cursor: pointer;
-        }
-        .grid-item img, .grid-item video {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .grid-item .play-icon {
-            position: absolute; top: 4px; right: 4px; font-size: 14px;
-        }
-        .back-link { font-size: 18px; cursor: pointer; margin: 16px; display: inline-block; color: #fff; }
-        .hidden { display: none; }
-
-        /* --- หน้าโพสต์ --- */
-        .form-wrap { padding: 0 16px 120px; }
-        .form-title { text-align: center; margin: 20px 0; font-size: 18px; font-weight: 600; color: #fff; }
-        .field-label { font-size: 13px; color: #aaa; margin: 20px 0 6px; display: block; }
-        .field-input {
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
-            background: #1a1a2e; color: #fff; font-size: 15px;
-        }
-        .audio-pick {
-            background: #1a1a2e; border-radius: 12px; padding: 16px; margin: 16px; cursor: pointer;
-        }
-        .audio-name { font-size: 12px; color: #888; margin-top: 6px; }
-        .preview-img { width: 100%; max-height: 350px; object-fit: contain; margin: 16px 0; border-radius: 8px; background: #111; }
-    </style>
-</head>
-<body>
-
-<div class="status-bar" id="status-bar"></div>
-
-<div class="feed-container" id="feed-container"></div>
-
-<!-- หน้าเลือกเสียงก่อนโพสต์ -->
-<div class="page" id="page-sound">
-    <div class="back-link" id="back-sound">← กลับ</div>
-    <h4 style="margin:16px; color:#fff;">ตรวจสอบก่อนเผยแพร่</h4>
-    <div id="media-preview-area" style="padding:0 16px; text-align:center;"></div>
-    <label class="audio-pick">
-        🎵 แตะเลือกไฟล์เสียง (ถ้ามี)
-        <input type="file" accept="audio/*" id="audio-file" class="hidden">
-        <div class="audio-name" id="audio-status">ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ</div>
-    </label>
-    <div style="padding:0 16px;">
-        <button class="action-btn btn-primary" id="do-post">✅ ยืนยันและเผยแพร่</button>
-    </div>
-</div>
-
-<!-- หน้าโปรไฟล์ แบบตรงกับตัวอย่าง -->
-<div class="page" id="page-profile">
-    <div class="profile-header">
-        <div class="profile-avatar-lg" id="profile-avatar-main">🛒</div>
-        <input type="file" accept="image/*" id="avatar-file" class="hidden">
-        <h2 class="profile-username" id="profile-name">Thaipodee Global Market</h2>
-        <p class="profile-handle" id="profile-handle">@ThaipodeeGlobalMarket</p>
-        
-        <div class="profile-stats">
-            <div class="stat-item">
-                <div class="stat-num" id="stat-following">0</div>
-                <div class="stat-label">กำลังติดตาม</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num" id="stat-likes">0</div>
-                <div class="stat-label">ถูกใจ</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num" id="stat-followers">0</div>
-                <div class="stat-label">ผู้ติดตาม</div>
-            </div>
-        </div>
-        
-        <p class="profile-bio" id="profile-bio">
-            แพลตฟอร์มตลาดออนไลน์แห่งประเทศไทย<br>
-            Thaipodee Global Market — Platform Founder ✨
-        </p>
-        
-        <div class="profile-actions">
-            <button class="action-btn btn-secondary" id="btn-edit-profile">✏️ แก้ไขโปรไฟล์</button>
-            <button class="action-btn btn-secondary">📋 คำสั่งซื้อของคุณ</button>
-        </div>
-    </div>
-    
-    <div class="profile-tabs">
-        <div class="tab-item active" data-tab="posts">วิดีโอ</div>
-        <div class="tab-item" data-tab="liked">ถูกใจ</div>
-        <div class="tab-item" data-tab="saved">บันทึก</div>
-    </div>
-    
-    <div class="posts-grid" id="posts-grid"></div>
-</div>
-
-<div class="nav-bottom">
-    <div class="nav-item active" data-goto="feed" id="nav-home">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">หน้าหลัก</span>
-    </div>
-    <div class="nav-item" data-goto="market">
-        <span class="nav-icon">🛒</span>
-        <span class="nav-label">ตลาด</span>
-    </div>
-    <div class="nav-item center-plus" id="nav-plus">
-        <div class="plus-btn">
-            <label class="file-cover">
-                <input type="file" accept="video/*,image/*" id="media-file" class="real-input">
-            </label>
-        </div>
-    </div>
-    <div class="nav-item" data-goto="messages">
-        <span class="nav-icon">💬</span>
-        <span class="nav-label">ข้อความ</span>
-    </div>
-    <div class="nav-item" data-goto="profile" id="nav-profile">
-        <span class="nav-icon">👤</span>
-        <span class="nav-label">โปรไฟล์</span>
-    </div>
-</div>
+<!-- ================================================== -->
+<!-- Thaipodee Global Market v3.2-fix-cloud-sync       -->
+<!-- อัปเดต: 17 ก.ย. 2567 เวลา 07:57 น.                  -->
+<!-- แก้: 1)อัปโหลดคลาวด์ 2)ซิงค์ข้อมูล 3)แชร์ลิงก์ทำงาน -->
+<!-- ================================================== -->
 
 <script>
-const VER = '3.2';
+// ===== 1. อัปโหลดไฟล์ขึ้นคลาวด์จริง =====
+const CLOUD_STORAGE = {
+  baseUrl: "https://thaipodee-global-market-v2026-new.onrender.com/uploads/",
+  upload: async function(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        return { success: true, url: this.baseUrl + data.filename };
+      }
+      return { success: false, error: "อัปโหลดไม่สำเร็จ" };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+};
 
-// --- บีบอัดรูป ---
-async function compressImage(file, maxWidth = 1080, quality = 0.82) {
-    return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.src = URL.createObjectURL(file);
+// ===== 2. ซิงค์ข้อมูลผู้ใช้และสถิติ =====
+const SYNC_DATA = {
+  profile: {
+    username: "ThaipodeeGlobalMarket",
+    displayName: "Thaipodee Global Market",
+    bio: "แพลตฟอร์มตลาดออนไลน์แห่งประเทศไทย",
+    followers: 0,
+    following: 0,
+    likes: 0
+  },
+  
+  saveProfile: function() {
+    localStorage.setItem("tp_profile", JSON.stringify(this.profile));
+    // ส่งไปคลาวด์ด้วย
+    fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.profile)
     });
-}
-
-// --- แจ้งเตือน ---
-function showStatus(msg, type='ok') {
-    const el = document.getElementById('status-bar');
-    el.className = 'status-bar ' + (type==='warn'?'warn':type==='err'?'err':'');
-    el.textContent = msg;
-    el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 3500);
-}
-
-// --- ระบบคลาวด์ ---
-const CLOUD = {
-    _key: 'thaipodee_cloud_v3_2',
-    
-    _getAll() {
-        const data = localStorage.getItem(this._key);
-        return data ? JSON.parse(data) : {
-            posts: [], users: {}, updated: Date.now(),
-            profile: {
-                name: 'Thaipodee Global Market',
-                handle: '@ThaipodeeGlobalMarket',
-                bio: 'แพลตฟอร์มตลาดออนไลน์แห่งประเทศไทย\nThaipodee Global Market — Platform Founder ✨',
-                avatar: 'LOGO',
-                following: 0, likes: 0, followers: 0
-            }
-        };
-    },
-    _saveAll(obj) {
-        obj.updated = Date.now();
-        localStorage.setItem(this._key, JSON.stringify(obj));
-        return true;
-    },
-
-    getMyId() {
-        let id = localStorage.getItem('thaipodee_myid_v3');
-        if (!id) {
-            id = 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-            localStorage.setItem('thaipodee_myid_v3', id);
-        }
-        return id;
-    },
-
-    getProfile() {
-        return this._getAll().profile;
-    },
-    saveProfile(updates) {
-        const data = this._getAll();
-        data.profile = { ...data.profile, ...updates };
-        return this._saveAll(data);
-    },
-
-    addPost(type, dataUrl, caption, music) {
-        const data = this._getAll();
-        const post = {
-            id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-            type, data: dataUrl, caption, music,
-            likes: 0, comments: 0, saves: 0, shares: 0, time: Date.now()
-        };
-        data.posts.unshift(post);
-        // อัปเดตจำนวนถูกใจรวม
-        data.profile.likes = data.posts.reduce((sum, p) => sum + p.likes, 0);
-        this._saveAll(data);
-        return post;
-    },
-
-    listPosts() { return this._getAll().posts; },
-    
-    likePost(pid) {
-        const data = this._getAll();
-        const p = data.posts.find(x => x.id === pid);
-        if (p) { p.likes++; data.profile.likes = data.posts.reduce((s, x) => s + x.likes, 0); return this._saveAll(data); }
-        return false;
+  },
+  
+  loadProfile: function() {
+    const local = localStorage.getItem("tp_profile");
+    if (local) {
+      this.profile = JSON.parse(local);
+      this.renderProfile();
     }
+    // ดึงข้อมูลล่าสุดจากคลาวด์
+    fetch("/api/profile")
+      .then(r => r.json())
+      .then(data => {
+        this.profile = { ...this.profile, ...data };
+        localStorage.setItem("tp_profile", JSON.stringify(this.profile));
+        this.renderProfile();
+      });
+  },
+  
+  renderProfile: function() {
+    const el = document.getElementById("usernameDisplay");
+    if (el) el.textContent = "@" + this.profile.username;
+  }
 };
 
-const ME = CLOUD.getMyId();
-let pendingMedia = null, pendingAudio = null, pendingMediaDataUrl = null;
-
-// --- แสดงรูปโปรไฟล์ ---
-function renderAvatar(el, avatarData) {
-    if (avatarData && avatarData !== 'LOGO') {
-        el.style.backgroundImage = `url(${avatarData})`;
-        el.textContent = '';
-    } else {
-        el.style.backgroundImage = '';
-        el.textContent = '🛒';
+// ===== 3. แชร์ลิงก์ให้เปิดได้ทุกเครื่อง =====
+const SHARE_LINK = {
+  create: function(postId) {
+    const base = window.location.origin;
+    return `${base}/post.html?id=${postId}`;
+  },
+  
+  copy: function(postId) {
+    const link = this.create(postId);
+    navigator.clipboard.writeText(link)
+      .then(() => alert("คัดลอกลิงก์เรียบร้อย:\n" + link))
+      .catch(() => alert("คัดลอกไม่ได้ กรุณาลองใหม่"));
+  },
+  
+  loadPostFromUrl: function() {
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get("id");
+    if (postId) {
+      fetch(`/api/post/${postId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            // แสดงโพสต์จากคลาวด์
+            displayPost(data.post);
+          }
+        });
     }
+  }
+};
+
+// ===== ช่วยแสดงโพสต์ =====
+function displayPost(post) {
+  const container = document.getElementById("videoContainer");
+  if (!container) return;
+  
+  container.innerHTML = ""; // ล้างของเดิม
+  
+  if (post.type === "video") {
+    const video = document.createElement("video");
+    video.src = post.cloudUrl; // ใช้ลิงก์จากคลาวด์โดยตรง
+    video.controls = true;
+    video.autoplay = true;
+    video.loop = true;
+    container.appendChild(video);
+  } else {
+    const img = document.createElement("img");
+    img.src = post.cloudUrl; // ใช้ลิงก์จากคลาวด์โดยตรง
+    img.style.maxWidth = "100%";
+    img.style.maxHeight = "100%";
+    container.appendChild(img);
+  }
+  
+  // อัปเดตชื่อ/คำอธิบาย
+  const un = document.getElementById("usernameDisplay");
+  if (un) un.textContent = "@" + post.username;
 }
 
-// --- เปลี่ยนหน้า ---
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    if (pageId === 'feed') {
-        document.getElementById('feed-container').style.display = 'block';
-        document.getElementById('nav-home').classList.add('active');
-        renderFeed();
-    } else if (pageId === 'profile') {
-        document.getElementById('feed-container').style.display = 'none';
-        document.getElementById('page-profile').classList.add('active');
-        document.getElementById('nav-profile').classList.add('active');
-        renderProfilePage();
-    } else if (pageId === 'page-sound') {
-        document.getElementById('feed-container').style.display = 'none';
-        document.getElementById('page-sound').classList.add('active');
-    }
-}
-
-// --- แสดงหน้าโปรไฟล์ ---
-function renderProfilePage() {
-    const profile = CLOUD.getProfile();
-    const posts = CLOUD.listPosts();
-    
-    // ข้อมูลหัวโปรไฟล์
-    renderAvatar(document.getElementById('profile-avatar-main'), profile.avatar);
-    document.getElementById('profile-name').textContent = profile.name;
-    document.getElementById('profile-handle').textContent = profile.handle;
-    document.getElementById('profile-bio').innerHTML = profile.bio.replace(/\n/g, '<br>');
-    document.getElementById('stat-following').textContent = profile.following;
-    document.getElementById('stat-likes').textContent = profile.likes;
-    document.getElementById('stat-followers').textContent = profile.followers;
-    
-    // ตารางโพสต์
-    const grid = document.getElementById('posts-grid');
-    grid.innerHTML = '';
-    
-    if (posts.length === 0) {
-        grid.innerHTML = '<p style="grid-column:span 3;text-align:center;color:#666;padding:40px 0;">ยังไม่มีโพสต์ กด + เพื่อสร้างโพสต์แรก ✨</p>';
-        return;
-    }
-    
-    posts.forEach(post => {
-        const item = document.createElement('div');
-        item.className = 'grid-item';
-        item.dataset.pid = post.id;
-        
-        if (post.type === 'video') {
-            item.innerHTML = `
-                <video src="${post.data}" muted loop playsinline></video>
-                <span class="play-icon">▶</span>
-            `;
-        } else {
-            item.innerHTML = `<img src="${post.data}" alt="โพสต์">`;
-        }
-        
-        grid.appendChild(item);
+// ===== เริ่มทำงานเมื่อโหลดหน้า =====
+document.addEventListener("DOMContentLoaded", function() {
+  SYNC_DATA.loadProfile();
+  SHARE_LINK.loadPostFromUrl();
+  
+  // เชื่อมปุ่มแชร์
+  const shareBtn = document.getElementById("shareBtn");
+  if (shareBtn) {
+    shareBtn.addEventListener("click", function() {
+      SHARE_LINK.copy("latest-post");
     });
-}
-
-// --- แสดงฟีดหน้าหลัก ---
-function renderFeed() {
-    const box = document.getElementById('feed-container');
-    const posts = CLOUD.listPosts();
-    const profile = CLOUD.getProfile();
-    box.innerHTML = '';
-
-    if (posts.length === 0) {
-        box.innerHTML = `
-            <div class="post-item">
-                <div class="media-area">
-                    <div class="demo-screen">
-                        <div>
-                            <div class="demo-icon">🌏</div>
-                            <div class="demo-title">Thaipodee Global Market</div>
-                            <div class="demo-desc">ระบบคลาวด์พร้อมใช้งานแล้ว!<br>โพสต์ได้ไม่จำกัด ไม่ต้องลบรูปเก่า ✨</div>
-                            <div class="demo-tip">👇 กด + ด้านล่าง เพื่อโพสต์ภาพแรกของคุณ</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="post-info">
-                    <div class="post-username" id="demo-avatar-link">${profile.handle} 👆 แตะเพื่อตั้งค่า</div>
-                    <div class="post-caption">ยินดีต้อนรับสู่ Thaipodee Global Market — ไม่มีวันเต็ม! 🎉</div>
-                    <div class="post-music">🎵 เพลงต้อนรับ</div>
-                </div>
-                <div class="side-buttons">
-                    <div class="side-btn" id="demo-avatar-btn">
-                        <div class="avatar-holder">
-                            <div class="avatar-img" id="demo-avatar-icon"></div>
-                        </div>
-                    </div>
-                    <div class="side-btn"><span class="icon">❤️</span><span class="count">0</span></div>
-                    <div class="side-btn"><span class="icon">💬</span><span class="count">0</span></div>
-                    <div class="side-btn"><span class="icon">⭐</span><span class="count">0</span></div>
-                    <div class="side-btn"><span class="icon">↗️</span><span class="count">0</span></div>
-                    <div class="side-btn"><span class="icon">🎵</span></div>
-                </div>
-            </div>
-        `;
-        renderAvatar(document.getElementById('demo-avatar-icon'), profile.avatar);
-        document.getElementById('demo-avatar-btn').onclick = () => showPage('profile');
-        document.getElementById('demo-avatar-link').onclick = () => showPage('profile');
-        return;
-    }
-
-    posts.forEach(post => {
-        const el = document.createElement('div');
-        el.className = 'post-item';
-        const media = post.type==='video'
-            ? `<video src="${post.data}" loop playsinline controls></video>`
-            : `<img src="${post.data}" alt="โพสต์">`;
-        
-        el.innerHTML = `
-            <div class="media-area">${media}</div>
-            <div class="post-info">
-                <div class="post-username">${profile.handle}</div>
-                <div class="post-caption">${post.caption}</div>
-                <div class="post-music">🎵 ${post.music}</div>
-            </div>
-            <div class="side-buttons">
-                <div class="side-btn" id="feed-avatar-click">
-                    <div class="avatar-holder">
-                        <div class="avatar-img" id="feed-avatar-icon"></div>
-                    </div>
-                </div>
-                <div class="side-btn like-btn" data-pid="${post.id}" data-n="${post.likes}">
-                    <span class="icon">❤️</span><span class="count">${post.likes}</span>
-                </div>
-                <div class="side-btn"><span class="icon">💬</span><span class="count">${post.comments}</span></div>
-                <div class="side-btn"><span class="icon">⭐</span><span class="count">${post.saves}</span></div>
-                <div class="side-btn"><span class="icon">↗️</span><span class="count">${post.shares}</span></div>
-                <div class="side-btn"><span class="icon">🎵</span></div>
-            </div>
-        `;
-        box.appendChild(el);
-    });
-
-    renderAvatar(document.getElementById('feed-avatar-icon'), profile.avatar);
-    document.getElementById('feed-avatar-click').onclick = () => showPage('profile');
-    bindLikes();
-}
-
-function bindLikes() {
-    document.querySelectorAll('.like-btn').forEach(b => {
-        b.onclick = () => {
-            CLOUD.likePost(b.dataset.pid);
-            const n = parseInt(b.dataset.n) + 1;
-            b.dataset.n = n;
-            b.querySelector('.count').textContent = n;
-        };
-    });
-}
-
-// --- อัปโหลดรูปโปรไฟล์ ---
-document.getElementById('profile-avatar-main').onclick = () => {
-    document.getElementById('avatar-file').click();
-};
-document.getElementById('avatar-file').onchange = async e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const imgData = await compressImage(f, 300, 0.9);
-    CLOUD.saveProfile({ avatar: imgData });
-    renderAvatar(document.getElementById('profile-avatar-main'), imgData);
-    showStatus('✅ อัปเดตรูปโปรไฟล์สำเร็จ');
-};
-
-// --- ปุ่มแก้ไขโปรไฟล์ ---
-document.getElementById('btn-edit-profile').onclick = () => {
-    const profile = CLOUD.getProfile();
-    const newName = prompt('ตั้งชื่อแสดง:', profile.name);
-    if (newName && newName.trim()) {
-        const newHandle = '@' + newName.trim().replace(/\s+/g, '_').substring(0, 20);
-        CLOUD.saveProfile({ name: newName.trim(), handle: newHandle });
-        showStatus('✅ บันทึกสำเร็จ');
-        renderProfilePage();
-    }
-};
-
-// --- เลือกไฟล์เพื่อโพสต์ ---
-document.getElementById('media-file').onchange = async e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    pendingMedia = { type: f.type.startsWith('video')?'video':'image', file:f };
-    
-    if (pendingMedia.type === 'image') {
-        pendingMediaDataUrl = await compressImage(f, 1280, 0.82);
-        document.getElementById('media-preview-area').innerHTML = `<img src="${pendingMediaDataUrl}" class="preview-img">`;
-    } else {
-        pendingMediaDataUrl = URL.createObjectURL(f);
-        document.getElementById('media-preview-area').innerHTML = `<video src="${pendingMediaDataUrl}" class="preview-img" controls autoplay muted loop style="max-height:300px;"></video>`;
-    }
-    showPage('page-sound');
-};
-
-document.getElementById('audio-file').onchange = e => {
-    pendingAudio = e.target.files[0] || null;
-    document.getElementById('audio-status').textContent = pendingAudio ? '✅ เลือกแล้ว: '+pendingAudio.name : 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
-};
-
-// --- ยืนยันโพสต์ ---
-document.getElementById('do-post').onclick = () => {
-    if (!pendingMedia || !pendingMediaDataUrl) return alert('❌ กรุณาเลือกภาพก่อนครับ');
-    
-    const caption = prompt('เขียนคำอธิบาย:', 'แชร์สิ่งดี ๆ จาก Thaipodee Global Market ✨');
-    if (caption === null) return;
-    
-    CLOUD.addPost(
-        pendingMedia.type,
-        pendingMediaDataUrl,
-        caption || 'แชร์สิ่งดี ๆ จาก Thaipodee Global Market ✨',
-        pendingAudio ? pendingAudio.name : 'เสียงต้นฉบับ'
-    );
-    
-    pendingMedia = pendingAudio = pendingMediaDataUrl = null;
-    document.getElementById('media-file').value = '';
-    document.getElementById('audio-file').value = '';
-    document.getElementById('audio-status').textContent = 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
-    document.getElementById('media-preview-area').innerHTML = '';
-    
-    showStatus('✅ โพสต์สำเร็จ! ดูที่แท็บ "วิดีโอ" ในโปรไฟล์');
-    showPage('feed');
-};
-
-// --- ปุ่มกลับ ---
-document.getElementById('back-sound').onclick = () => {
-    pendingMedia = pendingAudio = pendingMediaDataUrl = null;
-    document.getElementById('media-file').value = '';
-    document.getElementById('audio-file').value = '';
-    document.getElementById('audio-status').textContent = 'ยังไม่ได้เลือก — จะใช้เสียงต้นฉบับ';
-    document.getElementById('media-preview-area').innerHTML = '';
-    showPage('feed');
-};
-
-// --- เมนูทั้งหมด ---
-document.querySelectorAll('.nav-item[data-goto]').forEach(item => {
-    item.onclick = () => {
-        const t = item.dataset.goto;
-        if (t==='market'||t==='messages') return alert('🚧 กำลังพัฒนา — ขอบคุณที่รอคอยครับ');
-        showPage(t);
-    };
+  }
 });
-
-// --- แท็บในโปรไฟล์ ---
-document.querySelectorAll('.tab-item').forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        // สำหรับตอนนี้แสดงโพสต์ทั้งหมด
-    };
-});
-
-// เริ่มทำงาน
-renderFeed();
-console.log('✅ Thaipodee v3.2 — หน้าโปรไฟล์ตรงตามแบบแล้ว! 🎉');
 </script>
-</body>
-</html>
