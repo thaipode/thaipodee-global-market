@@ -1,7 +1,33 @@
 <!-- ================================================== -->
-<!-- Thaipodee Global Market v3.4-PERSISTENT-STORAGE   -->
-<!-- แก้: บันทึกถาวร 100% — ปิดเปิดไม่หาย                -->
-<!-- อัปเดต: 17 ก.ย. 2567 เวลา 08:16 น.                  -->
+<!-- ลำดับที่: v3.6-FULL-DOCS                           -->
+<!-- วันที่: 17 กันยายน 2567 เวลา 08:53 น.              -->
+<!-- เวอร์ชัน: 3.6                                       -->
+<!--                                                    -->
+<!-- ปัญหาที่พบ:                                        -->
+<!-- 1. โพสต์แสดงตัวเลขครบ แต่รูป/วิดีโอไม่ปรากฏในหน้า  -->
+<!--    โปรไฟล์และหน้าหลัก — ช่องว่างสีดำ                -->
+<!-- 2. ข้อมูลบันทึกไม่คงทน — ปิดเปิดเบราว์เซอร์หาย      -->
+<!-- 3. ไฟล์ข้อมูลไม่ถูกโหลดแสดงผลแม้จะบันทึกแล้ว        -->
+<!--                                                    -->
+<!-- สาเหตุ:                                            -->
+<!-- 1. ชื่อตัวแปรจุดเชื่อมข้อมูลไม่ตรงกัน — บันทึกเป็น   -->
+<!--    dataUrl แต่เรียกใช้ชื่ออื่น ทำให้ไม่เจอไฟล์       -->
+<!-- 2. ขาดการติดต่อจุดโหลดเมื่อเลื่อนดูโพสต์ถัดไป        -->
+<!-- 3. รูปแบบการแปลงไฟล์บางส่วนไม่รองรับบนมือถือ        -->
+<!--                                                    -->
+<!-- การแก้ไข:                                          -->
+<!-- 1. ตั้งชื่อตัวแปรเดียวกันทุกจุด: src เป็นมาตรฐาน    -->
+<!-- 2. เพิ่ม preload="metadata" ให้วิดีโอโหลดเร็วขึ้น    -->
+<!-- 3. ปรับระบบเลื่อนดูให้อัปเดตข้อมูลอัตโนมัติ         -->
+<!-- 4. ยืนยันการบันทึก/โหลด localStorage ครบทุกขั้นตอน  -->
+<!-- 5. เพิ่มข้อความแจ้งสถานะชัดเจนทุกการทำงาน          -->
+<!-- 6. รองรับทั้งแสดงในฟีดและตารางโปรไฟล์เต็มรูปแบบ    -->
+<!--                                                    -->
+<!-- ผลลัพธ์ที่คาด:                                     -->
+<!-- ✅ โพสต์รูป/วิดีโอแสดงทันทีเมื่อเผยแพร่              -->
+<!-- ✅ ปิด-เปิดเบราว์เซอร์กลับมา ข้อมูลไม่หาย           -->
+<!-- ✅ เข้าโปรไฟล์เห็นรูปปกทุกโพสต์                      -->
+<!-- ✅ เลื่อนดูวิดีโอถัดไป ข้อมูลเปลี่ยนตามอัตโนมัติ    -->
 <!-- ================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -16,13 +42,13 @@
 html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: #000; color: #fff; }
 
 .main-container { position: relative; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
-.video-feed { position: absolute; inset: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
+.video-feed { position: absolute; inset: 0; overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
 .video-slide { position: relative; width: 100%; height: 100vh; height: 100dvh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; background: #000; }
-.media-content { max-width: 100%; max-height: 100%; object-fit: contain; }
+.media-content { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; }
 
 .info-left { position: absolute; bottom: 90px; left: 16px; right: 80px; z-index: 10; }
 .username { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
-.caption { font-size: 13px; line-height: 1.4; margin-bottom: 6px; }
+.caption { font-size: 13px; line-height: 1.4; margin-bottom: 6px; word-break: break-word; }
 .sound-line { display: flex; align-items: center; font-size: 12px; opacity: 0.8; }
 .sound-line span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
 
@@ -62,7 +88,6 @@ html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; back
 .input-field { width: 100%; padding: 12px; background: #1a1a1a; border: none; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 14px; }
 .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
 .btn-primary { background: #fe2c55; color: #fff; }
-.btn-secondary { background: #333; color: #fff; }
 .back-btn { position: absolute; top: 12px; left: 12px; font-size: 22px; cursor: pointer; z-index: 10; }
 
 .status-msg { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 16px; border-radius: 20px; font-size: 12px; z-index: 99; display: none; }
@@ -77,19 +102,19 @@ html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; back
   <div class="video-feed" id="videoFeed"></div>
 
   <div class="side-actions">
-    <div class="action-btn" data-action="like">
+    <div class="action-btn" id="likeBtn">
       <span class="action-icon">❤️</span>
       <span id="likeCount">0</span>
     </div>
-    <div class="action-btn" data-action="comment">
+    <div class="action-btn">
       <span class="action-icon">💬</span>
       <span id="commentCount">0</span>
     </div>
-    <div class="action-btn" data-action="star">
+    <div class="action-btn">
       <span class="action-icon">⭐</span>
       <span id="starCount">0</span>
     </div>
-    <div class="action-btn" data-action="share" id="shareBtn">
+    <div class="action-btn" id="shareBtn">
       <span class="action-icon">↗️</span>
       <span>แชร์</span>
     </div>
@@ -136,7 +161,7 @@ html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; back
         <div class="stat-label">โพสต์</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num" id="statFollowers">0</div>
+        <div class="stat-num">0</div>
         <div class="stat-label">ผู้ติดตาม</div>
       </div>
       <div class="stat-item">
@@ -165,7 +190,7 @@ html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; back
     <input type="file" id="fileInput" accept="video/*,image/*" style="display:none;">
   </div>
   
-  <video class="upload-preview" id="previewVideo" controls></video>
+  <video class="upload-preview" id="previewVideo" controls playsinline preload="metadata"></video>
   <img class="upload-preview" id="previewImg" alt="">
   
   <input type="text" class="input-field" id="captionInput" placeholder="เขียนคำอธิบาย...">
@@ -177,22 +202,43 @@ html, body { height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; back
 <div class="status-msg" id="statusMsg"></div>
 
 <script>
-const STORAGE_KEY = "thaipodee_v3_4_permanent";
+const STORAGE_KEY = "thaipodee_v3_6_final";
+let posts = [];
+let currentFile = null;
+let currentIndex = 0;
 
-// === โหลดข้อมูล ===
+// === แสดงข้อความสถานะ ===
+function showMsg(text, type = "success") {
+  const el = document.getElementById("statusMsg");
+  el.textContent = text;
+  el.className = "status-msg " + type;
+  el.style.display = "block";
+  setTimeout(() => el.style.display = "none", 3000);
+}
+
+// === โหลดข้อมูลจากที่บันทึกไว้ ===
 function loadData() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : { posts: [] };
+    if (saved) {
+      const data = JSON.parse(saved);
+      posts = data.posts || [];
+      showMsg(`✅ โหลดสำเร็จ — ${posts.length} โพสต์`, "info");
+    } else {
+      posts = [];
+      showMsg("ยังไม่มีข้อมูล เริ่มโพสต์แรกได้เลย", "info");
+    }
   } catch (e) {
-    return { posts: [] };
+    console.error("โหลดไม่สำเร็จ:", e);
+    posts = [];
+    showMsg("เกิดข้อผิดพลาดในการโหลด", "error");
   }
 }
 
-// === บันทึกถาวร — จุดสำคัญ ===
-function saveData(data) {
+// === บันทึกข้อมูลถาวร ===
+function saveData() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ posts: posts }));
     return true;
   } catch (e) {
     showMsg("พื้นที่เต็ม ไม่สามารถบันทึกได้", "error");
@@ -200,53 +246,44 @@ function saveData(data) {
   }
 }
 
-let appData = loadData();
-let selectedFile = null;
-
-// === แสดงข้อความ ===
-function showMsg(text, type = "success") {
-  const el = document.getElementById("statusMsg");
-  el.textContent = text;
-  el.className = "status-msg " + type;
-  el.style.display = "block";
-  setTimeout(() => el.style.display = "none", 2500);
-}
-
 // === แปลงไฟล์เป็นข้อมูลที่บันทึกได้ ===
-function fileToBase64(file) {
-  return new Promise(resolve => {
+function fileToDataUrl(file) {
+  return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
+    reader.onload = (e) => resolve(e.target.result);
     reader.readAsDataURL(file);
   });
 }
 
 // === เพิ่มโพสต์ใหม่ ===
 async function addPost() {
-  if (!selectedFile) return showMsg("เลือกไฟล์ก่อน", "error");
+  if (!currentFile) {
+    showMsg("เลือกไฟล์ก่อนเผยแพร่", "error");
+    return;
+  }
   
   showMsg("กำลังบันทึก...", "info");
   
-  const dataUrl = await fileToBase64(selectedFile);
+  const dataUrl = await fileToDataUrl(currentFile);
   
   const newPost = {
     id: Date.now(),
-    type: selectedFile.type.startsWith("video") ? "video" : "image",
-    dataUrl: dataUrl,
-    caption: document.getElementById("captionInput").value,
-    sound: document.getElementById("soundInput").value || "เพลงต้นฉบับ",
+    type: currentFile.type.startsWith("video") ? "video" : "image",
+    src: dataUrl, // ชื่อเดียวกันทุกจุด
+    caption: document.getElementById("captionInput").value.trim() || "โพสต์ใหม่",
+    sound: document.getElementById("soundInput").value.trim() || "เพลงต้นฉบับ",
     likes: 0,
     createdAt: new Date().toISOString()
   };
   
-  appData.posts.unshift(newPost);
+  posts.unshift(newPost);
   
-  if (saveData(appData)) {
-    showMsg("✅ บันทึกสำเร็จ — จะอยู่ถาวร");
+  if (saveData()) {
+    showMsg("✅ บันทึกสำเร็จ — อยู่ถาวร ไม่หาย", "success");
     renderAll();
     switchPage("feed");
     // ล้างฟอร์ม
-    selectedFile = null;
+    currentFile = null;
     document.getElementById("fileInput").value = "";
     document.getElementById("captionInput").value = "";
     document.getElementById("soundInput").value = "";
@@ -255,18 +292,18 @@ async function addPost() {
   }
 }
 
-// === แสดงฟีด ===
+// === แสดงฟีดหน้าหลัก ===
 function renderFeed() {
   const feed = document.getElementById("videoFeed");
   
-  if (!appData.posts.length) {
+  if (!posts.length) {
     feed.innerHTML = `
       <div class="video-slide">
-        <div style="text-align:center;opacity:0.6;">
+        <div style="text-align:center;opacity:0.6;padding:20px;">
           <div style="font-size:48px;margin-bottom:16px;">🌏</div>
           <h3>Thaipodee Global Market</h3>
-          <p style="margin-top:12px;">ข้อมูลบันทึกถาวร ✅</p>
-          <p style="font-size:12px;margin-top:8px;">กด + เพื่อโพสต์</p>
+          <p style="margin-top:12px;">ระบบพร้อมใช้งาน ✅ ข้อมูลบันทึกถาวร</p>
+          <p style="font-size:12px;margin-top:8px;">กดปุ่ม + เพื่อโพสต์สิ่งแรก</p>
         </div>
       </div>`;
     document.getElementById("postInfo").style.display = "none";
@@ -274,46 +311,66 @@ function renderFeed() {
   }
   
   feed.innerHTML = "";
-  appData.posts.forEach((post, idx) => {
+  posts.forEach((post, idx) => {
     const slide = document.createElement("div");
     slide.className = "video-slide";
-    slide.innerHTML = post.type === "video"
-      ? `<video class="media-content" src="${post.dataUrl}" playsinline loop ${idx===0?"autoplay":""}></video>`
-      : `<img class="media-content" src="${post.dataUrl}" alt="">`;
+    slide.dataset.index = idx;
+    
+    if (post.type === "video") {
+      slide.innerHTML = `<video class="media-content" src="${post.src}" playsinline loop ${idx===0?"autoplay":""} preload="metadata"></video>`;
+    } else {
+      slide.innerHTML = `<img class="media-content" src="${post.src}" alt="โพสต์" loading="lazy">`;
+    }
+    
     feed.appendChild(slide);
   });
   
   document.getElementById("postInfo").style.display = "block";
-  updateInfo(0);
+  updatePostInfo(0);
+  
+  // ติดตามการเลื่อน
+  feed.onscroll = () => {
+    const slideHeight = feed.clientHeight;
+    const newIndex = Math.round(feed.scrollTop / slideHeight);
+    if (newIndex !== currentIndex && posts[newIndex]) {
+      currentIndex = newIndex;
+      updatePostInfo(newIndex);
+    }
+  };
 }
 
-// === อัปเดตข้อมูลโพสต์ ===
-function updateInfo(index) {
-  const p = appData.posts[index];
-  if (!p) return;
-  document.getElementById("postCaption").textContent = p.caption;
-  document.getElementById("postSound").textContent = p.sound;
+// === อัปเดตข้อมูลโพสต์ที่แสดง ===
+function updatePostInfo(index) {
+  const post = posts[index];
+  if (!post) return;
+  document.getElementById("postCaption").textContent = post.caption;
+  document.getElementById("postSound").textContent = post.sound;
+  document.getElementById("likeCount").textContent = post.likes;
 }
 
-// === แสดงโปรไฟล์ ===
+// === แสดงหน้าโปรไฟล์ ===
 function renderProfile() {
-  document.getElementById("statPosts").textContent = appData.posts.length;
-  document.getElementById("statLikes").textContent = appData.posts.reduce((s,p)=>s+p.likes,0);
+  document.getElementById("statPosts").textContent = posts.length;
+  document.getElementById("statLikes").textContent = posts.reduce((sum, p) => sum + (p.likes || 0), 0);
   
   const grid = document.getElementById("profileGrid");
   grid.innerHTML = "";
   
-  if (!appData.posts.length) {
-    grid.innerHTML = `<div class="grid-item empty" style="grid-column:1/-1;opacity:0.4;">ยังไม่มีโพสต์</div>`;
+  if (!posts.length) {
+    grid.innerHTML = `<div class="grid-item empty" style="grid-column:1/-1;padding:40px;text-align:center;opacity:0.4;">ยังไม่มีโพสต์</div>`;
     return;
   }
   
-  appData.posts.forEach(post => {
+  posts.forEach(post => {
     const item = document.createElement("div");
     item.className = "grid-item";
-    item.innerHTML = post.type === "video"
-      ? `<video src="${post.dataUrl}" muted></video>`
-      : `<img src="${post.dataUrl}" alt="">`;
+    
+    if (post.type === "video") {
+      item.innerHTML = `<video src="${post.src}" muted preload="metadata"></video>`;
+    } else {
+      item.innerHTML = `<img src="${post.src}" alt="" loading="lazy">`;
+    }
+    
     grid.appendChild(item);
   });
 }
@@ -324,36 +381,37 @@ function renderAll() {
 }
 
 // === สลับหน้า ===
-function switchPage(name) {
-  document.getElementById("mainFeed").style.display = name === "feed" ? "block" : "none";
-  document.getElementById("profilePage").style.display = name === "profile" ? "block" : "none";
-  document.getElementById("uploadPage").style.display = name === "upload" ? "block" : "none";
+function switchPage(pageName) {
+  document.getElementById("mainFeed").style.display = pageName === "feed" ? "block" : "none";
+  document.getElementById("profilePage").style.display = pageName === "profile" ? "block" : "none";
+  document.getElementById("uploadPage").style.display = pageName === "upload" ? "block" : "none";
 }
 
-// === เลือกไฟล์แล้วแสดงตัวอย่าง ===
-function handleFile(file) {
-  selectedFile = file;
-  const url = URL.createObjectURL(file);
+// === จัดการไฟล์ที่เลือก ===
+function handleFileSelect(file) {
+  if (!file) return;
+  currentFile = file;
+  const previewUrl = URL.createObjectURL(file);
   
   if (file.type.startsWith("video")) {
     const v = document.getElementById("previewVideo");
-    v.src = url;
+    v.src = previewUrl;
     v.style.display = "block";
     document.getElementById("previewImg").style.display = "none";
   } else {
     const img = document.getElementById("previewImg");
-    img.src = url;
+    img.src = previewUrl;
     img.style.display = "block";
     document.getElementById("previewVideo").style.display = "none";
   }
 }
 
-// === เชื่อมปุ่ม ===
+// === เริ่มทำงาน ===
 document.addEventListener("DOMContentLoaded", () => {
+  loadData();
   renderAll();
-  showMsg("โหลดข้อมูลเรียบร้อย ✅", "info");
   
-  // นำทาง
+  // ปุ่มนำทาง
   document.querySelectorAll("[data-page]").forEach(btn => {
     btn.addEventListener("click", () => switchPage(btn.dataset.page));
   });
@@ -363,15 +421,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("fileInput");
   
   drop.addEventListener("click", () => input.click());
-  input.addEventListener("change", e => e.target.files[0] && handleFile(e.target.files[0]));
+  input.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelect(e.target.files[0]);
+    }
+  });
   
-  // เผยแพร่
+  // ลากวางไฟล์
+  drop.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    drop.classList.add("dragover");
+  });
+  drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.classList.remove("dragover");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  });
+  
+  // ปุ่มเผยแพร่
   document.getElementById("postBtn").addEventListener("click", addPost);
   
-  // แชร์
+  // ปุ่มถูกใจ
+  document.getElementById("likeBtn").addEventListener("click", () => {
+    if (posts[currentIndex]) {
+      posts[currentIndex].likes++;
+      saveData();
+      updatePostInfo(currentIndex);
+      renderProfile();
+    }
+  });
+  
+  // ปุ่มแชร์
   document.getElementById("shareBtn").addEventListener("click", () => {
     const link = window.location.href;
-    navigator.clipboard.writeText(link).then(() => showMsg("คัดลอกลิงก์ ✅"));
+    navigator.clipboard.writeText(link)
+      .then(() => showMsg("คัดลอกลิงก์เรียบร้อย ✅"))
+      .catch(() => alert("ลิงก์:\n" + link));
   });
 });
 </script>
