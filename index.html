@@ -44,6 +44,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .post-file-info { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.5; }
 .size-warning { color: #ffd700; }
 .size-ok { color: #4ade80; }
+.audio-note { font-size: 11px; color: #90ee90; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -70,6 +71,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
         <span class="file-info-item"><strong>📐 ภาพ:</strong> <span id="fnRes"></span></span>
         <span class="file-info-item" id="fnSizeCheck"></span>
       </div>
+      <p class="audio-note">💡 กดปุ่มเสียง 🔊 บนวิดีโอเพื่อเปิดฟัง</p>
     </div>
     <div class="right">
       <div class="icon" data-goto="pageProfile"><i class="fa-solid fa-user"></i></div>
@@ -139,11 +141,11 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 <script>
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-const MAX_RECOMMENDED_MB = 100; // ขนาดแนะนำสูงสุด
-const TARGET_DURATION_SEC = 180; // 3 นาที เป้าหมาย
+const MAX_RECOMMENDED_MB = 100;
+const TARGET_DURATION_SEC = 180;
 
 let file, type, cloudUrl = '';
-let fileMeta = {}; // เก็บข้อมูลทั้งหมดของไฟล์
+let fileMeta = {};
 let currentPost = null;
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
@@ -217,7 +219,6 @@ document.getElementById('fileInp').onchange = async e => {
     resolution: null
   };
   
-  // ดึงข้อมูลวิดีโอเพิ่มเติม
   if (type === 'video') {
     const tempUrl = URL.createObjectURL(file);
     const v = document.createElement('video');
@@ -235,7 +236,6 @@ document.getElementById('fileInp').onchange = async e => {
     });
   }
   
-  // แสดงข้อมูลที่หน้าเลือกไฟล์
   const previewBlock = document.getElementById('previewFileInfo');
   previewBlock.style.display = 'block';
   document.getElementById('pName').textContent = fileMeta.name;
@@ -246,12 +246,15 @@ document.getElementById('fileInp').onchange = async e => {
   document.getElementById('pDur').textContent = formatTime(fileMeta.duration) + checkDurationAdvice(fileMeta.duration);
   document.getElementById('pRes').textContent = fileMeta.resolution || '-';
   
-  // แสดงตัวอย่าง
   const tempUrl = URL.createObjectURL(file);
   mediaArea.innerHTML = '';
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = tempUrl; v.controls = true; v.autoplay = true; v.loop = true; v.muted = true;
+    v.src = tempUrl; 
+    v.controls = true; 
+    v.autoplay = true; 
+    v.loop = true; 
+    v.muted = false; // ✅ เปิดเสียงไว้เลย
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
@@ -282,9 +285,7 @@ document.getElementById('pubBtn').onclick = () => {
     if (e.lengthComputable) {
       const pct = Math.round((e.loaded / e.total) * 100);
       progBar.style.width = pct + '%';
-      const loadedMB = (e.loaded / (1024 * 1024)).toFixed(1);
-      const totalMB = (e.total / (1024 * 1024)).toFixed(1);
-      showStatus(`⏳ กำลังส่ง... ${pct}%\n${loadedMB} / ${totalMB} MB`, 'info');
+      showStatus(`⏳ กำลังส่ง... ${pct}%`, 'info');
     }
   };
   
@@ -304,7 +305,7 @@ document.getElementById('pubBtn').onclick = () => {
           type: type,
           title: title,
           sound: soundDisplay,
-          fileMeta: { ...fileMeta }, // บันทึกข้อมูลทั้งหมด
+          fileMeta: { ...fileMeta },
           time: new Date().toLocaleString('th-TH')
         };
         
@@ -313,9 +314,8 @@ document.getElementById('pubBtn').onclick = () => {
         
         currentPost = newPost;
         updateMainDisplay(title, soundDisplay);
-        showStatus('✅ อัปโหลดสำเร็จ!', 'success');
+        showStatus('✅ อัปโหลดสำเร็จ!\nกดปุ่ม 🔊 บนวิดีโอเพื่อฟังเสียง', 'success');
         
-        // เคลียร์
         file = null;
         fileMeta = {};
         cloudUrl = '';
@@ -361,7 +361,6 @@ function updateMainDisplay(title, soundText) {
   const isOriginal = soundText === 'เสียงต้นฉบับ' || soundText === '';
   document.getElementById('dispSoundType').textContent = isOriginal ? '🎵 เสียงต้นฉบับ' : soundText;
   
-  // แสดงข้อมูลไฟล์
   if (fileMeta.name) {
     document.getElementById('fileInfoBlock').style.display = 'block';
     document.getElementById('fnName').textContent = fileMeta.name;
@@ -376,12 +375,16 @@ function updateMainDisplay(title, soundText) {
   }
   
   mediaArea.innerHTML = '';
-  if (!cloudUrl && !currentPost?.url) return;
-  const src = cloudUrl || currentPost.url;
+  const src = cloudUrl || currentPost?.url;
+  if (!src) return;
   
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = src; v.controls = true; v.autoplay = true; v.loop = true; v.muted = true;
+    v.src = src; 
+    v.controls = true; 
+    v.autoplay = true; 
+    v.loop = true; 
+    v.muted = false; // ✅ ไม่ปิดเสียง
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
