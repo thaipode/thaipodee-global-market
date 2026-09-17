@@ -29,11 +29,14 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .nav span { font-size: 10px; margin-top: 2px; }
 .btn { background: linear-gradient(90deg, #ff2e55, #ff6b4a); border: none; padding: 12px; border-radius: 6px; color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 15px; }
 .inp { background: #222; border: none; padding: 12px; border-radius: 6px; color: white; width: 100%; margin-bottom: 10px; font-size: 14px; }
-.progress { height: 4px; background: #333; border-radius: 2px; margin: 10px 0; display: none; }
-.prog-bar { height: 100%; background: #ff2e55; border-radius: 2px; width: 0%; transition: width 0.2s; }
-.status { text-align: center; padding: 10px; font-size: 13px; }
-.status.error { color: #ff6b4a; }
-.status.success { color: #4ade80; }
+.progress { height: 6px; background: #333; border-radius: 3px; margin: 15px 0; display: none; }
+.prog-bar { height: 100%; background: #ff2e55; border-radius: 3px; width: 0%; transition: width 0.2s; }
+.status { text-align: center; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; margin: 10px 0; white-space: pre-wrap; }
+.status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
+.status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
+.status.info { color: #facc15; background: rgba(250,204,21,0.15); }
+.post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; }
+.post-item:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -46,26 +49,20 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     </div>
   </div>
   <div class="ui">
+    <div class="top" id="postInfo" style="display:none;">
+      <p class="username">ThaiPodee Master</p>
+      <p class="desc" id="dispDesc"></p>
+      <div class="sound">
+        <i class="fa-solid fa-music fa-xs"></i>
+        <span id="dispSound" style="font-size:12px;"></span>
+      </div>
+    </div>
     <div class="right">
-      <div class="icon" data-goto="pageProfile">
-        <i class="fa-solid fa-user"></i>
-      </div>
-      <div class="icon">
-        <i class="fa-solid fa-heart"></i>
-        <span>0</span>
-      </div>
-      <div class="icon">
-        <i class="fa-solid fa-comment"></i>
-        <span>0</span>
-      </div>
-      <div class="icon">
-        <i class="fa-solid fa-bookmark"></i>
-        <span>บันทึก</span>
-      </div>
-      <div class="icon">
-        <i class="fa-solid fa-share"></i>
-        <span>แชร์</span>
-      </div>
+      <div class="icon" data-goto="pageProfile"><i class="fa-solid fa-user"></i></div>
+      <div class="icon"><i class="fa-solid fa-heart"></i><span id="likeCount">0</span></div>
+      <div class="icon"><i class="fa-solid fa-comment"></i><span>0</span></div>
+      <div class="icon"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
+      <div class="icon"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
     </div>
     <div class="bottom">
       <div class="nav" data-goto="page1"><i class="fa-solid fa-home"></i></div>
@@ -81,18 +78,16 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 
 <div id="pageUpload" class="page hidden">
   <div style="padding:20px;">
+    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;margin-bottom:15px;">
+      <i class="fa-solid fa-arrow-left"></i> กลับ
+    </button>
     <h3 style="margin-bottom:15px;">อัปโหลดสื่อ</h3>
     <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
-    <input type="text" class="inp" id="titleInp" placeholder="ชื่อสินค้า...">
+    <input type="text" class="inp" id="titleInp" placeholder="ชื่อสินค้า/คำอธิบาย...">
     <input type="text" class="inp" id="soundInp" placeholder="เสียงประกอบ...">
     <button class="btn" id="pubBtn">เผยแพร่ขึ้นคลาวด์</button>
-    <div id="progWrap" class="progress">
-      <div id="progBar" class="prog-bar"></div>
-    </div>
-    <p id="statusMsg" class="status"></p>
-    <div style="color:#666; font-size:11px; text-align:center; margin-top:10px;">
-      💡 เก็บบนคลาวด์ — ทุกคนเห็นเหมือนกัน
-    </div>
+    <div id="progWrap" class="progress"><div id="progBar" class="prog-bar"></div></div>
+    <p id="statusMsg" class="status" style="display:none;"></p>
   </div>
 </div>
 
@@ -108,65 +103,61 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       <h2 style="margin-top:10px;">ThaiPodee Master</h2>
       <p style="color:#888;">@thaipodee_master</p>
       <div style="display:flex;justify-content:center;gap:30px;margin-top:15px;">
-        <div style="text-align:center;"><strong>0</strong><br><small>โพสต์</small></div>
+        <div style="text-align:center;"><strong id="postCount">0</strong><br><small>โพสต์</small></div>
         <div style="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
         <div style="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
       </div>
     </div>
     <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
-    <p style="text-align:center;color:#888;">ยังไม่มีโพสต์</p>
+    <div id="postList"></div>
+    <p id="emptyMsg" style="text-align:center;color:#888;">ยังไม่มีโพสต์</p>
   </div>
 </div>
 
 <script>
-const CLOUD_NAME ='orjpnytt';
+const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 
-let file, type, tempUrl, muted = true;
+console.log('✅ Cloud Name:', CLOUD_NAME);
+console.log('✅ Upload Preset:', UPLOAD_PRESET);
+
+let file, type, cloudUrl = '';
 const mediaArea = document.getElementById('mediaArea');
+let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
+renderPosts();
 
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  document.getElementById('statusMsg').textContent = '';
-  document.getElementById('statusMsg').className = 'status';
+  if (id === 'pageUpload') {
+    document.getElementById('statusMsg').style.display = 'none';
+    document.getElementById('progWrap').style.display = 'none';
+  }
 }
 
-document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => show(b.dataset.goto));
-
-document.getElementById('uploadBtn').onclick = () => {
-  show('pageUpload');
-};
+document.querySelectorAll('[data-goto]').forEach(b => 
+  b.onclick = () => show(b.dataset.goto)
+);
+document.getElementById('uploadBtn').onclick = () => show('pageUpload');
 
 document.getElementById('fileInp').onchange = e => {
   file = e.target.files[0];
   if (!file) return;
   type = file.type.startsWith('video') ? 'video' : 'image';
-  if (tempUrl) URL.revokeObjectURL(tempUrl);
-  tempUrl = URL.createObjectURL(file);
-  
+  const tempUrl = URL.createObjectURL(file);
   mediaArea.innerHTML = '';
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = tempUrl;
-    v.controls = true;
-    v.autoplay = true;
-    v.loop = true;
-    v.muted = true;
+    v.src = tempUrl; v.controls = true; v.autoplay = true; v.loop = true; v.muted = true;
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
-    img.src = tempUrl;
-    mediaArea.appendChild(img);
+    img.src = tempUrl; mediaArea.appendChild(img);
   }
-  show('page1');
 };
 
 document.getElementById('pubBtn').onclick = async () => {
-  if (!file) {
-    document.getElementById('statusMsg').textContent = '⚠️ เลือกไฟล์ก่อนนะ';
-    return;
-  }
+  if (!file) return showStatus('⚠️ เลือกไฟล์ก่อนนะ', 'error');
   
   const statusMsg = document.getElementById('statusMsg');
   const progWrap = document.getElementById('progWrap');
@@ -174,81 +165,102 @@ document.getElementById('pubBtn').onclick = async () => {
   
   progWrap.style.display = 'block';
   progBar.style.width = '0%';
-  statusMsg.textContent = '⏳ กำลังอัปโหลด...';
-  statusMsg.className = 'status';
+  showStatus('⏳ กำลังส่งขึ้นคลาวด์...', 'info');
+  
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', UPLOAD_PRESET);
+  
+  const targetUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+  console.log('📤 ส่งไปที่:', targetUrl);
   
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET);
+    const response = await fetch(targetUrl, {
+      method: 'POST',
+      body: formData
+    });
     
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
+    console.log('📥 สถานะตอบกลับ:', response.status);
     
-    xhr.upload.onprogress = e => {
-      if (e.lengthComputable) {
-        const pct = Math.round((e.loaded / e.total) * 100);
-        progBar.style.width = pct + '%';
-        statusMsg.textContent = `⏳ กำลังอัปโหลด... ${pct}%`;
-      }
-    };
-    
-    xhr.onload = () => {
+    if (!response.ok) {
+      const errText = await response.text();
+      console.log('❌ ผิดพลาด:', errText);
       progWrap.style.display = 'none';
-      if (xhr.status === 200) {
-        try {
-          const res = JSON.parse(xhr.responseText);
-          const cloudUrl = res.secure_url;
-          
-          mediaArea.innerHTML = '';
-          if (type === 'video') {
-            const v = document.createElement('video');
-            v.src = cloudUrl;
-            v.controls = true;
-            v.autoplay = true;
-            v.loop = true;
-            v.muted = true;
-            mediaArea.appendChild(v);
-          } else {
-            const img = document.createElement('img');
-            img.src = cloudUrl;
-            mediaArea.appendChild(img);
-          }
-          
-          statusMsg.textContent = '✅ เผยแพร่สำเร็จ!';
-          statusMsg.className = 'status success';
-          show('page1');
-          
-          if (tempUrl) URL.revokeObjectURL(tempUrl);
-          file = null;
-          document.getElementById('fileInp').value = '';
-          document.getElementById('titleInp').value = '';
-          document.getElementById('soundInp').value = '';
-          
-        } catch (parseErr) {
-          statusMsg.textContent = '❌ อ่านข้อมูลไม่ได้';
-          statusMsg.className = 'status error';
-        }
-      } else {
-        statusMsg.textContent = `❌ ไม่สำเร็จ (โค้ด: ${xhr.status})`;
-        statusMsg.className = 'status error';
-        console.log('Error response:', xhr.responseText);
-      }
-    };
+      return showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${response.status}\nตรวจ: Upload Preset ชื่อ "${UPLOAD_PRESET}" มีอยู่จริงไหม?\nCloud Name: ${CLOUD_NAME}`, 'error');
+    }
     
-    xhr.onerror = () => {
-      progWrap.style.display = 'none';
-      statusMsg.textContent = '❌ ไม่เชื่อมต่อ หรือถูกบล็อก';
-      statusMsg.className = 'status error';
-    };
+    const data = await response.json();
+    console.log('✅ สำเร็จ:', data);
+    cloudUrl = data.secure_url;
     
-    xhr.send(formData);
+    progWrap.style.display = 'none';
+    
+    const title = document.getElementById('titleInp').value || 'ไม่มีชื่อ';
+    const sound = document.getElementById('soundInp').value || 'เสียงต้นฉบับ';
+    
+    posts.unshift({
+      url: cloudUrl, type, title, sound,
+      time: new Date().toLocaleString('th-TH')
+    });
+    localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+    
+    updateMainDisplay(title, sound);
+    showStatus('✅ อัปโหลดสำเร็จ! บันทึกแล้ว', 'success');
+    
+    file = null;
+    document.getElementById('fileInp').value = '';
+    document.getElementById('titleInp').value = '';
+    document.getElementById('soundInp').value = '';
+    
+    renderPosts();
+    setTimeout(() => show('page1'), 1500);
     
   } catch (err) {
-    statusMsg.textContent = '❌ ผิดพลาด: ' + err.message;
-    statusMsg.className = 'status error';
+    progWrap.style.display = 'none';
+    console.error('❌ Error:', err);
+    showStatus(`❌ ขัดข้อง: ${err.message}\nตรวจอินเทอร์เน็ต หรือชื่อ Cloud/Upload Preset`, 'error');
   }
 };
+
+function showStatus(text, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = text;
+  el.className = `status ${type}`;
+  el.style.display = 'block';
+}
+
+function updateMainDisplay(title, sound) {
+  document.getElementById('postInfo').style.display = 'block';
+  document.getElementById('dispDesc').textContent = title;
+  document.getElementById('dispSound').textContent = sound;
+  mediaArea.innerHTML = '';
+  if (type === 'video') {
+    const v = document.createElement('video');
+    v.src = cloudUrl; v.controls = true; v.autoplay = true; v.loop = true;
+    mediaArea.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.src = cloudUrl; mediaArea.appendChild(img);
+  }
+}
+
+function renderPosts() {
+  const list = document.getElementById('postList');
+  document.getElementById('postCount').textContent = posts.length;
+  if (posts.length === 0) {
+    list.innerHTML = '';
+    document.getElementById('emptyMsg').style.display = 'block';
+    return;
+  }
+  document.getElementById('emptyMsg').style.display = 'none';
+  list.innerHTML = posts.map(p => `
+    <div class="post-item">
+      <strong>${p.title}</strong><br>
+      <small style="color:#888;">${p.time}</small><br>
+      <small style="color:#aaa;">🎵 ${p.sound}</small>
+    </div>
+  `).join('');
+}
 </script>
 </body>
 </html>
