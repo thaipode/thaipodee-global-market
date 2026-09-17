@@ -29,12 +29,16 @@
     .nav span { font-size:10px; margin-top:2px; }
     .plus { width:45px; height:35px; background:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold; font-size:20px; }
     .back { position:absolute; top:16px; left:16px; font-size:20px; cursor:pointer; z-index:100; }
-    .preview { width:calc(100% - 32px); height:200px; background:#111; border-radius:8px; display:flex; align-items:center; justify-content:center; margin:16px; cursor:pointer; overflow:hidden; }
-    .inp { width:calc(100% - 32px); margin:0 16px 12px; background:#222; border:none; border-radius:8px; padding:12px; color:#fff; }
-    .btn { width:calc(100% - 32px); margin:0 16px; background:#e91e63; border:none; border-radius:8px; padding:14px; color:#fff; font-weight:bold; cursor:pointer; }
-    .progress { width:calc(100% - 32px); margin:0 16px; height:6px; background:#333; border-radius:3px; overflow:hidden; display:none; }
+    .preview { width:calc(100% - 32px); height:200px; background:#111; border-radius:8px; display:flex; align-items:center; justify-content:center; margin:16px; cursor:pointer; overflow:hidden; position:relative; z-index:5; }
+    .inp { width:calc(100% - 32px); margin:0 16px 12px; background:#222; border:none; border-radius:8px; padding:12px; color:#fff; position:relative; z-index:5; }
+    .btn { width:calc(100% - 32px); margin:0 16px; background:#e91e63; border:none; border-radius:8px; padding:14px; color:#fff; font-weight:bold; cursor:pointer; position:relative; z-index:5; font-size:16px; }
+    .btn:active { opacity:0.8; }
+    .progress { width:calc(100% - 32px); margin:0 16px; height:6px; background:#333; border-radius:3px; overflow:hidden; display:none; position:relative; z-index:5; }
     .prog-bar { height:100%; background:#e91e63; width:0%; transition:width 0.3s; }
-    input[type=file] { display:none; }
+    input[type=file] { display:none; position:relative; z-index:5; }
+    .status { text-align:center; font-size:12px; margin-top:10px; color:#888; padding:0 16px; }
+    .status.error { color:#f55; }
+    .status.ok { color:#4f4; }
   </style>
 </head>
 <body>
@@ -67,16 +71,17 @@
     <i class="fa-solid fa-arrow-left back" data-goto="home"></i>
     <div style="padding-top:50px;">
       <div class="preview" id="prevBox">
-        <div style="color:#888;text-align:center;">
+        <div id="placeholder" style="color:#888;text-align:center;">
           <i class="fa-solid fa-folder-open" style="font-size:32px;"></i>
           <p style="margin-top:8px;">แตะเพื่อเลือกไฟล์</p>
         </div>
         <input type="file" id="fIn" accept="video/*,image/*">
       </div>
-      <div class="progress" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
       <input type="text" class="inp" id="dIn" placeholder="ชื่อสินค้า...">
       <input type="text" class="inp" id="sIn" placeholder="เสียงประกอบ...">
       <button class="btn" id="pub">เผยแพร่ขึ้นคลาวด์</button>
+      <div class="progress" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
+      <div id="statusMsg" class="status"></div>
       <p style="color:#666; font-size:11px; text-align:center; margin-top:10px;">
         💡 เก็บบนคลาวด์ — ทุกคนเห็นเหมือนกัน
       </p>
@@ -93,6 +98,8 @@
     function show(id) {
       document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
+      document.getElementById('statusMsg').textContent = '';
+      document.getElementById('statusMsg').className = 'status';
     }
 
     document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>show(b.dataset.goto));
@@ -116,10 +123,20 @@
         i.src=tempUrl; i.style.maxWidth='100%';
         pb.appendChild(i);
       }
+      document.getElementById('statusMsg').textContent = '✅ เลือกไฟล์แล้ว — กดเผยแพร่ได้เลย';
+      document.getElementById('statusMsg').className = 'status ok';
     };
 
     document.getElementById('pub').onclick=async ()=>{
-      if(!file)return alert('เลือกไฟล์ก่อนครับ');
+      const statusMsg = document.getElementById('statusMsg');
+      if(!file){
+        statusMsg.textContent = '❌ กรุณาเลือกไฟล์ก่อนครับ';
+        statusMsg.className = 'status error';
+        return;
+      }
+
+      statusMsg.textContent = '⏳ กำลังอัปโหลด...';
+      statusMsg.className = 'status';
 
       const formData = new FormData();
       formData.append('file', file);
@@ -130,54 +147,80 @@
       progWrap.style.display = 'block';
       progBar.style.width = '0%';
 
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`);
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
 
-      xhr.upload.onprogress = e => {
-        if(e.lengthComputable) progBar.style.width = Math.round((e.loaded/e.total)*100)+'%';
-      };
-
-      xhr.onload = () => {
-        if(xhr.status === 200){
-          const res = JSON.parse(xhr.responseText);
-          const cloudUrl = res.secure_url;
-          
-          mediaArea.innerHTML = '';
-          if(type==='video'){
-            const v=document.createElement('video');
-            v.src = cloudUrl;
-            v.loop = true;
-            v.playsInline = true;
-            v.muted = true;
-            v.style.width = '100%';
-            v.style.height = '100%';
-            mediaArea.appendChild(v);
-            v.play().catch(()=>{});
-          }else{
-            const i=document.createElement('img');
-            i.src = cloudUrl;
-            i.style.maxWidth = '100%';
-            mediaArea.appendChild(i);
+        xhr.upload.onprogress = e => {
+          if(e.lengthComputable){
+            const pct = Math.round((e.loaded/e.total)*100);
+            progBar.style.width = pct + '%';
+            statusMsg.textContent = `⏳ กำลังอัปโหลด... ${pct}%`;
           }
-          
-          document.getElementById('ds').textContent = document.getElementById('dIn').value || 'สินค้าใหม่';
-          document.getElementById('snd').textContent = document.getElementById('sIn').value || 'เสียงต้นฉบับ';
-          
-          alert('✅ สำเร็จ! เก็บบนคลาวด์แล้ว\nทุกคนจะเห็นโพสต์นี้เหมือนกัน');
-          progWrap.style.display = 'none';
-          show('home');
-          
-          document.getElementById('fIn').value='';
-          document.getElementById('dIn').value='';
-          document.getElementById('sIn').value='';
-          document.getElementById('prevBox').innerHTML=`<div style="color:#888;text-align:center;"><i class="fa-solid fa-folder-open" style="font-size:32px;"></i><p style="margin-top:8px;">แตะเพื่อเลือกไฟล์</p></div>`;
-        }else{
-          alert('❌ ไม่สำเร็จ\n\nเช็ค: สร้าง Preset ชื่อ "thaipodee" และเลือกเป็น Unsigned แล้วหรือยัง?\n\n' + xhr.responseText);
-          progWrap.style.display = 'none';
-        }
-      };
+        };
 
-      xhr.send(formData);
+        xhr.onload = () => {
+          progWrap.style.display = 'none';
+          if(xhr.status === 200){
+            try {
+              const res = JSON.parse(xhr.responseText);
+              const cloudUrl = res.secure_url;
+              
+              mediaArea.innerHTML = '';
+              if(type==='video'){
+                const v=document.createElement('video');
+                v.src = cloudUrl;
+                v.loop = true;
+                v.playsInline = true;
+                v.muted = true;
+                v.style.width = '100%';
+                v.style.height = '100%';
+                mediaArea.appendChild(v);
+                v.play().catch(()=>{});
+              }else{
+                const i=document.createElement('img');
+                i.src = cloudUrl;
+                i.style.maxWidth = '100%';
+                mediaArea.appendChild(i);
+              }
+              
+              document.getElementById('ds').textContent = document.getElementById('dIn').value || 'สินค้าใหม่';
+              document.getElementById('snd').textContent = document.getElementById('sIn').value || 'เสียงต้นฉบับ';
+              
+              statusMsg.textContent = '✅ สำเร็จ! เก็บบนคลาวด์แล้ว';
+              statusMsg.className = 'status ok';
+              
+              setTimeout(()=>{
+                show('home');
+                document.getElementById('fIn').value='';
+                document.getElementById('dIn').value='';
+                document.getElementById('sIn').value='';
+                document.getElementById('prevBox').innerHTML=`<div id="placeholder" style="color:#888;text-align:center;"><i class="fa-solid fa-folder-open" style="font-size:32px;"></i><p style="margin-top:8px;">แตะเพื่อเลือกไฟล์</p></div>`;
+              }, 1500);
+              
+            } catch (parseErr) {
+              statusMsg.textContent = '❌ อ่านข้อมูลไม่ได้: ' + parseErr.message;
+              statusMsg.className = 'status error';
+            }
+          }else{
+            statusMsg.textContent = `❌ ไม่สำเร็จ (โค้ด: ${xhr.status})\nตรวจ Preset ชื่อ "thaipodee" ต้องเป็น Unsigned`;
+            statusMsg.className = 'status error';
+            console.log('Response:', xhr.responseText);
+          }
+        };
+
+        xhr.onerror = () => {
+          progWrap.style.display = 'none';
+          statusMsg.textContent = '❌ ไม่เชื่อมต่ออินเทอร์เน็ต หรือถูกบล็อก';
+          statusMsg.className = 'status error';
+        };
+
+        xhr.send(formData);
+        
+      } catch (err) {
+        statusMsg.textContent = '❌ ผิดพลาด: ' + err.message;
+        statusMsg.className = 'status error';
+      }
     };
 
     document.getElementById('vol').onclick=()=>{
