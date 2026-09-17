@@ -11,7 +11,7 @@
 html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
 .page { position: absolute; inset: 0; z-index: 1; overflow-y: auto; }
 .page.hidden { display: none; }
-.media { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; }
+.media { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: #000; }
 .media video, .media img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .ui { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 .ui * { pointer-events: auto; }
@@ -20,7 +20,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .desc { font-size: 12px; margin-top: 4px; opacity: 0.9; }
 .sound { display: flex; align-items: center; gap: 4px; margin-top: 8px; }
 .right { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; }
-.icon { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
 .icon i { font-size: 24px; }
 .icon span { font-size: 11px; }
 .bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; z-index: 30; }
@@ -35,7 +35,8 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
 .status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
 .status.info { color: #facc15; background: rgba(250,204,21,0.15); }
-.post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; }
+.post-item { border-bottom: 1px solid #222; padding: 12px; margin-bottom: 8px; cursor: pointer; }
+.post-item:hover { background: #111; }
 .post-item:last-child { border-bottom: none; }
 </style>
 </head>
@@ -45,7 +46,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
   <div class="media" id="mediaArea">
     <div style="text-align:center;color:#888;padding-top:40px;">
       <i class="fa-solid fa-video fa-2x"></i>
-      <p style="margin-top:10px;">กดปุ่ม + เพื่ออัปโหลดวิดีโอหรือรูปภาพ</p>
+      <p style="margin-top:10px;">กดปุ่ม + เพื่ออัปโหลด<br>หรือกดที่โพสต์ในโปรไฟล์เพื่อแสดง</p>
     </div>
   </div>
   <div class="ui">
@@ -119,6 +120,7 @@ const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 
 let file, type, cloudUrl = '';
+let currentPost = null;
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
 renderPosts();
@@ -130,6 +132,14 @@ function show(id) {
     document.getElementById('statusMsg').style.display = 'none';
     document.getElementById('progWrap').style.display = 'none';
   }
+}
+
+function showPost(post) {
+  currentPost = post;
+  cloudUrl = post.url;
+  type = post.type;
+  updateMainDisplay(post.title, post.sound);
+  show('page1');
 }
 
 document.querySelectorAll('[data-goto]').forEach(b => 
@@ -189,12 +199,18 @@ document.getElementById('pubBtn').onclick = () => {
         const title = document.getElementById('titleInp').value || 'ไม่มีชื่อ';
         const sound = document.getElementById('soundInp').value || 'เสียงต้นฉบับ';
         
-        posts.unshift({
-          url: cloudUrl, type, title, sound,
+        const newPost = {
+          url: cloudUrl, 
+          type: type, 
+          title: title, 
+          sound: sound,
           time: new Date().toLocaleString('th-TH')
-        });
+        };
+        
+        posts.unshift(newPost);
         localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
         
+        currentPost = newPost;
         updateMainDisplay(title, sound);
         showStatus('✅ อัปโหลดสำเร็จ!', 'success');
         
@@ -209,14 +225,14 @@ document.getElementById('pubBtn').onclick = () => {
         showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
       }
     } else {
-      showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}\nตรวจ Upload Preset ชื่อ "${UPLOAD_PRESET}" ใน Cloudinary`, 'error');
-      console.log('Error response:', xhr.responseText);
+      showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
+      console.log('Error:', xhr.responseText);
     }
   };
   
   xhr.onerror = () => {
     progWrap.style.display = 'none';
-    showStatus('❌ ไม่เชื่อมต่อ\nตรวจอินเทอร์เน็ต หรือเปิดหน้านี้ผ่าน https', 'error');
+    showStatus('❌ ไม่เชื่อมต่อ', 'error');
   };
   
   xhr.send(formData);
@@ -234,32 +250,58 @@ function updateMainDisplay(title, sound) {
   document.getElementById('dispDesc').textContent = title;
   document.getElementById('dispSound').textContent = sound;
   mediaArea.innerHTML = '';
+  
+  if (!cloudUrl) {
+    mediaArea.innerHTML = '<div style="text-align:center;color:#888;"><i class="fa-solid fa-image fa-2x"></i><p style="margin-top:10px;">ไม่มีรูป</p></div>';
+    return;
+  }
+  
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = cloudUrl; v.controls = true; v.autoplay = true; v.loop = true;
+    v.src = cloudUrl; 
+    v.controls = true; 
+    v.autoplay = true; 
+    v.loop = true;
+    v.muted = true;
+    v.onerror = () => {
+      mediaArea.innerHTML += `<p style="color:red;">❌ โหลดวิดีโอไม่ได้: ${cloudUrl}</p>`;
+    };
     mediaArea.appendChild(v);
   } else {
     const img = document.createElement('img');
-    img.src = cloudUrl; mediaArea.appendChild(img);
+    img.src = cloudUrl;
+    img.onerror = () => {
+      mediaArea.innerHTML += `<p style="color:red;">❌ โหลดรูปไม่ได้: ${cloudUrl}</p>`;
+    };
+    mediaArea.appendChild(img);
   }
 }
 
 function renderPosts() {
   const list = document.getElementById('postList');
   document.getElementById('postCount').textContent = posts.length;
+  
   if (posts.length === 0) {
     list.innerHTML = '';
     document.getElementById('emptyMsg').style.display = 'block';
     return;
   }
+  
   document.getElementById('emptyMsg').style.display = 'none';
-  list.innerHTML = posts.map(p => `
-    <div class="post-item">
+  list.innerHTML = posts.map((p, i) => `
+    <div class="post-item" data-index="${i}">
       <strong>${p.title}</strong><br>
       <small style="color:#888;">${p.time}</small><br>
       <small style="color:#aaa;">🎵 ${p.sound}</small>
     </div>
   `).join('');
+  
+  document.querySelectorAll('.post-item').forEach(item => {
+    item.onclick = () => {
+      const idx = parseInt(item.dataset.index);
+      showPost(posts[idx]);
+    };
+  });
 }
 </script>
 </body>
