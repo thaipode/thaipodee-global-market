@@ -47,14 +47,12 @@
     .post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; }
     .post-item { aspect-ratio: 9/12; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer; }
     .post-item img, .post-item video { width: 100%; height: 100%; object-fit: cover; }
-    .loading { text-align: center; padding: 20px; color: #888; }
   </style>
 </head>
 <body>
-  <!-- หน้าหลัก -->
   <div id="homePage" class="page">
     <div class="video-container">
-      <video id="mainVideo" loop playsinline autoplay muted></video>
+      <video id="mainVideo" loop playsinline muted></video>
     </div>
     <div class="ui-layer">
       <div class="top-info">
@@ -112,7 +110,6 @@
     </div>
   </div>
 
-  <!-- หน้าอัปโหลด -->
   <div id="uploadPage" class="page hidden" style="background:#000;z-index:30;">
     <div class="page-header">
       <i class="fa fa-arrow-left back-btn" data-back="home"></i>
@@ -139,7 +136,6 @@
     </div>
   </div>
 
-  <!-- หน้าโปรไฟล์ -->
   <div id="profilePage" class="page hidden" style="background:#000;z-index:30;">
     <div class="page-header">
       <i class="fa fa-arrow-left back-btn" data-back="home"></i>
@@ -147,7 +143,7 @@
     </div>
     <div class="profile-header">
       <div class="avatar">
-        <img src="https://res.cloudinary.com/orjpnytt/image/upload/sample-avatar.png" id="avatarImg" alt="Avatar">
+        <img src="https://res.cloudinary.com/orjpnytt/image/upload/sample-avatar.png" id="avatarImg" alt="Avatar" onerror="this.src='https://picsum.photos/200/200'">
       </div>
       <h3 id="profileUsername">Thaipodee Master</h3>
       <div class="stats">
@@ -169,19 +165,15 @@
   </div>
 
   <script>
-    // === CLOUDINARY CONFIG ===
     const CLOUD_NAME = 'orjpnytt';
-    const API_KEY = '254122143215822';
-    const API_SECRET = 'grsmmuGh4qUNRBLKK2WKSX7kg5E';
+    const UPLOAD_PRESET = 'ml_default';
     const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
-    // === STATE ===
     let posts = [];
     let selectedFile = null;
     let selectedPreviewUrl = null;
     let isMuted = true;
 
-    // === ELEMENTS ===
     const pages = {
       home: document.getElementById('homePage'),
       upload: document.getElementById('uploadPage'),
@@ -195,7 +187,6 @@
     const postBtn = document.getElementById('postBtn');
     const uploadStatus = document.getElementById('uploadStatus');
 
-    // === NAVIGATION ===
     function showPage(name) {
       Object.keys(pages).forEach(k => pages[k].classList.add('hidden'));
       pages[name].classList.remove('hidden');
@@ -208,7 +199,6 @@
       el.addEventListener('click', () => showPage(el.dataset.back));
     });
 
-    // === FILE SELECT ===
     previewBox.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => {
       selectedFile = e.target.files[0];
@@ -230,22 +220,25 @@
       }
     });
 
-    // === UPLOAD TO CLOUDINARY ===
     async function uploadFile(file) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('api_key', API_KEY);
-      formData.append('upload_preset', 'ml_default');
+      formData.append('upload_preset', UPLOAD_PRESET);
       
       const res = await fetch(CLOUDINARY_UPLOAD_URL, {
         method: 'POST',
-        body: formData
+        body: formData,
+        mode: 'cors'
       });
-      if (!res.ok) throw new Error('อัปโหลดไม่สำเร็จ');
+      
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Cloudinary Error:', res.status, text);
+        throw new Error(`ผิดพลาด ${res.status}`);
+      }
       return res.json();
     }
 
-    // === POST ===
     postBtn.addEventListener('click', async () => {
       if (!selectedFile) {
         alert('กรุณาเลือกไฟล์ก่อน');
@@ -254,7 +247,7 @@
       
       postBtn.disabled = true;
       postBtn.textContent = 'กำลังอัปโหลด...';
-      uploadStatus.textContent = 'กำลังส่งไฟล์ไปคลาวด์...';
+      uploadStatus.textContent = 'กำลังส่งไปคลาวด์...';
 
       try {
         const data = await uploadFile(selectedFile);
@@ -273,7 +266,6 @@
         
         uploadStatus.textContent = '✅ เผยแพร่สำเร็จ!';
         
-        // Reset form
         setTimeout(() => {
           descInput.value = '';
           soundInput.value = '';
@@ -284,17 +276,16 @@
           postBtn.disabled = false;
           postBtn.textContent = 'เผยแพร่';
           showPage('home');
-        }, 1200);
+        }, 1500);
         
       } catch (err) {
         console.error(err);
-        uploadStatus.textContent = '❌ ผิดพลาด: ' + err.message;
+        uploadStatus.textContent = '❌ ' + err.message + ' — กรุณาตรวจสอบ Upload Preset ใน Cloudinary';
         postBtn.disabled = false;
         postBtn.textContent = 'เผยแพร่';
       }
     });
 
-    // === SAVE/LOAD ===
     function savePosts() {
       localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
     }
@@ -303,12 +294,12 @@
       if (saved) posts = JSON.parse(saved);
     }
 
-    // === FEED ===
     function loadFeed() {
       if (posts.length === 0) {
         mainVideo.src = '';
         document.getElementById('displayDesc').textContent = 'ยังไม่มีโพสต์ — กด + เพื่อเผยแพร่อันแรก';
         document.getElementById('displaySound').textContent = 'เสียงต้นฉบับ';
+        document.getElementById('postCount').textContent = '0';
         return;
       }
       
@@ -316,7 +307,7 @@
       if (latest.type === 'video') {
         mainVideo.src = latest.url;
         mainVideo.muted = isMuted;
-        mainVideo.play().catch(() => {});
+        mainVideo.play().catch(e => console.log('เล่นอัตโนมัติถูกปิด'));
       } else {
         mainVideo.src = '';
       }
@@ -325,20 +316,18 @@
       document.getElementById('displaySound').textContent = latest.soundName || 'เสียงต้นฉบับ';
       document.getElementById('postCount').textContent = posts.length;
       
-      // Profile grid
       const grid = document.getElementById('userPostGrid');
       grid.innerHTML = '';
       posts.forEach(p => {
         const div = document.createElement('div');
         div.className = 'post-item';
         div.innerHTML = p.type === 'video' 
-          ? `<video src="${p.url}" muted></video>`
+          ? `<video src="${p.url}" muted preload="metadata"></video>`
           : `<img src="${p.url}" alt="">`;
         grid.appendChild(div);
       });
     }
 
-    // === SOUND TOGGLE ===
     document.getElementById('soundToggle').addEventListener('click', () => {
       isMuted = !isMuted;
       mainVideo.muted = isMuted;
@@ -347,7 +336,6 @@
         : 'fa fa-volume-up';
     });
 
-    // === LIKE ===
     let liked = false, likes = 0;
     document.getElementById('likeBtn').addEventListener('click', () => {
       liked = !liked;
@@ -358,7 +346,6 @@
       document.getElementById('likeCount').textContent = likes;
     });
 
-    // === INIT ===
     loadPosts();
     loadFeed();
   </script>
