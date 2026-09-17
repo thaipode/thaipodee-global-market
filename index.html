@@ -165,8 +165,9 @@
   </div>
 
   <script>
+    // === ตรงนี้สำคัญ — ต้องตรงกับ Cloudinary ===
     const CLOUD_NAME = 'orjpnytt';
-    const UPLOAD_PRESET = 'thaipodee'; // เปลี่ยนชื่อใหม่
+    const UPLOAD_PRESET = 'ml_default'; // ใช้ชื่อที่มีอยู่แล้ว
     const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
     let posts = [];
@@ -220,6 +221,7 @@
       }
     });
 
+    // === อัปโหลดขึ้นคลาวด์จริงๆ ===
     async function uploadFile(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -234,7 +236,7 @@
       if (!res.ok) {
         const text = await res.text();
         console.error('Cloudinary Error:', res.status, text);
-        throw new Error(`ผิดพลาด ${res.status}`);
+        throw new Error(`ตรวจสอบ Upload Preset ใน Cloudinary — ต้องเป็น Unsigned`);
       }
       return res.json();
     }
@@ -247,24 +249,27 @@
       
       postBtn.disabled = true;
       postBtn.textContent = 'กำลังอัปโหลด...';
-      uploadStatus.textContent = 'กำลังส่งไปคลาวด์...';
+      uploadStatus.textContent = 'กำลังส่งขึ้นคลาวด์...';
 
       try {
         const data = await uploadFile(selectedFile);
+        console.log('อัปโหลดสำเร็จ:', data);
+        
         const post = {
           id: Date.now(),
-          url: data.secure_url,
+          url: data.secure_url, // ลิงก์จากคลาวด์จริงๆ
           type: data.resource_type,
           description: descInput.value || '',
           soundName: soundInput.value || 'เสียงต้นฉบับ',
+          publicId: data.public_id,
           createdAt: new Date().toISOString()
         };
         
         posts.unshift(post);
-        savePosts();
+        savePostsToLocal(); // เก็บลิงก์ไว้ในเครื่อง
         loadFeed();
         
-        uploadStatus.textContent = '✅ เผยแพร่สำเร็จ!';
+        uploadStatus.textContent = '✅ อัปโหลดขึ้นคลาวด์สำเร็จ!';
         
         setTimeout(() => {
           descInput.value = '';
@@ -286,10 +291,11 @@
       }
     });
 
-    function savePosts() {
+    // เก็บเฉพาะลิงก์ ไม่ใช่ไฟล์ — ไฟล์อยู่บนคลาวด์
+    function savePostsToLocal() {
       localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
     }
-    function loadPosts() {
+    function loadPostsFromLocal() {
       const saved = localStorage.getItem('thaipodee_posts');
       if (saved) posts = JSON.parse(saved);
     }
@@ -346,7 +352,7 @@
       document.getElementById('likeCount').textContent = likes;
     });
 
-    loadPosts();
+    loadPostsFromLocal();
     loadFeed();
   </script>
 </body>
