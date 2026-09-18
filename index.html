@@ -16,7 +16,7 @@ function renderPostList() {
 
   let html = '';
   posts.forEach((p, i) => {
-    const name = (p.name || `รายการที่ ${i+1}`).replace(/\.[^.]+$/, '');
+    const name = (p.name || 'รายการที่ ' + (i+1)).replace(/\.[^.]+$/, '');
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
     const sizeMB = p.sizeMB || '0';
     const time = p.time || '-';
@@ -29,7 +29,7 @@ function renderPostList() {
       if (p.url && p.url.includes('cloudinary')) {
         thumbUrl = p.url
           .replace('/video/upload/', '/video/upload/w_200,h_260,c_fill/')
-          .replace(/\.mp4(\?|$)/, '.jpg$1');
+          .replace('.mp4', '.jpg');
       } else {
         thumbUrl = '';
       }
@@ -47,41 +47,34 @@ function renderPostList() {
     if (p.soundMode === 'original') {
       soundInfo = '<span style="color:#90ee90; font-size:11px;">🔊 เสียงต้นฉบับ</span>';
     } else if (p.soundMode === 'custom' && p.soundName) {
-      soundInfo = `<span style="color:#ffd700; font-size:11px;">🎵 ${p.soundName}</span>`;
+      soundInfo = '<span style="color:#ffd700; font-size:11px;">🎵 ' + p.soundName + '</span>';
     }
 
-    html += `
-      <div class="post-item">
-        <div class="post-thumb" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
-          ${thumbUrl 
-            ? `<img src="${thumbUrl}" alt="${name}" loading="lazy"
-                 onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-${p.type === 'video' ? 'play' : 'image'}\\'></i>';">`
-            : `<i class="fa-solid fa-${p.type === 'video' ? 'play' : 'image'}"></i>`
-          }
-        </div>
-        <div style="flex:1; min-width:0;">
-          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-            <span style="font-size:14px;">${typeIcon}</span>
-            <span style="font-size:12px; color:#aaa; font-weight:bold;">${typeLabel}</span>
-          </div>
-          
-          <div class="post-title" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
-            ${name}
-          </div>
-          
-          ${soundInfo ? `<div style="margin:3px 0;">${soundInfo}</div>` : ''}
-          
-          <div class="post-meta">
-            📦 ${sizeMB} MB — ${parseFloat(sizeMB) <= MAX_MB ? '✅' : '⚠️'}<br>
-            📐 ${ratio} | 📅 ${time}
-          </div>
-          
-          <button class="del-btn" onclick="openDelModal(${i})">
-            <i class="fa-solid fa-trash"></i> ลบ
-          </button>
-        </div>
-      </div>
-    `;
+    html += '<div class="post-item">' +
+      '<div class="post-thumb" onclick="displayPost(posts[' + i + '], ' + i + '); showPage(\'home\');">' +
+        (thumbUrl ?
+          '<img src="' + thumbUrl + '" alt="' + name + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fa-solid fa-' + (p.type === 'video' ? 'play' : 'image') + '\\\'></i>\';">' :
+          '<i class="fa-solid fa-' + (p.type === 'video' ? 'play' : 'image') + '"></i>'
+        ) +
+      '</div>' +
+      '<div style="flex:1; min-width:0;">' +
+        '<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">' +
+          '<span style="font-size:14px;">' + typeIcon + '</span>' +
+          '<span style="font-size:12px; color:#aaa; font-weight:bold;">' + typeLabel + '</span>' +
+        '</div>' +
+        '<div class="post-title" onclick="displayPost(posts[' + i + '], ' + i + '); showPage(\'home\');">' +
+          name +
+        '</div>' +
+        (soundInfo ? '<div style="margin:3px 0;">' + soundInfo + '</div>' : '') +
+        '<div class="post-meta">' +
+          '📦 ' + sizeMB + ' MB — ' + (parseFloat(sizeMB) <= MAX_MB ? '✅' : '⚠️') + '<br>' +
+          '📐 ' + ratio + ' | 📅 ' + time +
+        '</div>' +
+        '<button class="del-btn" onclick="openDelModal(' + i + ');">' +
+          '<i class="fa-solid fa-trash"></i> ลบ' +
+        '</button>' +
+      '</div>' +
+    '</div>';
   });
 
   listEl.innerHTML = html;
