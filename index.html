@@ -21,7 +21,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .sound { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; flex-wrap: wrap; }
 .sound-original { color: #90ee90; font-weight: 500; }
 .sound-custom { color: #ffd700; font-weight: 500; }
-.file-info { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.7; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+.file-info { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.8; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
 .right { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 22px; }
 .icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
 .icon i { font-size: 26px; }
@@ -31,6 +31,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .nav i { font-size: 22px; }
 .nav span { font-size: 10px; margin-top: 2px; }
 .btn { background: linear-gradient(90deg, #ff2e55, #ff6b4a); border: none; padding: 14px; border-radius: 8px; color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
+.btn-danger { background: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; color: white; font-size: 11px; cursor: pointer; margin-top: 6px; }
 .inp { background: #222; border: none; padding: 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 12px; font-size: 15px; }
 .inp-small { background: #222; border: none; padding: 10px 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 10px; font-size: 14px; }
 .progress { height: 10px; background: #333; border-radius: 5px; margin: 18px 0; display: none; overflow: hidden; }
@@ -39,29 +40,45 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
 .status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
 .status.info { color: #facc15; background: rgba(250,204,21,0.15); }
-.post-item { border-bottom: 1px solid #222; padding: 14px; margin-bottom: 8px; cursor: pointer; display: flex; gap: 14px; align-items: flex-start; }
+.post-item { border-bottom: 1px solid #222; padding: 10px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
 .post-item:hover { background: #111; }
-.post-thumb { width: 100px; height: 130px; background: #1a1a1a; border-radius: 8px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.post-thumb { width: 90px; height: 120px; background: #1a1a1a; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .post-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.post-thumb .placeholder { color: #555; font-size: 28px; }
+.post-thumb .placeholder { color: #555; font-size: 24px; }
 .post-content { flex: 1; min-width: 0; }
-.post-title { font-weight: bold; font-size: 14px; margin-bottom: 4px; line-height: 1.4; word-break: break-all; }
-.post-file-info { font-size: 11px; color: #777; margin-top: 4px; line-height: 1.6; }
+.post-title { font-weight: bold; font-size: 14px; margin-bottom: 3px; line-height: 1.4; word-break: break-all; cursor: pointer; }
+.post-file-info { font-size: 11px; color: #777; margin-top: 3px; line-height: 1.6; }
 .size-warning { color: #ffd700; }
 .size-ok { color: #4ade80; }
-.audio-note { font-size: 11px; color: #90ee90; margin-top: 6px; }
+.aspect-ratio { color: #87ceeb; font-weight: bold; }
 .sound-option { display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; }
 .sound-option.selected { outline: 2px solid #ffd700; }
-.sound-option input { width: auto; margin: 0; }
+.confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.confirm-box { background: #1f1f1f; padding: 20px; border-radius: 10px; max-width: 300px; width: 100%; text-align: center; }
+.confirm-buttons { display: flex; gap: 10px; margin-top: 15px; }
+.confirm-del { flex: 1; background: #dc2626; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
+.confirm-cancel { flex: 1; background: #333; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
+
+<div id="confirmOverlay" class="confirm-overlay hidden">
+  <div class="confirm-box">
+    <p style="font-size:15px; font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
+    <p style="font-size:13px; color:#aaa;">ลบโพสต์นี้แน่ใจไหม?<br>เมื่อลบแล้วกู้คืนไม่ได้</p>
+    <div class="confirm-buttons">
+      <button class="confirm-cancel" onclick="hideConfirm()">ยกเลิก</button>
+      <button class="confirm-del" onclick="doDelete()">ลบทันที</button>
+    </div>
+  </div>
+</div>
 
 <div id="page1" class="page">
   <div class="media" id="mediaArea">
     <div style="text-align:center;color:#888;padding-top:40px;">
       <i class="fa-solid fa-video fa-2x"></i>
-      <p style="margin-top:12px;">กดปุ่ม + เพื่ออัปโหลด<br>หรือกดที่โพสต์ในโปรไฟล์เพื่อแสดง</p>
+      <p style="margin-top:12px;">กดปุ่ม + เพื่อโพสต์<br>หรือกดที่โพสต์ในโปรไฟล์เพื่อแสดง</p>
     </div>
   </div>
   <div class="ui">
@@ -73,13 +90,12 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
         <span id="dispSoundType"></span>
       </div>
       <div class="file-info" id="fileInfoBlock" style="display:none;">
-        <span class="file-info-item"><strong>📄 ชื่อไฟล์:</strong> <span id="fnName"></span></span><br>
-        <span class="file-info-item"><strong>📦 ขนาด:</strong> <span id="fnSize"></span></span>
-        <span class="file-info-item"><strong>⏱️ เวลา:</strong> <span id="fnDur"></span></span>
-        <span class="file-info-item"><strong>📐 ภาพ:</strong> <span id="fnRes"></span></span>
-        <span class="file-info-item" id="fnSizeCheck"></span>
+        📄 ชื่อไฟล์: <span id="fnName"></span><br>
+        📦 ขนาด: <span id="fnSize"></span> — <span id="fnSizeCheck"></span><br>
+        ⏱️ เวลา: <span id="fnDur"></span><br>
+        📐 อัตราส่วน: <span id="fnAspect" class="aspect-ratio"></span>
       </div>
-      <p class="audio-note">💡 กดปุ่มเสียง 🔊 บนวิดีโอเพื่อเปิดฟัง</p>
+      <p style="font-size:11px;color:#90ee90;margin-top:6px;">💡 กดปุ่มเสียง 🔊 บนวิดีโอเพื่อเปิดฟัง</p>
     </div>
     <div class="right">
       <div class="icon" data-goto="pageProfile"><i class="fa-solid fa-user"></i></div>
@@ -102,43 +118,43 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 
 <div id="pageUpload" class="page hidden">
   <div style="padding:20px;">
-    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;margin-bottom:15px;">
+    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:15px;">
       <i class="fa-solid fa-arrow-left"></i> กลับ
     </button>
-    <h3 style="margin-bottom:15px;">อัปโหลดสื่อ</h3>
+    <h3 style="margin-bottom:15px;">โพสต์วิดีโอ/รูปภาพ</h3>
     <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
     
-    <div id="previewFileInfo" style="background:rgba(255,255,255,0.05);padding:14px;border-radius:8px;margin-bottom:14px;display:none;font-size:13px;line-height:1.8;">
-      <strong>📋 ข้อมูลไฟล์:</strong><br>
+    <div id="previewFileInfo" style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-bottom:14px;display:none;font-size:13px;line-height:1.8;">
+      📋 ข้อมูลไฟล์:<br>
       ชื่อไฟล์: <span id="pName"></span><br>
       ขนาด: <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
       เวลา: <span id="pDur"></span><br>
-      ความละเอียด: <span id="pRes"></span>
+      อัตราส่วน: <span id="pAspect" class="aspect-ratio"></span>
     </div>
 
     <p style="font-size:13px;color:#ccc;margin:15px 0 8px;"><strong>🎵 เลือกเสียง:</strong></p>
     
-    <label class="sound-option selected" id="optSoundOriginal">
-      <input type="radio" name="soundMode" value="original" checked>
+    <label class="sound-option selected">
+      <input type="radio" name="soundMode" value="original" checked style="margin-right:8px;">
       <div>
         <strong>🔊 เสียงต้นฉบับ</strong><br>
-        <small style="color:#888;">ใช้เสียงจากวิดีโอเดิม</small>
+        <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
       </div>
     </label>
     
-    <label class="sound-option" id="optSoundCustom">
-      <input type="radio" name="soundMode" value="custom">
+    <label class="sound-option">
+      <input type="radio" name="soundMode" value="custom" style="margin-right:8px;">
       <div>
         <strong>✨ เพิ่มเสียงใหม่</strong><br>
-        <small style="color:#888;">ใส่ชื่อเสียงหรือเพลงที่ต้องการ</small>
+        <small style="color:#888;">ใส่ชื่อเพลง/เสียงที่ต้องการ</small>
       </div>
     </label>
     
-    <input type="text" class="inp-small" id="customSoundName" placeholder="ตั้งชื่อเสียงที่จะเพิ่ม..." style="display:none;margin-top:5px;">
+    <input type="text" class="inp-small" id="customSoundName" placeholder="ตั้งชื่อเสียง..." style="display:none;margin-top:5px;">
     
-    <p style="font-size:12px;color:#888;margin:12px 0;">💡 ชื่อวิดีโอจะนำมาจากชื่อไฟล์โดยตรง</p>
+    <p style="font-size:12px;color:#888;margin:12px 0;">💡 ชื่อจะนำมาจากชื่อไฟล์โดยตรง</p>
     
-    <button class="btn" id="pubBtn">เผยแพร่ขึ้นคลาวด์</button>
+    <button class="btn" id="pubBtn">เผยแพร่</button>
     <div id="progWrap" class="progress"><div id="progBar" class="prog-bar"></div></div>
     <p id="statusMsg" class="status" style="display:none;"></p>
   </div>
@@ -146,7 +162,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 
 <div id="pageProfile" class="page hidden">
   <div style="padding:20px;">
-    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;">
+    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">
       <i class="fa-solid fa-arrow-left"></i> กลับ
     </button>
     <div style="text-align:center; margin:20px 0;">
@@ -157,8 +173,8 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       <p style="color:#888;">@thaipodee_master</p>
       <div style="display:flex;justify-content:center;gap:30px;margin-top:15px;">
         <div style="text-align:center;"><strong id="postCount">0</strong><br><small>โพสต์</small></div>
-        <div class="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
-        <div class="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
+        <div style="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
+        <div style="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
       </div>
     </div>
     <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
@@ -171,22 +187,18 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 const MAX_RECOMMENDED_MB = 100;
-const TARGET_DURATION_SEC = 180;
 
 let file, type, cloudUrl = '';
 let fileMeta = {};
 let thumbnailUrl = '';
 let currentPost = null;
+let deleteIndex = null;
 const mediaArea = document.getElementById('mediaArea');
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
 
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  if (id === 'pageUpload') {
-    document.getElementById('statusMsg').style.display = 'none';
-    document.getElementById('progWrap').style.display = 'none';
-  }
 }
 
 function formatTime(sec) {
@@ -196,26 +208,18 @@ function formatTime(sec) {
   return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
-function formatSize(bytes) {
-  if (!bytes) return '-';
-  const mb = (bytes / (1024 * 1024)).toFixed(1);
-  return `${mb} MB`;
-}
-
 function checkSizeAdvice(mb) {
-  if (!mb) return { text: '', ok: true };
+  if (!mb && mb !== 0) return { text: '', ok: true };
   if (mb > MAX_RECOMMENDED_MB) {
     return { text: `⚠️ ใหญ่เกิน ${MAX_RECOMMENDED_MB}MB`, ok: false };
   }
   return { text: '✅ ขนาดเหมาะสม', ok: true };
 }
 
-function checkDurationAdvice(sec) {
-  if (!sec) return '';
-  const diff = Math.abs(sec - TARGET_DURATION_SEC);
-  if (diff < 10) return ' ✅ ตรงเป้าหมาย 3 นาที';
-  if (sec < TARGET_DURATION_SEC) return ` (สั้นกว่าเป้าหมาย ${Math.round((TARGET_DURATION_SEC-sec)/60)} นาที)`;
-  return ` (ยาวกว่าเป้าหมาย ${Math.round((sec-TARGET_DURATION_SEC)/60)} นาที)`;
+// ✅ แก้ตรงนี้: คำนวณและแสดงแค่อันเดียวตามจริง
+function getAspectRatio(width, height) {
+  if (!width || !height) return '-';
+  return height > width ? '9:16' : '16:9';
 }
 
 function getFileNameOnly(fullName) {
@@ -231,19 +235,14 @@ function getFileNameOnly(fullName) {
 function getCloudThumbnailUrl(videoUrl) {
   if (!videoUrl) return '';
   if (!videoUrl.includes('cloudinary.com')) return '';
-  if (videoUrl.includes('/w_') || videoUrl.includes('/h_') || videoUrl.includes('/c_fill')) {
-    return videoUrl;
-  }
-  let thumbUrl = videoUrl;
-  thumbUrl = thumbUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
-  return thumbUrl;
+  if (videoUrl.includes('/w_') || videoUrl.includes('/c_fill')) return videoUrl;
+  return videoUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
 }
 
 async function generateThumbnail(fileObj, isVideo) {
   return new Promise(res => {
     if (!isVideo) {
-      const url = URL.createObjectURL(fileObj);
-      res(url);
+      res(URL.createObjectURL(fileObj));
       return;
     }
     const video = document.createElement('video');
@@ -251,35 +250,27 @@ async function generateThumbnail(fileObj, isVideo) {
     video.src = URL.createObjectURL(fileObj);
     video.currentTime = 1;
     video.onseeked = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 200;
-      canvas.height = 260;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const thumbUrl = canvas.toDataURL('image/jpeg', 0.85);
+      const c = document.createElement('canvas');
+      c.width = 200; c.height = 260;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(video, 0, 0, c.width, c.height);
+      res(c.toDataURL('image/jpeg', 0.85));
       URL.revokeObjectURL(video.src);
-      res(thumbUrl);
     };
-    video.onerror = () => {
-      URL.revokeObjectURL(video.src);
-      res('');
-    };
+    video.onerror = () => { URL.revokeObjectURL(video.src); res(''); };
   });
 }
 
 async function uploadThumbnail(dataUrl) {
-  if (!dataUrl) return '';
-  const formData = new FormData();
-  formData.append('file', dataUrl);
-  formData.append('upload_preset', UPLOAD_PRESET);
-
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-    method: 'POST',
-    body: formData
-  });
-
-  const data = await res.json();
-  return data.secure_url || '';
+  if (!dataUrl || !dataUrl.startsWith('data:')) return '';
+  try {
+    const fd = new FormData();
+    fd.append('file', dataUrl);
+    fd.append('upload_preset', UPLOAD_PRESET);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: fd });
+    const d = await r.json();
+    return d.secure_url || '';
+  } catch { return ''; }
 }
 
 function showPost(post) {
@@ -292,6 +283,24 @@ function showPost(post) {
   show('page1');
 }
 
+function showConfirm(idx) {
+  deleteIndex = idx;
+  document.getElementById('confirmOverlay').classList.remove('hidden');
+}
+
+function hideConfirm() {
+  deleteIndex = null;
+  document.getElementById('confirmOverlay').classList.add('hidden');
+}
+
+function doDelete() {
+  if (deleteIndex === null) return;
+  posts.splice(deleteIndex, 1);
+  localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+  renderPosts();
+  hideConfirm();
+}
+
 document.querySelectorAll('[data-goto]').forEach(b => 
   b.onclick = () => show(b.dataset.goto)
 );
@@ -299,44 +308,30 @@ document.getElementById('uploadBtn').onclick = () => show('pageUpload');
 
 document.querySelectorAll('input[name="soundMode"]').forEach(radio => {
   radio.addEventListener('change', () => {
-    document.querySelectorAll('.sound-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelectorAll('.sound-option').forEach(o => o.classList.remove('selected'));
     radio.closest('.sound-option').classList.add('selected');
-    
-    const customInput = document.getElementById('customSoundName');
-    if (radio.value === 'custom') {
-      customInput.style.display = 'block';
-    } else {
-      customInput.style.display = 'none';
-    }
+    document.getElementById('customSoundName').style.display = 
+      radio.value === 'custom' ? 'block' : 'none';
   });
 });
 
 document.getElementById('fileInp').onchange = async e => {
   file = e.target.files[0];
   if (!file) return;
-  
   type = file.type.startsWith('video') ? 'video' : 'image';
   const sizeMB = parseFloat((file.size / (1024 * 1024)).toFixed(1));
-  
-  fileMeta = {
-    name: file.name,
-    sizeMB: sizeMB,
-    type: type,
-    duration: null,
-    resolution: null
-  };
+  fileMeta = { name: file.name, sizeMB, type, duration: null, width: null, height: null };
   
   if (type === 'video') {
-    const tempUrl = URL.createObjectURL(file);
+    const url = URL.createObjectURL(file);
     const v = document.createElement('video');
-    v.preload = 'metadata';
-    v.src = tempUrl;
+    v.preload = 'metadata'; v.src = url;
     await new Promise(res => {
       v.onloadedmetadata = () => {
         fileMeta.duration = v.duration;
-        fileMeta.resolution = `${v.videoWidth}×${v.videoHeight}`;
-        URL.revokeObjectURL(tempUrl);
-        res();
+        fileMeta.width = v.videoWidth;
+        fileMeta.height = v.videoHeight;
+        URL.revokeObjectURL(url); res();
       };
       v.onerror = () => res();
     });
@@ -344,47 +339,41 @@ document.getElementById('fileInp').onchange = async e => {
   
   thumbnailUrl = await generateThumbnail(file, type === 'video');
   
-  const previewBlock = document.getElementById('previewFileInfo');
-  previewBlock.style.display = 'block';
+  document.getElementById('previewFileInfo').style.display = 'block';
   document.getElementById('pName').textContent = fileMeta.name;
-  document.getElementById('pSize').textContent = formatSize(file.size);
-  const sizeCheck = checkSizeAdvice(sizeMB);
-  const sizeCheckEl = document.getElementById('pSizeCheck');
-  sizeCheckEl.textContent = sizeCheck.text;
-  sizeCheckEl.className = sizeCheck.ok ? 'size-ok' : 'size-warning';
-  document.getElementById('pDur').textContent = formatTime(fileMeta.duration) + checkDurationAdvice(fileMeta.duration);
-  document.getElementById('pRes').textContent = fileMeta.resolution || '-';
+  document.getElementById('pSize').textContent = `${sizeMB} MB`;
+  const chk = checkSizeAdvice(sizeMB);
+  const chkEl = document.getElementById('pSizeCheck');
+  chkEl.textContent = chk.text;
+  chkEl.className = chk.ok ? 'size-ok' : 'size-warning';
+  document.getElementById('pDur').textContent = formatTime(fileMeta.duration);
+  // ✅ แสดงแค่อันเดียวตามจริง
+  document.getElementById('pAspect').textContent = getAspectRatio(fileMeta.width, fileMeta.height);
   
-  const tempUrl = URL.createObjectURL(file);
   mediaArea.innerHTML = '';
+  const tempUrl = URL.createObjectURL(file);
   if (type === 'video') {
     const v = document.createElement('video');
-    v.src = tempUrl; 
-    v.controls = true; 
-    v.autoplay = true; 
-    v.loop = true; 
-    v.muted = false;
+    v.src = tempUrl; v.controls = true; v.autoplay = true; v.loop = true; v.muted = false;
     mediaArea.appendChild(v);
   } else {
-    const img = document.createElement('img');
-    img.src = tempUrl; mediaArea.appendChild(img);
+    const img = document.createElement('img'); img.src = tempUrl; mediaArea.appendChild(img);
   }
 };
 
 document.getElementById('pubBtn').onclick = async () => {
   if (!file) return showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
-  
   const statusMsg = document.getElementById('statusMsg');
   const progWrap = document.getElementById('progWrap');
   const progBar = document.getElementById('progBar');
   
   progWrap.style.display = 'block';
   progBar.style.width = '0%';
-  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อไฟล์: ${fileMeta.name}\nขนาด: ${formatSize(file.size)}`, 'info');
+  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อไฟล์: ${fileMeta.name}\nขนาด: ${fileMeta.sizeMB} MB`, 'info');
   
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
   
   const xhr = new XMLHttpRequest();
   xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
@@ -404,68 +393,54 @@ document.getElementById('pubBtn').onclick = async () => {
       try {
         const data = JSON.parse(xhr.responseText);
         cloudUrl = data.secure_url;
-
-        let uploadedThumbUrl = '';
+        
+        let thumb = '';
         if (thumbnailUrl) {
           showStatus(`⏳ กำลังอัปโหลดรูปย่อ...`, 'info');
-          uploadedThumbUrl = await uploadThumbnail(thumbnailUrl);
+          thumb = await uploadThumbnail(thumbnailUrl);
         }
         
         const title = getFileNameOnly(fileMeta.name);
-        
         const soundMode = document.querySelector('input[name="soundMode"]:checked').value;
-        let soundName = '';
-        let soundDisplayText = '';
+        const soundName = soundMode === 'custom' 
+          ? document.getElementById('customSoundName').value.trim() || 'เสียงใหม่' 
+          : '';
+        const soundDisplay = soundMode === 'original' 
+          ? '🔊 เสียงต้นฉบับ' 
+          : `✨ เพิ่มเสียง: ${soundName}`;
         
-        if (soundMode === 'original') {
-          soundDisplayText = '🔊 เสียงต้นฉบับ';
-        } else if (soundMode === 'custom') {
-          soundName = document.getElementById('customSoundName').value.trim() || 'เสียงใหม่';
-          soundDisplayText = `✨ เพิ่มเสียง: ${soundName}`;
-        }
-        
-        const newPost = {
+        posts.unshift({
           url: cloudUrl,
-          type: type,
-          title: title,
+          type,
+          title,
           originalFileName: fileMeta.name,
-          soundMode: soundMode,
-          soundName: soundName,
-          soundDisplay: soundDisplayText,
-          thumbnail: uploadedThumbUrl,
-          fileMeta: { 
+          soundMode,
+          soundName,
+          soundDisplay,
+          thumbnail: thumb,
+          fileMeta: {
             ...fileMeta,
             duration: data.duration || fileMeta.duration,
-            resolution: data.width && data.height ? `${data.width}×${data.height}` : fileMeta.resolution
+            width: data.width || fileMeta.width,
+            height: data.height || fileMeta.height
           },
           time: new Date().toLocaleString('th-TH')
-        };
+        });
         
-        posts.unshift(newPost);
         localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+        renderPosts();
+        showStatus(`✅ เสร็จสิ้น!\nชื่อ: ${title}`, 'success');
         
-        currentPost = newPost;
-        updateMainDisplay(title, soundMode, soundName);
-        showStatus(`✅ อัปโหลดสำเร็จ!\nชื่อ: ${title}\nเสียง: ${soundDisplayText}`, 'success');
-        
-        file = null;
-        fileMeta = {};
-        cloudUrl = '';
-        thumbnailUrl = '';
+        file = null; fileMeta = {}; cloudUrl = ''; thumbnailUrl = '';
         document.getElementById('fileInp').value = '';
         document.getElementById('customSoundName').value = '';
         document.getElementById('customSoundName').style.display = 'none';
         document.querySelector('input[value="original"]').checked = true;
-        document.querySelectorAll('.sound-option').forEach((opt, idx) => {
-          opt.classList.toggle('selected', idx === 0);
-        });
+        document.querySelectorAll('.sound-option').forEach((o, i) => o.classList.toggle('selected', i === 0));
         document.getElementById('previewFileInfo').style.display = 'none';
         
-        renderPosts();
         setTimeout(() => show('page1'), 2000);
-      } catch (err) {
-        showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
-      }
+      } catch { showStatus('❌ อ่านข้อมูลไม่ได้', 'error'); }
     } else {
       showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
     }
@@ -473,15 +448,13 @@ document.getElementById('pubBtn').onclick = async () => {
   
   xhr.ontimeout = () => {
     progWrap.style.display = 'none';
-    showStatus('⏰ หมดเวลา\n- ลดขนาดไฟล์ลง\n- หรือส่งที่ Cloudinary โดยตรง', 'error');
+    showStatus('⏰ หมดเวลา\nลองลดขนาดไฟล์ลง', 'error');
   };
-  
   xhr.onerror = () => {
     progWrap.style.display = 'none';
     showStatus('❌ ขาดการเชื่อมต่อ', 'error');
   };
-  
-  xhr.send(formData);
+  xhr.send(fd);
 };
 
 function showStatus(text, type) {
@@ -495,47 +468,35 @@ function updateMainDisplay(title, soundMode, soundName) {
   document.getElementById('postInfo').style.display = 'block';
   document.getElementById('dispDesc').textContent = title;
   
-  let displayText = '';
-  if (soundMode === 'original') {
-    displayText = '🔊 เสียงต้นฉบับ';
-    document.getElementById('dispSoundType').className = 'sound-original';
-  } else if (soundMode === 'custom') {
-    displayText = `✨ เพิ่มเสียง: ${soundName || 'เสียงใหม่'}`;
-    document.getElementById('dispSoundType').className = 'sound-custom';
-  }
-  document.getElementById('dispSoundType').textContent = displayText;
+  const dispType = document.getElementById('dispSoundType');
+  dispType.textContent = soundMode === 'original' 
+    ? '🔊 เสียงต้นฉบับ' 
+    : `✨ เพิ่มเสียง: ${soundName || 'เสียงใหม่'}`;
+  dispType.className = soundMode === 'original' ? 'sound-original' : 'sound-custom';
   
   const fm = fileMeta || currentPost?.fileMeta || {};
-  const origName = fileMeta.name || currentPost?.originalFileName || fm.name;
+  const sizeMB = fm.sizeMB || 0;
+  const chk = checkSizeAdvice(sizeMB);
+  // ✅ แสดงแค่อันเดียวตามจริง
+  const aspect = getAspectRatio(fm.width, fm.height);
   
-  if (origName || fm.sizeMB) {
-    document.getElementById('fileInfoBlock').style.display = 'block';
-    document.getElementById('fnName').textContent = origName || '-';
-    document.getElementById('fnSize').textContent = formatSize(file.size || (fm.sizeMB * 1024 * 1024));
-    document.getElementById('fnDur').textContent = formatTime(fm.duration);
-    document.getElementById('fnRes').textContent = fm.resolution || '-';
-    const check = checkSizeAdvice(fm.sizeMB);
-    document.getElementById('fnSizeCheck').textContent = check.text;
-    document.getElementById('fnSizeCheck').className = check.ok ? 'size-ok' : 'size-warning';
-  } else {
-    document.getElementById('fileInfoBlock').style.display = 'none';
-  }
+  document.getElementById('fileInfoBlock').style.display = 'block';
+  document.getElementById('fnName').textContent = fm.name || currentPost?.originalFileName || 'ไม่ระบุ';
+  document.getElementById('fnSize').textContent = `${sizeMB} MB`;
+  document.getElementById('fnSizeCheck').textContent = chk.text;
+  document.getElementById('fnSizeCheck').className = chk.ok ? 'size-ok' : 'size-warning';
+  document.getElementById('fnDur').textContent = formatTime(fm.duration);
+  document.getElementById('fnAspect').textContent = aspect;
   
   mediaArea.innerHTML = '';
   const src = cloudUrl || currentPost?.url;
   if (!src) return;
-  
-  if (type === 'video' || (currentPost?.type === 'video')) {
+  if ((currentPost?.type || type) === 'video') {
     const v = document.createElement('video');
-    v.src = src; 
-    v.controls = true; 
-    v.autoplay = true; 
-    v.loop = true; 
-    v.muted = false;
+    Object.assign(v, { src, controls: true, autoplay: true, loop: true, muted: false });
     mediaArea.appendChild(v);
   } else {
-    const img = document.createElement('img');
-    img.src = src; mediaArea.appendChild(img);
+    const img = document.createElement('img'); img.src = src; mediaArea.appendChild(img);
   }
 }
 
@@ -548,46 +509,51 @@ function renderPosts() {
     document.getElementById('emptyMsg').style.display = 'block';
     return;
   }
-  
   document.getElementById('emptyMsg').style.display = 'none';
+  
   list.innerHTML = posts.map((p, i) => {
     const m = p.fileMeta || {};
-    const sizeCheck = checkSizeAdvice(m.sizeMB);
+    const sizeMB = m.sizeMB || 0;
+    const chk = checkSizeAdvice(sizeMB);
+    // ✅ แสดงแค่อันเดียวตามจริง
+    const aspect = getAspectRatio(m.width, m.height);
     
-    let displayTitle = p.title;
-    if (!displayTitle || displayTitle === 'ไม่มีชื่อ' || displayTitle.startsWith('http')) {
-      displayTitle = getFileNameOnly(p.originalFileName || m.name || p.url);
+    let title = p.title;
+    if (!title || title === 'ไม่มีชื่อ' || title.startsWith('http')) {
+      title = getFileNameOnly(p.originalFileName || m.name || p.url);
     }
     
     let thumbHtml = '';
-
     if (p.thumbnail && p.thumbnail.startsWith('http')) {
-      thumbHtml = `<img src="${p.thumbnail}" alt="รูปตัวอย่าง" loading="lazy" 
-        onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
+      thumbHtml = `<img src="${p.thumbnail}" alt="รูปย่อ" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
     } else {
-      thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
+      const cloudThumb = getCloudThumbnailUrl(p.url);
+      if (cloudThumb) {
+        thumbHtml = `<img src="${cloudThumb}" alt="รูปย่อ" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
+      } else {
+        thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
+      }
     }
     
     return `
-      <div class="post-item" data-index="${i}">
-        <div class="post-thumb">${thumbHtml}</div>
+      <div class="post-item">
+        <div class="post-thumb" onclick='showPost(posts[${i}])'>${thumbHtml}</div>
         <div class="post-content">
-          <div class="post-title">${displayTitle}</div>
+          <div class="post-title" onclick='showPost(posts[${i}])'>${title}</div>
           <small style="color:${p.soundMode === 'original' ? '#90ee90' : '#ffd700'};">${p.soundDisplay || '🔊 เสียงต้นฉบับ'}</small><br>
           <div class="post-file-info">
             📄 ${m.name || p.originalFileName || 'ไม่ระบุ'}<br>
-            📦 ${m.sizeMB || '?'} MB — <span class="${sizeCheck.ok ? 'size-ok' : 'size-warning'}">${sizeCheck.text}</span><br>
-            ⏱️ ${formatTime(m.duration)}${checkDurationAdvice(m.duration)} | 📐 ${m.resolution || '-'}
+            📦 ${sizeMB} MB — <span class="${chk.ok ? 'size-ok' : 'size-warning'}">${chk.text}</span><br>
+            ⏱️ ${formatTime(m.duration)} | 📐 <span class="aspect-ratio">${aspect}</span>
           </div>
           <small style="color:#555;margin-top:4px;display:block;">${p.time}</small>
+          <button class="btn-danger" onclick='showConfirm(${i})'>
+            <i class="fa-solid fa-trash"></i> ลบโพสต์นี้
+          </button>
         </div>
       </div>
     `;
   }).join('');
-  
-  document.querySelectorAll('.post-item').forEach(item => {
-    item.onclick = () => showPost(posts[parseInt(item.dataset.index)]);
-  });
 }
 
 renderPosts();
