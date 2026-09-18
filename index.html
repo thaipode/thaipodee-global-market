@@ -1,84 +1,79 @@
-function renderPostList() {
-  loadPosts();
-  const listEl = document.getElementById('postListContainer');
-  const totalEl = document.getElementById('postTotal');
-  const emptyEl = document.getElementById('noPostText');
-  
-  totalEl.textContent = posts.length;
+<!-- ==============================================================
+   ThaiPodee Global Market — หน้าจอหน้าแรก
+   เวอร์ชัน: 1.0 | วันที่: 2026-09-18
+   อ้างอิง: ภาพหน้าจอจริง 13:37 น.
+   เป้าหมาย: เหมือนภาพเป๊ะ — ไม่แก้ไขอะไรเพิ่ม
+============================================================== -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thaipodee Global Market</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
 
-  if (!posts.length) {
-    listEl.innerHTML = '<p style="color:#888; padding:30px; text-align:center;">ยังไม่มีโพสต์</p>';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
+    /* พื้นที่วิดีโอตรงกลาง */
+    .video-area {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .video-icon { font-size: 40px; color: #888; margin-bottom: 12px; }
+    .hint-text { color: #888; font-size: 14px; }
 
-  let html = '';
-  posts.forEach(function(p, i) {
-    let name = (p.name || 'รายการที่ ' + (i+1)).replace(/\.[^.]+$/, '');
-    let ratio = (p.width && p.height) ? (p.width > p.height ? '16:9' : '9:16') : '-';
-    let sizeMB = p.sizeMB || '0';
-    let time = p.time || '-';
-    
-    let typeIcon, typeLabel, thumbUrl;
-    
-    if (p.type === 'video') {
-      typeIcon = '<i class="fa-solid fa-video"></i>';
-      typeLabel = 'วิดีโอ';
-      if (p.url && p.url.indexOf('cloudinary') !== -1) {
-        thumbUrl = p.url
-          .replace('/video/upload/', '/video/upload/w_200,h_260,c_fill/')
-          .replace('.mp4', '.jpg');
-      } else {
-        thumbUrl = '';
-      }
-    } else {
-      typeIcon = '<i class="fa-solid fa-image"></i>';
-      if (p.soundMode === 'custom') {
-        typeLabel = 'รูปภาพ + เสียง';
-      } else {
-        typeLabel = 'รูปภาพ';
-      }
-      thumbUrl = p.url || '';
+    /* ปุ่มด้านขวา */
+    .right-buttons {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 24px; align-items: center;
+    }
+    .right-btn { font-size: 24px; cursor: pointer; user-select: none; }
+    .info-btn {
+      background: linear-gradient(90deg, #c0f, #f08);
+      border: none; border-radius: 20px; padding: 8px 14px;
+      color: #fff; font-size: 12px; margin-top: 8px;
     }
 
-    let soundInfo = '';
-    if (p.soundMode === 'original') {
-      soundInfo = '<span style="color:#90ee90; font-size:11px;">🔊 เสียงต้นฉบับ</span>';
-    } else if (p.soundMode === 'custom' && p.soundName) {
-      soundInfo = '<span style="color:#ffd700; font-size:11px;">🎵 ' + p.soundName + '</span>';
+    /* แถบด้านล่าง */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 10px 0; background: #000;
     }
+    .nav-btn { font-size: 22px; cursor: pointer; user-select: none; }
+    .post-btn {
+      background: #f33; border: none; border-radius: 6px;
+      width: 36px; height: 36px; font-size: 22px; color: #fff; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
 
-    html += '<div class="post-item">';
-    html += '<div class="post-thumb" onclick="displayPost(posts[' + i + '], ' + i + '); showPage(\'home\');">';
-    
-    if (thumbUrl) {
-      let iconType = (p.type === 'video') ? 'play' : 'image';
-      html += '<img src="' + thumbUrl + '" alt="' + name + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fa-solid fa-' + iconType + '\\\'></i>\';">';
-    } else {
-      let iconType = (p.type === 'video') ? 'play' : 'image';
-      html += '<i class="fa-solid fa-' + iconType + '"></i>';
-    }
-    
-    html += '</div>';
-    html += '<div style="flex:1; min-width:0;">';
-    html += '<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">';
-    html += '<span style="font-size:14px;">' + typeIcon + '</span>';
-    html += '<span style="font-size:12px; color:#aaa; font-weight:bold;">' + typeLabel + '</span>';
-    html += '</div>';
-    html += '<div class="post-title" onclick="displayPost(posts[' + i + '], ' + i + '); showPage(\'home\');">' + name + '</div>';
-    
-    if (soundInfo) {
-      html += '<div style="margin:3px 0;">' + soundInfo + '</div>';
-    }
-    
-    html += '<div class="post-meta">';
-    html += '📦 ' + sizeMB + ' MB — ' + (parseFloat(sizeMB) <= MAX_MB ? '✅' : '⚠️') + '<br>';
-    html += '📐 ' + ratio + ' | 📅 ' + time;
-    html += '</div>';
-    html += '<button class="del-btn" onclick="openDelModal(' + i + ');"><i class="fa-solid fa-trash"></i> ลบ</button>';
-    html += '</div></div>';
-  });
+  <!-- พื้นที่ตรงกลาง -->
+  <div class="video-area">
+    <div class="video-icon">🎥</div>
+    <div class="hint-text">กดปุ่ม + เพื่อโพสต์</div>
+  </div>
 
-  listEl.innerHTML = html;
-}
+  <!-- ปุ่มด้านขวา -->
+  <div class="right-buttons">
+    <div class="right-btn">👤</div>
+    <div class="right-btn">🤍</div>
+    <div class="right-btn">💬</div>
+    <div class="right-btn">📌</div>
+    <div class="right-btn">↗️</div>
+    <button class="info-btn">ข้อมูลเพิ่ม</button>
+  </div>
+
+  <!-- แถบล่าง -->
+  <div class="bottom-nav">
+    <div class="nav-btn">🏠</div>
+    <div class="nav-btn">🔍</div>
+    <button class="post-btn">+</button>
+    <div class="nav-btn">💬</div>
+    <div class="nav-btn">👤</div>
+  </div>
+
+</body>
+</html>
