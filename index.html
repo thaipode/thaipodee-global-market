@@ -194,14 +194,23 @@ function checkDurationAdvice(sec) {
 
 function getFileNameOnly(fullName) {
   if (!fullName) return 'ไม่ระบุชื่อไฟล์';
-  // ตัดนามสกุลออก
-  return fullName.replace(/\.[^/.]+$/, '');
+  let name = fullName;
+  if (name.startsWith('http')) {
+    const parts = name.split('/');
+    name = parts[parts.length - 1];
+  }
+  return name.replace(/\.[^/.]+$/, '');
 }
 
 function getCloudThumbnailUrl(videoUrl) {
-  if (!videoUrl || !videoUrl.includes('cloudinary.com')) return '';
-  // สร้างรูปที่ชัดเจน ขนาดพอดี
-  return videoUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
+  if (!videoUrl) return '';
+  if (!videoUrl.includes('cloudinary.com')) return '';
+  // แก้ตรงนี้: เปลี่ยนรูปแบบลิงก์ให้ถูกต้อง
+  let thumbUrl = videoUrl;
+  if (thumbUrl.includes('/video/upload/')) {
+    thumbUrl = thumbUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
+  }
+  return thumbUrl;
 }
 
 async function generateThumbnail(fileObj, isVideo) {
@@ -343,7 +352,6 @@ document.getElementById('pubBtn').onclick = async () => {
         cloudUrl = data.secure_url;
         
         const titleInput = document.getElementById('titleInp').value.trim();
-        // ✅ ถ้าไม่ใส่ชื่อ ใช้ชื่อไฟล์จริงแทน
         const title = titleInput || getFileNameOnly(fileMeta.name);
         const soundInput = document.getElementById('soundInp').value.trim();
         const soundDisplay = soundInput === '' ? 'เสียงต้นฉบับ' : soundInput;
@@ -352,7 +360,7 @@ document.getElementById('pubBtn').onclick = async () => {
           url: cloudUrl,
           type: type,
           title: title,
-          originalFileName: fileMeta.name, // เก็บชื่อจริงไว้ด้วย
+          originalFileName: fileMeta.name,
           sound: soundDisplay,
           thumbnail: '',
           fileMeta: { 
@@ -416,13 +424,16 @@ function updateMainDisplay(title, soundText) {
   const isOriginal = soundText === 'เสียงต้นฉบับ' || soundText === '';
   document.getElementById('dispSoundType').textContent = isOriginal ? '🎵 เสียงต้นฉบับ' : soundText;
   
-  if (fileMeta.name || currentPost?.originalFileName) {
+  const fm = fileMeta || currentPost?.fileMeta || {};
+  const origName = fileMeta.name || currentPost?.originalFileName || fm.name;
+  
+  if (origName || fm.sizeMB) {
     document.getElementById('fileInfoBlock').style.display = 'block';
-    document.getElementById('fnName').textContent = fileMeta.name || currentPost.originalFileName || '-';
-    document.getElementById('fnSize').textContent = formatSize(file.size || (fileMeta.sizeMB * 1024 * 1024) || (currentPost?.fileMeta?.sizeMB * 1024 * 1024));
-    document.getElementById('fnDur').textContent = formatTime(fileMeta.duration || currentPost?.fileMeta?.duration);
-    document.getElementById('fnRes').textContent = fileMeta.resolution || currentPost?.fileMeta?.resolution || '-';
-    const check = checkSizeAdvice(fileMeta.sizeMB || currentPost?.fileMeta?.sizeMB);
+    document.getElementById('fnName').textContent = origName || '-';
+    document.getElementById('fnSize').textContent = formatSize(file.size || (fm.sizeMB * 1024 * 1024));
+    document.getElementById('fnDur').textContent = formatTime(fm.duration);
+    document.getElementById('fnRes').textContent = fm.resolution || '-';
+    const check = checkSizeAdvice(fm.sizeMB);
     document.getElementById('fnSizeCheck').textContent = check.text;
     document.getElementById('fnSizeCheck').className = check.ok ? 'size-ok' : 'size-warning';
   } else {
@@ -462,20 +473,21 @@ function renderPosts() {
     const m = p.fileMeta || {};
     const sizeCheck = checkSizeAdvice(m.sizeMB);
     
-    // ✅ ใช้ชื่อไฟล์จริง ถ้าไม่ได้ตั้งชื่อเอง
+    // ✅ แสดงชื่อถูกต้อง
     let displayTitle = p.title;
-    if (displayTitle === 'ไม่มีชื่อ' || !displayTitle) {
+    if (!displayTitle || displayTitle === 'ไม่มีชื่อ' || displayTitle.startsWith('http')) {
       displayTitle = getFileNameOnly(p.originalFileName || m.name || p.url);
     }
     
-    // ✅ สร้างรูปภาพตัวอย่างที่ชัดเจน
+    // ✅ รูปจาก Cloudinary ทุกรายการ
     let thumbHtml = '';
     if (p.thumbnail && p.thumbnail.startsWith('data:')) {
       thumbHtml = `<img src="${p.thumbnail}" alt="รูปตัวอย่าง">`;
     } else {
       const cloudThumb = getCloudThumbnailUrl(p.url);
       if (cloudThumb) {
-        thumbHtml = `<img src="${cloudThumb}" alt="รูปตัวอย่าง" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
+        thumbHtml = `<img src="${cloudThumb}" alt="รูปตัวอย่าง" loading="lazy" 
+          onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
       } else {
         thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
       }
