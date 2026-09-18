@@ -886,6 +886,9 @@ function displayPost(post, index) {
     const img = document.createElement('img');
     img.src = post.url;
     img.alt = post.name;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
     area.appendChild(img);
   }
 
@@ -923,10 +926,16 @@ function renderPostList() {
 
   list.innerHTML = posts.map((p, i) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+    // สร้างลิงก์รูปภาพย่อ
+    let thumbUrl = p.url;
+    if (p.type === 'video') {
+      // ถ้าเป็นวิดีโอ ใช้ลิงก์เดิมก่อน หรือใช้ภาพจากคลาวด์ถ้ามี
+      thumbUrl = p.url.replace(/\.mp4$/, '.jpg');
+    }
     return `
       <div class="post-item">
         <div class="post-thumb" onclick='displayPost(posts[${i}], ${i}); showPage("home");'>
-          <img src="${p.url.replace(/\.[^.]+$/, '.jpg')}" onerror="this.src='${p.url}'">
+          <img src="${thumbUrl}" onerror="this.src='${p.url}'">
         </div>
         <div style="flex:1;">
           <div class="post-title" onclick='displayPost(posts[${i}], ${i}); showPage("home");'>
@@ -1058,6 +1067,11 @@ function resetUploadForm() {
   document.getElementById('optCustom').classList.remove('selected');
   document.getElementById('statusLine').style.display = 'none';
 }
+
+// โหลดข้อมูลเมื่อเปิดหน้า
+document.addEventListener('DOMContentLoaded', () => {
+  renderPostList();
+});
 </script>
 </body>
 </html>
