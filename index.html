@@ -19,7 +19,8 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .username { font-weight: bold; font-size: 15px; }
 .desc { font-size: 13px; margin-top: 4px; opacity: 0.95; word-break: break-all; }
 .sound { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; flex-wrap: wrap; }
-.sound-original { color: #22d369; font-weight: 500; }
+.sound-original { color: #90ee90; font-weight: 500; }
+.sound-custom { color: #ffd700; font-weight: 500; }
 .file-info { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.7; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
 .right { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 22px; }
 .icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
@@ -31,6 +32,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .nav span { font-size: 10px; margin-top: 2px; }
 .btn { background: linear-gradient(90deg, #ff2e55, #ff6b4a); border: none; padding: 14px; border-radius: 8px; color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
 .inp { background: #222; border: none; padding: 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 12px; font-size: 15px; }
+.inp-small { background: #222; border: none; padding: 10px 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 10px; font-size: 14px; }
 .progress { height: 10px; background: #333; border-radius: 5px; margin: 18px 0; display: none; overflow: hidden; }
 .prog-bar { height: 100%; background: linear-gradient(90deg, #ff2e55, #ff6b4a); border-radius: 5px; width: 0%; transition: width 0.3s; }
 .status { text-align: center; padding: 14px; font-size: 14px; font-weight: bold; border-radius: 8px; margin: 12px 0; white-space: pre-wrap; line-height: 1.6; }
@@ -48,6 +50,9 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .size-warning { color: #ffd700; }
 .size-ok { color: #4ade80; }
 .audio-note { font-size: 11px; color: #90ee90; margin-top: 6px; }
+.sound-option { display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; }
+.sound-option.selected { outline: 2px solid #ffd700; }
+.sound-option input { width: auto; margin: 0; }
 </style>
 </head>
 <body>
@@ -65,7 +70,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       <p class="desc" id="dispDesc"></p>
       <div class="sound" id="soundInfo">
         <i class="fa-solid fa-music fa-xs"></i>
-        <span class="sound-original" id="dispSoundType"></span>
+        <span id="dispSoundType"></span>
       </div>
       <div class="file-info" id="fileInfoBlock" style="display:none;">
         <span class="file-info-item"><strong>📄 ชื่อไฟล์:</strong> <span id="fnName"></span></span><br>
@@ -102,6 +107,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     </button>
     <h3 style="margin-bottom:15px;">อัปโหลดสื่อ</h3>
     <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
+    
     <div id="previewFileInfo" style="background:rgba(255,255,255,0.05);padding:14px;border-radius:8px;margin-bottom:14px;display:none;font-size:13px;line-height:1.8;">
       <strong>📋 ข้อมูลไฟล์:</strong><br>
       ชื่อไฟล์: <span id="pName"></span><br>
@@ -109,9 +115,29 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       เวลา: <span id="pDur"></span><br>
       ความละเอียด: <span id="pRes"></span>
     </div>
-    <p style="font-size:12px;color:#888;margin-bottom:12px;">💡 ปล่อยช่องเสียงว่าง = ใช้เสียงต้นฉบับจากวิดีโอ</p>
-    <input type="text" class="inp" id="titleInp" placeholder="ชื่อ/คำอธิบาย (ถ้าปล่อยว่าง จะใช้ชื่อไฟล์)...">
-    <input type="text" class="inp" id="soundInp" placeholder="เสียงประกอบ (ปล่อยว่าง = เสียงต้นฉบับ)...">
+
+    <p style="font-size:13px;color:#ccc;margin:15px 0 8px;"><strong>🎵 เลือกเสียง:</strong></p>
+    
+    <label class="sound-option selected" id="optSoundOriginal">
+      <input type="radio" name="soundMode" value="original" checked>
+      <div>
+        <strong>🔊 เสียงต้นฉบับ</strong><br>
+        <small style="color:#888;">ใช้เสียงจากวิดีโอเดิม</small>
+      </div>
+    </label>
+    
+    <label class="sound-option" id="optSoundCustom">
+      <input type="radio" name="soundMode" value="custom">
+      <div>
+        <strong>✨ เพิ่มเสียงใหม่</strong><br>
+        <small style="color:#888;">ใส่ชื่อเสียงหรือเพลงที่ต้องการ</small>
+      </div>
+    </label>
+    
+    <input type="text" class="inp-small" id="customSoundName" placeholder="ตั้งชื่อเสียงที่จะเพิ่ม..." style="display:none;margin-top:5px;">
+    
+    <p style="font-size:12px;color:#888;margin:12px 0;">💡 ชื่อวิดีโอจะนำมาจากชื่อไฟล์โดยตรง</p>
+    
     <button class="btn" id="pubBtn">เผยแพร่ขึ้นคลาวด์</button>
     <div id="progWrap" class="progress"><div id="progBar" class="prog-bar"></div></div>
     <p id="statusMsg" class="status" style="display:none;"></p>
@@ -247,7 +273,7 @@ function showPost(post) {
   type = post.type;
   fileMeta = post.fileMeta || {};
   thumbnailUrl = post.thumbnail || '';
-  updateMainDisplay(post.title, post.sound);
+  updateMainDisplay(post.title, post.soundMode, post.soundName);
   show('page1');
 }
 
@@ -255,6 +281,21 @@ document.querySelectorAll('[data-goto]').forEach(b =>
   b.onclick = () => show(b.dataset.goto)
 );
 document.getElementById('uploadBtn').onclick = () => show('pageUpload');
+
+// จัดการเลือกโหมดเสียง — เหลือ 2 อย่าง
+document.querySelectorAll('input[name="soundMode"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.sound-option').forEach(opt => opt.classList.remove('selected'));
+    radio.closest('.sound-option').classList.add('selected');
+    
+    const customInput = document.getElementById('customSoundName');
+    if (radio.value === 'custom') {
+      customInput.style.display = 'block';
+    } else {
+      customInput.style.display = 'none';
+    }
+  });
+});
 
 document.getElementById('fileInp').onchange = async e => {
   file = e.target.files[0];
@@ -350,17 +391,29 @@ document.getElementById('pubBtn').onclick = async () => {
         const data = JSON.parse(xhr.responseText);
         cloudUrl = data.secure_url;
         
-        const titleInput = document.getElementById('titleInp').value.trim();
-        const title = titleInput || getFileNameOnly(fileMeta.name);
-        const soundInput = document.getElementById('soundInp').value.trim();
-        const soundDisplay = soundInput === '' ? 'เสียงต้นฉบับ' : soundInput;
+        // เอาชื่อจากไฟล์โดยตรง
+        const title = getFileNameOnly(fileMeta.name);
+        
+        // อ่านโหมดเสียง — 2 อย่าง
+        const soundMode = document.querySelector('input[name="soundMode"]:checked').value;
+        let soundName = '';
+        let soundDisplayText = '';
+        
+        if (soundMode === 'original') {
+          soundDisplayText = '🔊 เสียงต้นฉบับ';
+        } else if (soundMode === 'custom') {
+          soundName = document.getElementById('customSoundName').value.trim() || 'เสียงใหม่';
+          soundDisplayText = `✨ เพิ่มเสียง: ${soundName}`;
+        }
         
         const newPost = {
           url: cloudUrl,
           type: type,
           title: title,
           originalFileName: fileMeta.name,
-          sound: soundDisplay,
+          soundMode: soundMode,
+          soundName: soundName,
+          soundDisplay: soundDisplayText,
           thumbnail: '',
           fileMeta: { 
             ...fileMeta,
@@ -374,16 +427,21 @@ document.getElementById('pubBtn').onclick = async () => {
         localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
         
         currentPost = newPost;
-        updateMainDisplay(title, soundDisplay);
-        showStatus(`✅ อัปโหลดสำเร็จ!\nชื่อ: ${title}\nกดปุ่ม 🔊 บนวิดีโอเพื่อฟังเสียง`, 'success');
+        updateMainDisplay(title, soundMode, soundName);
+        showStatus(`✅ อัปโหลดสำเร็จ!\nชื่อ: ${title}\nเสียง: ${soundDisplayText}`, 'success');
         
+        // รีเซ็ตฟอร์ม
         file = null;
         fileMeta = {};
         cloudUrl = '';
         thumbnailUrl = '';
         document.getElementById('fileInp').value = '';
-        document.getElementById('titleInp').value = '';
-        document.getElementById('soundInp').value = '';
+        document.getElementById('customSoundName').value = '';
+        document.getElementById('customSoundName').style.display = 'none';
+        document.querySelector('input[value="original"]').checked = true;
+        document.querySelectorAll('.sound-option').forEach((opt, idx) => {
+          opt.classList.toggle('selected', idx === 0);
+        });
         document.getElementById('previewFileInfo').style.display = 'none';
         
         renderPosts();
@@ -416,12 +474,20 @@ function showStatus(text, type) {
   el.style.display = 'block';
 }
 
-function updateMainDisplay(title, soundText) {
+function updateMainDisplay(title, soundMode, soundName) {
   document.getElementById('postInfo').style.display = 'block';
   document.getElementById('dispDesc').textContent = title;
   
-  const isOriginal = soundText === 'เสียงต้นฉบับ' || soundText === '';
-  document.getElementById('dispSoundType').textContent = isOriginal ? '🎵 เสียงต้นฉบับ' : soundText;
+  // แสดงประเภทเสียง — 2 อย่าง
+  let displayText = '';
+  if (soundMode === 'original') {
+    displayText = '🔊 เสียงต้นฉบับ';
+    document.getElementById('dispSoundType').className = 'sound-original';
+  } else if (soundMode === 'custom') {
+    displayText = `✨ เพิ่มเสียง: ${soundName || 'เสียงใหม่'}`;
+    document.getElementById('dispSoundType').className = 'sound-custom';
+  }
+  document.getElementById('dispSoundType').textContent = displayText;
   
   const fm = fileMeta || currentPost?.fileMeta || {};
   const origName = fileMeta.name || currentPost?.originalFileName || fm.name;
@@ -495,7 +561,7 @@ function renderPosts() {
         <div class="post-thumb">${thumbHtml}</div>
         <div class="post-content">
           <div class="post-title">${displayTitle}</div>
-          <small style="color:#90ee90;">${p.sound}</small><br>
+          <small style="color:${p.soundMode === 'original' ? '#90ee90' : '#ffd700'};">${p.soundDisplay || '🔊 เสียงต้นฉบับ'}</small><br>
           <div class="post-file-info">
             📄 ${m.name || p.originalFileName || 'ไม่ระบุ'}<br>
             📦 ${m.sizeMB || '?'} MB — <span class="${sizeCheck.ok ? 'size-ok' : 'size-warning'}">${sizeCheck.text}</span><br>
