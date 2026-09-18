@@ -157,8 +157,8 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       <p style="color:#888;">@thaipodee_master</p>
       <div style="display:flex;justify-content:center;gap:30px;margin-top:15px;">
         <div style="text-align:center;"><strong id="postCount">0</strong><br><small>โพสต์</small></div>
-        <div style="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
-        <div style="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
+        <div class="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
+        <div class="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
       </div>
     </div>
     <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
@@ -267,6 +267,21 @@ async function generateThumbnail(fileObj, isVideo) {
   });
 }
 
+async function uploadThumbnail(dataUrl) {
+  if (!dataUrl) return '';
+  const formData = new FormData();
+  formData.append('file', dataUrl);
+  formData.append('upload_preset', UPLOAD_PRESET);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json();
+  return data.secure_url || '';
+}
+
 function showPost(post) {
   currentPost = post;
   cloudUrl = post.url;
@@ -282,7 +297,6 @@ document.querySelectorAll('[data-goto]').forEach(b =>
 );
 document.getElementById('uploadBtn').onclick = () => show('pageUpload');
 
-// จัดการเลือกโหมดเสียง — เหลือ 2 อย่าง
 document.querySelectorAll('input[name="soundMode"]').forEach(radio => {
   radio.addEventListener('change', () => {
     document.querySelectorAll('.sound-option').forEach(opt => opt.classList.remove('selected'));
@@ -390,11 +404,15 @@ document.getElementById('pubBtn').onclick = async () => {
       try {
         const data = JSON.parse(xhr.responseText);
         cloudUrl = data.secure_url;
+
+        let uploadedThumbUrl = '';
+        if (thumbnailUrl) {
+          showStatus(`⏳ กำลังอัปโหลดรูปย่อ...`, 'info');
+          uploadedThumbUrl = await uploadThumbnail(thumbnailUrl);
+        }
         
-        // เอาชื่อจากไฟล์โดยตรง
         const title = getFileNameOnly(fileMeta.name);
         
-        // อ่านโหมดเสียง — 2 อย่าง
         const soundMode = document.querySelector('input[name="soundMode"]:checked').value;
         let soundName = '';
         let soundDisplayText = '';
@@ -414,7 +432,7 @@ document.getElementById('pubBtn').onclick = async () => {
           soundMode: soundMode,
           soundName: soundName,
           soundDisplay: soundDisplayText,
-          thumbnail: '',
+          thumbnail: uploadedThumbUrl,
           fileMeta: { 
             ...fileMeta,
             duration: data.duration || fileMeta.duration,
@@ -430,7 +448,6 @@ document.getElementById('pubBtn').onclick = async () => {
         updateMainDisplay(title, soundMode, soundName);
         showStatus(`✅ อัปโหลดสำเร็จ!\nชื่อ: ${title}\nเสียง: ${soundDisplayText}`, 'success');
         
-        // รีเซ็ตฟอร์ม
         file = null;
         fileMeta = {};
         cloudUrl = '';
@@ -478,7 +495,6 @@ function updateMainDisplay(title, soundMode, soundName) {
   document.getElementById('postInfo').style.display = 'block';
   document.getElementById('dispDesc').textContent = title;
   
-  // แสดงประเภทเสียง — 2 อย่าง
   let displayText = '';
   if (soundMode === 'original') {
     displayText = '🔊 เสียงต้นฉบับ';
@@ -544,16 +560,12 @@ function renderPosts() {
     }
     
     let thumbHtml = '';
-    if (p.thumbnail && p.thumbnail.startsWith('data:')) {
-      thumbHtml = `<img src="${p.thumbnail}" alt="รูปตัวอย่าง">`;
+
+    if (p.thumbnail && p.thumbnail.startsWith('http')) {
+      thumbHtml = `<img src="${p.thumbnail}" alt="รูปตัวอย่าง" loading="lazy" 
+        onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
     } else {
-      const cloudThumb = getCloudThumbnailUrl(p.url);
-      if (cloudThumb) {
-        thumbHtml = `<img src="${cloudThumb}" alt="รูปตัวอย่าง" loading="lazy" 
-          onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-video\\'></i></span>'">`;
-      } else {
-        thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
-      }
+      thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
     }
     
     return `
