@@ -205,11 +205,11 @@ function getFileNameOnly(fullName) {
 function getCloudThumbnailUrl(videoUrl) {
   if (!videoUrl) return '';
   if (!videoUrl.includes('cloudinary.com')) return '';
-  // แก้ตรงนี้: เปลี่ยนรูปแบบลิงก์ให้ถูกต้อง
-  let thumbUrl = videoUrl;
-  if (thumbUrl.includes('/video/upload/')) {
-    thumbUrl = thumbUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
+  if (videoUrl.includes('/w_') || videoUrl.includes('/h_') || videoUrl.includes('/c_fill')) {
+    return videoUrl;
   }
+  let thumbUrl = videoUrl;
+  thumbUrl = thumbUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
   return thumbUrl;
 }
 
@@ -276,7 +276,6 @@ document.getElementById('fileInp').onchange = async e => {
     const v = document.createElement('video');
     v.preload = 'metadata';
     v.src = tempUrl;
-    
     await new Promise(res => {
       v.onloadedmetadata = () => {
         fileMeta.duration = v.duration;
@@ -473,13 +472,11 @@ function renderPosts() {
     const m = p.fileMeta || {};
     const sizeCheck = checkSizeAdvice(m.sizeMB);
     
-    // ✅ แสดงชื่อถูกต้อง
     let displayTitle = p.title;
     if (!displayTitle || displayTitle === 'ไม่มีชื่อ' || displayTitle.startsWith('http')) {
       displayTitle = getFileNameOnly(p.originalFileName || m.name || p.url);
     }
     
-    // ✅ รูปจาก Cloudinary ทุกรายการ
     let thumbHtml = '';
     if (p.thumbnail && p.thumbnail.startsWith('data:')) {
       thumbHtml = `<img src="${p.thumbnail}" alt="รูปตัวอย่าง">`;
