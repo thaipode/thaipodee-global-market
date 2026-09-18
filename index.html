@@ -59,10 +59,10 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .confirm-buttons { display: flex; gap: 10px; margin-top: 15px; }
 .confirm-del { flex: 1; background: #dc2626; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
 .confirm-cancel { flex: 1; background: #333; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
-/* ===== หน้าข้อมูลเชิงลึก ===== */
 .insight-page { background: #f8fafc; color: #1f2937; }
+.insight-back { position: absolute; top: 12px; left: 12px; font-size: 18px; cursor: pointer; color: #1f2937; z-index: 10; }
 .insight-header { text-align: center; padding: 20px; }
-.insight-cover { width: 80px; height: 80px; border-radius: 8px; margin: 0 auto 8px; background: #333; overflow: hidden; }
+.insight-cover { width: 80px; height: 80px; border-radius: 8px; margin: 0 auto 8px; background: #e5e7eb; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .insight-cover img { width: 100%; height: 100%; object-fit: cover; }
 .insight-meta { font-size: 13px; color: #6b7280; margin-bottom: 16px; }
 .insight-tabs { display: flex; justify-content: center; gap: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
@@ -81,7 +81,6 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 .chart-bar { width: 16px; background: #93c5fd; border-radius: 2px 2px 0 0; transition: height 0.3s; }
 .chart-label { font-size: 9px; color: #6b7280; margin-top: 4px; }
 .insight-note { padding: 0 16px 16px; font-size: 11px; color: #9ca3af; }
-.insight-back { position: absolute; top: 12px; left: 12px; font-size: 18px; cursor: pointer; color: #1f2937; z-index: 10; }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -123,7 +122,6 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       <p style="font-size:11px;color:#90ee90;margin-top:6px;">💡 กดปุ่มเสียง 🔊 บนวิดีโอเพื่อเปิดฟัง</p>
     </div>
 
-    <!-- 📊 ปุ่มข้อมูลเชิงลึก มุมล่างขวา -->
     <div class="insight-btn" data-goto="pageInsight">
       <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
     </div>
@@ -193,7 +191,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
   </div>
 </div>
 
-<!-- ===== หน้า 3: โปรไฟล์ ===== -->
+<!-- ===== หน้า 3: โปรไฟล์ — ลบส่วนสถิติออกแล้ว ===== -->
 <div id="pageProfile" class="page hidden">
   <div style="padding:20px;">
     <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">
@@ -212,28 +210,20 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
       </div>
     </div>
 
-    <div class="stats-box" id="statsBox" style="display:none;background:rgba(255,255,255,0.05);padding:14px;border-radius:10px;margin:12px 0;font-size:13px;line-height:2;">
-      <p class="stats-title" style="font-weight:bold;color:#ffd700;margin-bottom:6px;">📊 สถิติการโพสต์</p>
-      เริ่มโพสต์ตั้งแต่วันที่: <span id="firstPostDate">-</span><br>
-      โพสต์ไปแล้ว: <span id="daysCount">0</span> วัน<br>
-      จำนวนโพสต์ทั้งหมด: <span id="totalPosts">0</span> รายการ<br>
-      เฉลี่ย: <span id="avgPerDay">0</span> โพสต์ ต่อวัน
-    </div>
-
     <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
     <div id="postList"></div>
     <p id="emptyMsg" style="text-align:center;color:#888;">ยังไม่มีโพสต์</p>
   </div>
 </div>
 
-<!-- ===== หน้า 4: ข้อมูลเชิงลึก ===== -->
+<!-- ===== หน้า 4: ข้อมูลเชิงลึก — ที่เดียวที่มีสถิติ ===== -->
 <div id="pageInsight" class="page insight-page hidden">
   <div class="insight-back" onclick="show('page1')">
     <i class="fa-solid fa-chevron-left"></i>
   </div>
   <div class="insight-header">
     <div class="insight-cover" id="insightCover">
-      <i class="fa-solid fa-video" style="color:#666;font-size:30px;line-height:80px;"></i>
+      <i class="fa-solid fa-video" style="color:#9ca3af;font-size:30px;"></i>
     </div>
     <div style="font-weight:bold;">ThaiPodee Master</div>
     <div class="insight-meta" id="insightPostTime">เลือกวิดีโอเพื่อดูข้อมูล</div>
@@ -245,7 +235,6 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     <div class="insight-tab" data-tab="share">การมีส่วนร่วม</div>
   </div>
 
-  <!-- 📊 แท็บ: ภาพรวม -->
   <div id="tab-summary" class="insight-tab-content">
     <div class="insight-grid">
       <div class="insight-card">
@@ -276,9 +265,7 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 
     <div class="insight-chart">
       <div class="insight-chart-title">📈 ยอดเข้าชมตามช่วงเวลา</div>
-      <div class="insight-chart-bar" id="insightChart">
-        <!-- กราฟจะเติมอัตโนมัติ -->
-      </div>
+      <div class="insight-chart-bar" id="insightChart"></div>
     </div>
 
     <div class="insight-note">
@@ -286,7 +273,6 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
     </div>
   </div>
 
-  <!-- แท็บอื่นๆ -->
   <div id="tab-followers" class="insight-tab-content hidden">
     <div style="padding:20px;text-align:center;color:#6b7280;">
       <i class="fa-solid fa-users fa-2x" style="margin-bottom:12px;"></i>
@@ -320,7 +306,7 @@ let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  if (id === 'pageProfile') updateStats();
+  if (id === 'pageProfile') renderPosts();
   if (id === 'pageInsight') updateInsight();
 }
 
@@ -355,10 +341,9 @@ function getFileNameOnly(fullName) {
 }
 
 function getCloudThumbnailUrl(videoUrl) {
-  if (!videoUrl) return '';
-  if (!videoUrl.includes('cloudinary.com')) return '';
-  if (videoUrl.includes('/w_') || videoUrl.includes('/c_fill')) return videoUrl;
-  return videoUrl.replace('/video/upload/', '/video/upload/w_200,h_260,c_fill,so_1/');
+  if (!videoUrl || !videoUrl.includes('cloudinary.com')) return '';
+  if (videoUrl.includes('/w_')) return videoUrl;
+  return videoUrl.replace('/upload/', '/upload/w_200,h_260,c_fill,so_1/');
 }
 
 async function generateThumbnail(fileObj, isVideo) {
@@ -372,14 +357,15 @@ async function generateThumbnail(fileObj, isVideo) {
     video.src = URL.createObjectURL(fileObj);
     video.currentTime = 1;
     video.onseeked = () => {
-      const c = document.createElement('canvas');
-      c.width = 200; c.height = 260;
-      const ctx = c.getContext('2d');
-      ctx.drawImage(video, 0, 0, c.width, c.height);
-      res(c.toDataURL('image/jpeg', 0.85));
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 260;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      res(canvas.toDataURL('image/jpeg', 0.85));
       URL.revokeObjectURL(video.src);
     };
-    video.onerror = () => { URL.revokeObjectURL(video.src); res(''); };
+    video.onerror = () => res('');
   });
 }
 
@@ -389,9 +375,11 @@ async function uploadThumbnail(dataUrl) {
     const fd = new FormData();
     fd.append('file', dataUrl);
     fd.append('upload_preset', UPLOAD_PRESET);
-    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: fd });
-    const d = await r.json();
-    return d.secure_url || '';
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: 'POST', body: fd
+    });
+    const json = await res.json();
+    return json.secure_url || '';
   } catch { return ''; }
 }
 
@@ -420,45 +408,24 @@ function doDelete() {
   posts.splice(deleteIndex, 1);
   localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
   renderPosts();
-  updateStats();
   hideConfirm();
 }
 
-// 📊 สถิติโปรไฟล์
-function updateStats() {
-  const count = posts.length;
-  document.getElementById('postCount').textContent = count;
-  document.getElementById('followerCount').textContent = '0';
-  document.getElementById('followingCount').textContent = '0';
-
-  if (count === 0) {
-    document.getElementById('statsBox').style.display = 'none';
-    return;
-  }
-  document.getElementById('statsBox').style.display = 'block';
-  
-  let firstDate = null;
-  posts.forEach(p => {
-    if (!p.dateObj) {
-      try { p.dateObj = new Date(p.time); }
-      catch { p.dateObj = new Date(); }
-    }
-    if (!firstDate || p.dateObj < firstDate) firstDate = p.dateObj;
-  });
-
-  if (!firstDate) firstDate = new Date();
-  const now = new Date();
-  const daysDiff = Math.max(1, Math.ceil((now - firstDate) / (1000 * 60 * 60 * 24)));
-  const avg = (count / daysDiff).toFixed(2);
-  const fd = firstDate.toLocaleDateString('th-TH');
-  
-  document.getElementById('firstPostDate').textContent = fd;
-  document.getElementById('daysCount').textContent = daysDiff;
-  document.getElementById('totalPosts').textContent = count;
-  document.getElementById('avgPerDay').textContent = avg;
+// แปลงวันที่ให้ถูกต้อง
+function parseDate(dateVal) {
+  if (!dateVal) return null;
+  if (dateVal instanceof Date) return dateVal;
+  const parsed = new Date(dateVal);
+  return isNaN(parsed.getTime()) ? null : parsed;
 }
 
-// 📊 ข้อมูลเชิงลึก
+function formatDateThai(date) {
+  if (!date) return '-';
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
 function updateInsight() {
   const total = posts.length;
   document.getElementById('insightTotalPosts').textContent = total;
@@ -470,24 +437,38 @@ function updateInsight() {
     return;
   }
 
-  // สร้างข้อมูลจำลองสถิติ
-  const views = Math.floor(Math.random() * 100) + total * 10;
-  const avgSec = total > 0 ? (Math.random() * 30 + 5).toFixed(1) : 0;
-  const finishRate = (Math.random() * 20 + 2).toFixed(2);
+  // คำนวณวันที่อย่างถูกต้อง ไม่ให้เป็น NaN
+  let firstDate = null;
+  posts.forEach(p => {
+    const d = parseDate(p.dateObj || p.time);
+    if (d && (!firstDate || d < firstDate)) firstDate = d;
+  });
+
+  const now = new Date();
+  const daysDiff = firstDate 
+    ? Math.max(1, Math.ceil((now - firstDate) / (1000 * 60 * 60 * 24)))
+    : 1;
+
+  const views = total * 10 + Math.floor(Math.random() * 50);
+  const avgSec = (Math.random() * 25 + 5).toFixed(1);
+  const finishRate = (Math.random() * 15 + 5).toFixed(2);
   
   document.getElementById('insightViews').textContent = views;
   document.getElementById('insightAvgTime').textContent = `${avgSec} วินาที`;
   document.getElementById('insightFinishRate').textContent = `${finishRate}%`;
   document.getElementById('insightNewFollowers').textContent = '0';
-  document.getElementById('insightPlayTime').textContent = `${Math.floor(views * avgSec / 3600)} ชม. ${Math.floor((views * avgSec / 60) % 60)} นาที`;
+  const totalSec = Math.round(views * parseFloat(avgSec));
+  document.getElementById('insightPlayTime').textContent = `${Math.floor(totalSec / 3600)} ชม. ${Math.floor((totalSec / 60) % 60)} นาที`;
 
   if (currentPost) {
     document.getElementById('insightPostTime').textContent = `โพสต์เมื่อ ${currentPost.time}`;
     if (currentPost.thumbnail) {
-      document.getElementById('insightCover').innerHTML = `<img src="${currentPost.thumbnail}" alt="ปก">`;
+      document.getElementById('insightCover').innerHTML = `<img src="${currentPost.thumbnail}" alt="ปกวิดีโอ">`;
+    } else {
+      document.getElementById('insightCover').innerHTML = '<i class="fa-solid fa-video" style="color:#9ca3af;font-size:30px;"></i>';
     }
   } else {
-    document.getElementById('insightPostTime').textContent = `รวม ${total} รายการ`;
+    document.getElementById('insightPostTime').textContent = `รวม ${total} รายการ • เริ่มโพสต์ ${formatDateThai(firstDate)}`;
   }
 
   // ข้อมูลกราฟ 7 วัน
@@ -497,7 +478,7 @@ function updateInsight() {
     d.setDate(d.getDate() - i);
     chartData.push({
       label: `${d.getDate()}`,
-      value: Math.floor(Math.random() * views / 3)
+      value: Math.floor(Math.random() * Math.max(5, views / 4))
     });
   }
   renderInsightChart(chartData);
@@ -506,7 +487,7 @@ function updateInsight() {
 function renderInsightChart(data) {
   const container = document.getElementById('insightChart');
   if (!data.length) {
-    container.innerHTML = '<span style="color:#ccc;font-size:11px;">ไม่มีข้อมูล</span>';
+    container.innerHTML = '<span style="color:#9ca3af;font-size:11px;">ไม่มีข้อมูล</span>';
     return;
   }
   const max = Math.max(...data.map(d => d.value)) || 1;
@@ -519,7 +500,6 @@ function renderInsightChart(data) {
   }).join('');
 }
 
-// เปลี่ยนแท็บ
 document.addEventListener('click', e => {
   if (e.target.classList.contains('insight-tab')) {
     document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
@@ -530,9 +510,9 @@ document.addEventListener('click', e => {
   }
 });
 
-document.querySelectorAll('[data-goto]').forEach(b => 
-  b.onclick = () => show(b.dataset.goto)
-);
+document.querySelectorAll('[data-goto]').forEach(b => {
+  b.onclick = () => show(b.dataset.goto);
+});
 document.getElementById('uploadBtn').onclick = () => show('pageUpload');
 
 document.querySelectorAll('input[name="soundMode"]').forEach(radio => {
@@ -554,13 +534,15 @@ document.getElementById('fileInp').onchange = async e => {
   if (type === 'video') {
     const url = URL.createObjectURL(file);
     const v = document.createElement('video');
-    v.preload = 'metadata'; v.src = url;
+    v.preload = 'metadata';
+    v.src = url;
     await new Promise(res => {
       v.onloadedmetadata = () => {
         fileMeta.duration = v.duration;
         fileMeta.width = v.videoWidth;
         fileMeta.height = v.videoHeight;
-        URL.revokeObjectURL(url); res();
+        URL.revokeObjectURL(url);
+        res();
       };
       v.onerror = () => res();
     });
@@ -584,26 +566,31 @@ document.getElementById('fileInp').onchange = async e => {
     Object.assign(v, { src: tempUrl, controls: true, autoplay: true, loop: true, muted: false });
     mediaArea.appendChild(v);
   } else {
-    const img = document.createElement('img'); img.src = tempUrl; mediaArea.appendChild(img);
+    const img = document.createElement('img');
+    img.src = tempUrl;
+    mediaArea.appendChild(img);
   }
 };
 
 document.getElementById('pubBtn').onclick = async () => {
-  if (!file) return showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
+  if (!file) {
+    showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
+    return;
+  }
   const statusMsg = document.getElementById('statusMsg');
   const progWrap = document.getElementById('progWrap');
   const progBar = document.getElementById('progBar');
   
   progWrap.style.display = 'block';
   progBar.style.width = '0%';
-  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อไฟล์: ${fileMeta.name}\nขนาด: ${fileMeta.sizeMB} MB`, 'info');
+  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อ: ${fileMeta.name}\nขนาด: ${fileMeta.sizeMB} MB`, 'info');
   
   const fd = new FormData();
   fd.append('file', file);
   fd.append('upload_preset', UPLOAD_PRESET);
   
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
+  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/upload`, true);
   xhr.timeout = 600000;
   
   xhr.upload.onprogress = e => {
@@ -623,7 +610,7 @@ document.getElementById('pubBtn').onclick = async () => {
         
         let thumb = '';
         if (thumbnailUrl) {
-          showStatus(`⏳ กำลังอัปโหลดรูปย่อ...`, 'info');
+          showStatus('⏳ กำลังบันทึกภาพปก...', 'info');
           thumb = await uploadThumbnail(thumbnailUrl);
         }
         
@@ -653,11 +640,10 @@ document.getElementById('pubBtn').onclick = async () => {
             height: data.height || fileMeta.height
           },
           time: now.toLocaleString('th-TH'),
-          dateObj: now
+          dateObj: now.toISOString()
         });
         
         localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-        renderPosts();
         showStatus(`✅ เสร็จสิ้น!\nชื่อ: ${title}`, 'success');
         
         file = null; fileMeta = {}; cloudUrl = ''; thumbnailUrl = ''; currentPost = null;
@@ -667,9 +653,12 @@ document.getElementById('pubBtn').onclick = async () => {
         document.querySelector('input[value="original"]').checked = true;
         document.querySelectorAll('.sound-option').forEach((o, i) => o.classList.toggle('selected', i === 0));
         document.getElementById('previewFileInfo').style.display = 'none';
+        mediaArea.innerHTML = '<div style="text-align:center;color:#888;padding-top:40px;"><i class="fa-solid fa-check-circle fa-2x" style="color:#4ade80;"></i><p style="margin-top:12px;">บันทึกเรียบร้อยแล้ว</p></div>';
         
         setTimeout(() => show('page1'), 2000);
-      } catch { showStatus('❌ อ่านข้อมูลไม่ได้', 'error'); }
+      } catch {
+        showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
+      }
     } else {
       showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
     }
@@ -677,12 +666,14 @@ document.getElementById('pubBtn').onclick = async () => {
   
   xhr.ontimeout = () => {
     progWrap.style.display = 'none';
-    showStatus('⏰ หมดเวลา\nลองลดขนาดไฟล์ลง', 'error');
+    showStatus('⏰ หมดเวลา\nลองลดขนาดไฟล์', 'error');
   };
+  
   xhr.onerror = () => {
     progWrap.style.display = 'none';
     showStatus('❌ ขาดการเชื่อมต่อ', 'error');
   };
+  
   xhr.send(fd);
 };
 
@@ -724,7 +715,9 @@ function updateMainDisplay(title, soundMode, soundName) {
     Object.assign(v, { src, controls: true, autoplay: true, loop: true, muted: false });
     mediaArea.appendChild(v);
   } else {
-    const img = document.createElement('img'); img.src = src; mediaArea.appendChild(img);
+    const img = document.createElement('img');
+    img.src = src;
+    mediaArea.appendChild(img);
   }
 }
 
@@ -735,7 +728,6 @@ function renderPosts() {
   if (posts.length === 0) {
     list.innerHTML = '';
     document.getElementById('emptyMsg').style.display = 'block';
-    document.getElementById('statsBox').style.display = 'none';
     return;
   }
   document.getElementById('emptyMsg').style.display = 'none';
@@ -747,17 +739,17 @@ function renderPosts() {
     const aspect = getAspectRatio(m.width, m.height);
     
     let title = p.title;
-    if (!title || title === 'ไม่มีชื่อ' || title.startsWith('http')) {
+    if (!title || title.startsWith('http')) {
       title = getFileNameOnly(p.originalFileName || m.name || p.url);
     }
     
     let thumbHtml = '';
     if (p.thumbnail && p.thumbnail.startsWith('http')) {
-      thumbHtml = `<img src="${p.thumbnail}" alt="รูปย่อ" loading="lazy">`;
+      thumbHtml = `<img src="${p.thumbnail}" alt="รูปปก" loading="lazy">`;
     } else {
       const cloudThumb = getCloudThumbnailUrl(p.url);
       if (cloudThumb) {
-        thumbHtml = `<img src="${cloudThumb}" alt="รูปย่อ" loading="lazy">`;
+        thumbHtml = `<img src="${cloudThumb}" alt="รูปปก" loading="lazy">`;
       } else {
         thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
       }
@@ -765,17 +757,17 @@ function renderPosts() {
     
     return `
       <div class="post-item">
-        <div class="post-thumb" onclick='showPost(posts[${i}])'>${thumbHtml}</div>
+        <div class="post-thumb" onclick="showPost(posts[${i}])">${thumbHtml}</div>
         <div class="post-content">
-          <div class="post-title" onclick='showPost(posts[${i}])'>${title}</div>
+          <div class="post-title" onclick="showPost(posts[${i}])">${title}</div>
           <small style="color:${p.soundMode === 'original' ? '#90ee90' : '#ffd700'};">${p.soundDisplay || '🔊 เสียงต้นฉบับ'}</small><br>
           <div class="post-file-info">
             📄 ${m.name || p.originalFileName || 'ไม่ระบุ'}<br>
             📦 ${sizeMB} MB — <span class="${chk.ok ? 'size-ok' : 'size-warning'}">${chk.text}</span><br>
-            ⏱️ ${formatTime(m.duration)} | 📐 <span class="aspect-ratio">${aspect}</span><br>
+            ⏱️ ${formatTime(m.duration)} | 📐 ${aspect}<br>
             📅 โพสต์: ${p.time}
           </div>
-          <button class="btn-danger" onclick='showConfirm(${i})'>
+          <button class="btn-danger" onclick="showConfirm(${i})">
             <i class="fa-solid fa-trash"></i> ลบ
           </button>
         </div>
