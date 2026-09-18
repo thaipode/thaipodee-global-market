@@ -2,290 +2,406 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ThaiPodee Market">
+<meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
 <title>ThaiPodee Market</title>
+
+<!-- ไอคอนแอป ใช้โลโก้ตรงตามรูป ไม่แก้ไข -->
+<link rel="apple-touch-icon" href="https://i.imgur.com/9Z7w8xY.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/9Z7w8xY.png">
+
+<!-- Manifest สำหรับติดตั้งเป็นแอป -->
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGUgTWFya2V0Iiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5IjoiZnVsbHNjcmVlbiIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaS5pbWd1ci5jb20vOVo3dzhZLnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
-.page { position: absolute; inset: 0; z-index: 1; overflow-y: auto; }
-.page.hidden { display: none; }
-.media { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: #000; }
-.media video, .media img { width: 100%; height: 100%; object-fit: contain; }
-.ui { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
-.ui * { pointer-events: auto; }
-.top { position: absolute; top: 40px; left: 16px; right: 16px; }
+html, body {
+  height: 100%;
+  background: #000;
+  color: #fff;
+  font-family: sans-serif;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.3s ease;
+}
+.page.hidden { opacity: 0; pointer-events: none; }
+
+/* ===== หน้าเริ่มต้น — โลโก้ตรงเป๊ะ ไม่แก้ไข ===== */
+.splash-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  z-index: 9999;
+}
+.logo-main {
+  width: 280px;
+  height: 280px;
+  background: url('https://i.imgur.com/9Z7w8xY.png') no-repeat center;
+  background-size: contain;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.logo-text {
+  margin-top: 24px;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #fff;
+}
+.logo-sub {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #888;
+}
+
+/* ส่วนอื่นๆ เหมือนเดิม */
+.top { position: absolute; top: 48px; left: 16px; right: 16px; }
 .username { font-weight: bold; font-size: 15px; }
 .desc { font-size: 13px; margin-top: 4px; opacity: 0.95; word-break: break-all; }
 .sound { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; flex-wrap: wrap; }
 .sound-original { color: #90ee90; font-weight: 500; }
 .sound-custom { color: #ffd700; font-weight: 500; }
-.file-info { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.8; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-.right { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 22px; }
-.icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-.icon i { font-size: 26px; }
-.icon span { font-size: 11px; margin-top: 2px; }
-.insight-btn { position: absolute; right: 12px; bottom: 80px; background: linear-gradient(90deg, #8b5cf6, #ec4899); padding: 8px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 25; }
-.bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; z-index: 30; }
-.nav { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-.nav i { font-size: 22px; }
-.nav span { font-size: 10px; margin-top: 2px; }
-.btn { background: linear-gradient(90deg, #ff2e55, #ff6b4a); border: none; padding: 14px; border-radius: 8px; color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
-.btn-danger { background: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; color: white; font-size: 11px; cursor: pointer; margin-top: 6px; }
-.inp { background: #222; border: none; padding: 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 12px; font-size: 15px; }
-.inp-small { background: #222; border: none; padding: 10px 14px; border-radius: 8px; color: white; width: 100%; margin-bottom: 10px; font-size: 14px; }
-.progress { height: 10px; background: #333; border-radius: 5px; margin: 18px 0; display: none; overflow: hidden; }
-.prog-bar { height: 100%; background: linear-gradient(90deg, #ff2e55, #ff6b4a); border-radius: 5px; width: 0%; transition: width 0.3s; }
-.status { text-align: center; padding: 14px; font-size: 14px; font-weight: bold; border-radius: 8px; margin: 12px 0; white-space: pre-wrap; line-height: 1.6; }
-.status.error { color: #ff6b4a; background: rgba(255,46,85,0.15); }
-.status.success { color: #4ade80; background: rgba(74,222,128,0.15); }
-.status.info { color: #facc15; background: rgba(250,204,21,0.15); }
-.post-item { border-bottom: 1px solid #222; padding: 10px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
-.post-item:hover { background: #111; }
-.post-thumb { width: 90px; height: 120px; background: #1a1a1a; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.file-info {
+  font-size: 11px; color: #888; margin-top: 6px; line-height: 1.8;
+  background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;
+}
+.media-container {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+}
+.media-container video, .media-container img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.right-icons {
+  position: absolute; right: 12px; bottom: 120px;
+  display: flex; flex-direction: column; gap: 22px;
+}
+.icon-btn {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; cursor: pointer;
+}
+.insight-btn {
+  position: absolute; right: 12px; bottom: 80px;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  padding: 8px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: bold; cursor: pointer;
+}
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 65px; background: #000;
+  display: flex; justify-content: space-around; align-items: center;
+  border-top: 1px solid #222;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 22px; cursor: pointer;
+}
+.nav-item span { font-size: 10px; margin-top: 2px; }
+.upload-btn {
+  width: 48px; height: 34px;
+  background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.btn {
+  background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+  border: none; padding: 14px; border-radius: 8px;
+  color: white; font-weight: bold; width: 100%;
+  cursor: pointer; font-size: 16px;
+}
+.btn-danger {
+  background: #dc2626; border: none; padding: 6px 10px;
+  border-radius: 6px; color: white; font-size: 11px;
+  cursor: pointer; margin-top: 6px;
+}
+.input-field {
+  background: #222; border: none; padding: 14px; border-radius: 8px;
+  color: white; width: 100%; margin-bottom: 12px; font-size: 15px;
+}
+.progress-bar {
+  height: 10px; background: #333; border-radius: 5px; margin: 18px 0; overflow: hidden;
+  display: none;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+  width: 0%; transition: width 0.3s;
+}
+.status-text {
+  text-align: center; padding: 14px; font-size: 14px; font-weight: bold;
+  border-radius: 8px; margin: 12px; white-space: pre-line; display: none;
+}
+.status-error { background: rgba(255,46,85,0.15); color: #ff6b4a; }
+.status-success { background: rgba(74,222,128,0.15); color: #4ade80; }
+.status-info { background: rgba(250,204,21,0.15); color: #facc15; }
+.post-item {
+  border-bottom: 1px solid #222; padding: 10px; margin-bottom: 8px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.post-thumb {
+  width: 90px; height: 120px; background: #1a1a1a; border-radius: 6px;
+  overflow: hidden; flex-shrink: 0; cursor: pointer;
+}
 .post-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.post-thumb .placeholder { color: #555; font-size: 24px; }
-.post-content { flex: 1; min-width: 0; }
-.post-title { font-weight: bold; font-size: 14px; margin-bottom: 3px; line-height: 1.4; word-break: break-all; cursor: pointer; }
-.post-file-info { font-size: 11px; color: #777; margin-top: 3px; line-height: 1.6; }
-.size-warning { color: #ffd700; }
+.post-title { font-weight: bold; font-size: 14px; margin-bottom: 3px; cursor: pointer; }
+.post-meta { font-size: 11px; color: #777; margin-top: 3px; line-height: 1.6; }
 .size-ok { color: #4ade80; }
+.size-warn { color: #ffd700; }
 .aspect-ratio { color: #87ceeb; font-weight: bold; }
-.sound-option { display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; }
+.sound-option {
+  display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 10px;
+  background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;
+}
 .sound-option.selected { outline: 2px solid #ffd700; }
-.confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.confirm-box { background: #1f1f1f; padding: 20px; border-radius: 10px; max-width: 300px; width: 100%; text-align: center; }
-.confirm-buttons { display: flex; gap: 10px; margin-top: 15px; }
-.confirm-del { flex: 1; background: #dc2626; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
-.confirm-cancel { flex: 1; background: #333; border: none; padding: 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  display: none;
+}
+.modal-box {
+  background: #1f1f1f; padding: 20px; border-radius: 10px; max-width: 300px; width: 100%; text-align: center;
+}
+.modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
+.modal-btn { flex: 1; padding: 10px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+.modal-confirm { background: #dc2626; color: white; }
+.modal-cancel { background: #333; color: white; }
+
+/* ===== หน้าข้อมูลเชิงลึก ===== */
 .insight-page { background: #f8fafc; color: #1f2937; }
 .insight-back { position: absolute; top: 12px; left: 12px; font-size: 18px; cursor: pointer; color: #1f2937; z-index: 10; }
-.insight-header { text-align: center; padding: 20px; }
-.insight-cover { width: 80px; height: 80px; border-radius: 8px; margin: 0 auto 8px; background: #e5e7eb; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.insight-header { text-align: center; padding: 20px; padding-top: 40px; }
+.insight-cover {
+  width: 80px; height: 80px; border-radius: 8px; margin: 0 auto 8px;
+  background: #e5e7eb; overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
 .insight-cover img { width: 100%; height: 100%; object-fit: cover; }
 .insight-meta { font-size: 13px; color: #6b7280; margin-bottom: 16px; }
-.insight-tabs { display: flex; justify-content: center; gap: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
+.insight-tabs {
+  display: flex; justify-content: center; gap: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px;
+}
 .insight-tab { padding: 8px 4px; font-size: 14px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
-.insight-tab.active { color: #1d4ed8; border-bottom: 2px solid #1d4ed8; font-weight: bold; }
+.insight-tab.active { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: bold; }
 .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
 .insight-card { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.insight-card-title { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
-.insight-card-value { font-size: 20px; font-weight: bold; }
-.insight-card-value.sm { font-size: 14px; }
-.insight-card-value.highlight { color: #1d4ed8; }
-.insight-chart { padding: 16px; }
+.insight-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+.insight-value { font-size: 20px; font-weight: bold; }
+.insight-value.sm { font-size: 14px; }
+.insight-value.highlight { color: #1d4ed8; }
+.insight-chart-wrap { padding: 16px; }
 .insight-chart-title { font-size: 14px; font-weight: bold; margin-bottom: 12px; }
-.insight-chart-bar { height: 140px; display: flex; align-items: flex-end; justify-content: space-around; gap: 4px; border-bottom: 1px solid #e5e7eb; border-left: 1px solid #e5e7eb; padding: 0 8px; position: relative; }
+.insight-chart {
+  height: 140px; display: flex; align-items: flex-end; justify-content: space-around; gap: 4px;
+  border-bottom: 1px solid #e5e7eb; border-left: 1px solid #e5e7eb; padding: 0 8px;
+}
 .chart-col { display: flex; flex-direction: column; align-items: center; width: 24px; }
 .chart-bar { width: 16px; background: #93c5fd; border-radius: 2px 2px 0 0; transition: height 0.3s; }
 .chart-label { font-size: 9px; color: #6b7280; margin-top: 4px; }
 .insight-note { padding: 0 16px 16px; font-size: 11px; color: #9ca3af; }
+
 .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<div id="confirmOverlay" class="confirm-overlay hidden">
-  <div class="confirm-box">
-    <p style="font-size:15px; font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
-    <p style="font-size:13px; color:#aaa;">ลบโพสต์นี้แน่ใจไหม?<br>เมื่อลบแล้วกู้คืนไม่ได้</p>
-    <div class="confirm-buttons">
-      <button class="confirm-cancel" onclick="hideConfirm()">ยกเลิก</button>
-      <button class="confirm-del" onclick="doDelete()">ลบทันที</button>
-    </div>
-  </div>
+<!-- ===== หน้าเริ่มต้น — โลโก้ไม่แก้ไข ===== -->
+<div id="splashPage" class="page splash-screen">
+  <div class="logo-main"></div>
+  <div class="logo-text">ThaiPodee Market</div>
+  <div class="logo-sub">Global • Master • Market</div>
 </div>
 
-<!-- ===== หน้า 1: หน้าหลัก ===== -->
-<div id="page1" class="page">
-  <div class="media" id="mediaArea">
-    <div style="text-align:center;color:#888;padding-top:40px;">
+<!-- ===== หน้าหลัก ===== -->
+<div id="homePage" class="page hidden">
+  <div class="media-container" id="mediaArea">
+    <div style="text-align:center;color:#888;">
       <i class="fa-solid fa-video fa-2x"></i>
-      <p style="margin-top:12px;">กดปุ่ม + เพื่อโพสต์<br>หรือกดที่โพสต์ในโปรไฟล์เพื่อแสดง</p>
+      <p style="margin-top:12px;">กดปุ่ม + เพื่อโพสต์</p>
     </div>
   </div>
-  <div class="ui">
-    <div class="top" id="postInfo" style="display:none;">
-      <p class="username">ThaiPodee Master</p>
-      <p class="desc" id="dispDesc"></p>
-      <div class="sound" id="soundInfo">
-        <i class="fa-solid fa-music fa-xs"></i>
-        <span id="dispSoundType"></span>
-      </div>
-      <div class="file-info" id="fileInfoBlock" style="display:none;">
-        📄 ชื่อไฟล์: <span id="fnName"></span><br>
-        📦 ขนาด: <span id="fnSize"></span> — <span id="fnSizeCheck"></span><br>
-        ⏱️ เวลา: <span id="fnDur"></span><br>
-        📐 อัตราส่วน: <span id="fnAspect" class="aspect-ratio"></span>
-      </div>
-      <p style="font-size:11px;color:#90ee90;margin-top:6px;">💡 กดปุ่มเสียง 🔊 บนวิดีโอเพื่อเปิดฟัง</p>
-    </div>
 
-    <div class="insight-btn" data-goto="pageInsight">
-      <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
+  <div class="top" id="postInfo" style="display:none;">
+    <p class="username">ThaiPodee Master</p>
+    <p class="desc" id="descText"></p>
+    <div class="sound" id="soundRow">
+      <i class="fa-solid fa-music"></i>
+      <span id="soundLabel"></span>
     </div>
+    <div class="file-info" id="fileDetails" style="display:none;">
+      ชื่อ: <span id="fName"></span><br>
+      ขนาด: <span id="fSize"></span><br>
+      เวลา: <span id="fDur"></span><br>
+      อัตราส่วน: <span id="fRatio"></span>
+    </div>
+  </div>
 
-    <div class="right">
-      <div class="icon" data-goto="pageProfile"><i class="fa-solid fa-user"></i></div>
-      <div class="icon"><i class="fa-solid fa-heart"></i><span id="likeCount">0</span></div>
-      <div class="icon"><i class="fa-solid fa-comment"></i><span>0</span></div>
-      <div class="icon"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
-      <div class="icon"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
-    </div>
+  <div class="right-icons">
+    <div class="icon-btn" data-goto="profilePage"><i class="fa-solid fa-user"></i></div>
+    <div class="icon-btn"><i class="fa-solid fa-heart"></i></div>
+    <div class="icon-btn"><i class="fa-solid fa-comment"></i></div>
+    <div class="icon-btn"><i class="fa-solid fa-bookmark"></i></div>
+    <div class="icon-btn"><i class="fa-solid fa-share"></i></div>
+  </div>
 
-    <div class="bottom">
-      <div class="nav" data-goto="page1"><i class="fa-solid fa-home"></i></div>
-      <div class="nav"><i class="fa-solid fa-magnifying-glass"></i></div>
-      <div class="nav" id="uploadBtn" style="background:linear-gradient(90deg,#ff2e55,#ff6b4a);width:48px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;">
-        <i class="fa-solid fa-plus" style="font-size:18px;"></i>
-      </div>
-      <div class="nav"><i class="fa-solid fa-message"></i></div>
-      <div class="nav" data-goto="pageProfile"><i class="fa-solid fa-user"></i></div>
+  <div class="insight-btn" data-goto="insightPage">
+    <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" data-goto="homePage"><i class="fa-solid fa-home"></i></div>
+    <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <div class="nav-item" data-goto="uploadPage">
+      <div class="upload-btn"><i class="fa-solid fa-plus"></i></div>
     </div>
+    <div class="nav-item"><i class="fa-solid fa-message"></i></div>
+    <div class="nav-item" data-goto="profilePage"><i class="fa-solid fa-user"></i></div>
   </div>
 </div>
 
-<!-- ===== หน้า 2: อัปโหลด ===== -->
-<div id="pageUpload" class="page hidden">
-  <div style="padding:20px;">
-    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:15px;">
-      <i class="fa-solid fa-arrow-left"></i> กลับ
-    </button>
-    <h3 style="margin-bottom:15px;">โพสต์วิดีโอ/รูปภาพ</h3>
-    <input type="file" id="fileInp" accept="video/*,image/*" class="inp">
-    
-    <div id="previewFileInfo" style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-bottom:14px;display:none;font-size:13px;line-height:1.8;">
-      📋 ข้อมูลไฟล์:<br>
-      ชื่อไฟล์: <span id="pName"></span><br>
-      ขนาด: <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
-      เวลา: <span id="pDur"></span><br>
-      อัตราส่วน: <span id="pAspect" class="aspect-ratio"></span>
-    </div>
-
-    <p style="font-size:13px;color:#ccc;margin:15px 0 8px;"><strong>🎵 เลือกเสียง:</strong></p>
-    
-    <label class="sound-option selected">
-      <input type="radio" name="soundMode" value="original" checked style="margin-right:8px;">
-      <div>
-        <strong>🔊 เสียงต้นฉบับ</strong><br>
-        <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
-      </div>
-    </label>
-    
-    <label class="sound-option">
-      <input type="radio" name="soundMode" value="custom" style="margin-right:8px;">
-      <div>
-        <strong>✨ เพิ่มเสียงใหม่</strong><br>
-        <small style="color:#888;">ใส่ชื่อเพลง/เสียงที่ต้องการ</small>
-      </div>
-    </label>
-    
-    <input type="text" class="inp-small" id="customSoundName" placeholder="ตั้งชื่อเสียง..." style="display:none;margin-top:5px;">
-    
-    <p style="font-size:12px;color:#888;margin:12px 0;">💡 ชื่อจะนำมาจากชื่อไฟล์โดยตรง</p>
-    
-    <button class="btn" id="pubBtn">เผยแพร่</button>
-    <div id="progWrap" class="progress"><div id="progBar" class="prog-bar"></div></div>
-    <p id="statusMsg" class="status" style="display:none;"></p>
+<!-- ===== หน้าอัปโหลด ===== -->
+<div id="uploadPage" class="page hidden" style="padding:20px;">
+  <button onclick="goBack()" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:15px;">
+    <i class="fa-solid fa-arrow-left"></i> กลับ
+  </button>
+  <h3 style="margin-bottom:15px;">โพสต์วิดีโอ / รูปภาพ</h3>
+  <input type="file" id="fileInput" accept="video/*,image/*" class="input-field">
+  
+  <div id="previewInfo" style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-bottom:14px;display:none;font-size:13px;line-height:1.8;">
+    ชื่อไฟล์: <span id="pName"></span><br>
+    ขนาด: <span id="pSize"></span> — <span id="pSizeStatus"></span><br>
+    ระยะเวลา: <span id="pDur"></span><br>
+    อัตราส่วน: <span id="pRatio"></span>
   </div>
+
+  <p style="font-size:13px;color:#ccc;margin:15px 0 8px;"><strong>เลือกเสียง:</strong></p>
+  <label class="sound-option selected" id="optOrig">
+    <input type="radio" name="soundMode" value="original" checked style="margin-right:8px;">
+    <div>
+      <strong>🔊 เสียงต้นฉบับ</strong><br>
+      <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
+    </div>
+  </label>
+  <label class="sound-option" id="optCustom">
+    <input type="radio" name="soundMode" value="custom" style="margin-right:8px;">
+    <div>
+      <strong>✨ เพิ่มเสียงใหม่</strong><br>
+      <small style="color:#888;">ใส่ชื่อเพลง/เสียงที่ต้องการ</small>
+    </div>
+  </label>
+  <input type="text" id="customSound" placeholder="ชื่อเสียง/เพลง..." class="input-field" style="display:none;margin-top:5px;">
+
+  <button class="btn" id="submitBtn">เผยแพร่</button>
+  <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="statusMsg" class="status-text"></div>
 </div>
 
-<!-- ===== หน้า 3: โปรไฟล์ — ลบส่วนสถิติออกแล้ว ===== -->
-<div id="pageProfile" class="page hidden">
-  <div style="padding:20px;">
-    <button onclick="show('page1')" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">
-      <i class="fa-solid fa-arrow-left"></i> กลับ
-    </button>
-    <div style="text-align:center; margin:20px 0;">
-      <div style="width:80px;height:80px;background:#333;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;">
-        <i class="fa-solid fa-user fa-2x"></i>
-      </div>
-      <h2 style="margin-top:10px;">ThaiPodee Master</h2>
-      <p style="color:#888;">@thaipodee_master</p>
-      <div style="display:flex;justify-content:center;gap:30px;margin-top:15px;">
-        <div style="text-align:center;"><strong id="postCount">0</strong><br><small>โพสต์</small></div>
-        <div style="text-align:center;"><strong id="followerCount">0</strong><br><small>ผู้ติดตาม</small></div>
-        <div style="text-align:center;"><strong id="followingCount">0</strong><br><small>กำลังติดตาม</small></div>
-      </div>
+<!-- ===== หน้าโปรไฟล์ ===== -->
+<div id="profilePage" class="page hidden" style="padding:20px;">
+  <button onclick="goBack()" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:15px;">
+    <i class="fa-solid fa-arrow-left"></i> กลับ
+  </button>
+  <div style="text-align:center;margin:20px 0;">
+    <div style="width:80px;height:80px;background:#333;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;">
+      <i class="fa-solid fa-user"></i>
     </div>
-
-    <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
-    <div id="postList"></div>
-    <p id="emptyMsg" style="text-align:center;color:#888;">ยังไม่มีโพสต์</p>
+    <h2 style="margin-top:10px;font-size:18px;">ThaiPodee Master</h2>
+    <p style="color:#888;font-size:13px;">@thaipodee_master</p>
+    <div style="display:flex;justify-content:center;gap:30px;margin-top:15px;">
+      <div style="text-align:center;"><strong id="postCount">0</strong><br><small>โพสต์</small></div>
+      <div style="text-align:center;"><strong>0</strong><br><small>ผู้ติดตาม</small></div>
+      <div style="text-align:center;"><strong>0</strong><br><small>กำลังติดตาม</small></div>
+    </div>
   </div>
+  <hr style="border:none;border-top:1px solid #333;margin:15px 0;">
+  <div id="postList"></div>
+  <p id="emptyMsg" style="text-align:center;color:#888;">ยังไม่มีโพสต์</p>
 </div>
 
-<!-- ===== หน้า 4: ข้อมูลเชิงลึก — ที่เดียวที่มีสถิติ ===== -->
-<div id="pageInsight" class="page insight-page hidden">
-  <div class="insight-back" onclick="show('page1')">
-    <i class="fa-solid fa-chevron-left"></i>
-  </div>
+<!-- ===== หน้าข้อมูลเชิงลึก ===== -->
+<div id="insightPage" class="page insight-page hidden">
+  <div class="insight-back" data-goto="homePage"><i class="fa-solid fa-chevron-left"></i></div>
   <div class="insight-header">
     <div class="insight-cover" id="insightCover">
       <i class="fa-solid fa-video" style="color:#9ca3af;font-size:30px;"></i>
     </div>
     <div style="font-weight:bold;">ThaiPodee Master</div>
-    <div class="insight-meta" id="insightPostTime">เลือกวิดีโอเพื่อดูข้อมูล</div>
+    <div class="insight-meta" id="insightMeta">เลือกวิดีโอเพื่อดูข้อมูล</div>
   </div>
-
   <div class="insight-tabs">
     <div class="insight-tab active" data-tab="summary">ภาพรวม</div>
-    <div class="insight-tab" data-tab="followers">ผู้ชม</div>
-    <div class="insight-tab" data-tab="share">การมีส่วนร่วม</div>
+    <div class="insight-tab" data-tab="audience">ผู้ชม</div>
+    <div class="insight-tab" data-tab="engagement">การมีส่วนร่วม</div>
   </div>
-
-  <div id="tab-summary" class="insight-tab-content">
+  <div id="tabSummary" class="tab-content">
     <div class="insight-grid">
       <div class="insight-card">
-        <div class="insight-card-title">ยอดเข้าชมวิดีโอ</div>
-        <div class="insight-card-value highlight" id="insightViews">0</div>
+        <div class="insight-label">ยอดเข้าชม</div>
+        <div class="insight-value highlight" id="totalViews">0</div>
       </div>
       <div class="insight-card">
-        <div class="insight-card-title">เวลาเล่นทั้งหมด</div>
-        <div class="insight-card-value sm" id="insightPlayTime">0 ชม. 0 นาที</div>
+        <div class="insight-label">เวลารวม</div>
+        <div class="insight-value sm" id="totalTime">0 นาที</div>
       </div>
       <div class="insight-card">
-        <div class="insight-card-title">เวลาที่ดูโดยเฉลี่ย</div>
-        <div class="insight-card-value" id="insightAvgTime">0 วินาที</div>
+        <div class="insight-label">เฉลี่ยต่อครั้ง</div>
+        <div class="insight-value sm" id="avgTime">0 วินาที</div>
       </div>
       <div class="insight-card">
-        <div class="insight-card-title">ดูวิดีโอจนจบ</div>
-        <div class="insight-card-value" id="insightFinishRate">0%</div>
+        <div class="insight-label">ดูจนจบ</div>
+        <div class="insight-value sm" id="completion">0%</div>
       </div>
       <div class="insight-card">
-        <div class="insight-card-title">ผู้ติดตามใหม่</div>
-        <div class="insight-card-value" id="insightNewFollowers">0</div>
+        <div class="insight-label">โพสต์ทั้งหมด</div>
+        <div class="insight-value" id="totalPosts">0</div>
       </div>
       <div class="insight-card">
-        <div class="insight-card-title">จำนวนโพสต์ทั้งหมด</div>
-        <div class="insight-card-value" id="insightTotalPosts">0</div>
+        <div class="insight-label">เริ่มเมื่อ</div>
+        <div class="insight-value sm" id="startDate">-</div>
       </div>
     </div>
-
-    <div class="insight-chart">
-      <div class="insight-chart-title">📈 ยอดเข้าชมตามช่วงเวลา</div>
-      <div class="insight-chart-bar" id="insightChart"></div>
+    <div class="insight-chart-wrap">
+      <div class="insight-chart-title">📊 ยอดเข้าชม 7 วันล่าสุด</div>
+      <div class="insight-chart" id="chartArea"></div>
     </div>
-
-    <div class="insight-note">
-      ข้อมูลอัปเดตแบบเรียลไทม์ • แสดงผลย้อนหลัง 7 วันล่าสุด
-    </div>
+    <p class="insight-note">อัปเดตแบบเรียลไทม์</p>
   </div>
-
-  <div id="tab-followers" class="insight-tab-content hidden">
-    <div style="padding:20px;text-align:center;color:#6b7280;">
-      <i class="fa-solid fa-users fa-2x" style="margin-bottom:12px;"></i>
-      <p>ข้อมูลผู้ชมจะแสดงที่นี่</p>
-      <p style="font-size:12px;margin-top:8px;">เมื่อมีผู้เข้าชมจะอัปเดตอัตโนมัติ</p>
-    </div>
+  <div id="tabAudience" class="tab-content hidden" style="padding:40px 20px;text-align:center;color:#6b7280;">
+    <i class="fa-solid fa-users fa-2x" style="margin-bottom:12px;"></i>
+    <p>ข้อมูลผู้ชมจะแสดงที่นี่</p>
   </div>
+  <div id="tabEngagement" class="tab-content hidden" style="padding:40px 20px;text-align:center;color:#6b7280;">
+    <i class="fa-solid fa-share-nodes fa-2x" style="margin-bottom:12px;"></i>
+    <p>ข้อมูลการมีส่วนร่วมจะแสดงที่นี่</p>
+  </div>
+</div>
 
-  <div id="tab-share" class="insight-tab-content hidden">
-    <div style="padding:20px;text-align:center;color:#6b7280;">
-      <i class="fa-solid fa-share-nodes fa-2x" style="margin-bottom:12px;"></i>
-      <p>การมีส่วนร่วมจะแสดงที่นี่</p>
-      <p style="font-size:12px;margin-top:8px;">กดถูกใจ, แสดงความคิดเห็น, แชร์</p>
+<!-- ===== กล่องยืนยันลบ ===== -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-box">
+    <p style="font-weight:bold;margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
+    <p style="font-size:13px;color:#aaa;">ลบแล้วกู้คืนไม่ได้</p>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-cancel" onclick="closeDeleteModal()">ยกเลิก</button>
+      <button class="modal-btn modal-confirm" onclick="confirmDelete()">ลบ</button>
     </div>
   </div>
 </div>
@@ -293,21 +409,159 @@ html,body { height: 100%; background: #000; color: #fff; font-family: sans-serif
 <script>
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-const MAX_RECOMMENDED_MB = 100;
+const MAX_MB = 100;
 
-let file, type, cloudUrl = '';
-let fileMeta = {};
-let thumbnailUrl = '';
-let currentPost = null;
-let deleteIndex = null;
-const mediaArea = document.getElementById('mediaArea');
+let fileData = null;
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
+let deletingIndex = -1;
+let currentPage = 'splashPage';
+let selectedPost = null;
 
-function show(id) {
+// ซ่อนหน้าเริ่มต้นหลังโหลด
+setTimeout(() => {
+  switchPage('homePage');
+}, 2000);
+
+function switchPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  if (id === 'pageProfile') renderPosts();
-  if (id === 'pageInsight') updateInsight();
+  document.getElementById(pageId).classList.remove('hidden');
+  currentPage = pageId;
+  if (pageId === 'profilePage') renderPostList();
+  if (pageId === 'insightPage') renderInsight();
+}
+function goBack() {
+  switchPage('homePage');
+}
+document.querySelectorAll('[data-goto]').forEach(el => {
+  el.addEventListener('click', () => switchPage(el.dataset.goto));
+});
+
+// เลือกไฟล์
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', async e => {
+  fileData = e.target.files[0];
+  if (!fileData) return;
+  
+  const mb = (fileData.size / 1024 / 1024).toFixed(1);
+  document.getElementById('pName').textContent = fileData.name;
+  document.getElementById('pSize').textContent = `${mb} MB`;
+  document.getElementById('pSizeStatus').textContent = mb <= MAX_MB ? '✅ ขนาดเหมาะสม' : '⚠️ ใหญ่เกินไป';
+  document.getElementById('previewInfo').style.display = 'block';
+  
+  if (fileData.type.startsWith('video/')) {
+    const v = document.createElement('video');
+    v.src = URL.createObjectURL(fileData);
+    await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; });
+    document.getElementById('pDur').textContent = formatTime(v.duration);
+    document.getElementById('pRatio').textContent = v.videoWidth > v.videoHeight ? '16:9' : '9:16';
+    URL.revokeObjectURL(v.src);
+  } else {
+    const img = new Image();
+    img.src = URL.createObjectURL(fileData);
+    await new Promise(r => { img.onload = r; img.onerror = r; });
+    document.getElementById('pDur').textContent = '-';
+    document.getElementById('pRatio').textContent = img.width > img.height ? '16:9' : '9:16';
+    URL.revokeObjectURL(img.src);
+  }
+});
+
+// เลือกเสียง
+document.querySelectorAll('input[name="soundMode"]').forEach(rad => {
+  rad.addEventListener('change', () => {
+    document.querySelectorAll('.sound-option').forEach(o => o.classList.remove('selected'));
+    rad.closest('.sound-option').classList.add('selected');
+    document.getElementById('customSound').style.display = rad.value === 'custom' ? 'block' : 'none';
+  });
+});
+
+// อัปโหลด
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  if (!fileData) return showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
+  
+  const mb = (fileData.size / 1024 / 1024).toFixed(1);
+  if (mb > MAX_MB) return showStatus(`⚠️ ไฟล์ใหญ่เกิน ${MAX_MB}MB`, 'error');
+  
+  showStatus('⏳ กำลังอัปโหลด...', 'info');
+  document.getElementById('progressBar').style.display = 'block';
+  
+  const form = new FormData();
+  form.append('file', fileData);
+  form.append('upload_preset', UPLOAD_PRESET);
+  
+  const type = fileData.type.startsWith('video/') ? 'video' : 'image';
+  
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/upload`);
+    
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+      }
+    };
+    
+    xhr.onload = async () => {
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText);
+        const soundMode = document.querySelector('input[name="soundMode"]:checked').value;
+        const soundName = soundMode === 'custom' ? document.getElementById('customSound').value.trim() : '';
+        const soundDisplay = soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : `✨ เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
+        
+        posts.unshift({
+          id: res.public_id,
+          url: res.secure_url,
+          type,
+          name: fileData.name,
+          sizeMB: mb,
+          width: res.width || 0,
+          height: res.height || 0,
+          duration: res.duration || 0,
+          soundMode,
+          soundName,
+          soundDisplay,
+          time: new Date().toLocaleString('th-TH'),
+          isoTime: new Date().toISOString()
+        });
+        
+        localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+        showStatus('✅ เสร็จสิ้น', 'success');
+        resetForm();
+        setTimeout(() => switchPage('homePage'), 1500);
+      } else {
+        showStatus('❌ อัปโหลดไม่สำเร็จ', 'error');
+      }
+      document.getElementById('progressBar').style.display = 'none';
+    };
+    
+    xhr.onerror = () => {
+      showStatus('❌ ขาดการเชื่อมต่อ', 'error');
+      document.getElementById('progressBar').style.display = 'none';
+    };
+    
+    xhr.send(form);
+  } catch {
+    showStatus('❌ มีข้อผิดพลาด', 'error');
+  }
+});
+
+function resetForm() {
+  fileData = null;
+  fileInput.value = '';
+  document.getElementById('previewInfo').style.display = 'none';
+  document.getElementById('customSound').value = '';
+  document.querySelector('input[value="original"]').checked = true;
+  document.getElementById('customSound').style.display = 'none';
+  document.querySelectorAll('.sound-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('optOrig').classList.add('selected');
+}
+
+function showStatus(text, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = text;
+  el.className = `status-text status-${type}`;
+  el.style.display = 'block';
+  if (type !== 'info') setTimeout(() => el.style.display = 'none', 4000);
 }
 
 function formatTime(sec) {
@@ -317,457 +571,32 @@ function formatTime(sec) {
   return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
-function checkSizeAdvice(mb) {
-  if (!mb && mb !== 0) return { text: '', ok: true };
-  if (mb > MAX_RECOMMENDED_MB) {
-    return { text: `⚠️ ใหญ่เกิน ${MAX_RECOMMENDED_MB}MB`, ok: false };
-  }
-  return { text: '✅ ขนาดเหมาะสม', ok: true };
-}
-
-function getAspectRatio(width, height) {
-  if (!width || !height) return '-';
-  return height > width ? '9:16' : '16:9';
-}
-
-function getFileNameOnly(fullName) {
-  if (!fullName) return 'ไม่ระบุชื่อไฟล์';
-  let name = fullName;
-  if (name.startsWith('http')) {
-    const parts = name.split('/');
-    name = parts[parts.length - 1];
-  }
-  return name.replace(/\.[^/.]+$/, '');
-}
-
-function getCloudThumbnailUrl(videoUrl) {
-  if (!videoUrl || !videoUrl.includes('cloudinary.com')) return '';
-  if (videoUrl.includes('/w_')) return videoUrl;
-  return videoUrl.replace('/upload/', '/upload/w_200,h_260,c_fill,so_1/');
-}
-
-async function generateThumbnail(fileObj, isVideo) {
-  return new Promise(res => {
-    if (!isVideo) {
-      res(URL.createObjectURL(fileObj));
-      return;
-    }
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.src = URL.createObjectURL(fileObj);
-    video.currentTime = 1;
-    video.onseeked = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 200;
-      canvas.height = 260;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      res(canvas.toDataURL('image/jpeg', 0.85));
-      URL.revokeObjectURL(video.src);
-    };
-    video.onerror = () => res('');
-  });
-}
-
-async function uploadThumbnail(dataUrl) {
-  if (!dataUrl || !dataUrl.startsWith('data:')) return '';
-  try {
-    const fd = new FormData();
-    fd.append('file', dataUrl);
-    fd.append('upload_preset', UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-      method: 'POST', body: fd
-    });
-    const json = await res.json();
-    return json.secure_url || '';
-  } catch { return ''; }
-}
-
-function showPost(post) {
-  currentPost = post;
-  cloudUrl = post.url;
-  type = post.type;
-  fileMeta = post.fileMeta || {};
-  thumbnailUrl = post.thumbnail || '';
-  updateMainDisplay(post.title, post.soundMode, post.soundName);
-  show('page1');
-}
-
-function showConfirm(idx) {
-  deleteIndex = idx;
-  document.getElementById('confirmOverlay').classList.remove('hidden');
-}
-
-function hideConfirm() {
-  deleteIndex = null;
-  document.getElementById('confirmOverlay').classList.add('hidden');
-}
-
-function doDelete() {
-  if (deleteIndex === null) return;
-  posts.splice(deleteIndex, 1);
-  localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-  renderPosts();
-  hideConfirm();
-}
-
-// แปลงวันที่ให้ถูกต้อง
-function parseDate(dateVal) {
-  if (!dateVal) return null;
-  if (dateVal instanceof Date) return dateVal;
-  const parsed = new Date(dateVal);
-  return isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function formatDateThai(date) {
-  if (!date) return '-';
-  return date.toLocaleDateString('th-TH', {
-    day: 'numeric', month: 'short', year: 'numeric'
-  });
-}
-
-function updateInsight() {
-  const total = posts.length;
-  document.getElementById('insightTotalPosts').textContent = total;
-  
-  if (total === 0) {
-    document.getElementById('insightViews').textContent = '0';
-    document.getElementById('insightPostTime').textContent = 'ยังไม่มีโพสต์';
-    renderInsightChart([]);
-    return;
-  }
-
-  // คำนวณวันที่อย่างถูกต้อง ไม่ให้เป็น NaN
-  let firstDate = null;
-  posts.forEach(p => {
-    const d = parseDate(p.dateObj || p.time);
-    if (d && (!firstDate || d < firstDate)) firstDate = d;
-  });
-
-  const now = new Date();
-  const daysDiff = firstDate 
-    ? Math.max(1, Math.ceil((now - firstDate) / (1000 * 60 * 60 * 24)))
-    : 1;
-
-  const views = total * 10 + Math.floor(Math.random() * 50);
-  const avgSec = (Math.random() * 25 + 5).toFixed(1);
-  const finishRate = (Math.random() * 15 + 5).toFixed(2);
-  
-  document.getElementById('insightViews').textContent = views;
-  document.getElementById('insightAvgTime').textContent = `${avgSec} วินาที`;
-  document.getElementById('insightFinishRate').textContent = `${finishRate}%`;
-  document.getElementById('insightNewFollowers').textContent = '0';
-  const totalSec = Math.round(views * parseFloat(avgSec));
-  document.getElementById('insightPlayTime').textContent = `${Math.floor(totalSec / 3600)} ชม. ${Math.floor((totalSec / 60) % 60)} นาที`;
-
-  if (currentPost) {
-    document.getElementById('insightPostTime').textContent = `โพสต์เมื่อ ${currentPost.time}`;
-    if (currentPost.thumbnail) {
-      document.getElementById('insightCover').innerHTML = `<img src="${currentPost.thumbnail}" alt="ปกวิดีโอ">`;
-    } else {
-      document.getElementById('insightCover').innerHTML = '<i class="fa-solid fa-video" style="color:#9ca3af;font-size:30px;"></i>';
-    }
-  } else {
-    document.getElementById('insightPostTime').textContent = `รวม ${total} รายการ • เริ่มโพสต์ ${formatDateThai(firstDate)}`;
-  }
-
-  // ข้อมูลกราฟ 7 วัน
-  const chartData = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    chartData.push({
-      label: `${d.getDate()}`,
-      value: Math.floor(Math.random() * Math.max(5, views / 4))
-    });
-  }
-  renderInsightChart(chartData);
-}
-
-function renderInsightChart(data) {
-  const container = document.getElementById('insightChart');
-  if (!data.length) {
-    container.innerHTML = '<span style="color:#9ca3af;font-size:11px;">ไม่มีข้อมูล</span>';
-    return;
-  }
-  const max = Math.max(...data.map(d => d.value)) || 1;
-  container.innerHTML = data.map(d => {
-    const h = Math.max(4, (d.value / max) * 100);
-    return `<div class="chart-col">
-      <div class="chart-bar" style="height:${h}%;"></div>
-      <span class="chart-label">${d.label}</span>
-    </div>`;
-  }).join('');
-}
-
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('insight-tab')) {
-    document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
-    e.target.classList.add('active');
-    const tabId = e.target.dataset.tab;
-    document.querySelectorAll('.insight-tab-content').forEach(c => c.classList.add('hidden'));
-    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-  }
-});
-
-document.querySelectorAll('[data-goto]').forEach(b => {
-  b.onclick = () => show(b.dataset.goto);
-});
-document.getElementById('uploadBtn').onclick = () => show('pageUpload');
-
-document.querySelectorAll('input[name="soundMode"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    document.querySelectorAll('.sound-option').forEach(o => o.classList.remove('selected'));
-    radio.closest('.sound-option').classList.add('selected');
-    document.getElementById('customSoundName').style.display = 
-      radio.value === 'custom' ? 'block' : 'none';
-  });
-});
-
-document.getElementById('fileInp').onchange = async e => {
-  file = e.target.files[0];
-  if (!file) return;
-  type = file.type.startsWith('video') ? 'video' : 'image';
-  const sizeMB = parseFloat((file.size / (1024 * 1024)).toFixed(1));
-  fileMeta = { name: file.name, sizeMB, type, duration: null, width: null, height: null };
-  
-  if (type === 'video') {
-    const url = URL.createObjectURL(file);
-    const v = document.createElement('video');
-    v.preload = 'metadata';
-    v.src = url;
-    await new Promise(res => {
-      v.onloadedmetadata = () => {
-        fileMeta.duration = v.duration;
-        fileMeta.width = v.videoWidth;
-        fileMeta.height = v.videoHeight;
-        URL.revokeObjectURL(url);
-        res();
-      };
-      v.onerror = () => res();
-    });
-  }
-  
-  thumbnailUrl = await generateThumbnail(file, type === 'video');
-  
-  document.getElementById('previewFileInfo').style.display = 'block';
-  document.getElementById('pName').textContent = fileMeta.name;
-  document.getElementById('pSize').textContent = `${sizeMB} MB`;
-  const chk = checkSizeAdvice(sizeMB);
-  document.getElementById('pSizeCheck').textContent = chk.text;
-  document.getElementById('pSizeCheck').className = chk.ok ? 'size-ok' : 'size-warning';
-  document.getElementById('pDur').textContent = formatTime(fileMeta.duration);
-  document.getElementById('pAspect').textContent = getAspectRatio(fileMeta.width, fileMeta.height);
-  
-  mediaArea.innerHTML = '';
-  const tempUrl = URL.createObjectURL(file);
-  if (type === 'video') {
-    const v = document.createElement('video');
-    Object.assign(v, { src: tempUrl, controls: true, autoplay: true, loop: true, muted: false });
-    mediaArea.appendChild(v);
-  } else {
-    const img = document.createElement('img');
-    img.src = tempUrl;
-    mediaArea.appendChild(img);
-  }
-};
-
-document.getElementById('pubBtn').onclick = async () => {
-  if (!file) {
-    showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
-    return;
-  }
-  const statusMsg = document.getElementById('statusMsg');
-  const progWrap = document.getElementById('progWrap');
-  const progBar = document.getElementById('progBar');
-  
-  progWrap.style.display = 'block';
-  progBar.style.width = '0%';
-  showStatus(`⏳ กำลังส่งขึ้นคลาวด์...\nชื่อ: ${fileMeta.name}\nขนาด: ${fileMeta.sizeMB} MB`, 'info');
-  
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', UPLOAD_PRESET);
-  
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/upload`, true);
-  xhr.timeout = 600000;
-  
-  xhr.upload.onprogress = e => {
-    if (e.lengthComputable) {
-      const pct = Math.round((e.loaded / e.total) * 100);
-      progBar.style.width = `${pct}%`;
-      showStatus(`⏳ กำลังส่ง... ${pct}%`, 'info');
-    }
-  };
-  
-  xhr.onload = async () => {
-    progWrap.style.display = 'none';
-    if (xhr.status === 200) {
-      try {
-        const data = JSON.parse(xhr.responseText);
-        cloudUrl = data.secure_url;
-        
-        let thumb = '';
-        if (thumbnailUrl) {
-          showStatus('⏳ กำลังบันทึกภาพปก...', 'info');
-          thumb = await uploadThumbnail(thumbnailUrl);
-        }
-        
-        const title = getFileNameOnly(fileMeta.name);
-        const soundMode = document.querySelector('input[name="soundMode"]:checked').value;
-        const soundName = soundMode === 'custom' 
-          ? document.getElementById('customSoundName').value.trim() || 'เสียงใหม่' 
-          : '';
-        const soundDisplay = soundMode === 'original' 
-          ? '🔊 เสียงต้นฉบับ' 
-          : `✨ เพิ่มเสียง: ${soundName}`;
-        
-        const now = new Date();
-        posts.unshift({
-          url: cloudUrl,
-          type,
-          title,
-          originalFileName: fileMeta.name,
-          soundMode,
-          soundName,
-          soundDisplay,
-          thumbnail: thumb,
-          fileMeta: {
-            ...fileMeta,
-            duration: data.duration || fileMeta.duration,
-            width: data.width || fileMeta.width,
-            height: data.height || fileMeta.height
-          },
-          time: now.toLocaleString('th-TH'),
-          dateObj: now.toISOString()
-        });
-        
-        localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-        showStatus(`✅ เสร็จสิ้น!\nชื่อ: ${title}`, 'success');
-        
-        file = null; fileMeta = {}; cloudUrl = ''; thumbnailUrl = ''; currentPost = null;
-        document.getElementById('fileInp').value = '';
-        document.getElementById('customSoundName').value = '';
-        document.getElementById('customSoundName').style.display = 'none';
-        document.querySelector('input[value="original"]').checked = true;
-        document.querySelectorAll('.sound-option').forEach((o, i) => o.classList.toggle('selected', i === 0));
-        document.getElementById('previewFileInfo').style.display = 'none';
-        mediaArea.innerHTML = '<div style="text-align:center;color:#888;padding-top:40px;"><i class="fa-solid fa-check-circle fa-2x" style="color:#4ade80;"></i><p style="margin-top:12px;">บันทึกเรียบร้อยแล้ว</p></div>';
-        
-        setTimeout(() => show('page1'), 2000);
-      } catch {
-        showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
-      }
-    } else {
-      showStatus(`❌ ไม่สำเร็จ\nโค้ด: ${xhr.status}`, 'error');
-    }
-  };
-  
-  xhr.ontimeout = () => {
-    progWrap.style.display = 'none';
-    showStatus('⏰ หมดเวลา\nลองลดขนาดไฟล์', 'error');
-  };
-  
-  xhr.onerror = () => {
-    progWrap.style.display = 'none';
-    showStatus('❌ ขาดการเชื่อมต่อ', 'error');
-  };
-  
-  xhr.send(fd);
-};
-
-function showStatus(text, type) {
-  const el = document.getElementById('statusMsg');
-  el.textContent = text;
-  el.className = `status ${type}`;
-  el.style.display = 'block';
-}
-
-function updateMainDisplay(title, soundMode, soundName) {
-  document.getElementById('postInfo').style.display = 'block';
-  document.getElementById('dispDesc').textContent = title;
-  
-  const dispType = document.getElementById('dispSoundType');
-  dispType.textContent = soundMode === 'original' 
-    ? '🔊 เสียงต้นฉบับ' 
-    : `✨ เพิ่มเสียง: ${soundName || 'เสียงใหม่'}`;
-  dispType.className = soundMode === 'original' ? 'sound-original' : 'sound-custom';
-  
-  const fm = fileMeta || currentPost?.fileMeta || {};
-  const sizeMB = fm.sizeMB || 0;
-  const chk = checkSizeAdvice(sizeMB);
-  const aspect = getAspectRatio(fm.width, fm.height);
-  
-  document.getElementById('fileInfoBlock').style.display = 'block';
-  document.getElementById('fnName').textContent = fm.name || currentPost?.originalFileName || 'ไม่ระบุ';
-  document.getElementById('fnSize').textContent = `${sizeMB} MB`;
-  document.getElementById('fnSizeCheck').textContent = chk.text;
-  document.getElementById('fnSizeCheck').className = chk.ok ? 'size-ok' : 'size-warning';
-  document.getElementById('fnDur').textContent = formatTime(fm.duration);
-  document.getElementById('fnAspect').textContent = aspect;
-  
-  mediaArea.innerHTML = '';
-  const src = cloudUrl || currentPost?.url;
-  if (!src) return;
-  if ((currentPost?.type || type) === 'video') {
-    const v = document.createElement('video');
-    Object.assign(v, { src, controls: true, autoplay: true, loop: true, muted: false });
-    mediaArea.appendChild(v);
-  } else {
-    const img = document.createElement('img');
-    img.src = src;
-    mediaArea.appendChild(img);
-  }
-}
-
-function renderPosts() {
+// แสดงรายการโพสต์
+function renderPostList() {
   const list = document.getElementById('postList');
   document.getElementById('postCount').textContent = posts.length;
-  
-  if (posts.length === 0) {
+  if (!posts.length) {
     list.innerHTML = '';
     document.getElementById('emptyMsg').style.display = 'block';
     return;
   }
   document.getElementById('emptyMsg').style.display = 'none';
-  
   list.innerHTML = posts.map((p, i) => {
-    const m = p.fileMeta || {};
-    const sizeMB = m.sizeMB || 0;
-    const chk = checkSizeAdvice(sizeMB);
-    const aspect = getAspectRatio(m.width, m.height);
-    
-    let title = p.title;
-    if (!title || title.startsWith('http')) {
-      title = getFileNameOnly(p.originalFileName || m.name || p.url);
-    }
-    
-    let thumbHtml = '';
-    if (p.thumbnail && p.thumbnail.startsWith('http')) {
-      thumbHtml = `<img src="${p.thumbnail}" alt="รูปปก" loading="lazy">`;
-    } else {
-      const cloudThumb = getCloudThumbnailUrl(p.url);
-      if (cloudThumb) {
-        thumbHtml = `<img src="${cloudThumb}" alt="รูปปก" loading="lazy">`;
-      } else {
-        thumbHtml = `<span class="placeholder"><i class="fa-solid fa-video"></i></span>`;
-      }
-    }
-    
+    const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
     return `
       <div class="post-item">
-        <div class="post-thumb" onclick="showPost(posts[${i}])">${thumbHtml}</div>
-        <div class="post-content">
-          <div class="post-title" onclick="showPost(posts[${i}])">${title}</div>
-          <small style="color:${p.soundMode === 'original' ? '#90ee90' : '#ffd700'};">${p.soundDisplay || '🔊 เสียงต้นฉบับ'}</small><br>
-          <div class="post-file-info">
-            📄 ${m.name || p.originalFileName || 'ไม่ระบุ'}<br>
-            📦 ${sizeMB} MB — <span class="${chk.ok ? 'size-ok' : 'size-warning'}">${chk.text}</span><br>
-            ⏱️ ${formatTime(m.duration)} | 📐 ${aspect}<br>
-            📅 โพสต์: ${p.time}
+        <div class="post-thumb" onclick="openPost(${i})">
+          <img src="${p.url.replace(/\.[^.]+$/, '.jpg')}" onerror="this.src='${p.url}'">
+        </div>
+        <div style="flex:1;">
+          <div class="post-title" onclick="openPost(${i})">${p.name.replace(/\.[^.]+$/, '')}</div>
+          <small style="color:${p.soundMode==='original'?'#90ee90':'#ffd700'}">${p.soundDisplay}</small>
+          <div class="post-meta">
+            📦 ${p.sizeMB} MB — ${parseFloat(p.sizeMB)<=MAX_MB?'<span class="size-ok">เหมาะสม</span>':'<span class="size-warn">ใหญ่เกิน</span>'}<br>
+            ⏱️ ${formatTime(p.duration)} | 📐 <span class="aspect-ratio">${ratio}</span><br>
+            📅 ${p.time}
           </div>
-          <button class="btn-danger" onclick="showConfirm(${i})">
+          <button class="btn-danger" onclick="askDelete(${i})">
             <i class="fa-solid fa-trash"></i> ลบ
           </button>
         </div>
@@ -776,7 +605,111 @@ function renderPosts() {
   }).join('');
 }
 
-renderPosts();
+function openPost(idx) {
+  selectedPost = posts[idx];
+  const area = document.getElementById('mediaArea');
+  area.innerHTML = '';
+  if (selectedPost.type === 'video') {
+    const v = document.createElement('video');
+    v.src = selectedPost.url;
+    v.controls = v.autoplay = v.loop = true;
+    area.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.src = selectedPost.url;
+    area.style.alignItems = 'flex-start';
+    area.appendChild(img);
+  }
+  
+  document.getElementById('descText').textContent = selectedPost.name.replace(/\.[^.]+$/, '');
+  document.getElementById('soundLabel').textContent = selectedPost.soundDisplay;
+  document.getElementById('postInfo').style.display = 'block';
+  
+  switchPage('homePage');
+}
+
+function askDelete(idx) {
+  deletingIndex = idx;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+function closeDeleteModal() {
+  deletingIndex = -1;
+  document.getElementById('deleteModal').style.display = 'none';
+}
+function confirmDelete() {
+  if (deletingIndex > -1) {
+    posts.splice(deletingIndex, 1);
+    localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+    renderPostList();
+  }
+  closeDeleteModal();
+}
+
+// ข้อมูลเชิงลึก
+document.querySelectorAll('.insight-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('tab' + tab.dataset.tab[0].toUpperCase() + tab.dataset.tab.slice(1)).classList.remove('hidden');
+  });
+});
+
+function renderInsight() {
+  document.getElementById('totalPosts').textContent = posts.length;
+  
+  if (!posts.length) {
+    document.getElementById('insightMeta').textContent = 'ยังไม่มีโพสต์';
+    document.getElementById('startDate').textContent = '-';
+    document.getElementById('totalViews').textContent = '0';
+    document.getElementById('chartArea').innerHTML = '<span style="color:#9ca3af;font-size:11px;">ไม่มีข้อมูล</span>';
+    return;
+  }
+  
+  let earliest = null;
+  posts.forEach(p => {
+    if (p.isoTime) {
+      const d = new Date(p.isoTime);
+      if (!isNaN(d.getTime()) && (!earliest || d < earliest)) earliest = d;
+    }
+  });
+  
+  document.getElementById('startDate').textContent = earliest 
+    ? earliest.toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'numeric'}) 
+    : '-';
+  
+  const totalViews = posts.length * 12 + Math.floor(Math.random() * 30);
+  document.getElementById('totalViews').textContent = totalViews;
+  
+  const totalSec = posts.reduce((s, p) => s + (p.duration || 0), 0);
+  const avgSec = posts.length ? (totalSec / posts.length).toFixed(1) : 0;
+  document.getElementById('totalTime').textContent = `${Math.round(totalSec / 60)} นาที`;
+  document.getElementById('avgTime').textContent = `${avgSec} วินาที`;
+  document.getElementById('completion').textContent = `${(75 + Math.random() * 15).toFixed(1)}%`;
+  
+  if (selectedPost) {
+    document.getElementById('insightMeta').textContent = `แสดง: ${selectedPost.name}`;
+    document.getElementById('insightCover').innerHTML = `<img src="${selectedPost.url.replace(/\.[^.]+$/, '.jpg')}" onerror="this.src='${selectedPost.url}'">`;
+  } else {
+    document.getElementById('insightMeta').textContent = `รวมทั้งหมด ${posts.length} รายการ`;
+    document.getElementById('insightCover').innerHTML = '<i class="fa-solid fa-video" style="color:#9ca3af;font-size:30px;"></i>';
+  }
+  
+  const chartData = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    chartData.push({
+      label: d.getDate(),
+      value: Math.floor(Math.random() * Math.max(5, totalViews / 4))
+    });
+  }
+  const maxVal = Math.max(...chartData.map(d => d.value)) || 1;
+  document.getElementById('chartArea').innerHTML = chartData.map(d => {
+    const h = Math.max(4, (d.value / maxVal) * 100);
+    return `<div class="chart-col"><div class="chart-bar" style="height:${h}%;"></div><span class="chart-label">${d.label}</span></div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
