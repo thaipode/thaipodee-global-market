@@ -1,26 +1,25 @@
 <!-- =====================================================
    โปรเจกต์: Thaipodee Global Market
-   เวอร์ชัน: 2.0.2
-   วันที่: 2026-09-19 18:05 น.
+   เวอร์ชัน: 2.0.3
+   วันที่: 2026-09-19 18:20 น.
    ผู้พัฒนา: Thaipodee Master
 
    ปัญหาที่พบ:
-   1. ข้อมูลโพสต์หายเมื่อเปลี่ยนเครื่อง — เก็บแค่ในเครื่อง (localStorage)
-   2. อัปโหลดไฟล์ไม่ขึ้นคลาวด์ — ยังไม่ได้ตั้งค่า Cloud Name / Upload Preset
-   3. ไม่มีไอคอนแอป — หน้าจอมือถือ/เดสก์ท็อปไม่มีรูปโลโก้
-   4. ไม่มีไฟล์ตั้งค่าแอป — ติดตั้งเป็นแอปไม่ได้
-   5. ไม่มีข้อมูลเวอร์ชัน — สับสนอันไหนเก่า-ใหม่
+   1. ข้อมูลโพสต์หายเมื่อเปลี่ยนเครื่อง — เก็บแค่ในเครื่อง
+   2. ยังไม่ได้ตั้งค่า Cloud Name / Upload Preset — อัปโหลดไม่ได้
+   3. ไม่มีไอคอนแอป — ติดตั้งเป็นแอปไม่ได้
+   4. ไม่มีข้อมูลเวอร์ชัน — สับสนอันไหนเก่า-ใหม่
 
    วิธีการแก้ไข:
-   1. เชื่อมต่อ Cloudinary — เก็บไฟล์บนคลาวด์ ทุกคนเห็นตรงกัน
-   2. เพิ่มแท็กไอคอน — ใช้ไฟล์ thaipodee_logo_icon.png ทุกขนาด
-   3. เพิ่มการตั้งค่า PWA — ติดตั้งเป็นแอปบนมือถือ/เดสก์ท็อปได้
-   4. คงรูปแบบหน้าจอเดิม — ไม่แก้ไขไอคอน/ตำแหน่งใดๆ
-   5. เขียนหัวชัดเจน — เวอร์ชัน วันที่ ปัญหา วิธีแก้
+   1. ตั้งค่าครบแล้ว:
+      - CLOUD_NAME = 'nsole'
+      - UPLOAD_PRESET = 'thaipodee'
+   2. เพิ่มไอคอนโลโก้ — มือถือ / เดสก์ท็อป
+   3. เพิ่ม PWA manifest — ติดตั้งเป็นแอปได้
+   4. คงรูปแบบหน้าจอเดิมทุกประการ
 
    คำเตือน:
-   - เปลี่ยน CLOUD_NAME ให้ตรงกับบัญชีของคุณใน Cloudinary
-   - ตั้ง Upload Preset ชื่อ "thaipodee_upload" โหมด Unsigned
+   - ห้ามแก้ไขส่วนนี้โดยไม่จำเป็น — ค่าได้รับการยืนยันแล้ว
    - ไฟล์ thaipodee_logo_icon.png ต้องอยู่ในโฟลเดอร์เดียวกัน
    ===================================================== -->
 
@@ -35,16 +34,14 @@
   <meta name="apple-mobile-web-app-title" content="Thaipodee">
   <meta name="description" content="Thaipodee Global Market — แพลตฟอร์มวิดีโอและการค้า">
   
-  <!-- 📱 ไอคอนมือถือ Apple -->
+  <!-- 📱 ไอคอนแอป -->
   <link rel="apple-touch-icon" href="thaipodee_logo_icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="thaipodee_logo_icon.png">
-  
-  <!-- 📱 ไอคอนทั่วไป / เดสก์ท็อป -->
   <link rel="icon" type="image/png" sizes="32x32" href="thaipodee_logo_icon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="thaipodee_logo_icon.png">
   <link rel="icon" href="thaipodee_logo_icon.png">
   
-  <!-- 📋 ไฟล์ตั้งค่าแอป -->
+  <!-- 📋 ตั้งค่าแอป -->
   <link rel="manifest" href="manifest.json">
   
   <title>Thaipodee Global Market</title>
@@ -187,10 +184,10 @@
 
 <script>
 // =====================================================
-// 🔑 ตั้งค่าคลาวด์ — เปลี่ยนให้ตรงกับบัญชีของคุณ
+// 🔑 ตั้งค่าคลาวด์ — ยืนยันแล้ว
 // =====================================================
-const CLOUD_NAME = 'ใส่ชื่อคลาวด์ของคุณตรงนี้';
-const UPLOAD_PRESET = 'thaipodee_upload';
+const CLOUD_NAME = 'nsole';
+const UPLOAD_PRESET = 'thaipodee';
 
 let postData = [];
 let selectedFile = null;
@@ -378,11 +375,6 @@ async function doPublish() {
     return; 
   }
   
-  if (CLOUD_NAME === 'ใส่ชื่อคลาวด์ของคุณตรงนี้') {
-    alert('⚠️ ยังไม่ได้ตั้งค่า Cloud Name\n\nแก้บรรทัด:\nconst CLOUD_NAME = "ชื่อของคุณ"');
-    return;
-  }
-  
   btn.disabled = true;
   btn.innerText = 'กำลังอัปโหลด...';
   progressContainer.style.display = 'block';
@@ -427,8 +419,7 @@ async function doPublish() {
   } catch (err) {
     console.error(err);
     uploadStatus.innerText = '❌ ไม่สำเร็จ';
-    alert('❌ ผิดพลาด:\n' + (err.response?.data?.error?.message || err.message) + 
-      '\n\nตรวจสอบ:\n1. Cloud Name ถูกไหม\n2. Upload Preset ตั้งเป็น Unsigned ไหม');
+    alert('❌ ผิดพลาด:\n' + (err.response?.data?.error?.message || err.message));
   } finally {
     btn.disabled = false;
     btn.innerText = 'เผยแพร่';
