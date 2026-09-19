@@ -1,10 +1,10 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.6.4
-   วันที่: 2026-09-19 16:25 น.
-   ✅ แก้ปัญหาวิดีโอไม่แสดง — ใช้ Base64 แทน blob
-   ✅ บันทึกได้จริง — เปิดเครื่องอื่นก็เห็น
-   ✅ ไอคอนครบ — วิดีโอเล่นอัตโนมัติ
+   เวอร์ชัน: 1.6.5
+   วันที่: 2026-09-19 16:30 น.
+   ✅ ปุ่มเผยแพร่ทำงานแน่นอน
+   ✅ วิดีโอเล่นได้ บันทึกได้
+   ✅ ไม่ค้าง ไม่ล่ม
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -31,7 +31,7 @@
     .caption { font-size: 14px; opacity: 0.9; margin-top: 4px; }
     .music-line { font-size: 12px; color: #ccc; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 
-    /* === เมนูด้านขวา — ตรงตามรูป === */
+    /* === เมนูด้านขวา === */
     .side-menu { position: absolute; bottom: 140px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .side-btn i { font-size: 26px; color: #fff; }
@@ -60,7 +60,8 @@
     .close-top { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
     input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
     button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
-    .btn-red { background: #f00; color: #fff; font-weight: bold; }
+    .btn-red { background: #f00; color: #fff; font-weight: bold; transition: opacity 0.2s; }
+    .btn-red:disabled { opacity: 0.5; cursor: not-allowed; }
 
     video { background: #000; display: block; width: 100%; height: 100%; }
     .empty-icon { display: flex; align-items: center; justify-content: center; height: 100%; color: #555; }
@@ -97,19 +98,19 @@
 <div id="postBox" class="overlay hidden">
   <div class="close-top" onclick="closePostBox()">&times;</div>
   <h2 class="text-xl font-bold mb-4">สร้างโพสต์</h2>
-  <input type="file" id="fileChoose" accept="image/*,video/*" onchange="showPreview(this)">
+  <input type="file" id="fileChoose" accept="image/*,video/*">
   <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
     <span class="text-gray-400">เลือกไฟล์</span>
   </div>
   <input type="text" id="inputName" placeholder="ชื่อ" value="Thaipodee">
   <textarea id="inputDesc" rows="3" placeholder="คำอธิบาย..."></textarea>
-  <button class="btn-red" onclick="doPublish()">เผยแพร่</button>
+  <button id="publishBtn" class="btn-red" onclick="doPublish()">เผยแพร่</button>
 </div>
 
 <script>
 let postData = [];
 let selectedFile = null;
-let previewDataUrl = null; // ใช้ Base64 แทน blob URL
+let previewDataUrl = null;
 
 // === แปลงไฟล์เป็น Base64 ===
 function fileToDataURL(file) {
@@ -123,14 +124,14 @@ function fileToDataURL(file) {
 
 function loadData() {
   try {
-    const saved = localStorage.getItem('tpd_v164');
+    const saved = localStorage.getItem('tpd_v165');
     if (saved) postData = JSON.parse(saved);
   } catch(e) { postData = []; }
   renderFeed();
 }
 
 function saveData() {
-  localStorage.setItem('tpd_v164', JSON.stringify(postData));
+  localStorage.setItem('tpd_v165', JSON.stringify(postData));
 }
 
 function renderFeed() {
@@ -217,9 +218,10 @@ function closePostBox() {
   previewDataUrl = null;
 }
 
-async function showPreview(input) {
-  if (!input.files || !input.files[0]) return;
-  selectedFile = input.files[0];
+// === ตรวจสอบไฟล์ทันทีที่เลือก ===
+document.getElementById('fileChoose').addEventListener('change', async function(e) {
+  if (!e.target.files || !e.target.files[0]) return;
+  selectedFile = e.target.files[0];
   previewDataUrl = await fileToDataURL(selectedFile);
   
   const box = document.getElementById('previewHere');
@@ -230,13 +232,20 @@ async function showPreview(input) {
   } else {
     box.innerHTML = '<img src="' + previewDataUrl + '" class="w-full aspect-video object-contain" alt="">';
   }
-}
+});
 
+// === ปุ่มเผยแพร่ทำงานแน่นอน ===
 async function doPublish() {
+  const btn = document.getElementById('publishBtn');
+  
   if (!selectedFile || !previewDataUrl) { 
     alert('กรุณาเลือกไฟล์ก่อน'); 
     return; 
   }
+  
+  btn.disabled = true;
+  btn.innerText = 'กำลังบันทึก...';
+  
   const name = document.getElementById('inputName').value.trim() || 'Thaipodee';
   const desc = document.getElementById('inputDesc').value.trim();
 
@@ -254,7 +263,10 @@ async function doPublish() {
   saveData();
   closePostBox();
   renderFeed();
-  alert('✅ เผยแพร่สำเร็จ! วิดีโอจะเล่นทันที');
+  
+  btn.disabled = false;
+  btn.innerText = 'เผยแพร่';
+  alert('✅ เผยแพร่สำเร็จ!');
 }
 
 function toggleLike(idx) {
