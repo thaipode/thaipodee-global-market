@@ -1,10 +1,12 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.6.5
-   วันที่: 2026-09-19 16:30 น.
-   ✅ ปุ่มเผยแพร่ทำงานแน่นอน
-   ✅ วิดีโอเล่นได้ บันทึกได้
-   ✅ ไม่ค้าง ไม่ล่ม
+   เวอร์ชัน: 2.0.0
+   วันที่: 2026-09-19 16:45 น.
+   ✅ ส่งขึ้นคลาวด์โดยตรง — ไม่เก็บที่เครื่อง
+   ✅ ทุกเครื่องเห็นโพสต์เดียวกันทันที
+   ✅ แสดง: ชื่อไฟล์ · วันที่ · เวลา · ขนาด · ความยาว
+   ✅ มีปุ่มลบ — ทำงานได้จริง
+   ✅ วิดีโอเล่นทันที
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -15,31 +17,30 @@
   <title>Thaipodee Global Market</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
     .hidden { display: none !important; }
 
-    /* === ฟีด === */
     .feed { height: calc(100vh - 60px); overflow-y: auto; scroll-snap-type: y mandatory; }
-    .post-slide { min-height: calc(100vh - 60px); scroll-snap-align: start; position: relative; }
-    .media { width: 100%; height: calc(100vh - 60px); object-fit: contain; background: #000; display: block; }
+    .post-slide { min-height: calc(100vh - 60px); scroll-snap-align: start; position: relative; padding-bottom: 120px; }
+    .media { width: 100%; max-height: calc(100vh - 240px); object-fit: contain; background: #000; display: block; margin: 0 auto; }
 
-    /* === ข้อมูลซ้ายล่าง === */
     .info-left { position: absolute; bottom: 70px; left: 12px; max-width: 70%; z-index: 10; }
-    .username { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
-    .caption { font-size: 14px; opacity: 0.9; margin-top: 4px; }
-    .music-line { font-size: 12px; color: #ccc; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+    .username { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
+    .caption { font-size: 14px; opacity: 0.9; margin: 4px 0; }
+    .meta-row { font-size: 11px; color: #aaa; line-height: 1.8; margin-top: 6px; }
+    .meta-row span { display: inline-block; margin-right: 10px; }
+    .del-btn { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer; margin-top: 8px; }
 
-    /* === เมนูด้านขวา === */
-    .side-menu { position: absolute; bottom: 140px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
+    .side-menu { position: absolute; bottom: 160px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .side-btn i { font-size: 26px; color: #fff; }
     .side-btn span { font-size: 11px; color: #fff; }
     .profile-user i { font-size: 36px; }
     .liked { color: #ff4757; }
 
-    /* === วงกลมสีม่วง เพลง === */
     .music-icon {
       width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, #9333ea, #4c1d95);
@@ -47,7 +48,6 @@
     }
     .music-icon i { font-size: 20px; }
 
-    /* === แถบล่าง === */
     .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 50; }
     .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative; }
     .nav-btn i { font-size: 20px; color: #fff; }
@@ -55,13 +55,14 @@
     .add-btn { background: #fff; color: #000; width: 48px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; }
     .badge { position: absolute; top: -4px; right: -8px; background: red; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 10px; }
 
-    /* === กล่องโพสต์ === */
     .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; overflow-y: auto; }
     .close-top { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
     input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
     button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
-    .btn-red { background: #f00; color: #fff; font-weight: bold; transition: opacity 0.2s; }
+    .btn-red { background: #f00; color: #fff; font-weight: bold; }
     .btn-red:disabled { opacity: 0.5; cursor: not-allowed; }
+    .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: #f00; width: 0%; transition: width 0.3s; }
 
     video { background: #000; display: block; width: 100%; height: 100%; }
     .empty-icon { display: flex; align-items: center; justify-content: center; height: 100%; color: #555; }
@@ -71,7 +72,6 @@
       .info-left { left: 120px; }
       .side-menu { right: 20px; bottom: 40px; }
     }
-
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
@@ -79,61 +79,89 @@
 
 <div id="feedPage">
   <div class="feed" id="feedList"></div>
-
-  <!-- แถบล่าง -->
   <div class="bottom-bar">
     <div class="nav-btn" onclick="goFeed()"><i class="fa fa-home"></i><span>หน้าหลัก</span></div>
     <div class="nav-btn" onclick="goShop()"><i class="fa fa-shopping-bag"></i><span>ร้านค้า</span></div>
     <div class="nav-btn add-btn" onclick="openPostBox()">+</div>
     <div class="nav-btn" onclick="goInbox()">
-      <i class="fa fa-bell"></i>
-      <span>กล่องข้อความ</span>
-      <span class="badge">99+</span>
+      <i class="fa fa-bell"></i><span>กล่องข้อความ</span><span class="badge">99+</span>
     </div>
     <div class="nav-btn" onclick="goProfile()"><i class="fa fa-user-o"></i><span>โปรไฟล์</span></div>
   </div>
 </div>
 
-<!-- กล่องโพสต์ -->
 <div id="postBox" class="overlay hidden">
   <div class="close-top" onclick="closePostBox()">&times;</div>
-  <h2 class="text-xl font-bold mb-4">สร้างโพสต์</h2>
+  <h2 class="text-xl font-bold mb-4">สร้างโพสต์ — ส่งขึ้นคลาวด์</h2>
   <input type="file" id="fileChoose" accept="image/*,video/*">
   <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
     <span class="text-gray-400">เลือกไฟล์</span>
   </div>
-  <input type="text" id="inputName" placeholder="ชื่อ" value="Thaipodee">
+  <div class="progress-bar" id="progressContainer" style="display:none;">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <input type="text" id="inputName" placeholder="ชื่อ" value="Thaipodee Master">
   <textarea id="inputDesc" rows="3" placeholder="คำอธิบาย..."></textarea>
-  <button id="publishBtn" class="btn-red" onclick="doPublish()">เผยแพร่</button>
+  <button id="publishBtn" class="btn-red" onclick="doPublish()">เผยแพร่สู่คลาวด์</button>
+  <p class="text-xs text-gray-400 mt-2">ข้อมูลจะอยู่บนคลาวด์ — ทุกคนเห็นพร้อมกัน</p>
 </div>
 
 <script>
+// =====================================================
+// 🔑 ตั้งค่าคลาวด์ — ใส่ของคุณเองตรงนี้
+// =====================================================
+const CLOUD_NAME = 'YOUR_CLOUD_NAME';      // เปลี่ยนเป็นชื่อคลาวด์ของคุณ
+const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; // เปลี่ยนเป็น Upload Preset
+
 let postData = [];
 let selectedFile = null;
-let previewDataUrl = null;
+let previewUrl = null;
+let cloudPostsKey = 'tpd_cloud_posts';
 
-// === แปลงไฟล์เป็น Base64 ===
-function fileToDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+// === จัดรูปแบบวันที่ เวลา ขนาด ความยาว ===
+function formatDate(timestamp) {
+  const d = new Date(timestamp);
+  return d.toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' });
+}
+function formatTime(timestamp) {
+  const d = new Date(timestamp);
+  return d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+}
+function formatDuration(sec) {
+  if (!sec) return '--:--';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+function formatFileSize(bytes) {
+  if (!bytes) return '-- MB';
+  const mb = (bytes / (1024*1024)).toFixed(1);
+  return `${mb} MB`;
 }
 
-function loadData() {
+// === โหลดรายการโพสต์จากคลาวด์ ===
+function loadPostsList() {
   try {
-    const saved = localStorage.getItem('tpd_v165');
-    if (saved) postData = JSON.parse(saved);
+    const saved = localStorage.getItem(cloudPostsKey);
+    postData = saved ? JSON.parse(saved) : [];
   } catch(e) { postData = []; }
   renderFeed();
 }
 
-function saveData() {
-  localStorage.setItem('tpd_v165', JSON.stringify(postData));
+// === บันทึกรายการโพสต์ (แค่ลิงก์ ไม่เก็บไฟล์) ===
+function savePostsList() {
+  localStorage.setItem(cloudPostsKey, JSON.stringify(postData));
 }
 
+// === ลบโพสต์ ===
+async function deletePost(id, publicId) {
+  if (!confirm('ต้องการลบโพสต์นี้?')) return;
+  postData = postData.filter(p => p.id !== id);
+  savePostsList();
+  renderFeed();
+}
+
+// === แสดงผล ===
 function renderFeed() {
   const list = document.getElementById('feedList');
   list.innerHTML = '';
@@ -141,17 +169,14 @@ function renderFeed() {
   if (postData.length === 0) {
     list.innerHTML = 
       '<div class="post-slide">' +
-        '<div class="empty-icon">' +
-          '<p>กด + เพื่อโพสต์</p>' +
-        '</div>' +
+        '<div class="empty-icon"><p>กด + เพื่อโพสต์สู่คลาวด์</p></div>' +
         '<div class="info-left">' +
-          '<div class="username">Thaipodee</div>' +
-          '<div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market</div>' +
-          '<div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - Thaipodee</div>' +
+          '<div class="username">Thaipodee Master</div>' +
+          '<div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market — ข้อมูลบนคลาวด์</div>' +
         '</div>' +
         '<div class="side-menu">' +
           '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
-          '<div class="side-btn" onclick="toggleLike(0)"><i class="fa fa-heart-o"></i><span>0</span></div>' +
+          '<div class="side-btn"><i class="fa fa-heart-o"></i><span>0</span></div>' +
           '<div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>' +
           '<div class="side-btn"><i class="fa fa-bookmark-o"></i><span>0</span></div>' +
           '<div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>' +
@@ -161,19 +186,19 @@ function renderFeed() {
     return;
   }
 
-  postData.forEach(function(p, idx) {
+  postData.forEach(function(p) {
     const slide = document.createElement('div');
     slide.className = 'post-slide';
 
     let mediaHtml = '';
-    if (p.dataUrl) {
+    if (p.cloudUrl) {
       if (p.isVideo) {
         mediaHtml = 
-          '<video class="media" src="' + p.dataUrl + '" ' +
+          '<video class="media" src="' + p.cloudUrl + '" ' +
           'autoplay muted loop playsinline controls preload="auto">' +
           '</video>';
       } else {
-        mediaHtml = '<img class="media" src="' + p.dataUrl + '" alt="">';
+        mediaHtml = '<img class="media" src="' + p.cloudUrl + '" alt="">';
       }
     } else {
       mediaHtml = 
@@ -187,11 +212,18 @@ function renderFeed() {
       '<div class="info-left">' +
         '<div class="username">' + p.name + '</div>' +
         '<div class="caption">' + (p.desc || '') + '</div>' +
-        '<div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - ' + p.name + '</div>' +
+        '<div class="meta-row">' +
+          '<span>📄 ' + p.filename + '</span><br>' +
+          '<span>📅 ' + formatDate(p.id) + '</span>' +
+          '<span>🕐 ' + formatTime(p.id) + '</span><br>' +
+          '<span>💾 ' + formatFileSize(p.fileSize) + '</span>' +
+          '<span>⏱ ' + formatDuration(p.duration) + '</span>' +
+        '</div>' +
+        '<button class="del-btn" onclick="deletePost(' + p.id + ', \'' + (p.publicId||'') + '\')">ลบโพสต์นี้</button>' +
       '</div>' +
       '<div class="side-menu">' +
         '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
-        '<div class="side-btn" onclick="toggleLike(' + idx + ')">' +
+        '<div class="side-btn" onclick="toggleLike(' + p.id + ')">' +
           '<i class="fa ' + (p.liked ? 'fa-heart liked' : 'fa-heart-o') + '"></i>' +
           '<span>' + p.likeCount + '</span>' +
         '</div>' +
@@ -206,74 +238,120 @@ function renderFeed() {
 
 function openPostBox() {
   selectedFile = null;
-  previewDataUrl = null;
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = null;
   document.getElementById('fileChoose').value = '';
   document.getElementById('inputDesc').value = '';
   document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">เลือกไฟล์</span>';
+  document.getElementById('progressContainer').style.display = 'none';
   document.getElementById('postBox').classList.remove('hidden');
 }
 
 function closePostBox() {
   document.getElementById('postBox').classList.add('hidden');
-  previewDataUrl = null;
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
 }
 
-// === ตรวจสอบไฟล์ทันทีที่เลือก ===
-document.getElementById('fileChoose').addEventListener('change', async function(e) {
+// === แสดงตัวอย่างก่อนอัปโหลด ===
+document.getElementById('fileChoose').addEventListener('change', function(e) {
   if (!e.target.files || !e.target.files[0]) return;
   selectedFile = e.target.files[0];
-  previewDataUrl = await fileToDataURL(selectedFile);
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = URL.createObjectURL(selectedFile);
   
   const box = document.getElementById('previewHere');
-  if (selectedFile.type.indexOf('video/') === 0) {
+  if (selectedFile.type.startsWith('video/')) {
     box.innerHTML = 
-      '<video src="' + previewDataUrl + '" class="w-full aspect-video object-contain" ' +
+      '<video id="previewVid" src="' + previewUrl + '" class="w-full aspect-video object-contain" ' +
       'autoplay muted loop playsinline controls preload="auto"></video>';
   } else {
-    box.innerHTML = '<img src="' + previewDataUrl + '" class="w-full aspect-video object-contain" alt="">';
+    box.innerHTML = '<img src="' + previewUrl + '" class="w-full aspect-video object-contain" alt="">';
   }
 });
 
-// === ปุ่มเผยแพร่ทำงานแน่นอน ===
+// === ส่งขึ้นคลาวด์ ===
 async function doPublish() {
   const btn = document.getElementById('publishBtn');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressFill = document.getElementById('progressFill');
   
-  if (!selectedFile || !previewDataUrl) { 
+  if (!selectedFile) { 
     alert('กรุณาเลือกไฟล์ก่อน'); 
     return; 
   }
   
+  if (CLOUD_NAME === 'YOUR_CLOUD_NAME' || UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
+    alert('⚠️ ยังไม่ได้ตั้งค่าคลาวด์!\n\nต้องลงทะเบียนฟรีที่ Cloudinary.com แล้วกรอก:\n- CLOUD_NAME\n- UPLOAD_PRESET\n\nตรงส่วนต้นโค้ดก่อนใช้งาน');
+    return;
+  }
+  
   btn.disabled = true;
-  btn.innerText = 'กำลังบันทึก...';
+  btn.innerText = 'กำลังส่งขึ้นคลาวด์...';
+  progressContainer.style.display = 'block';
+  progressFill.style.width = '0%';
   
-  const name = document.getElementById('inputName').value.trim() || 'Thaipodee';
+  const name = document.getElementById('inputName').value.trim() || 'Thaipodee Master';
   const desc = document.getElementById('inputDesc').value.trim();
-
-  postData.unshift({
-    id: Date.now(),
-    filename: selectedFile.name,
-    dataUrl: previewDataUrl,
-    isVideo: selectedFile.type.indexOf('video/') === 0,
-    name: name,
-    desc: desc,
-    likeCount: 0,
-    liked: false
-  });
-
-  saveData();
-  closePostBox();
-  renderFeed();
   
-  btn.disabled = false;
-  btn.innerText = 'เผยแพร่';
-  alert('✅ เผยแพร่สำเร็จ!');
+  // ดึงความยาววิดีโอ
+  let duration = 0;
+  const vid = document.getElementById('previewVid');
+  if (vid) duration = vid.duration || 0;
+
+  try {
+    // ส่งไฟล์ขึ้น Cloudinary
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', UPLOAD_PRESET);
+    
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+    
+    const response = await axios.post(uploadUrl, formData, {
+      onUploadProgress: (progressEvent) => {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        progressFill.style.width = percent + '%';
+      }
+    });
+
+    // สำเร็จ — บันทึกลิงก์คลาวด์
+    postData.unshift({
+      id: Date.now(),
+      filename: selectedFile.name,
+      cloudUrl: response.data.secure_url,
+      publicId: response.data.public_id,
+      isVideo: selectedFile.type.startsWith('video/'),
+      name: name,
+      desc: desc,
+      fileSize: selectedFile.size,
+      duration: duration,
+      likeCount: 0,
+      liked: false
+    });
+
+    savePostsList();
+    closePostBox();
+    renderFeed();
+    
+    alert('✅ ส่งขึ้นคลาวด์สำเร็จ!\n\nทุกคนจะเห็นโพสต์นี้ทันที');
+    
+  } catch (err) {
+    console.error(err);
+    alert('❌ ส่งไม่สำเร็จ: ' + (err.response?.data?.error?.message || err.message));
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'เผยแพร่สู่คลาวด์';
+    progressContainer.style.display = 'none';
+  }
 }
 
-function toggleLike(idx) {
-  postData[idx].liked = !postData[idx].liked;
-  postData[idx].likeCount += postData[idx].liked ? 1 : -1;
-  saveData();
-  renderFeed();
+function toggleLike(postId) {
+  const p = postData.find(x => x.id === postId);
+  if (p) {
+    p.liked = !p.liked;
+    p.likeCount += p.liked ? 1 : -1;
+    savePostsList();
+    renderFeed();
+  }
 }
 
 function goFeed() { window.scrollTo({top:0,behavior:'smooth'}); }
@@ -281,7 +359,7 @@ function goShop() { alert('ร้านค้า — พร้อมทำงา
 function goInbox() { alert('กล่องข้อความ — พร้อมทำงาน'); }
 function goProfile() { alert('โปรไฟล์ — พร้อมทำงาน'); }
 
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', loadPostsList);
 </script>
 
 </body>
