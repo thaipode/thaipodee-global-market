@@ -1,14 +1,15 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.0.0
+   เวอร์ชัน: 1.1.0
    วันที่: 2026-09-19
-   เวลา: 12:34 น.
-   ปัญหาที่แก้:
-   - manifest.json เขียนถูกต้องตามมาตรฐาน
-   - เชื่อมไฟล์ manifest ครบถ้วน
-   - ไอคอน: thaipodee_logo_icon.png
-   - เปิดเต็มจอแบบแอป ไม่มีแถบเบราว์เซอร์
-   - ปุ่มทุกอันทำงานสมบูรณ์
+   เวลา: 12:39 น.
+   ปรับปรุง:
+   ✅ ทุกไอคอนมีคำสั่งทำงานครบถ้วน
+   ✅ หน้าโพสต์+อัปโหลดภาพ/วิดีโอ ทำงานจริง
+   ✅ บันทึกและแสดงโพสต์ทั้งหมด
+   ✅ ระบบกดถูกใจ คอมเมนต์ บันทึก แชร์ เสร็จสมบูรณ์
+   ✅ เชื่อม manifest.json ติดตั้งเป็นแอปได้
+   ✅ ไอคอน: thaipodee_logo_icon.png
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -23,7 +24,8 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
-    .page { position: absolute; inset: 0; z-index: 1; }
+    .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s ease; }
+    .page.hidden { opacity: 0; pointer-events: none; }
     
     .feed-container { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
     .video-slide { height: 100vh; scroll-snap-align: start; position: relative; }
@@ -31,96 +33,199 @@
     
     .info-left { position: absolute; bottom: 100px; left: 12px; max-width: 70%; }
     .username { font-weight: bold; margin-bottom: 4px; font-size: 15px; }
-    .caption { font-size: 14px; line-height: 1.4; opacity: 0.9; }
+    .caption { font-size: 14px; line-height: 1.4; opacity: 0.9; margin-top: 4px; }
     
     .actions-right { position: absolute; bottom: 120px; right: 12px; display: flex; flex-direction: column; gap: 22px; align-items: center; }
-    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
+    .action-btn:active { transform: scale(0.92); opacity: 0.8; }
     .action-btn i { font-size: 26px; }
     .action-btn span { font-size: 11px; }
     
     .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 10; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; transition: all 0.2s; }
+    .nav-item:active { transform: scale(0.92); opacity: 0.7; }
     .nav-item i { font-size: 22px; }
     .nav-item span { font-size: 10px; }
     .nav-item.post-btn { background: #f00; width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     
+    .modal { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+    .modal.hidden { display: none; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .close-btn { font-size: 24px; cursor: pointer; }
+    input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
+    button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
+    .btn-primary { background: #f00; color: #fff; width: 100%; margin-top: 10px; }
+    .btn-secondary { background: #333; color: #fff; margin-top: 8px; }
+    
     ::-webkit-scrollbar { display: none; }
-    .action-btn:active { opacity: 0.7; transform: scale(0.95); }
-    .nav-item:active { opacity: 0.7; }
   </style>
 </head>
 <body>
 
+<!-- หน้าแรก ฟีด -->
 <div id="feedPage" class="page">
   <div class="feed-container" id="feedContainer"></div>
 
   <nav class="bottom-nav">
-    <div class="nav-item" onclick="goHome()">
+    <div class="nav-item" onclick="showPage('feedPage')">
       <i class="fa fa-home"></i>
       <span>หน้าแรก</span>
     </div>
-    <div class="nav-item" onclick="goSearch()">
+    <div class="nav-item" onclick="showPage('searchPage')">
       <i class="fa fa-search"></i>
       <span>ค้นหา</span>
     </div>
-    <div class="nav-item post-btn" onclick="goPost()">
+    <div class="nav-item post-btn" onclick="openPostModal()">
       <i class="fa fa-plus"></i>
     </div>
-    <div class="nav-item" onclick="goNotifications()">
+    <div class="nav-item" onclick="showPage('notifPage')">
       <i class="fa fa-bell-o"></i>
       <span>แจ้งเตือน</span>
     </div>
-    <div class="nav-item" onclick="goProfile()">
+    <div class="nav-item" onclick="showPage('profilePage')">
       <i class="fa fa-user-o"></i>
       <span>ฉัน</span>
     </div>
   </nav>
 </div>
 
+<!-- หน้าค้นหา -->
+<div id="searchPage" class="page hidden flex flex-col p-5">
+  <div class="flex justify-between items-center mb-5">
+    <h2 class="text-xl font-bold">ค้นหา</h2>
+    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
+  </div>
+  <input type="text" id="searchInput" placeholder="ค้นหาชื่อ คำอธิบาย...">
+  <div id="searchResults" class="mt-4"></div>
+</div>
+
+<!-- หน้าแจ้งเตือน -->
+<div id="notifPage" class="page hidden flex flex-col p-5">
+  <div class="flex justify-between items-center mb-5">
+    <h2 class="text-xl font-bold">การแจ้งเตือน</h2>
+    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
+  </div>
+  <div id="notifList" class="space-y-4 mt-2">
+    <div class="p-3 bg-gray-900 rounded-lg">ยังไม่มีการแจ้งเตือน</div>
+  </div>
+</div>
+
+<!-- หน้าโปรไฟล์ -->
+<div id="profilePage" class="page hidden flex flex-col p-5">
+  <div class="flex justify-between items-center mb-5">
+    <h2 class="text-xl font-bold">โปรไฟล์</h2>
+    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
+  </div>
+  <div class="flex items-center gap-4 mb-6">
+    <div class="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center text-3xl">
+      <i class="fa fa-user"></i>
+    </div>
+    <div>
+      <div class="font-bold text-lg" id="profileName">Thaipodee Master</div>
+      <div class="text-gray-400 text-sm">ผู้สร้างแอป</div>
+    </div>
+  </div>
+  <button class="btn-secondary" onclick="changeProfileName()">เปลี่ยนชื่อผู้ใช้</button>
+  <h3 class="font-bold mt-6 mb-3">โพสต์ของฉัน</h3>
+  <div id="myPosts" class="space-y-3"></div>
+</div>
+
+<!-- หน้าโพสต์ใหม่ -->
+<div id="postModal" class="modal hidden">
+  <div class="modal-header">
+    <h2 class="text-lg font-bold">สร้างโพสต์</h2>
+    <span class="close-btn" onclick="closePostModal()">&times;</span>
+  </div>
+  <input type="file" id="fileInput" accept="image/*,video/*" onchange="previewFile(event)">
+  <div id="previewArea" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4 overflow-hidden">
+    <span class="text-gray-400">ตัวอย่างไฟล์</span>
+  </div>
+  <input type="text" id="authorInput" placeholder="ชื่อผู้โพสต์" value="Thaipodee Master">
+  <textarea id="captionInput" rows="3" placeholder="เขียนคำอธิบาย..."></textarea>
+  <button class="btn-primary" onclick="submitPost()">เผยแพร่</button>
+</div>
+
+<!-- กล่องคอมเมนต์ -->
+<div id="commentModal" class="modal hidden">
+  <div class="modal-header">
+    <h2 class="text-lg font-bold">ความคิดเห็น</h2>
+    <span class="close-btn" onclick="closeCommentModal()">&times;</span>
+  </div>
+  <div id="commentList" class="space-y-3 mb-4 max-h-60 overflow-y-auto"></div>
+  <div class="flex gap-2">
+    <input type="text" id="newComment" placeholder="เขียนความคิดเห็น..." class="flex-1">
+    <button class="btn-primary" onclick="addComment()">ส่ง</button>
+  </div>
+</div>
+
 <script>
-function goHome() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function goSearch() {
-  alert('🔍 กำลังไปหน้าค้นหา...');
-}
-function goPost() {
-  alert('➕ กำลังไปหน้าโพสต์...');
-}
-function goNotifications() {
-  alert('🔔 กำลังไปหน้าแจ้งเตือน...');
-}
-function goProfile() {
-  alert('👤 กำลังไปหน้าโปรไฟล์...');
-}
-function goProfilePage() {
-  goProfile();
-}
-
-function likePost(el) {
-  const countEl = el.querySelector('span');
-  let count = parseInt(countEl.textContent) || 0;
-  countEl.textContent = count + 1;
-  el.querySelector('i').classList.remove('fa-heart-o');
-  el.querySelector('i').classList.add('fa-heart');
-  el.style.color = '#ff4757';
-}
-function commentPost() {
-  alert('💬 เปิดกล่องคอมเมนต์...');
-}
-function bookmarkPost(el) {
-  el.querySelector('i').classList.toggle('fa-bookmark-o');
-  el.querySelector('i').classList.toggle('fa-bookmark');
-  el.style.color = el.style.color === '#ffd700' ? '' : '#ffd700';
-}
-function sharePost() {
-  alert('🔄 แชร์ลิงก์นี้...');
-}
-function moreOptions() {
-  alert('⋮ ตัวเลือกเพิ่มเติม...');
-}
-
 let posts = JSON.parse(localStorage.getItem('tpd_posts') || '[]');
+let currentPostIndex = null;
+
+// สลับหน้า
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.getElementById(pageId).classList.remove('hidden');
+  if (pageId === 'profilePage') renderMyPosts();
+  if (pageId === 'searchPage') searchPosts();
+}
+
+// เปิด-ปิด โพสต์
+function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); }
+function closePostModal() { document.getElementById('postModal').classList.add('hidden'); resetPostForm(); }
+function resetPostForm() {
+  document.getElementById('fileInput').value = '';
+  document.getElementById('captionInput').value = '';
+  document.getElementById('previewArea').innerHTML = '<span class="text-gray-400">ตัวอย่างไฟล์</span>';
+}
+
+// แสดงตัวอย่างไฟล์
+let selectedFile = null, selectedFileData = null;
+function previewFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    selectedFileData = ev.target.result;
+    const area = document.getElementById('previewArea');
+    if (file.type.startsWith('video/')) {
+      area.innerHTML = `<video src="${selectedFileData}" class="w-full h-full object-contain" autoplay muted loop playsinline></video>`;
+    } else {
+      area.innerHTML = `<img src="${selectedFileData}" class="w-full h-full object-contain" alt="">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ส่งโพสต์
+function submitPost() {
+  if (!selectedFileData) { alert('กรุณาเลือกไฟล์ภาพหรือวิดีโอ'); return; }
+  const post = {
+    id: Date.now(),
+    type: selectedFile.type.startsWith('video/') ? 'video' : 'image',
+    src: selectedFileData,
+    author: document.getElementById('authorInput').value || 'ไม่ระบุชื่อ',
+    caption: document.getElementById('captionInput').value,
+    likes: 0,
+    liked: false,
+    bookmarked: false,
+    comments: [],
+    time: new Date().toLocaleString('th-TH')
+  };
+  posts.unshift(post);
+  savePosts();
+  renderPosts();
+  closePostModal();
+  alert('✅ เผยแพร่สำเร็จ!');
+}
+
+// บันทึกลงเครื่อง
+function savePosts() {
+  localStorage.setItem('tpd_posts', JSON.stringify(posts));
+}
+
+// แสดงฟีด
 function renderPosts() {
   const container = document.getElementById('feedContainer');
   container.innerHTML = '';
@@ -132,45 +237,157 @@ function renderPosts() {
         </div>
         <div class="info-left">
           <div class="username">Thaipodee Master</div>
-          <div class="caption">ยินดีต้อนรับสู่ Thaipodee</div>
+          <div class="caption">ยินดีต้อนรับสู่ Thaipodee — แอปของเราเอง</div>
         </div>
-        <div class="actions-right">
-          <div class="action-btn" onclick="goProfilePage()"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-          <div class="action-btn" onclick="likePost(this)"><i class="fa fa-heart-o"></i><span>0</span></div>
-          <div class="action-btn" onclick="commentPost()"><i class="fa fa-comment-o"></i><span>0</span></div>
-          <div class="action-btn" onclick="bookmarkPost(this)"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
-          <div class="action-btn" onclick="sharePost()"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-          <div class="action-btn" onclick="moreOptions()"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
-        </div>
-      </div>
-    `;
+      </div>`;
     return;
   }
-  posts.forEach(post => {
+  posts.forEach((post, idx) => {
     const slide = document.createElement('div');
     slide.className = 'video-slide';
     slide.innerHTML = `
-      ${post.type === 'video' 
+      ${post.type === 'video'
         ? `<video class="video-content" controls autoplay muted loop playsinline>
-             <source src="${post.src}" type="video/mp4"></video>`
+             <source src="${post.src}"></video>`
         : `<img class="video-content" src="${post.src}" alt="">`
       }
       <div class="info-left">
-        <div class="username">${post.author || 'Thaipodee Master'}</div>
+        <div class="username">${post.author}</div>
         <div class="caption">${post.caption || ''}</div>
+        <div class="text-xs text-gray-500 mt-1">${post.time}</div>
       </div>
       <div class="actions-right">
-        <div class="action-btn" onclick="goProfilePage()"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-        <div class="action-btn" onclick="likePost(this)"><i class="fa fa-heart-o"></i><span>0</span></div>
-        <div class="action-btn" onclick="commentPost()"><i class="fa fa-comment-o"></i><span>0</span></div>
-        <div class="action-btn" onclick="bookmarkPost(this)"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
-        <div class="action-btn" onclick="sharePost()"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-        <div class="action-btn" onclick="moreOptions()"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
+        <div class="action-btn" onclick="showPage('profilePage')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+        <div class="action-btn" onclick="toggleLike(${idx})">
+          <i class="fa ${post.liked ? 'fa-heart' : 'fa-heart-o'}" style="color:${post.liked ? '#ff4757' : ''}"></i>
+          <span>${post.likes}</span>
+        </div>
+        <div class="action-btn" onclick="openCommentModal(${idx})">
+          <i class="fa fa-comment-o"></i>
+          <span>${post.comments.length}</span>
+        </div>
+        <div class="action-btn" onclick="toggleBookmark(${idx})">
+          <i class="fa ${post.bookmarked ? 'fa-bookmark' : 'fa-bookmark-o'}" style="color:${post.bookmarked ? '#ffd700' : ''}"></i>
+          <span>บันทึก</span>
+        </div>
+        <div class="action-btn" onclick="sharePost(${idx})">
+          <i class="fa fa-share-alt"></i>
+          <span>แชร์</span>
+        </div>
+        <div class="action-btn" onclick="moreOptions(${idx})">
+          <i class="fa fa-ellipsis-h"></i>
+          <span>อื่นๆ</span>
+        </div>
       </div>
     `;
     container.appendChild(slide);
   });
 }
+
+// กดถูกใจ
+function toggleLike(idx) {
+  posts[idx].liked = !posts[idx].liked;
+  posts[idx].likes += posts[idx].liked ? 1 : -1;
+  savePosts(); renderPosts();
+}
+
+// กดบันทึก
+function toggleBookmark(idx) {
+  posts[idx].bookmarked = !posts[idx].bookmarked;
+  savePosts(); renderPosts();
+}
+
+// คอมเมนต์
+function openCommentModal(idx) {
+  currentPostIndex = idx;
+  renderComments();
+  document.getElementById('commentModal').classList.remove('hidden');
+}
+function closeCommentModal() {
+  document.getElementById('commentModal').classList.add('hidden');
+  currentPostIndex = null;
+}
+function renderComments() {
+  const list = document.getElementById('commentList');
+  if (!posts[currentPostIndex].comments.length) {
+    list.innerHTML = '<div class="text-gray-400 text-center py-4">ยังไม่มีความคิดเห็น เป็นคนแรกเลย!</div>';
+    return;
+  }
+  list.innerHTML = posts[currentPostIndex].comments.map(c =>
+    `<div class="p-2 bg-gray-900 rounded"><b>${c.name}:</b> ${c.text}</div>`
+  ).join('');
+}
+function addComment() {
+  const input = document.getElementById('newComment');
+  const text = input.value.trim();
+  if (!text) return;
+  posts[currentPostIndex].comments.push({ name: 'คุณ', text });
+  input.value = '';
+  savePosts(); renderComments(); renderPosts();
+}
+
+// แชร์
+function sharePost(idx) {
+  const post = posts[idx];
+  const shareText = `ชมโพสต์จาก Thaipodee: ${post.caption || ''}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Thaipodee', text: shareText });
+  } else {
+    navigator.clipboard.writeText(shareText);
+    alert('✅ คัดลอกข้อความแล้ว — แชร์ได้เลย!');
+  }
+}
+
+// ตัวเลือกอื่นๆ
+function moreOptions(idx) {
+  if (confirm('ต้องการลบโพสต์นี้หรือไม่?')) {
+    posts.splice(idx, 1);
+    savePosts(); renderPosts();
+    alert('ลบแล้ว');
+  }
+}
+
+// ค้นหา
+function searchPosts() {
+  const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  const results = document.getElementById('searchResults');
+  if (!q) { results.innerHTML = ''; return; }
+  const found = posts.filter(p =>
+    (p.author && p.author.toLowerCase().includes(q)) ||
+    (p.caption && p.caption.toLowerCase().includes(q))
+  );
+  if (!found.length) { results.innerHTML = '<div class="text-gray-400">ไม่พบโพสต์ที่ตรงกับคำค้นหา</div>'; return; }
+  results.innerHTML = found.map(p => `
+    <div class="p-3 bg-gray-900 rounded-lg mb-2">
+      <div class="font-bold">${p.author}</div>
+      <div class="text-sm text-gray-300">${p.caption || 'ไม่มีคำอธิบาย'}</div>
+    </div>
+  `).join('');
+}
+document.getElementById('searchInput')?.addEventListener('input', searchPosts);
+
+// โปรไฟล์
+function changeProfileName() {
+  const newName = prompt('ตั้งชื่อใหม่:', document.getElementById('profileName').textContent);
+  if (newName && newName.trim()) {
+    document.getElementById('profileName').textContent = newName.trim();
+  }
+}
+function renderMyPosts() {
+  const list = document.getElementById('myPosts');
+  if (!posts.length) { list.innerHTML = '<div class="text-gray-400">ยังไม่มีโพสต์</div>'; return; }
+  list.innerHTML = posts.map((p, i) => `
+    <div class="p-3 bg-gray-900 rounded-lg flex justify-between items-center">
+      <div>
+        <div class="font-bold text-sm">${p.caption?.substring(0,25) || 'โพสต์'}${p.caption?.length>25?'...':''}</div>
+        <div class="text-xs text-gray-400">${p.likes} ถูกใจ · ${p.comments.length} ความคิดเห็น</div>
+      </div>
+      <button class="text-red-500 text-sm" onclick="moreOptions(${i})">ลบ</button>
+    </div>
+  `).join('');
+}
+
+// เริ่มทำงาน
 document.addEventListener('DOMContentLoaded', renderPosts);
 </script>
 
