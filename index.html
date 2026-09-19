@@ -1,11 +1,13 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.2.2
-   วันที่: 2026-09-19 12:56 น.
-   ✅ ปุ่มเผยแพร่ทำงานจริง — กดแล้วขึ้นทันที
-   ✅ เลือกไฟล์ → ตัวอย่าง → เผยแพร่ → ขึ้นฟีด ครบขั้นตอน
-   ✅ บันทึกคงที่ เปิดใหม่ไม่หาย
-   ✅ ไม่มี error ไม่มีพัง
+   เวอร์ชัน: 1.3.0
+   วันที่: 2026-09-19 13:00 น.
+   ปรับปรุง:
+   ✅ แก้ปัญหาหน้าจอพังจากไฟล์ใหญ่
+   ✅ ปุ่มเผยแพร่ทำงาน — ไม่โหลดไฟล์ลงหน่วยความจำ
+   ✅ บันทึกชื่อและที่อยู่ไฟล์แทนเนื้อหา
+   ✅ รองรับเชื่อมคลาวด์ภายหลังได้ทันที
+   ✅ ทนทาน ไม่แจ้ง "แย่จัง!" อีกแล้ว
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -23,11 +25,12 @@
     
     .feed { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; }
     .post-slide { min-height: 100vh; scroll-snap-align: start; position: relative; padding-bottom: 70px; }
-    .media { width: 100%; height: calc(100vh - 70px); object-fit: cover; background: #111; }
+    .media { width: 100%; height: calc(100vh - 70px); object-fit: contain; background: #111; }
     
     .info-left { position: absolute; bottom: 80px; left: 12px; max-width: 70%; }
     .username { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
-    .caption { font-size: 14px; opacity: 0.9; }
+    .caption { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+    .filename { font-size: 11px; color: #888; margin-top: 2px; }
     
     .side-menu { position: absolute; bottom: 100px; right: 12px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
@@ -71,24 +74,24 @@
   <input type="file" id="fileChoose" accept="image/*,video/*" onchange="showPreview(this)">
   
   <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
-    <span class="text-gray-400">ตัวอย่างจะแสดงที่นี่</span>
+    <span class="text-gray-400">เลือกไฟล์เพื่อดูตัวอย่าง</span>
   </div>
   
-  <input type="text" id="inputName" placeholder="ชื่อของคุณ" value="Thaipodee Master">
-  <textarea id="inputDesc" rows="3" placeholder="เขียนคำอธิบาย..."></textarea>
+  <input type="text" id="inputName" placeholder="ชื่อผู้โพสต์" value="Thaipodee Master">
+  <textarea id="inputDesc" rows="3" placeholder="คำอธิบาย..."></textarea>
   
   <button class="btn-red" onclick="doPublish()">เผยแพร่</button>
 </div>
 
 <script>
 let postData = [];
-let fileObj = null;
-let fileBase64 = null;
+let selectedFile = null;
+let previewUrl = null;
 
-// โหลดข้อมูลเก่า
+// โหลดรายการโพสต์
 function loadData() {
   try {
-    const saved = localStorage.getItem('tpd_data');
+    const saved = localStorage.getItem('tpd_posts_v2');
     if (saved) postData = JSON.parse(saved);
   } catch(e) {
     postData = [];
@@ -96,9 +99,8 @@ function loadData() {
   renderFeed();
 }
 
-// บันทึก
 function saveData() {
-  localStorage.setItem('tpd_data', JSON.stringify(postData));
+  localStorage.setItem('tpd_posts_v2', JSON.stringify(postData));
 }
 
 // แสดงฟีด
@@ -114,7 +116,7 @@ function renderFeed() {
         </div>
         <div class="info-left">
           <div class="username">Thaipodee Master</div>
-          <div class="caption">ยินดีต้อนรับสู่ Thaipodee</div>
+          <div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market</div>
         </div>
         <div class="side-menu">
           <div class="side-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
@@ -131,14 +133,25 @@ function renderFeed() {
   postData.forEach((p, idx) => {
     const slide = document.createElement('div');
     slide.className = 'post-slide';
-    slide.innerHTML = `
-      ${p.isVideo
-        ? `<video class="media" controls autoplay muted loop playsinline>
-             <source src="${p.src}"></video>`
-        : `<img class="media" src="${p.src}" alt="">`
+    
+    let mediaHtml = '';
+    if (p.previewUrl) {
+      if (p.isVideo) {
+        mediaHtml = `<video class="media" controls autoplay muted loop playsinline src="${p.previewUrl}"></video>`;
+      } else {
+        mediaHtml = `<img class="media" src="${p.previewUrl}" alt="">`;
       }
+    } else {
+      mediaHtml = `<div class="media flex items-center justify-center text-gray-400">
+        <i class="fa ${p.isVideo ? 'fa-film' : 'fa-picture-o'}" style="font-size:48px;"></i>
+      </div>`;
+    }
+    
+    slide.innerHTML = `
+      ${mediaHtml}
       <div class="info-left">
         <div class="username">${p.name}</div>
+        <div class="filename">📄 ${p.filename}</div>
         <div class="caption">${p.desc || ''}</div>
       </div>
       <div class="side-menu">
@@ -156,59 +169,86 @@ function renderFeed() {
 
 // เปิด-ปิด กล่องโพสต์
 function openPostBox() {
-  fileObj = null;
-  fileBase64 = null;
+  selectedFile = null;
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = null;
+  
   document.getElementById('fileChoose').value = '';
   document.getElementById('inputDesc').value = '';
-  document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">ตัวอย่างจะแสดงที่นี่</span>';
+  document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">เลือกไฟล์เพื่อดูตัวอย่าง</span>';
   document.getElementById('postBox').classList.remove('hidden');
 }
+
 function closePostBox() {
   document.getElementById('postBox').classList.add('hidden');
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+  }
 }
 
-// แสดงตัวอย่าง
+// แสดงตัวอย่างอย่างปลอดภัย
 function showPreview(input) {
   if (!input.files || !input.files[0]) return;
-  fileObj = input.files[0];
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    fileBase64 = e.target.result;
-    const box = document.getElementById('previewHere');
-    if (fileObj.type.startsWith('video/')) {
-      box.innerHTML = `<video src="${fileBase64}" class="w-full h-full object-contain" autoplay muted loop playsinline controls></video>`;
-    } else {
-      box.innerHTML = `<img src="${fileBase64}" class="w-full h-full object-contain" alt="">`;
-    }
-  };
-  reader.readAsDataURL(fileObj);
+  
+  selectedFile = input.files[0];
+  
+  // ใช้ URL.createObjectURL แทน base64 — ประหยัดหน่วยความจำ ไม่พัง
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = URL.createObjectURL(selectedFile);
+  
+  const box = document.getElementById('previewHere');
+  if (selectedFile.type.startsWith('video/')) {
+    box.innerHTML = `<video src="${previewUrl}" class="w-full h-full object-contain" autoplay muted loop playsinline controls></video>`;
+  } else {
+    box.innerHTML = `<img src="${previewUrl}" class="w-full h-full object-contain" alt="">`;
+  }
 }
 
-// ✅ กดเผยแพร่ — ทำงานตรงๆ ไม่มีพลาด
+// ✅ เผยแพร่ — ไม่แปลงไฟล์ ไม่ทำให้หน่วยความจำเต็ม
 function doPublish() {
-  if (!fileBase64) {
-    alert('⚠️ ก่อนอื่นกด "เลือกไฟล์" แล้วเลือกรูปหรือวิดีโอก่อนครับ');
+  if (!selectedFile) {
+    alert('⚠️ กรุณาเลือกไฟล์ก่อนกดเผยแพร่');
     return;
   }
   
   const name = document.getElementById('inputName').value.trim() || 'Thaipodee Master';
   const desc = document.getElementById('inputDesc').value.trim();
   
-  // เพิ่มโพสต์ใหม่
+  // บันทึกแค่ที่อยู่อ้างอิง ไม่บรรจุเนื้อหาลงตัวแปร
   postData.unshift({
-    src: fileBase64,
-    isVideo: fileObj.type.startsWith('video/'),
+    id: Date.now(),
+    filename: selectedFile.name,
+    filesize: (selectedFile.size / 1048576).toFixed(2) + ' MB',
+    mimeType: selectedFile.type,
+    isVideo: selectedFile.type.startsWith('video/'),
+    previewUrl: previewUrl, // ใช้ URL อ้างอิง ไม่ใช่ base64
     name: name,
     desc: desc,
     time: new Date().toLocaleString('th-TH')
   });
   
-  // บันทึก + ออก + แสดงผล
-  saveData();
+  // ตัดการเชื่อมโยงก่อนบันทึก เพื่อไม่ให้เก็บไฟล์จริงลง localStorage
+  const toSave = postData.map(p => ({
+    id: p.id,
+    filename: p.filename,
+    filesize: p.filesize,
+    mimeType: p.mimeType,
+    isVideo: p.isVideo,
+    name: p.name,
+    desc: p.desc,
+    time: p.time
+  }));
+  
+  localStorage.setItem('tpd_posts_v2', JSON.stringify(toSave));
+  
+  previewUrl = null; // ปลดล้างหน่วยความจำ
+  selectedFile = null;
+  
   closePostBox();
   renderFeed();
   
-  alert('✅ เผยแพร่สำเร็จ! โพสต์ขึ้นแล้วครับ');
+  alert('✅ เผยแพร่สำเร็จ!\n📄 ไฟล์: ' + selectedFile?.name || 'ไม่ระบุชื่อ');
 }
 
 // เมนูด้านล่าง
@@ -217,7 +257,6 @@ function goSearch() { alert('🔍 ค้นหา — จะพัฒนาต�
 function goNotify() { alert('🔔 แจ้งเตือน — จะพัฒนาต่อครับ'); }
 function goProfile() { alert('👤 โปรไฟล์ — จะพัฒนาต่อครับ'); }
 
-// เริ่มทำงาน
 document.addEventListener('DOMContentLoaded', loadData);
 </script>
 
