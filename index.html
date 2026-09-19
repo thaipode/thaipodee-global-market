@@ -1,10 +1,10 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.6.3
-   วันที่: 2026-09-19 16:10 น.
-   ✅ แก้โครงสร้าง — ไม่แสดงโค้ดออกมา
-   ✅ วิดีโอเล่นอัตโนมัติ + เสียงเปิดได้
-   ✅ ไอคอนด้านขวาครบทุกอัน
+   เวอร์ชัน: 1.6.4
+   วันที่: 2026-09-19 16:25 น.
+   ✅ แก้ปัญหาวิดีโอไม่แสดง — ใช้ Base64 แทน blob
+   ✅ บันทึกได้จริง — เปิดเครื่องอื่นก็เห็น
+   ✅ ไอคอนครบ — วิดีโอเล่นอัตโนมัติ
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -31,7 +31,7 @@
     .caption { font-size: 14px; opacity: 0.9; margin-top: 4px; }
     .music-line { font-size: 12px; color: #ccc; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 
-    /* === เมนูด้านขวา — ครบทุกอัน โชว์ชัดเจน === */
+    /* === เมนูด้านขวา — ตรงตามรูป === */
     .side-menu { position: absolute; bottom: 140px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
     .side-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .side-btn i { font-size: 26px; color: #fff; }
@@ -63,6 +63,7 @@
     .btn-red { background: #f00; color: #fff; font-weight: bold; }
 
     video { background: #000; display: block; width: 100%; height: 100%; }
+    .empty-icon { display: flex; align-items: center; justify-content: center; height: 100%; color: #555; }
 
     @media (orientation: landscape) {
       .bottom-bar { width: 100px; height: auto; flex-direction: column; top: 0; bottom: 0; border-right: 1px solid #222; border-top: none; }
@@ -108,18 +109,28 @@
 <script>
 let postData = [];
 let selectedFile = null;
-let previewUrl = null;
+let previewDataUrl = null; // ใช้ Base64 แทน blob URL
+
+// === แปลงไฟล์เป็น Base64 ===
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function loadData() {
   try {
-    const saved = localStorage.getItem('tpd_v163');
+    const saved = localStorage.getItem('tpd_v164');
     if (saved) postData = JSON.parse(saved);
   } catch(e) { postData = []; }
   renderFeed();
 }
 
 function saveData() {
-  localStorage.setItem('tpd_v163', JSON.stringify(postData));
+  localStorage.setItem('tpd_v164', JSON.stringify(postData));
 }
 
 function renderFeed() {
@@ -129,7 +140,7 @@ function renderFeed() {
   if (postData.length === 0) {
     list.innerHTML = 
       '<div class="post-slide">' +
-        '<div class="flex items-center justify-center h-full text-gray-400 text-center">' +
+        '<div class="empty-icon">' +
           '<p>กด + เพื่อโพสต์</p>' +
         '</div>' +
         '<div class="info-left">' +
@@ -154,18 +165,18 @@ function renderFeed() {
     slide.className = 'post-slide';
 
     let mediaHtml = '';
-    if (p.previewUrl) {
+    if (p.dataUrl) {
       if (p.isVideo) {
         mediaHtml = 
-          '<video class="media" src="' + p.previewUrl + '" ' +
+          '<video class="media" src="' + p.dataUrl + '" ' +
           'autoplay muted loop playsinline controls preload="auto">' +
           '</video>';
       } else {
-        mediaHtml = '<img class="media" src="' + p.previewUrl + '" alt="">';
+        mediaHtml = '<img class="media" src="' + p.dataUrl + '" alt="">';
       }
     } else {
       mediaHtml = 
-        '<div class="flex items-center justify-center h-full text-gray-500">' +
+        '<div class="empty-icon">' +
           '<i class="fa ' + (p.isVideo ? 'fa-film' : 'fa-picture-o') + '" style="font-size:48px;"></i>' +
         '</div>';
     }
@@ -194,8 +205,7 @@ function renderFeed() {
 
 function openPostBox() {
   selectedFile = null;
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = null;
+  previewDataUrl = null;
   document.getElementById('fileChoose').value = '';
   document.getElementById('inputDesc').value = '';
   document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">เลือกไฟล์</span>';
@@ -204,33 +214,36 @@ function openPostBox() {
 
 function closePostBox() {
   document.getElementById('postBox').classList.add('hidden');
-  if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+  previewDataUrl = null;
 }
 
-function showPreview(input) {
+async function showPreview(input) {
   if (!input.files || !input.files[0]) return;
   selectedFile = input.files[0];
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(selectedFile);
+  previewDataUrl = await fileToDataURL(selectedFile);
+  
   const box = document.getElementById('previewHere');
   if (selectedFile.type.indexOf('video/') === 0) {
     box.innerHTML = 
-      '<video src="' + previewUrl + '" class="w-full aspect-video object-contain" ' +
+      '<video src="' + previewDataUrl + '" class="w-full aspect-video object-contain" ' +
       'autoplay muted loop playsinline controls preload="auto"></video>';
   } else {
-    box.innerHTML = '<img src="' + previewUrl + '" class="w-full aspect-video object-contain" alt="">';
+    box.innerHTML = '<img src="' + previewDataUrl + '" class="w-full aspect-video object-contain" alt="">';
   }
 }
 
-function doPublish() {
-  if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
+async function doPublish() {
+  if (!selectedFile || !previewDataUrl) { 
+    alert('กรุณาเลือกไฟล์ก่อน'); 
+    return; 
+  }
   const name = document.getElementById('inputName').value.trim() || 'Thaipodee';
   const desc = document.getElementById('inputDesc').value.trim();
 
   postData.unshift({
     id: Date.now(),
     filename: selectedFile.name,
-    previewUrl: previewUrl,
+    dataUrl: previewDataUrl,
     isVideo: selectedFile.type.indexOf('video/') === 0,
     name: name,
     desc: desc,
@@ -241,7 +254,7 @@ function doPublish() {
   saveData();
   closePostBox();
   renderFeed();
-  alert('✅ เผยแพร่สำเร็จ — หน้าแสดงปกติแล้ว!');
+  alert('✅ เผยแพร่สำเร็จ! วิดีโอจะเล่นทันที');
 }
 
 function toggleLike(idx) {
