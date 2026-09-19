@@ -12,23 +12,23 @@
     .page { position: absolute; inset: 0; z-index: 1; }
     .page.hidden { display: none; }
     
-    /* วิดีโอฟีด */
+    /* ฟีดเลื่อนแนวตั้ง */
     .feed-container { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
     .video-slide { height: 100vh; scroll-snap-align: start; position: relative; }
     .video-content { width: 100%; height: 100%; object-fit: cover; background: #111; }
     
-    /* แถบข้อมูลซ้าย */
+    /* ข้อมูลด้านซ้ายล่าง */
     .info-left { position: absolute; bottom: 100px; left: 12px; max-width: 70%; }
-    .username { font-weight: bold; margin-bottom: 4px; }
+    .username { font-weight: bold; margin-bottom: 4px; font-size: 15px; }
     .caption { font-size: 14px; line-height: 1.4; opacity: 0.9; }
     
-    /* แถบปุ่มขวา */
-    .actions-right { position: absolute; bottom: 100px; right: 12px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+    /* ปุ่มด้านขวา — ครบทุกอัน */
+    .actions-right { position: absolute; bottom: 120px; right: 12px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 5; }
     .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
     .action-btn i { font-size: 26px; }
     .action-btn span { font-size: 11px; }
     
-    /* แถบเมนูล่าง */
+    /* เมนูด้านล่าง */
     .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 10; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .nav-item i { font-size: 22px; }
@@ -44,25 +44,41 @@
 <!-- หน้าฟีดหลัก -->
 <div id="feedPage" class="page">
   <div class="feed-container" id="feedContainer">
-    <!-- โพสต์ตัวอย่างที่ 1 -->
+    <!-- โพสต์ตัวอย่าง -->
     <div class="video-slide">
       <video class="video-content" controls autoplay muted loop playsinline>
         <source src="video-sample-1.mp4" type="video/mp4">
       </video>
+      
+      <!-- ข้อมูลซ้าย -->
       <div class="info-left">
         <div class="username">thaipodee Master</div>
         <div class="caption">✨ ไม่ระบุ</div>
       </div>
+      
+      <!-- ปุ่มด้านขวา — ครบ 4 อันตรงนี้เลย -->
       <div class="actions-right">
-        <div class="action-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
-        <div class="action-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
-        <div class="action-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-        <div class="action-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+        <div class="action-btn">
+          <i class="fa fa-heart-o"></i>
+          <span>0</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-comment-o"></i>
+          <span>0</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-share-alt"></i>
+          <span>แชร์</span>
+        </div>
+        <div class="action-btn">
+          <i class="fa fa-user-circle-o"></i>
+          <span>โปรไฟล์</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- เมนูล่าง -->
+  <!-- เมนูล่าง — ครบถ้วน -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="switchPage('feed')">
       <i class="fa fa-home"></i>
@@ -90,24 +106,39 @@
 // เปลี่ยนหน้า
 function switchPage(page) {
   console.log('ไปที่:', page);
-  // เพิ่มตรรกะเปลี่ยนหน้าได้ตามต้องการ
 }
 
-// โหลดรายการจาก localStorage เพื่อให้เห็นตรงกันทุกเครื่องผ่านคลาวด์ในภายหลัง
+// โหลดโพสต์จากที่บันทึกไว้
 let posts = JSON.parse(localStorage.getItem('tpd_posts') || '[]');
 
-// บันทึกโพสต์
-function savePost(data) {
-  posts.unshift(data);
-  localStorage.setItem('tpd_posts', JSON.stringify(posts));
-  renderPosts();
-}
-
-// แสดงผลโพสต์
+// แสดงรายการโพสต์
 function renderPosts() {
   const container = document.getElementById('feedContainer');
-  container.innerHTML = ''; // ลบเก่าก่อน
+  container.innerHTML = '';
 
+  // ถ้ายังไม่มีโพสต์ ให้แสดงตัวอย่าง
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <div class="video-slide">
+        <div class="video-content flex items-center justify-center text-gray-400">
+          <p>ยังไม่มีโพสต์ กดปุ่ม + เพิ่มโพสต์แรก</p>
+        </div>
+        <div class="info-left">
+          <div class="username">thaipodee Master</div>
+          <div class="caption">✨ ยินดีต้อนรับสู่ Thaipodee</div>
+        </div>
+        <div class="actions-right">
+          <div class="action-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
+          <div class="action-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
+          <div class="action-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+          <div class="action-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // แสดงโพสต์ที่มีอยู่
   posts.forEach(post => {
     const slide = document.createElement('div');
     slide.className = 'video-slide';
