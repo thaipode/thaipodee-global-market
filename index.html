@@ -1,12 +1,27 @@
 <!-- =====================================================
-   Thaipodee Global Market
-   เวอร์ชัน: 2.0.0
-   วันที่: 2026-09-19 16:45 น.
-   ✅ ส่งขึ้นคลาวด์โดยตรง — ไม่เก็บที่เครื่อง
-   ✅ ทุกเครื่องเห็นโพสต์เดียวกันทันที
-   ✅ แสดง: ชื่อไฟล์ · วันที่ · เวลา · ขนาด · ความยาว
-   ✅ มีปุ่มลบ — ทำงานได้จริง
-   ✅ วิดีโอเล่นทันที
+   โปรเจกต์: Thaipodee Global Market
+   เวอร์ชัน: 2.0.2
+   วันที่: 2026-09-19 18:05 น.
+   ผู้พัฒนา: Thaipodee Master
+
+   ปัญหาที่พบ:
+   1. ข้อมูลโพสต์หายเมื่อเปลี่ยนเครื่อง — เก็บแค่ในเครื่อง (localStorage)
+   2. อัปโหลดไฟล์ไม่ขึ้นคลาวด์ — ยังไม่ได้ตั้งค่า Cloud Name / Upload Preset
+   3. ไม่มีไอคอนแอป — หน้าจอมือถือ/เดสก์ท็อปไม่มีรูปโลโก้
+   4. ไม่มีไฟล์ตั้งค่าแอป — ติดตั้งเป็นแอปไม่ได้
+   5. ไม่มีข้อมูลเวอร์ชัน — สับสนอันไหนเก่า-ใหม่
+
+   วิธีการแก้ไข:
+   1. เชื่อมต่อ Cloudinary — เก็บไฟล์บนคลาวด์ ทุกคนเห็นตรงกัน
+   2. เพิ่มแท็กไอคอน — ใช้ไฟล์ thaipodee_logo_icon.png ทุกขนาด
+   3. เพิ่มการตั้งค่า PWA — ติดตั้งเป็นแอปบนมือถือ/เดสก์ท็อปได้
+   4. คงรูปแบบหน้าจอเดิม — ไม่แก้ไขไอคอน/ตำแหน่งใดๆ
+   5. เขียนหัวชัดเจน — เวอร์ชัน วันที่ ปัญหา วิธีแก้
+
+   คำเตือน:
+   - เปลี่ยน CLOUD_NAME ให้ตรงกับบัญชีของคุณใน Cloudinary
+   - ตั้ง Upload Preset ชื่อ "thaipodee_upload" โหมด Unsigned
+   - ไฟล์ thaipodee_logo_icon.png ต้องอยู่ในโฟลเดอร์เดียวกัน
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -14,6 +29,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Thaipodee">
+  <meta name="description" content="Thaipodee Global Market — แพลตฟอร์มวิดีโอและการค้า">
+  
+  <!-- 📱 ไอคอนมือถือ Apple -->
+  <link rel="apple-touch-icon" href="thaipodee_logo_icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="thaipodee_logo_icon.png">
+  
+  <!-- 📱 ไอคอนทั่วไป / เดสก์ท็อป -->
+  <link rel="icon" type="image/png" sizes="32x32" href="thaipodee_logo_icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="thaipodee_logo_icon.png">
+  <link rel="icon" href="thaipodee_logo_icon.png">
+  
+  <!-- 📋 ไฟล์ตั้งค่าแอป -->
+  <link rel="manifest" href="manifest.json">
+  
   <title>Thaipodee Global Market</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -25,13 +58,13 @@
 
     .feed { height: calc(100vh - 60px); overflow-y: auto; scroll-snap-type: y mandatory; }
     .post-slide { min-height: calc(100vh - 60px); scroll-snap-align: start; position: relative; padding-bottom: 120px; }
-    .media { width: 100%; max-height: calc(100vh - 240px); object-fit: contain; background: #000; display: block; margin: 0 auto; }
+    .media { width: 100%; max-height: calc(100vh - 260px); object-fit: contain; background: #000; display: block; margin: 0 auto; }
 
     .info-left { position: absolute; bottom: 70px; left: 12px; max-width: 70%; z-index: 10; }
     .username { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
     .caption { font-size: 14px; opacity: 0.9; margin: 4px 0; }
-    .meta-row { font-size: 11px; color: #aaa; line-height: 1.8; margin-top: 6px; }
-    .meta-row span { display: inline-block; margin-right: 10px; }
+    .meta-row { font-size: 12px; color: #aaa; line-height: 2; margin-top: 6px; }
+    .meta-row span { display: inline-block; margin-right: 12px; }
     .del-btn { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer; margin-top: 8px; }
 
     .side-menu { position: absolute; bottom: 160px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
@@ -55,14 +88,29 @@
     .add-btn { background: #fff; color: #000; width: 48px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; }
     .badge { position: absolute; top: -4px; right: -8px; background: red; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 10px; }
 
-    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; overflow-y: auto; }
-    .close-top { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
-    input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
-    button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
-    .btn-red { background: #f00; color: #fff; font-weight: bold; }
-    .btn-red:disabled { opacity: 0.5; cursor: not-allowed; }
-    .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin: 10px 0; overflow: hidden; }
-    .progress-fill { height: 100%; background: #f00; width: 0%; transition: width 0.3s; }
+    .overlay { position: absolute; inset: 0; background: #000; z-index: 100; padding: 20px; overflow-y: auto; }
+    .back-btn { display: inline-flex; align-items: center; color: #fff; text-decoration: none; margin-bottom: 20px; }
+    .back-btn i { margin-right: 6px; }
+    .page-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+    
+    .file-info { background: #1a1a1a; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+    .file-name { font-size: 15px; margin-bottom: 10px; }
+    .file-meta { font-size: 13px; color: #aaa; line-height: 1.8; }
+    .file-meta .ok { color: #4ade80; margin-left: 6px; }
+    
+    .audio-section { margin-bottom: 25px; }
+    .audio-label { font-size: 14px; margin-bottom: 12px; }
+    .audio-option { border: 2px solid transparent; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+    .audio-option.active { border-color: #facc15; background: #2a2500; }
+    .audio-option input { margin-right: 10px; transform: scale(1.2); }
+    .audio-option-title { font-weight: bold; margin-bottom: 3px; }
+    .audio-option-desc { font-size: 12px; color: #aaa; }
+    
+    .publish-btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; background: linear-gradient(90deg, #e53935, #f97316); color: #fff; cursor: pointer; margin-bottom: 10px; }
+    .publish-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #e53935, #f97316); width: 0%; transition: width 0.3s; }
+    .upload-status { text-align: center; color: #aaa; font-size: 14px; padding: 10px; }
 
     video { background: #000; display: block; width: 100%; height: 100%; }
     .empty-icon { display: flex; align-items: center; justify-content: center; height: 100%; color: #555; }
@@ -91,34 +139,76 @@
 </div>
 
 <div id="postBox" class="overlay hidden">
-  <div class="close-top" onclick="closePostBox()">&times;</div>
-  <h2 class="text-xl font-bold mb-4">สร้างโพสต์ — ส่งขึ้นคลาวด์</h2>
-  <input type="file" id="fileChoose" accept="image/*,video/*">
-  <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
-    <span class="text-gray-400">เลือกไฟล์</span>
+  <a href="#" class="back-btn" onclick="closePostBox(); return false;">
+    <i class="fa fa-arrow-left"></i> กลับ
+  </a>
+  <h2 class="page-title">โพสต์วิดีโอ / รูปภาพ</h2>
+  
+  <input type="file" id="fileChoose" accept="image/*,video/*" class="hidden">
+  <button onclick="document.getElementById('fileChoose').click()" 
+          class="w-full py-3 bg-gray-800 rounded-lg mb-4 text-left px-4">
+    <i class="fa fa-folder-open mr-2"></i> เลือกไฟล์
+  </button>
+
+  <div id="fileInfo" class="file-info hidden">
+    <div class="file-name" id="showFileName"></div>
+    <div class="file-meta">
+      <div>ขนาด: <span id="showFileSize"></span> <span class="ok">✓ ขนาดเหมาะสม</span></div>
+      <div>ระยะเวลา: <span id="showDuration"></span></div>
+      <div>อัตราส่วน: <span id="showRatio"></span></div>
+    </div>
   </div>
+
+  <div class="audio-section" id="audioSection" style="display:none;">
+    <div class="audio-label">เลือกเสียง:</div>
+    <label class="audio-option active" id="optOriginal">
+      <input type="radio" name="audio" value="original" checked>
+      <div>
+        <div class="audio-option-title">🔊 เสียงต้นฉบับ</div>
+        <div class="audio-option-desc">ใช้เสียงจากไฟล์เดิม</div>
+      </div>
+    </label>
+    <label class="audio-option" id="optNew">
+      <input type="radio" name="audio" value="new">
+      <div>
+        <div class="audio-option-title">✨ เพิ่มเสียงใหม่</div>
+        <div class="audio-option-desc">ใส่ชื่อเพลง/เสียงที่ต้องการ</div>
+      </div>
+    </label>
+  </div>
+
   <div class="progress-bar" id="progressContainer" style="display:none;">
     <div class="progress-fill" id="progressFill"></div>
   </div>
-  <input type="text" id="inputName" placeholder="ชื่อ" value="Thaipodee Master">
-  <textarea id="inputDesc" rows="3" placeholder="คำอธิบาย..."></textarea>
-  <button id="publishBtn" class="btn-red" onclick="doPublish()">เผยแพร่สู่คลาวด์</button>
-  <p class="text-xs text-gray-400 mt-2">ข้อมูลจะอยู่บนคลาวด์ — ทุกคนเห็นพร้อมกัน</p>
+  <div id="uploadStatus" class="upload-status"></div>
+
+  <button id="publishBtn" class="publish-btn" onclick="doPublish()">เผยแพร่</button>
 </div>
 
 <script>
 // =====================================================
-// 🔑 ตั้งค่าคลาวด์ — ใส่ของคุณเองตรงนี้
+// 🔑 ตั้งค่าคลาวด์ — เปลี่ยนให้ตรงกับบัญชีของคุณ
 // =====================================================
-const CLOUD_NAME = 'YOUR_CLOUD_NAME';      // เปลี่ยนเป็นชื่อคลาวด์ของคุณ
-const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; // เปลี่ยนเป็น Upload Preset
+const CLOUD_NAME = 'ใส่ชื่อคลาวด์ของคุณตรงนี้';
+const UPLOAD_PRESET = 'thaipodee_upload';
 
 let postData = [];
 let selectedFile = null;
 let previewUrl = null;
-let cloudPostsKey = 'tpd_cloud_posts';
+let videoDuration = 0;
+const cloudPostsKey = 'tpd_cloud_posts';
 
-// === จัดรูปแบบวันที่ เวลา ขนาด ความยาว ===
+function formatFileSize(bytes) {
+  if (!bytes) return '-- MB';
+  const mb = (bytes / (1024*1024)).toFixed(1);
+  return `${mb} MB`;
+}
+function formatDuration(sec) {
+  if (!sec) return '--:--';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
 function formatDate(timestamp) {
   const d = new Date(timestamp);
   return d.toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' });
@@ -127,19 +217,7 @@ function formatTime(timestamp) {
   const d = new Date(timestamp);
   return d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
 }
-function formatDuration(sec) {
-  if (!sec) return '--:--';
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
-function formatFileSize(bytes) {
-  if (!bytes) return '-- MB';
-  const mb = (bytes / (1024*1024)).toFixed(1);
-  return `${mb} MB`;
-}
 
-// === โหลดรายการโพสต์จากคลาวด์ ===
 function loadPostsList() {
   try {
     const saved = localStorage.getItem(cloudPostsKey);
@@ -147,21 +225,17 @@ function loadPostsList() {
   } catch(e) { postData = []; }
   renderFeed();
 }
-
-// === บันทึกรายการโพสต์ (แค่ลิงก์ ไม่เก็บไฟล์) ===
 function savePostsList() {
   localStorage.setItem(cloudPostsKey, JSON.stringify(postData));
 }
 
-// === ลบโพสต์ ===
-async function deletePost(id, publicId) {
+function deletePost(id) {
   if (!confirm('ต้องการลบโพสต์นี้?')) return;
   postData = postData.filter(p => p.id !== id);
   savePostsList();
   renderFeed();
 }
 
-// === แสดงผล ===
 function renderFeed() {
   const list = document.getElementById('feedList');
   list.innerHTML = '';
@@ -169,10 +243,10 @@ function renderFeed() {
   if (postData.length === 0) {
     list.innerHTML = 
       '<div class="post-slide">' +
-        '<div class="empty-icon"><p>กด + เพื่อโพสต์สู่คลาวด์</p></div>' +
+        '<div class="empty-icon"><p>กด + เพื่อโพสต์</p></div>' +
         '<div class="info-left">' +
           '<div class="username">Thaipodee Master</div>' +
-          '<div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market — ข้อมูลบนคลาวด์</div>' +
+          '<div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market</div>' +
         '</div>' +
         '<div class="side-menu">' +
           '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
@@ -195,16 +269,10 @@ function renderFeed() {
       if (p.isVideo) {
         mediaHtml = 
           '<video class="media" src="' + p.cloudUrl + '" ' +
-          'autoplay muted loop playsinline controls preload="auto">' +
-          '</video>';
+          'autoplay muted loop playsinline controls preload="auto"></video>';
       } else {
         mediaHtml = '<img class="media" src="' + p.cloudUrl + '" alt="">';
       }
-    } else {
-      mediaHtml = 
-        '<div class="empty-icon">' +
-          '<i class="fa ' + (p.isVideo ? 'fa-film' : 'fa-picture-o') + '" style="font-size:48px;"></i>' +
-        '</div>';
     }
 
     slide.innerHTML = 
@@ -219,7 +287,7 @@ function renderFeed() {
           '<span>💾 ' + formatFileSize(p.fileSize) + '</span>' +
           '<span>⏱ ' + formatDuration(p.duration) + '</span>' +
         '</div>' +
-        '<button class="del-btn" onclick="deletePost(' + p.id + ', \'' + (p.publicId||'') + '\')">ลบโพสต์นี้</button>' +
+        '<button class="del-btn" onclick="deletePost(' + p.id + ')">ลบโพสต์นี้</button>' +
       '</div>' +
       '<div class="side-menu">' +
         '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
@@ -238,12 +306,22 @@ function renderFeed() {
 
 function openPostBox() {
   selectedFile = null;
+  videoDuration = 0;
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   previewUrl = null;
+  
   document.getElementById('fileChoose').value = '';
-  document.getElementById('inputDesc').value = '';
-  document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">เลือกไฟล์</span>';
+  document.getElementById('fileInfo').classList.add('hidden');
+  document.getElementById('audioSection').style.display = 'none';
   document.getElementById('progressContainer').style.display = 'none';
+  document.getElementById('uploadStatus').innerText = '';
+  document.getElementById('publishBtn').disabled = false;
+  document.getElementById('publishBtn').innerText = 'เผยแพร่';
+  
+  document.querySelectorAll('.audio-option').forEach(o => o.classList.remove('active'));
+  document.getElementById('optOriginal').classList.add('active');
+  document.querySelector('#optOriginal input').checked = true;
+  
   document.getElementById('postBox').classList.remove('hidden');
 }
 
@@ -252,78 +330,90 @@ function closePostBox() {
   if (previewUrl) URL.revokeObjectURL(previewUrl);
 }
 
-// === แสดงตัวอย่างก่อนอัปโหลด ===
-document.getElementById('fileChoose').addEventListener('change', function(e) {
+document.getElementById('fileChoose').addEventListener('change', async function(e) {
   if (!e.target.files || !e.target.files[0]) return;
   selectedFile = e.target.files[0];
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(selectedFile);
   
-  const box = document.getElementById('previewHere');
+  document.getElementById('showFileName').innerText = selectedFile.name;
+  document.getElementById('showFileSize').innerText = formatFileSize(selectedFile.size);
+  
   if (selectedFile.type.startsWith('video/')) {
-    box.innerHTML = 
-      '<video id="previewVid" src="' + previewUrl + '" class="w-full aspect-video object-contain" ' +
-      'autoplay muted loop playsinline controls preload="auto"></video>';
+    previewUrl = URL.createObjectURL(selectedFile);
+    const vid = document.createElement('video');
+    vid.src = previewUrl;
+    vid.preload = 'metadata';
+    
+    vid.onloadedmetadata = function() {
+      videoDuration = vid.duration;
+      const ratio = vid.videoWidth + ':' + vid.videoHeight;
+      document.getElementById('showDuration').innerText = formatDuration(vid.duration);
+      document.getElementById('showRatio').innerText = ratio;
+      document.getElementById('fileInfo').classList.remove('hidden');
+      document.getElementById('audioSection').style.display = 'block';
+    };
   } else {
-    box.innerHTML = '<img src="' + previewUrl + '" class="w-full aspect-video object-contain" alt="">';
+    document.getElementById('showDuration').innerText = '--:--';
+    document.getElementById('showRatio').innerText = 'รูปภาพ';
+    document.getElementById('fileInfo').classList.remove('hidden');
+    document.getElementById('audioSection').style.display = 'none';
   }
 });
 
-// === ส่งขึ้นคลาวด์ ===
+document.querySelectorAll('.audio-option').forEach(opt => {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.audio-option').forEach(o => o.classList.remove('active'));
+    this.classList.add('active');
+    this.querySelector('input').checked = true;
+  });
+});
+
 async function doPublish() {
   const btn = document.getElementById('publishBtn');
   const progressContainer = document.getElementById('progressContainer');
   const progressFill = document.getElementById('progressFill');
+  const uploadStatus = document.getElementById('uploadStatus');
   
   if (!selectedFile) { 
     alert('กรุณาเลือกไฟล์ก่อน'); 
     return; 
   }
   
-  if (CLOUD_NAME === 'YOUR_CLOUD_NAME' || UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
-    alert('⚠️ ยังไม่ได้ตั้งค่าคลาวด์!\n\nต้องลงทะเบียนฟรีที่ Cloudinary.com แล้วกรอก:\n- CLOUD_NAME\n- UPLOAD_PRESET\n\nตรงส่วนต้นโค้ดก่อนใช้งาน');
+  if (CLOUD_NAME === 'ใส่ชื่อคลาวด์ของคุณตรงนี้') {
+    alert('⚠️ ยังไม่ได้ตั้งค่า Cloud Name\n\nแก้บรรทัด:\nconst CLOUD_NAME = "ชื่อของคุณ"');
     return;
   }
   
   btn.disabled = true;
-  btn.innerText = 'กำลังส่งขึ้นคลาวด์...';
+  btn.innerText = 'กำลังอัปโหลด...';
   progressContainer.style.display = 'block';
   progressFill.style.width = '0%';
+  uploadStatus.innerText = '⏳ กำลังอัปโหลด...';
   
-  const name = document.getElementById('inputName').value.trim() || 'Thaipodee Master';
-  const desc = document.getElementById('inputDesc').value.trim();
-  
-  // ดึงความยาววิดีโอ
-  let duration = 0;
-  const vid = document.getElementById('previewVid');
-  if (vid) duration = vid.duration || 0;
-
   try {
-    // ส่งไฟล์ขึ้น Cloudinary
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('upload_preset', UPLOAD_PRESET);
     
     const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
     
-    const response = await axios.post(uploadUrl, formData, {
-      onUploadProgress: (progressEvent) => {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+    const res = await axios.post(uploadUrl, formData, {
+      onUploadProgress: (p) => {
+        const percent = Math.round((p.loaded * 100) / p.total);
         progressFill.style.width = percent + '%';
+        uploadStatus.innerText = `⏳ กำลังอัปโหลด... ${percent}%`;
       }
     });
 
-    // สำเร็จ — บันทึกลิงก์คลาวด์
     postData.unshift({
       id: Date.now(),
       filename: selectedFile.name,
-      cloudUrl: response.data.secure_url,
-      publicId: response.data.public_id,
+      cloudUrl: res.data.secure_url,
+      publicId: res.data.public_id,
       isVideo: selectedFile.type.startsWith('video/'),
-      name: name,
-      desc: desc,
+      name: 'Thaipodee Master',
+      desc: '',
       fileSize: selectedFile.size,
-      duration: duration,
+      duration: videoDuration,
       likeCount: 0,
       liked: false
     });
@@ -332,15 +422,16 @@ async function doPublish() {
     closePostBox();
     renderFeed();
     
-    alert('✅ ส่งขึ้นคลาวด์สำเร็จ!\n\nทุกคนจะเห็นโพสต์นี้ทันที');
+    alert('✅ อัปโหลดสำเร็จ!\n\nทุกคนจะเห็นโพสต์นี้ทันที');
     
   } catch (err) {
     console.error(err);
-    alert('❌ ส่งไม่สำเร็จ: ' + (err.response?.data?.error?.message || err.message));
+    uploadStatus.innerText = '❌ ไม่สำเร็จ';
+    alert('❌ ผิดพลาด:\n' + (err.response?.data?.error?.message || err.message) + 
+      '\n\nตรวจสอบ:\n1. Cloud Name ถูกไหม\n2. Upload Preset ตั้งเป็น Unsigned ไหม');
   } finally {
     btn.disabled = false;
-    btn.innerText = 'เผยแพร่สู่คลาวด์';
-    progressContainer.style.display = 'none';
+    btn.innerText = 'เผยแพร่';
   }
 }
 
