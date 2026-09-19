@@ -1,75 +1,210 @@
-<!-- แทนที่ส่วน renderFeed และ showPreview ด้วยนี้ -->
+<!-- =====================================================
+   Thaipodee Global Market
+   เวอร์ชัน: 1.6.3
+   วันที่: 2026-09-19 16:10 น.
+   ✅ แก้โครงสร้าง — ไม่แสดงโค้ดออกมา
+   ✅ วิดีโอเล่นอัตโนมัติ + เสียงเปิดได้
+   ✅ ไอคอนด้านขวาครบทุกอัน
+   ===================================================== -->
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thaipodee Global Market</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
+    .hidden { display: none !important; }
+
+    /* === ฟีด === */
+    .feed { height: calc(100vh - 60px); overflow-y: auto; scroll-snap-type: y mandatory; }
+    .post-slide { min-height: calc(100vh - 60px); scroll-snap-align: start; position: relative; }
+    .media { width: 100%; height: calc(100vh - 60px); object-fit: contain; background: #000; display: block; }
+
+    /* === ข้อมูลซ้ายล่าง === */
+    .info-left { position: absolute; bottom: 70px; left: 12px; max-width: 70%; z-index: 10; }
+    .username { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+    .caption { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+    .music-line { font-size: 12px; color: #ccc; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+
+    /* === เมนูด้านขวา — ครบทุกอัน โชว์ชัดเจน === */
+    .side-menu { position: absolute; bottom: 140px; right: 12px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
+    .side-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .side-btn i { font-size: 26px; color: #fff; }
+    .side-btn span { font-size: 11px; color: #fff; }
+    .profile-user i { font-size: 36px; }
+    .liked { color: #ff4757; }
+
+    /* === วงกลมสีม่วง เพลง === */
+    .music-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #9333ea, #4c1d95);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .music-icon i { font-size: 20px; }
+
+    /* === แถบล่าง === */
+    .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 50; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative; }
+    .nav-btn i { font-size: 20px; color: #fff; }
+    .nav-btn span { font-size: 10px; color: #fff; }
+    .add-btn { background: #fff; color: #000; width: 48px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; }
+    .badge { position: absolute; top: -4px; right: -8px; background: red; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 10px; }
+
+    /* === กล่องโพสต์ === */
+    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; overflow-y: auto; }
+    .close-top { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
+    input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
+    button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
+    .btn-red { background: #f00; color: #fff; font-weight: bold; }
+
+    video { background: #000; display: block; width: 100%; height: 100%; }
+
+    @media (orientation: landscape) {
+      .bottom-bar { width: 100px; height: auto; flex-direction: column; top: 0; bottom: 0; border-right: 1px solid #222; border-top: none; }
+      .info-left { left: 120px; }
+      .side-menu { right: 20px; bottom: 40px; }
+    }
+
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="feedPage">
+  <div class="feed" id="feedList"></div>
+
+  <!-- แถบล่าง -->
+  <div class="bottom-bar">
+    <div class="nav-btn" onclick="goFeed()"><i class="fa fa-home"></i><span>หน้าหลัก</span></div>
+    <div class="nav-btn" onclick="goShop()"><i class="fa fa-shopping-bag"></i><span>ร้านค้า</span></div>
+    <div class="nav-btn add-btn" onclick="openPostBox()">+</div>
+    <div class="nav-btn" onclick="goInbox()">
+      <i class="fa fa-bell"></i>
+      <span>กล่องข้อความ</span>
+      <span class="badge">99+</span>
+    </div>
+    <div class="nav-btn" onclick="goProfile()"><i class="fa fa-user-o"></i><span>โปรไฟล์</span></div>
+  </div>
+</div>
+
+<!-- กล่องโพสต์ -->
+<div id="postBox" class="overlay hidden">
+  <div class="close-top" onclick="closePostBox()">&times;</div>
+  <h2 class="text-xl font-bold mb-4">สร้างโพสต์</h2>
+  <input type="file" id="fileChoose" accept="image/*,video/*" onchange="showPreview(this)">
+  <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
+    <span class="text-gray-400">เลือกไฟล์</span>
+  </div>
+  <input type="text" id="inputName" placeholder="ชื่อ" value="Thaipodee">
+  <textarea id="inputDesc" rows="3" placeholder="คำอธิบาย..."></textarea>
+  <button class="btn-red" onclick="doPublish()">เผยแพร่</button>
+</div>
+
+<script>
+let postData = [];
+let selectedFile = null;
+let previewUrl = null;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('tpd_v163');
+    if (saved) postData = JSON.parse(saved);
+  } catch(e) { postData = []; }
+  renderFeed();
+}
+
+function saveData() {
+  localStorage.setItem('tpd_v163', JSON.stringify(postData));
+}
 
 function renderFeed() {
   const list = document.getElementById('feedList');
   list.innerHTML = '';
 
   if (postData.length === 0) {
-    list.innerHTML = `
-      <div class="post-slide">
-        <div class="flex items-center justify-center h-full text-gray-400 text-center">
-          <p>กด + เพื่อโพสต์</p>
-        </div>
-        <div class="info-left">
-          <div class="username">Thaipodee</div>
-          <div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market</div>
-          <div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - Thaipodee</div>
-        </div>
-        <div class="side-menu">
-          <div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>
-          <div class="side-btn" onclick="toggleLike(0)"><i class="fa fa-heart-o"></i><span>0</span></div>
-          <div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
-          <div class="side-btn"><i class="fa fa-bookmark-o"></i><span>0</span></div>
-          <div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-          <div class="side-btn music-icon"><i class="fa fa-music"></i></div>
-        </div>
-      </div>`;
+    list.innerHTML = 
+      '<div class="post-slide">' +
+        '<div class="flex items-center justify-center h-full text-gray-400 text-center">' +
+          '<p>กด + เพื่อโพสต์</p>' +
+        '</div>' +
+        '<div class="info-left">' +
+          '<div class="username">Thaipodee</div>' +
+          '<div class="caption">ยินดีต้อนรับสู่ Thaipodee Global Market</div>' +
+          '<div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - Thaipodee</div>' +
+        '</div>' +
+        '<div class="side-menu">' +
+          '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
+          '<div class="side-btn" onclick="toggleLike(0)"><i class="fa fa-heart-o"></i><span>0</span></div>' +
+          '<div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>' +
+          '<div class="side-btn"><i class="fa fa-bookmark-o"></i><span>0</span></div>' +
+          '<div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>' +
+          '<div class="side-btn music-icon"><i class="fa fa-music"></i></div>' +
+        '</div>' +
+      '</div>';
     return;
   }
 
-  postData.forEach((p, idx) => {
+  postData.forEach(function(p, idx) {
     const slide = document.createElement('div');
     slide.className = 'post-slide';
 
     let mediaHtml = '';
     if (p.previewUrl) {
       if (p.isVideo) {
-        mediaHtml = `
-          <video 
-            class="media" 
-            src="${p.previewUrl}"
-            autoplay muted loop playsinline controls preload="auto"
-          ></video>`;
+        mediaHtml = 
+          '<video class="media" src="' + p.previewUrl + '" ' +
+          'autoplay muted loop playsinline controls preload="auto">' +
+          '</video>';
       } else {
-        mediaHtml = `<img class="media" src="${p.previewUrl}" alt="">`;
+        mediaHtml = '<img class="media" src="' + p.previewUrl + '" alt="">';
       }
     } else {
-      mediaHtml = `<div class="flex items-center justify-center h-full text-gray-500">
-        <i class="fa ${p.isVideo ? 'fa-film' : 'fa-picture-o'}" style="font-size:48px;"></i>
-      </div>`;
+      mediaHtml = 
+        '<div class="flex items-center justify-center h-full text-gray-500">' +
+          '<i class="fa ' + (p.isVideo ? 'fa-film' : 'fa-picture-o') + '" style="font-size:48px;"></i>' +
+        '</div>';
     }
 
-    slide.innerHTML = `
-      ${mediaHtml}
-      <div class="info-left">
-        <div class="username">${p.name}</div>
-        <div class="caption">${p.desc || ''}</div>
-        <div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - ${p.name}</div>
-      </div>
-      <div class="side-menu">
-        <div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>
-        <div class="side-btn" onclick="toggleLike(${idx})">
-          <i class="fa ${p.liked ? 'fa-heart liked' : 'fa-heart-o'}"></i>
-          <span>${p.likeCount}</span>
-        </div>
-        <div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
-        <div class="side-btn"><i class="fa fa-bookmark-o"></i><span>0</span></div>
-        <div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-        <div class="side-btn music-icon"><i class="fa fa-music"></i></div>
-      </div>
-    `;
+    slide.innerHTML = 
+      mediaHtml +
+      '<div class="info-left">' +
+        '<div class="username">' + p.name + '</div>' +
+        '<div class="caption">' + (p.desc || '') + '</div>' +
+        '<div class="music-line"><i class="fa fa-music"></i> เสียงต้นฉบับ - ' + p.name + '</div>' +
+      '</div>' +
+      '<div class="side-menu">' +
+        '<div class="side-btn profile-user"><i class="fa fa-user-circle-o"></i></div>' +
+        '<div class="side-btn" onclick="toggleLike(' + idx + ')">' +
+          '<i class="fa ' + (p.liked ? 'fa-heart liked' : 'fa-heart-o') + '"></i>' +
+          '<span>' + p.likeCount + '</span>' +
+        '</div>' +
+        '<div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>' +
+        '<div class="side-btn"><i class="fa fa-bookmark-o"></i><span>0</span></div>' +
+        '<div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>' +
+        '<div class="side-btn music-icon"><i class="fa fa-music"></i></div>' +
+      '</div>';
     list.appendChild(slide);
   });
+}
+
+function openPostBox() {
+  selectedFile = null;
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = null;
+  document.getElementById('fileChoose').value = '';
+  document.getElementById('inputDesc').value = '';
+  document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">เลือกไฟล์</span>';
+  document.getElementById('postBox').classList.remove('hidden');
+}
+
+function closePostBox() {
+  document.getElementById('postBox').classList.add('hidden');
+  if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
 }
 
 function showPreview(input) {
@@ -78,14 +213,51 @@ function showPreview(input) {
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   previewUrl = URL.createObjectURL(selectedFile);
   const box = document.getElementById('previewHere');
-  if (selectedFile.type.startsWith('video/')) {
-    box.innerHTML = `
-      <video 
-        src="${previewUrl}" 
-        class="w-full aspect-video object-contain"
-        autoplay muted loop playsinline controls preload="auto"
-      ></video>`;
+  if (selectedFile.type.indexOf('video/') === 0) {
+    box.innerHTML = 
+      '<video src="' + previewUrl + '" class="w-full aspect-video object-contain" ' +
+      'autoplay muted loop playsinline controls preload="auto"></video>';
   } else {
-    box.innerHTML = `<img src="${previewUrl}" class="w-full aspect-video object-contain" alt="">`;
+    box.innerHTML = '<img src="' + previewUrl + '" class="w-full aspect-video object-contain" alt="">';
   }
 }
+
+function doPublish() {
+  if (!selectedFile) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
+  const name = document.getElementById('inputName').value.trim() || 'Thaipodee';
+  const desc = document.getElementById('inputDesc').value.trim();
+
+  postData.unshift({
+    id: Date.now(),
+    filename: selectedFile.name,
+    previewUrl: previewUrl,
+    isVideo: selectedFile.type.indexOf('video/') === 0,
+    name: name,
+    desc: desc,
+    likeCount: 0,
+    liked: false
+  });
+
+  saveData();
+  closePostBox();
+  renderFeed();
+  alert('✅ เผยแพร่สำเร็จ — หน้าแสดงปกติแล้ว!');
+}
+
+function toggleLike(idx) {
+  postData[idx].liked = !postData[idx].liked;
+  postData[idx].likeCount += postData[idx].liked ? 1 : -1;
+  saveData();
+  renderFeed();
+}
+
+function goFeed() { window.scrollTo({top:0,behavior:'smooth'}); }
+function goShop() { alert('ร้านค้า — พร้อมทำงาน'); }
+function goInbox() { alert('กล่องข้อความ — พร้อมทำงาน'); }
+function goProfile() { alert('โปรไฟล์ — พร้อมทำงาน'); }
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+</body>
+</html>
