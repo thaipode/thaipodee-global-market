@@ -1,56 +1,143 @@
-<!-- =====================================================
-   Thaipodee Global Market — PWA Complete All-in-One
-   เวอร์ชัน: 1.0.0  |  วันที่: 2026-09-19
-   ❌ ไม่แตะไอคอนด้านขวา-ล่าง ❌ ไม่แก้ปุ่ม/ฟังก์ชันเดิมเลย
-   เพิ่มอย่างเดียว: เปิดเหมือนแอปจริง เต็มจอ ไม่มีแถบเบราว์เซอร์
-   ===================================================== -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thaipodee Global Market</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
+    .page { position: absolute; inset: 0; z-index: 1; }
+    .page.hidden { display: none; }
+    
+    /* วิดีโอฟีด */
+    .feed-container { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
+    .video-slide { height: 100vh; scroll-snap-align: start; position: relative; }
+    .video-content { width: 100%; height: 100%; object-fit: cover; background: #111; }
+    
+    /* แถบข้อมูลซ้าย */
+    .info-left { position: absolute; bottom: 100px; left: 12px; max-width: 70%; }
+    .username { font-weight: bold; margin-bottom: 4px; }
+    .caption { font-size: 14px; line-height: 1.4; opacity: 0.9; }
+    
+    /* แถบปุ่มขวา */
+    .actions-right { position: absolute; bottom: 100px; right: 12px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .action-btn i { font-size: 26px; }
+    .action-btn span { font-size: 11px; }
+    
+    /* แถบเมนูล่าง */
+    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 10; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-item i { font-size: 22px; }
+    .nav-item span { font-size: 10px; }
+    .nav-item.post-btn { background: #f00; width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    
+    /* ซ่อนแถบเลื่อน*/
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
 
-<meta name="application-name" content="Thaipodee">
-<meta name="apple-mobile-web-app-title" content="Thaipodee">
-<meta name="description" content="Thaipodee Global Market — วิดีโอ สินค้า ชุมชน">
+<!-- หน้าฟีดหลัก -->
+<div id="feedPage" class="page">
+  <div class="feed-container" id="feedContainer">
+    <!-- โพสต์ตัวอย่างที่ 1 -->
+    <div class="video-slide">
+      <video class="video-content" controls autoplay muted loop playsinline>
+        <source src="video-sample-1.mp4" type="video/mp4">
+      </video>
+      <div class="info-left">
+        <div class="username">thaipodee Master</div>
+        <div class="caption">✨ ไม่ระบุ</div>
+      </div>
+      <div class="actions-right">
+        <div class="action-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
+        <div class="action-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
+        <div class="action-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+        <div class="action-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+      </div>
+    </div>
+  </div>
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#000000">
-<meta name="background-color" content="#000000">
+  <!-- เมนูล่าง -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="switchPage('feed')">
+      <i class="fa fa-home"></i>
+      <span>หน้าแรก</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('explore')">
+      <i class="fa fa-search"></i>
+      <span>ค้นหา</span>
+    </div>
+    <div class="nav-item post-btn" onclick="switchPage('post')">
+      <i class="fa fa-plus"></i>
+    </div>
+    <div class="nav-item" onclick="switchPage('notifications')">
+      <i class="fa fa-bell-o"></i>
+      <span>แจ้งเตือน</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('profile')">
+      <i class="fa fa-user-o"></i>
+      <span>ฉัน</span>
+    </div>
+  </nav>
+</div>
 
-<link rel="manifest" href="manifest.json">
-
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-
-<meta name="referrer" content="no-referrer">
-
-<script type="application/json" id="pwa-manifest-data">
-{
-  "_app": "Thaipodee Global Market",
-  "_ver": "1.0.0",
-  "_date": "2026-09-19",
-  "_note": "เพิ่มเฉพาะรูปแบบแอป — ไม่แก้ไขปุ่ม/ฟังก์ชันเดิม",
-  "name": "Thaipodee Global Market",
-  "short_name": "Thaipodee",
-  "description": "Thaipodee — วิดีโอ สินค้า ชุมชน",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+<script>
+// เปลี่ยนหน้า
+function switchPage(page) {
+  console.log('ไปที่:', page);
+  // เพิ่มตรรกะเปลี่ยนหน้าได้ตามต้องการ
 }
+
+// โหลดรายการจาก localStorage เพื่อให้เห็นตรงกันทุกเครื่องผ่านคลาวด์ในภายหลัง
+let posts = JSON.parse(localStorage.getItem('tpd_posts') || '[]');
+
+// บันทึกโพสต์
+function savePost(data) {
+  posts.unshift(data);
+  localStorage.setItem('tpd_posts', JSON.stringify(posts));
+  renderPosts();
+}
+
+// แสดงผลโพสต์
+function renderPosts() {
+  const container = document.getElementById('feedContainer');
+  container.innerHTML = ''; // ลบเก่าก่อน
+
+  posts.forEach(post => {
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `
+      ${post.type === 'video' 
+        ? `<video class="video-content" controls autoplay muted loop playsinline>
+             <source src="${post.src}" type="video/mp4">
+           </video>`
+        : `<img class="video-content" src="${post.src}" alt="">`
+      }
+      <div class="info-left">
+        <div class="username">${post.author || 'thaipodee Master'}</div>
+        <div class="caption">${post.caption || ''}</div>
+      </div>
+      <div class="actions-right">
+        <div class="action-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
+        <div class="action-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
+        <div class="action-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+        <div class="action-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+      </div>
+    `;
+    container.appendChild(slide);
+  });
+}
+
+// โหลดครั้งแรก
+document.addEventListener('DOMContentLoaded', () => {
+  renderPosts();
+});
 </script>
+
+</body>
+</html>
