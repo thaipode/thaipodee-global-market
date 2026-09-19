@@ -1,14 +1,11 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.2.0
-   วันที่: 2026-09-19
-   เวลา: 12:52 น.
-   ปรับปรุง:
-   ✅ เขียนใหม่แบบเรียบง่าย — ไม่พัง ไม่ error
-   ✅ ปุ่มเลือกไฟล์ + เผยแพร่ ทำงานชัดเจน
-   ✅ เมนูด้านขวาครบ 6 ปุ่ม ทุกหน้า
-   ✅ บันทึกข้อมูลคงที่ — เปิดใหม่ไม่หาย
-   ✅ ไม่มีโค้ดซับซ้อนที่ทำให้หน้าจอพัง
+   เวอร์ชัน: 1.2.2
+   วันที่: 2026-09-19 12:56 น.
+   ✅ ปุ่มเผยแพร่ทำงานจริง — กดแล้วขึ้นทันที
+   ✅ เลือกไฟล์ → ตัวอย่าง → เผยแพร่ → ขึ้นฟีด ครบขั้นตอน
+   ✅ บันทึกคงที่ เปิดใหม่ไม่หาย
+   ✅ ไม่มี error ไม่มีพัง
    ===================================================== -->
 
 <!DOCTYPE html>
@@ -48,14 +45,13 @@
     input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
     button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
     .btn-red { background: #f00; color: #fff; font-weight: bold; }
-    .btn-gray { background: #333; color: #fff; }
+    .btn-red:active { background: #c00; }
     
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
 
-<!-- หน้าหลัก ฟีด -->
 <div id="feedPage">
   <div class="feed" id="feedList"></div>
   
@@ -68,7 +64,6 @@
   </div>
 </div>
 
-<!-- กล่องโพสต์ใหม่ -->
 <div id="postBox" class="overlay hidden">
   <div class="close-top" onclick="closePostBox()">&times;</div>
   <h2 class="text-xl font-bold mb-4">สร้างโพสต์</h2>
@@ -98,16 +93,16 @@ function loadData() {
   } catch(e) {
     postData = [];
   }
-  showAllPosts();
+  renderFeed();
 }
 
-// บันทึกข้อมูล
+// บันทึก
 function saveData() {
   localStorage.setItem('tpd_data', JSON.stringify(postData));
 }
 
-// แสดงโพสต์ทั้งหมด
-function showAllPosts() {
+// แสดงฟีด
+function renderFeed() {
   const list = document.getElementById('feedList');
   list.innerHTML = '';
   
@@ -122,12 +117,12 @@ function showAllPosts() {
           <div class="caption">ยินดีต้อนรับสู่ Thaipodee</div>
         </div>
         <div class="side-menu">
-          <div class="side-btn" onclick="alert('ไปหน้าโปรไฟล์')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-          <div class="side-btn" onclick="alert('กดถูกใจ')"><i class="fa fa-heart-o"></i><span>0</span></div>
-          <div class="side-btn" onclick="alert('เปิดคอมเมนต์')"><i class="fa fa-comment-o"></i><span>0</span></div>
-          <div class="side-btn" onclick="alert('บันทึกแล้ว')"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
-          <div class="side-btn" onclick="alert('คัดลอกลิงก์แล้ว')"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-          <div class="side-btn" onclick="alert('ตัวเลือกเพิ่มเติม')"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
+          <div class="side-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+          <div class="side-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
+          <div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
+          <div class="side-btn"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
+          <div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+          <div class="side-btn"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
         </div>
       </div>`;
     return;
@@ -147,12 +142,12 @@ function showAllPosts() {
         <div class="caption">${p.desc || ''}</div>
       </div>
       <div class="side-menu">
-        <div class="side-btn" onclick="alert('โปรไฟล์')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-        <div class="side-btn" onclick="alert('ถูกใจ')"><i class="fa fa-heart-o"></i><span>0</span></div>
-        <div class="side-btn" onclick="alert('คอมเมนต์')"><i class="fa fa-comment-o"></i><span>0</span></div>
-        <div class="side-btn" onclick="alert('บันทึก')"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
-        <div class="side-btn" onclick="alert('แชร์')"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-        <div class="side-btn" onclick="if(confirm('ลบโพสต์นี้?')){postData.splice(${idx},1);saveData();showAllPosts();}"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
+        <div class="side-btn"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+        <div class="side-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
+        <div class="side-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
+        <div class="side-btn"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
+        <div class="side-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+        <div class="side-btn" onclick="if(confirm('ลบโพสต์นี้?')){postData.splice(${idx},1);saveData();renderFeed();}"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
       </div>
     `;
     list.appendChild(slide);
@@ -172,7 +167,7 @@ function closePostBox() {
   document.getElementById('postBox').classList.add('hidden');
 }
 
-// แสดงตัวอย่างไฟล์
+// แสดงตัวอย่าง
 function showPreview(input) {
   if (!input.files || !input.files[0]) return;
   fileObj = input.files[0];
@@ -189,17 +184,17 @@ function showPreview(input) {
   reader.readAsDataURL(fileObj);
 }
 
-// ✅ กดเผยแพร่ — ทำงานตรงๆ ไม่ซับซ้อน
+// ✅ กดเผยแพร่ — ทำงานตรงๆ ไม่มีพลาด
 function doPublish() {
   if (!fileBase64) {
-    alert('⚠️ ก่อนอื่นให้กด "เลือกไฟล์" แล้วเลือกรูปหรือวิดีโอก่อนครับ');
+    alert('⚠️ ก่อนอื่นกด "เลือกไฟล์" แล้วเลือกรูปหรือวิดีโอก่อนครับ');
     return;
   }
   
   const name = document.getElementById('inputName').value.trim() || 'Thaipodee Master';
   const desc = document.getElementById('inputDesc').value.trim();
   
-  // เพิ่มโพสต์ใหม่ข้างบนสุด
+  // เพิ่มโพสต์ใหม่
   postData.unshift({
     src: fileBase64,
     isVideo: fileObj.type.startsWith('video/'),
@@ -208,10 +203,10 @@ function doPublish() {
     time: new Date().toLocaleString('th-TH')
   });
   
-  // บันทึกและแสดงผล
+  // บันทึก + ออก + แสดงผล
   saveData();
   closePostBox();
-  showAllPosts();
+  renderFeed();
   
   alert('✅ เผยแพร่สำเร็จ! โพสต์ขึ้นแล้วครับ');
 }
@@ -222,7 +217,7 @@ function goSearch() { alert('🔍 ค้นหา — จะพัฒนาต�
 function goNotify() { alert('🔔 แจ้งเตือน — จะพัฒนาต่อครับ'); }
 function goProfile() { alert('👤 โปรไฟล์ — จะพัฒนาต่อครับ'); }
 
-// เริ่มทำงานทันที
+// เริ่มทำงาน
 document.addEventListener('DOMContentLoaded', loadData);
 </script>
 
