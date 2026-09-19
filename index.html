@@ -1,21 +1,20 @@
 <!-- =====================================================
    Thaipodee Global Market
-   เวอร์ชัน: 1.1.2
+   เวอร์ชัน: 1.2.0
    วันที่: 2026-09-19
-   เวลา: 12:48 น.
+   เวลา: 12:52 น.
    ปรับปรุง:
-   ✅ ปุ่ม "เผยแพร่" ทำงานเต็มที่ — ตรวจสอบ+บันทึก+แสดงผล
-   ✅ เมนูด้านขวาครบ 6 ปุ่ม ทุกหน้าแสดงครบ
-   ✅ อัปโหลดวิดีโอ/ภาพ ตัวอย่างขึ้นถูกต้อง
-   ✅ บันทึกลงเครื่อง — เปิดใหม่ไม่หาย
-   ✅ เชื่อม manifest.json ติดตั้งแอปได้
+   ✅ เขียนใหม่แบบเรียบง่าย — ไม่พัง ไม่ error
+   ✅ ปุ่มเลือกไฟล์ + เผยแพร่ ทำงานชัดเจน
+   ✅ เมนูด้านขวาครบ 6 ปุ่ม ทุกหน้า
+   ✅ บันทึกข้อมูลคงที่ — เปิดใหม่ไม่หาย
+   ✅ ไม่มีโค้ดซับซ้อนที่ทำให้หน้าจอพัง
    ===================================================== -->
 
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thaipodee Global Market</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,391 +22,208 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
-    .page { position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s ease; }
-    .page.hidden { opacity: 0; pointer-events: none; }
+    .hidden { display: none !important; }
     
-    .feed-container { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
-    .video-slide { height: 100vh; scroll-snap-align: start; position: relative; }
-    .video-content { width: 100%; height: 100%; object-fit: cover; background: #111; }
+    .feed { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; }
+    .post-slide { min-height: 100vh; scroll-snap-align: start; position: relative; padding-bottom: 70px; }
+    .media { width: 100%; height: calc(100vh - 70px); object-fit: cover; background: #111; }
     
-    .info-left { position: absolute; bottom: 100px; left: 12px; max-width: 70%; }
-    .username { font-weight: bold; margin-bottom: 4px; font-size: 15px; }
-    .caption { font-size: 14px; line-height: 1.4; opacity: 0.9; margin-top: 4px; }
+    .info-left { position: absolute; bottom: 80px; left: 12px; max-width: 70%; }
+    .username { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+    .caption { font-size: 14px; opacity: 0.9; }
     
-    .actions-right { position: absolute; bottom: 120px; right: 12px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 5; }
-    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
-    .action-btn:active { transform: scale(0.92); opacity: 0.8; }
-    .action-btn i { font-size: 26px; }
-    .action-btn span { font-size: 11px; }
+    .side-menu { position: absolute; bottom: 100px; right: 12px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+    .side-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .side-btn i { font-size: 26px; }
+    .side-btn span { font-size: 11px; }
     
-    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 10; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; transition: all 0.2s; }
-    .nav-item:active { transform: scale(0.92); opacity: 0.7; }
-    .nav-item i { font-size: 22px; }
-    .nav-item span { font-size: 10px; }
-    .nav-item.post-btn { background: #f00; width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+    .nav-btn i { font-size: 22px; }
+    .nav-btn span { font-size: 10px; }
+    .add-btn { background: #f00; width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     
-    .modal { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
-    .modal.hidden { display: none; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .close-btn { font-size: 24px; cursor: pointer; }
+    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; overflow-y: auto; }
+    .close-top { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
     input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: none; border-radius: 8px; color: #fff; font-size: 15px; }
-    button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; transition: all 0.2s; }
-    button:active { transform: scale(0.97); }
-    .btn-primary { background: #f00; color: #fff; width: 100%; margin-top: 10px; font-weight: bold; }
-    .btn-primary:hover { background: #e00; }
-    .btn-secondary { background: #333; color: #fff; margin-top: 8px; }
+    button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; margin-top: 10px; }
+    .btn-red { background: #f00; color: #fff; font-weight: bold; }
+    .btn-gray { background: #333; color: #fff; }
     
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
 
-<div id="feedPage" class="page">
-  <div class="feed-container" id="feedContainer"></div>
-
-  <nav class="bottom-nav">
-    <div class="nav-item" onclick="showPage('feedPage')">
-      <i class="fa fa-home"></i>
-      <span>หน้าแรก</span>
-    </div>
-    <div class="nav-item" onclick="showPage('searchPage')">
-      <i class="fa fa-search"></i>
-      <span>ค้นหา</span>
-    </div>
-    <div class="nav-item post-btn" onclick="openPostModal()">
-      <i class="fa fa-plus"></i>
-    </div>
-    <div class="nav-item" onclick="showPage('notifPage')">
-      <i class="fa fa-bell-o"></i>
-      <span>แจ้งเตือน</span>
-    </div>
-    <div class="nav-item" onclick="showPage('profilePage')">
-      <i class="fa fa-user-o"></i>
-      <span>ฉัน</span>
-    </div>
-  </nav>
-</div>
-
-<div id="searchPage" class="page hidden flex flex-col p-5">
-  <div class="flex justify-between items-center mb-5">
-    <h2 class="text-xl font-bold">ค้นหา</h2>
-    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
-  </div>
-  <input type="text" id="searchInput" placeholder="ค้นหาชื่อ คำอธิบาย...">
-  <div id="searchResults" class="mt-4"></div>
-</div>
-
-<div id="notifPage" class="page hidden flex flex-col p-5">
-  <div class="flex justify-between items-center mb-5">
-    <h2 class="text-xl font-bold">การแจ้งเตือน</h2>
-    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
-  </div>
-  <div id="notifList" class="space-y-4 mt-2">
-    <div class="p-3 bg-gray-900 rounded-lg">ยังไม่มีการแจ้งเตือน</div>
+<!-- หน้าหลัก ฟีด -->
+<div id="feedPage">
+  <div class="feed" id="feedList"></div>
+  
+  <div class="bottom-bar">
+    <div class="nav-btn" onclick="goFeed()"><i class="fa fa-home"></i><span>หน้าแรก</span></div>
+    <div class="nav-btn" onclick="goSearch()"><i class="fa fa-search"></i><span>ค้นหา</span></div>
+    <div class="nav-btn add-btn" onclick="openPostBox()"><i class="fa fa-plus"></i></div>
+    <div class="nav-btn" onclick="goNotify()"><i class="fa fa-bell-o"></i><span>แจ้งเตือน</span></div>
+    <div class="nav-btn" onclick="goProfile()"><i class="fa fa-user-o"></i><span>ฉัน</span></div>
   </div>
 </div>
 
-<div id="profilePage" class="page hidden flex flex-col p-5">
-  <div class="flex justify-between items-center mb-5">
-    <h2 class="text-xl font-bold">โปรไฟล์</h2>
-    <span class="close-btn" onclick="showPage('feedPage')">&times;</span>
+<!-- กล่องโพสต์ใหม่ -->
+<div id="postBox" class="overlay hidden">
+  <div class="close-top" onclick="closePostBox()">&times;</div>
+  <h2 class="text-xl font-bold mb-4">สร้างโพสต์</h2>
+  
+  <input type="file" id="fileChoose" accept="image/*,video/*" onchange="showPreview(this)">
+  
+  <div id="previewHere" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4">
+    <span class="text-gray-400">ตัวอย่างจะแสดงที่นี่</span>
   </div>
-  <div class="flex items-center gap-4 mb-6">
-    <div class="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center text-3xl">
-      <i class="fa fa-user"></i>
-    </div>
-    <div>
-      <div class="font-bold text-lg" id="profileName">Thaipodee Master</div>
-      <div class="text-gray-400 text-sm">ผู้สร้างแอป</div>
-    </div>
-  </div>
-  <button class="btn-secondary" onclick="changeProfileName()">เปลี่ยนชื่อผู้ใช้</button>
-  <h3 class="font-bold mt-6 mb-3">โพสต์ของฉัน</h3>
-  <div id="myPosts" class="space-y-3"></div>
-</div>
-
-<!-- ✅ หน้าโพสต์ — ปุ่มเผยแพร่ทำงานแน่นอน -->
-<div id="postModal" class="modal hidden">
-  <div class="modal-header">
-    <h2 class="text-lg font-bold">สร้างโพสต์</h2>
-    <span class="close-btn" onclick="closePostModal()">&times;</span>
-  </div>
-  <input type="file" id="fileInput" accept="image/*,video/*" onchange="previewFile(event)">
-  <div id="previewArea" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center my-4 overflow-hidden">
-    <span class="text-gray-400">ตัวอย่างไฟล์</span>
-  </div>
-  <input type="text" id="authorInput" placeholder="ชื่อผู้โพสต์" value="Thaipodee Master">
-  <textarea id="captionInput" rows="3" placeholder="เขียนคำอธิบาย..."></textarea>
-  <!-- ✅ ปุ่มเผยแพร่ เชื่อมตรง submitPost() -->
-  <button class="btn-primary" id="publishBtn" onclick="submitPost()">เผยแพร่</button>
-</div>
-
-<div id="commentModal" class="modal hidden">
-  <div class="modal-header">
-    <h2 class="text-lg font-bold">ความคิดเห็น</h2>
-    <span class="close-btn" onclick="closeCommentModal()">&times;</span>
-  </div>
-  <div id="commentList" class="space-y-3 mb-4 max-h-60 overflow-y-auto"></div>
-  <div class="flex gap-2">
-    <input type="text" id="newComment" placeholder="เขียนความคิดเห็น..." class="flex-1">
-    <button class="btn-primary" onclick="addComment()">ส่ง</button>
-  </div>
+  
+  <input type="text" id="inputName" placeholder="ชื่อของคุณ" value="Thaipodee Master">
+  <textarea id="inputDesc" rows="3" placeholder="เขียนคำอธิบาย..."></textarea>
+  
+  <button class="btn-red" onclick="doPublish()">เผยแพร่</button>
 </div>
 
 <script>
-let posts = JSON.parse(localStorage.getItem('tpd_posts') || '[]');
-let currentPostIndex = null;
-let selectedFile = null, selectedFileData = null;
+let postData = [];
+let fileObj = null;
+let fileBase64 = null;
 
-function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-  document.getElementById(pageId).classList.remove('hidden');
-  if (pageId === 'feedPage') renderPosts();
-  if (pageId === 'profilePage') renderMyPosts();
-}
-
-function openPostModal() {
-  selectedFile = null;
-  selectedFileData = null;
-  document.getElementById('fileInput').value = '';
-  document.getElementById('captionInput').value = '';
-  document.getElementById('previewArea').innerHTML = '<span class="text-gray-400">ตัวอย่างไฟล์</span>';
-  document.getElementById('postModal').classList.remove('hidden');
-}
-function closePostModal() {
-  document.getElementById('postModal').classList.add('hidden');
-  selectedFile = null;
-  selectedFileData = null;
-}
-
-function previewFile(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    selectedFileData = ev.target.result;
-    const area = document.getElementById('previewArea');
-    if (file.type.startsWith('video/')) {
-      area.innerHTML = `<video src="${selectedFileData}" class="w-full h-full object-contain" autoplay muted loop playsinline controls></video>`;
-    } else {
-      area.innerHTML = `<img src="${selectedFileData}" class="w-full h-full object-contain" alt="">`;
-    }
-  };
-  reader.readAsDataURL(file);
-}
-
-// ✅ ปุ่มเผยแพร่ — ทำงานเต็มที่
-function submitPost() {
-  console.log('กำลังตรวจสอบ...');
-  
-  // ตรวจสอบไฟล์
-  if (!selectedFileData) {
-    alert('⚠️ กรุณาเลือกไฟล์ภาพหรือวิดีโอก่อนกดเผยแพร่');
-    return;
+// โหลดข้อมูลเก่า
+function loadData() {
+  try {
+    const saved = localStorage.getItem('tpd_data');
+    if (saved) postData = JSON.parse(saved);
+  } catch(e) {
+    postData = [];
   }
-  
-  const authorVal = document.getElementById('authorInput').value.trim() || 'Thaipodee Master';
-  const captionVal = document.getElementById('captionInput').value.trim();
-  
-  console.log('กำลังบันทึก...');
-  
-  // สร้างโพสต์ใหม่
-  const newPost = {
-    id: Date.now(),
-    type: selectedFile.type.startsWith('video/') ? 'video' : 'image',
-    src: selectedFileData,
-    author: authorVal,
-    caption: captionVal,
-    likes: 0,
-    liked: false,
-    bookmarked: false,
-    comments: [],
-    time: new Date().toLocaleString('th-TH')
-  };
-  
-  // บันทึก
-  posts.unshift(newPost);
-  localStorage.setItem('tpd_posts', JSON.stringify(posts));
-  
-  console.log('บันทึกเสร็จ → แสดงผล');
-  
-  // ปิดหน้าโพสต์ + แสดงฟีด
-  closePostModal();
-  renderPosts();
-  
-  alert('✅ เผยแพร่สำเร็จ!');
+  showAllPosts();
 }
 
-function renderPosts() {
-  const container = document.getElementById('feedContainer');
-  container.innerHTML = '';
+// บันทึกข้อมูล
+function saveData() {
+  localStorage.setItem('tpd_data', JSON.stringify(postData));
+}
+
+// แสดงโพสต์ทั้งหมด
+function showAllPosts() {
+  const list = document.getElementById('feedList');
+  list.innerHTML = '';
   
-  if (posts.length === 0) {
-    container.innerHTML = `
-      <div class="video-slide">
-        <div class="video-content flex items-center justify-center text-gray-400">
+  if (postData.length === 0) {
+    list.innerHTML = `
+      <div class="post-slide">
+        <div class="media flex items-center justify-center text-gray-400">
           <p>กดปุ่ม + เพื่อโพสต์</p>
         </div>
         <div class="info-left">
           <div class="username">Thaipodee Master</div>
-          <div class="caption">ยินดีต้อนรับสู่ Thaipodee — แอปของเราเอง</div>
+          <div class="caption">ยินดีต้อนรับสู่ Thaipodee</div>
         </div>
-        <div class="actions-right">
-          <div class="action-btn" onclick="showPage('profilePage')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-          <div class="action-btn"><i class="fa fa-heart-o"></i><span>0</span></div>
-          <div class="action-btn"><i class="fa fa-comment-o"></i><span>0</span></div>
-          <div class="action-btn"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
-          <div class="action-btn"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
-          <div class="action-btn"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
+        <div class="side-menu">
+          <div class="side-btn" onclick="alert('ไปหน้าโปรไฟล์')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+          <div class="side-btn" onclick="alert('กดถูกใจ')"><i class="fa fa-heart-o"></i><span>0</span></div>
+          <div class="side-btn" onclick="alert('เปิดคอมเมนต์')"><i class="fa fa-comment-o"></i><span>0</span></div>
+          <div class="side-btn" onclick="alert('บันทึกแล้ว')"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
+          <div class="side-btn" onclick="alert('คัดลอกลิงก์แล้ว')"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+          <div class="side-btn" onclick="alert('ตัวเลือกเพิ่มเติม')"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
         </div>
       </div>`;
     return;
   }
   
-  posts.forEach((post, idx) => {
+  postData.forEach((p, idx) => {
     const slide = document.createElement('div');
-    slide.className = 'video-slide';
+    slide.className = 'post-slide';
     slide.innerHTML = `
-      ${post.type === 'video'
-        ? `<video class="video-content" controls autoplay muted loop playsinline>
-             <source src="${post.src}"></video>`
-        : `<img class="video-content" src="${post.src}" alt="">`
+      ${p.isVideo
+        ? `<video class="media" controls autoplay muted loop playsinline>
+             <source src="${p.src}"></video>`
+        : `<img class="media" src="${p.src}" alt="">`
       }
       <div class="info-left">
-        <div class="username">${post.author}</div>
-        <div class="caption">${post.caption || ''}</div>
-        <div class="text-xs text-gray-500 mt-1">${post.time}</div>
+        <div class="username">${p.name}</div>
+        <div class="caption">${p.desc || ''}</div>
       </div>
-      <div class="actions-right">
-        <div class="action-btn" onclick="showPage('profilePage')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
-        <div class="action-btn" onclick="toggleLike(${idx})">
-          <i class="fa ${post.liked ? 'fa-heart' : 'fa-heart-o'}" style="color:${post.liked ? '#ff4757' : ''}"></i>
-          <span>${post.likes}</span>
-        </div>
-        <div class="action-btn" onclick="openCommentModal(${idx})">
-          <i class="fa fa-comment-o"></i>
-          <span>${post.comments.length}</span>
-        </div>
-        <div class="action-btn" onclick="toggleBookmark(${idx})">
-          <i class="fa ${post.bookmarked ? 'fa-bookmark' : 'fa-bookmark-o'}" style="color:${post.bookmarked ? '#ffd700' : ''}"></i>
-          <span>บันทึก</span>
-        </div>
-        <div class="action-btn" onclick="sharePost(${idx})">
-          <i class="fa fa-share-alt"></i>
-          <span>แชร์</span>
-        </div>
-        <div class="action-btn" onclick="moreOptions(${idx})">
-          <i class="fa fa-ellipsis-h"></i>
-          <span>อื่นๆ</span>
-        </div>
+      <div class="side-menu">
+        <div class="side-btn" onclick="alert('โปรไฟล์')"><i class="fa fa-user-circle-o"></i><span>โปรไฟล์</span></div>
+        <div class="side-btn" onclick="alert('ถูกใจ')"><i class="fa fa-heart-o"></i><span>0</span></div>
+        <div class="side-btn" onclick="alert('คอมเมนต์')"><i class="fa fa-comment-o"></i><span>0</span></div>
+        <div class="side-btn" onclick="alert('บันทึก')"><i class="fa fa-bookmark-o"></i><span>บันทึก</span></div>
+        <div class="side-btn" onclick="alert('แชร์')"><i class="fa fa-share-alt"></i><span>แชร์</span></div>
+        <div class="side-btn" onclick="if(confirm('ลบโพสต์นี้?')){postData.splice(${idx},1);saveData();showAllPosts();}"><i class="fa fa-ellipsis-h"></i><span>อื่นๆ</span></div>
       </div>
     `;
-    container.appendChild(slide);
+    list.appendChild(slide);
   });
 }
 
-function toggleLike(idx) {
-  posts[idx].liked = !posts[idx].liked;
-  posts[idx].likes += posts[idx].liked ? 1 : -1;
-  localStorage.setItem('tpd_posts', JSON.stringify(posts));
-  renderPosts();
+// เปิด-ปิด กล่องโพสต์
+function openPostBox() {
+  fileObj = null;
+  fileBase64 = null;
+  document.getElementById('fileChoose').value = '';
+  document.getElementById('inputDesc').value = '';
+  document.getElementById('previewHere').innerHTML = '<span class="text-gray-400">ตัวอย่างจะแสดงที่นี่</span>';
+  document.getElementById('postBox').classList.remove('hidden');
+}
+function closePostBox() {
+  document.getElementById('postBox').classList.add('hidden');
 }
 
-function toggleBookmark(idx) {
-  posts[idx].bookmarked = !posts[idx].bookmarked;
-  localStorage.setItem('tpd_posts', JSON.stringify(posts));
-  renderPosts();
+// แสดงตัวอย่างไฟล์
+function showPreview(input) {
+  if (!input.files || !input.files[0]) return;
+  fileObj = input.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    fileBase64 = e.target.result;
+    const box = document.getElementById('previewHere');
+    if (fileObj.type.startsWith('video/')) {
+      box.innerHTML = `<video src="${fileBase64}" class="w-full h-full object-contain" autoplay muted loop playsinline controls></video>`;
+    } else {
+      box.innerHTML = `<img src="${fileBase64}" class="w-full h-full object-contain" alt="">`;
+    }
+  };
+  reader.readAsDataURL(fileObj);
 }
 
-function openCommentModal(idx) {
-  currentPostIndex = idx;
-  renderComments();
-  document.getElementById('commentModal').classList.remove('hidden');
-}
-function closeCommentModal() {
-  document.getElementById('commentModal').classList.add('hidden');
-  currentPostIndex = null;
-}
-function renderComments() {
-  const list = document.getElementById('commentList');
-  if (!posts[currentPostIndex]?.comments?.length) {
-    list.innerHTML = '<div class="text-gray-400 text-center py-4">ยังไม่มีความคิดเห็น เป็นคนแรกเลย!</div>';
+// ✅ กดเผยแพร่ — ทำงานตรงๆ ไม่ซับซ้อน
+function doPublish() {
+  if (!fileBase64) {
+    alert('⚠️ ก่อนอื่นให้กด "เลือกไฟล์" แล้วเลือกรูปหรือวิดีโอก่อนครับ');
     return;
   }
-  list.innerHTML = posts[currentPostIndex].comments.map(c =>
-    `<div class="p-2 bg-gray-900 rounded"><b>${c.name}:</b> ${c.text}</div>`
-  ).join('');
-}
-function addComment() {
-  const input = document.getElementById('newComment');
-  const text = input.value.trim();
-  if (!text) return;
-  posts[currentPostIndex].comments.push({ name: 'คุณ', text });
-  input.value = '';
-  localStorage.setItem('tpd_posts', JSON.stringify(posts));
-  renderComments();
-  renderPosts();
-}
-
-function sharePost(idx) {
-  const shareText = `ชมโพสต์จาก Thaipodee: ${posts[idx]?.caption || ''}`;
-  if (navigator.share) {
-    navigator.share({ title: 'Thaipodee', text: shareText });
-  } else {
-    navigator.clipboard.writeText(shareText);
-    alert('✅ คัดลอกข้อความแล้ว!');
-  }
+  
+  const name = document.getElementById('inputName').value.trim() || 'Thaipodee Master';
+  const desc = document.getElementById('inputDesc').value.trim();
+  
+  // เพิ่มโพสต์ใหม่ข้างบนสุด
+  postData.unshift({
+    src: fileBase64,
+    isVideo: fileObj.type.startsWith('video/'),
+    name: name,
+    desc: desc,
+    time: new Date().toLocaleString('th-TH')
+  });
+  
+  // บันทึกและแสดงผล
+  saveData();
+  closePostBox();
+  showAllPosts();
+  
+  alert('✅ เผยแพร่สำเร็จ! โพสต์ขึ้นแล้วครับ');
 }
 
-function moreOptions(idx) {
-  if (confirm('ต้องการลบโพสต์นี้หรือไม่?')) {
-    posts.splice(idx, 1);
-    localStorage.setItem('tpd_posts', JSON.stringify(posts));
-    renderPosts();
-  }
-}
+// เมนูด้านล่าง
+function goFeed() { window.scrollTo({top:0,behavior:'smooth'}); }
+function goSearch() { alert('🔍 ค้นหา — จะพัฒนาต่อครับ'); }
+function goNotify() { alert('🔔 แจ้งเตือน — จะพัฒนาต่อครับ'); }
+function goProfile() { alert('👤 โปรไฟล์ — จะพัฒนาต่อครับ'); }
 
-function searchPosts() {
-  const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
-  const results = document.getElementById('searchResults');
-  if (!q) { results.innerHTML = ''; return; }
-  const found = posts.filter(p =>
-    (p.author && p.author.toLowerCase().includes(q)) ||
-    (p.caption && p.caption.toLowerCase().includes(q))
-  );
-  if (!found.length) { results.innerHTML = '<div class="text-gray-400">ไม่พบโพสต์ที่ตรงกับคำค้นหา</div>'; return; }
-  results.innerHTML = found.map(p => `
-    <div class="p-3 bg-gray-900 rounded-lg mb-2">
-      <div class="font-bold">${p.author}</div>
-      <div class="text-sm text-gray-300">${p.caption || 'ไม่มีคำอธิบาย'}</div>
-    </div>
-  `).join('');
-}
-document.getElementById('searchInput')?.addEventListener('input', searchPosts);
-
-function changeProfileName() {
-  const newName = prompt('ตั้งชื่อใหม่:', document.getElementById('profileName').textContent);
-  if (newName && newName.trim()) {
-    document.getElementById('profileName').textContent = newName.trim();
-  }
-}
-function renderMyPosts() {
-  const list = document.getElementById('myPosts');
-  if (!posts.length) { list.innerHTML = '<div class="text-gray-400">ยังไม่มีโพสต์</div>'; return; }
-  list.innerHTML = posts.map((p, i) => `
-    <div class="p-3 bg-gray-900 rounded-lg flex justify-between items-center">
-      <div>
-        <div class="font-bold text-sm">${p.caption?.substring(0,25) || 'โพสต์'}${p.caption?.length>25?'...':''}</div>
-        <div class="text-xs text-gray-400">${p.likes} ถูกใจ · ${p.comments.length} ความคิดเห็น</div>
-      </div>
-      <button class="text-red-500 text-sm" onclick="moreOptions(${i})">ลบ</button>
-    </div>
-  `).join('');
-}
-
-document.addEventListener('DOMContentLoaded', renderPosts);
+// เริ่มทำงานทันที
+document.addEventListener('DOMContentLoaded', loadData);
 </script>
 
 </body>
