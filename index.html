@@ -1,3 +1,11 @@
+<!-- ==============================================================
+   Thaipodee Global Market
+   เวอร์ชัน: 2.5.1
+   วันที่: 20 กันยายน 2567
+   เวลา: 22:44 น.
+   สถานะ: ✅ แก้จุดแสดงข้อความผิดพลาด — รักษาโค้ดเดิมทั้งหมด
+   ============================================================== -->
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -71,13 +79,13 @@ html, body {
   color: #888;
 }
 
-/* ===== พื้นที่แสดงวิดีโอ — ปรับให้ชัดเจน ===== */
+/* ===== พื้นที่แสดงวิดีโอ ===== */
 .media-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 65px; /* เหลือที่ให้แถบล่าง */
+  bottom: 65px;
   background: #000;
   display: flex;
   align-items: center;
@@ -532,7 +540,6 @@ html, body {
 
 <!-- หน้าหลัก -->
 <div id="home" class="page hidden">
-  <!-- พื้นที่แสดงวิดีโอ — ปรับโครงสร้างใหม่ -->
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
       <i class="fa-solid fa-video"></i>
@@ -540,7 +547,6 @@ html, body {
     </div>
   </div>
 
-  <!-- ข้อมูลด้านบน -->
   <div class="top-info" id="topInfo" style="display:none;">
     <p class="username">ThaiPodee Master</p>
     <p class="desc" id="descText"></p>
@@ -548,7 +554,6 @@ html, body {
     <div class="file-meta" id="fileMetaBox" style="display:none;"></div>
   </div>
 
-  <!-- ปุ่มขวา -->
   <div class="right-buttons">
     <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i></div>
     <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
@@ -561,7 +566,6 @@ html, body {
     <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
   </div>
 
-  <!-- แถบล่าง -->
   <div class="bottom-nav">
     <div class="nav-item" data-goto="home"><i class="fa-solid fa-home"></i></div>
     <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i></div>
@@ -773,7 +777,7 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-// === อัปโหลด ===
+// === อัปโหลด — แก้ไขจุดข้อความแจ้งเตือน ===
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) {
     showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
@@ -813,7 +817,17 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       
       if (xhr.status === 200) {
         try {
+          // ตรวจสอบก่อนว่ามีข้อมูลครบถ้วน
+          if (!xhr.responseText) {
+            showStatus('❌ ไม่มีข้อมูลตอบกลับจากเซิร์ฟเวอร์', 'error');
+            return;
+          }
           const res = JSON.parse(xhr.responseText);
+          
+          if (!res.public_id || !res.secure_url) {
+            showStatus('❌ ข้อมูลไม่ครบถ้วน — ตรวจสอบการตั้งค่าคลาวด์', 'error');
+            return;
+          }
           
           const soundMode = document.getElementById('optOrig').classList.contains('selected') 
             ? 'original' : 'custom';
@@ -843,49 +857,51 @@ document.getElementById('doUpload').addEventListener('click', async () => {
 
           showStatus('✅ อัปโหลดเสร็จสิ้น!', 'success');
           
-          // แสดงทันที
           displayPost(newPost, 0);
           
-          // เคลียร์ฟอร์ม
           resetUploadForm();
           
           setTimeout(() => showPage('home'), 1500);
         } catch (err) {
-          showStatus('❌ อ่านข้อมูลไม่ได้', 'error');
+          showStatus(`❌ แปลงข้อมูลไม่ได้: ${err.message}`, 'error');
         }
       } else {
-        showStatus(`❌ ไม่สำเร็จ (โค้ด: ${xhr.status})`, 'error');
+        // บอกสาเหตุชัดเจน
+        let detail = '';
+        if (xhr.status === 401) detail = ' — ตรวจสอบชื่อบัญชี/รหัสไม่ถูกต้อง';
+        else if (xhr.status === 400) detail = ' — ข้อมูลส่งผิดรูปแบบ';
+        else if (xhr.status === 413) detail = ' — ไฟล์ใหญ่เกินกว่าที่กำหนด';
+        else if (xhr.status === 404) detail = ' — ไม่พบที่อยู่ปลายทาง';
+        showStatus(`❌ ไม่สำเร็จ (โค้ด: ${xhr.status})${detail}`, 'error');
       }
     };
 
     xhr.onerror = () => {
       document.getElementById('progWrap').style.display = 'none';
-      showStatus('❌ ขาดการเชื่อมต่อ', 'error');
+      showStatus('❌ ขาดการเชื่อมต่ออินเทอร์เน็ต — ลองใหม่อีกครั้ง', 'error');
     };
 
     xhr.send(formData);
   } catch (err) {
-    showStatus('❌ มีข้อผิดพลาด', 'error');
+    showStatus(`❌ มีข้อผิดพลาด: ${err.message}`, 'error');
   }
 });
 
-// === แสดงวิดีโอ/รูปที่หน้าหลัก — ปรับปรุงใหม่ให้แน่นอน ===
+// === แสดงวิดีโอ/รูปที่หน้าหลัก ===
 function displayPost(post, index) {
   currentPostIndex = index;
   const area = document.getElementById('mediaArea');
   
-  // ล้างของเดิม
   area.innerHTML = '';
 
-  // แสดงวิดีโอหรือรูป
   if (post.type === 'video') {
     const video = document.createElement('video');
     video.src = post.url;
     video.controls = true;
     video.autoplay = true;
-    video.muted = false; // บางเครื่องต้องกดเล่นเอง
+    video.muted = false;
     video.loop = true;
-    video.playsInline = true; // สำคัญ! บนมือถือไม่เปิดเต็มจออัตโนมัติ
+    video.playsInline = true;
     area.appendChild(video);
   } else {
     const img = document.createElement('img');
@@ -894,7 +910,6 @@ function displayPost(post, index) {
     area.appendChild(img);
   }
 
-  // แสดงข้อมูล
   document.getElementById('topInfo').style.display = 'block';
   document.getElementById('descText').textContent = post.name.replace(/\.[^/.]+$/, '');
   
@@ -1015,7 +1030,6 @@ function renderInsight() {
 
   document.getElementById('insightNote').textContent = `รวม ${posts.length} รายการ`;
 
-  // กราฟ 7 วัน
   const chartData = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
