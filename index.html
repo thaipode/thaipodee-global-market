@@ -1,9 +1,9 @@
 <!-- ==============================================================
    Thaipodee Global Market
-   เวอร์ชัน: 2.5.1
+   เวอร์ชัน: 2.5.2
    วันที่: 20 กันยายน 2567
-   เวลา: 22:44 น.
-   สถานะ: ✅ แก้จุดแสดงข้อความผิดพลาด — รักษาโค้ดเดิมทั้งหมด
+   เวลา: 23:00 น.
+   สถานะ: ✅ แก้โชว์รูป+รายการในหน้าโปรไฟล์ — โหลดข้อมูลตรงเวลา
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -18,10 +18,7 @@
 <meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
 <title>ThaiPodee Market</title>
 
-<!-- ไอคอนแอป -->
 <link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/9Z7w8xY.png">
-
-<!-- Manifest ติดตั้งเป็นแอป -->
 <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGUgTWFya2V0Iiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5IjoiZnVsbHNjcmVlbiIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaS5pbWd1ci5jb20vOVo3dzhZLnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -48,7 +45,6 @@ html, body {
 }
 .page.hidden { opacity: 0; pointer-events: none; }
 
-/* ===== หน้าเริ่มต้น — โลโก้ตรงเป๊ะ ===== */
 .splash-screen {
   display: flex;
   flex-direction: column;
@@ -79,7 +75,6 @@ html, body {
   color: #888;
 }
 
-/* ===== พื้นที่แสดงวิดีโอ ===== */
 .media-wrapper {
   position: absolute;
   top: 0;
@@ -105,7 +100,6 @@ html, body {
 }
 .media-placeholder i { font-size: 40px; margin-bottom: 12px; }
 
-/* ข้อมูลด้านบน */
 .top-info {
   position: absolute;
   top: 48px;
@@ -133,7 +127,6 @@ html, body {
   line-height: 1.8;
 }
 
-/* ปุ่มด้านขวา */
 .right-buttons {
   position: absolute;
   right: 12px;
@@ -165,7 +158,6 @@ html, body {
   z-index: 10;
 }
 
-/* แถบนำทางล่าง */
 .bottom-nav {
   position: absolute;
   bottom: 0;
@@ -198,7 +190,6 @@ html, body {
   font-size: 18px;
 }
 
-/* หน้าอัปโหลด */
 .upload-container {
   padding: 20px;
   padding-top: 50px;
@@ -293,7 +284,6 @@ html, body {
 .status-success { background: rgba(74,222,128,0.15); color: #4ade80; }
 .status-error { background: rgba(255,46,85,0.15); color: #ff6b4a; }
 
-/* หน้าโปรไฟล์ */
 .profile-container {
   padding: 20px;
   padding-top: 50px;
@@ -376,7 +366,6 @@ html, body {
   padding: 30px;
 }
 
-/* กล่องยืนยัน */
 .modal-bg {
   position: fixed;
   inset: 0;
@@ -412,7 +401,6 @@ html, body {
 .btn-cancel { background: #333; color: #fff; }
 .btn-confirm { background: #dc2626; color: #fff; }
 
-/* หน้าข้อมูลเชิงลึก */
 .insight-page {
   background: #f8fafc;
   color: #1f2937;
@@ -531,14 +519,12 @@ html, body {
 </head>
 <body>
 
-<!-- หน้าเริ่มต้น -->
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">ThaiPodee Market</div>
   <div class="logo-sub">Global • Master • Market</div>
 </div>
 
-<!-- หน้าหลัก -->
 <div id="home" class="page hidden">
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
@@ -577,7 +563,6 @@ html, body {
   </div>
 </div>
 
-<!-- หน้าอัปโหลด -->
 <div id="upload" class="page hidden upload-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -610,7 +595,6 @@ html, body {
   <div class="status-line" id="statusLine"></div>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
 <div id="profile" class="page hidden profile-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -639,7 +623,6 @@ html, body {
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์</p>
 </div>
 
-<!-- หน้าข้อมูลเชิงลึก -->
 <div id="insight" class="page insight-page hidden">
   <div class="insight-back" data-goto="home">
     <i class="fa-solid fa-chevron-left"></i>
@@ -690,7 +673,6 @@ html, body {
   </div>
 </div>
 
-<!-- กล่องยืนยันลบ -->
 <div id="delModal" class="modal-bg">
   <div class="modal-box">
     <p style="font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
@@ -703,18 +685,15 @@ html, body {
 </div>
 
 <script>
-// === ค่าคงที่ ===
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 const MAX_MB = 100;
 
-// === ตัวแปร ===
 let selectedFile = null;
 let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
 let delIndex = -1;
 let currentPostIndex = -1;
 
-// === สลับหน้า ===
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
@@ -723,15 +702,12 @@ function showPage(id) {
   if (id === 'insight') renderInsight();
 }
 
-// ซ่อนหน้าเริ่มต้น
 setTimeout(() => showPage('home'), 2000);
 
-// ปุ่มนำทางทั้งหมด
 document.querySelectorAll('[data-goto]').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.goto));
 });
 
-// === เลือกไฟล์ ===
 const fileInput = document.getElementById('fileInput');
 fileInput.addEventListener('change', async e => {
   selectedFile = e.target.files[0];
@@ -765,7 +741,6 @@ fileInput.addEventListener('change', async e => {
   }
 });
 
-// === เลือกประเภทเสียง ===
 document.getElementById('optOrig').addEventListener('click', () => {
   document.getElementById('optOrig').classList.add('selected');
   document.getElementById('optCustom').classList.remove('selected');
@@ -777,7 +752,6 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-// === อัปโหลด — แก้ไขจุดข้อความแจ้งเตือน ===
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) {
     showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
@@ -817,7 +791,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       
       if (xhr.status === 200) {
         try {
-          // ตรวจสอบก่อนว่ามีข้อมูลครบถ้วน
           if (!xhr.responseText) {
             showStatus('❌ ไม่มีข้อมูลตอบกลับจากเซิร์ฟเวอร์', 'error');
             return;
@@ -866,7 +839,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
           showStatus(`❌ แปลงข้อมูลไม่ได้: ${err.message}`, 'error');
         }
       } else {
-        // บอกสาเหตุชัดเจน
         let detail = '';
         if (xhr.status === 401) detail = ' — ตรวจสอบชื่อบัญชี/รหัสไม่ถูกต้อง';
         else if (xhr.status === 400) detail = ' — ข้อมูลส่งผิดรูปแบบ';
@@ -887,11 +859,9 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   }
 });
 
-// === แสดงวิดีโอ/รูปที่หน้าหลัก ===
 function displayPost(post, index) {
   currentPostIndex = index;
   const area = document.getElementById('mediaArea');
-  
   area.innerHTML = '';
 
   if (post.type === 'video') {
@@ -911,7 +881,7 @@ function displayPost(post, index) {
   }
 
   document.getElementById('topInfo').style.display = 'block';
-  document.getElementById('descText').textContent = post.name.replace(/\.[^/.]+$/, '');
+  document.getElementById('descText').textContent = post.name.replace(/\.[^.]+$/, '');
   
   document.getElementById('soundLine').innerHTML = 
     post.soundMode === 'original' 
@@ -929,24 +899,31 @@ function displayPost(post, index) {
   document.getElementById('fileMetaBox').style.display = 'block';
 }
 
-// === แสดงรายการในโปรไฟล์ ===
+// === แก้จุดโชว์รูปในโปรไฟล์ ===
 function renderPostList() {
   const list = document.getElementById('postListContainer');
+  const noPostText = document.getElementById('noPostText');
+  
+  // โหลดข้อมูลล่าสุดทุกครั้งที่เข้าหน้า
+  posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
   document.getElementById('postTotal').textContent = posts.length;
   
   if (!posts.length) {
     list.innerHTML = '';
-    document.getElementById('noPostText').style.display = 'block';
+    noPostText.style.display = 'block';
     return;
   }
-  document.getElementById('noPostText').style.display = 'none';
+  
+  noPostText.style.display = 'none';
 
   list.innerHTML = posts.map((p, i) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+    // ใช้ลิงก์ตรงเป็นรูปปก ไม่ต้องแปลงนามสกุล
+    const thumbUrl = p.url;
     return `
       <div class="post-item">
         <div class="post-thumb" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
-          <img src="${p.url.replace(/\.[^.]+$/, '.jpg')}" onerror="this.src='${p.url}'">
+          <img src="${thumbUrl}" alt="${p.name}" loading="lazy">
         </div>
         <div style="flex:1;">
           <div class="post-title" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
@@ -969,7 +946,6 @@ function renderPostList() {
   }).join('');
 }
 
-// === ลบโพสต์ ===
 function openDelModal(idx) {
   delIndex = idx;
   document.getElementById('delModal').style.display = 'flex';
@@ -988,7 +964,6 @@ document.getElementById('confirmDel').addEventListener('click', () => {
   document.getElementById('delModal').style.display = 'none';
 });
 
-// === ข้อมูลเชิงลึก ===
 document.querySelectorAll('.insight-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
@@ -999,6 +974,7 @@ document.querySelectorAll('.insight-tab').forEach(tab => {
 });
 
 function renderInsight() {
+  posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
   document.getElementById('pTotal').textContent = posts.length;
   
   if (!posts.length) {
@@ -1049,7 +1025,6 @@ function renderInsight() {
   }).join('');
 }
 
-// === เครื่องมือ ===
 function formatTime(sec) {
   if (!sec) return '-';
   const m = Math.floor(sec / 60);
