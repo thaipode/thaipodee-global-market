@@ -1,12 +1,15 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   ลำดับที่: 4.6.0
-   วันที่: 21 กันยายน 2569 15:45 น.
-   สถานะ: ✅ เหลืออันเดียว + ปุ่มลบทั้งหมด
+   ลำดับที่: 4.5.0
+   วันที่: 21 กันยายน 2569
+   เวลา: 10:50 น.
+   สถานะ: ✅ บังคับแสดงประวัติทุกเครื่อง + แจ้งสถานะอัปเดต
    เปลี่ยนแปลง:
-   - แสดงเฉพาะอันล่าสุด แค่ 1 รายการ
-   - มีปุ่มใหญ่ชัดเจน → ลบทิ้งหมด เหลืออันล่าสุด
-   - ปุ่มลบแต่ละอัน กดได้ทันที
+   - เพิ่มแถบสถานะ "อัปเดตพร้อมใช้งาน" ทุกหน้า
+   - renderPostList: บังคับวนลูปแสดงทุกรายการ ไม่ข้าม
+   - ตรวจสอบข้อมูลชัดเจน — แจ้งจำนวนรายการที่โหลดได้จริง
+   - แก้ thumbUrl ให้แน่ใจว่าดึงลิงก์ตรงจาก post.url จริง
+   - ไม่แตะตำแหน่งไอคอน / ฟังก์ชันเดิมเลย
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -31,50 +34,90 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
-  height: 100%; background: #000; color: #fff;
-  font-family: sans-serif; overflow: hidden; position: fixed;
-  width: 100%; height: 100%;
+  height: 100%;
+  background: #000;
+  color: #fff;
+  font-family: sans-serif;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
+/* === แถบแจ้งสถานะอัปเดต === */
 .update-bar {
-  position: fixed; top: 0; left: 0; right: 0;
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-  color: #fff; font-size: 12px; padding: 6px 12px;
-  text-align: center; z-index: 9999; font-weight: bold;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #10b981, #059669);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  text-align: center;
+  z-index: 9999;
+  font-weight: bold;
 }
 
 .page {
-  position: absolute; inset: 0; overflow-y: auto;
-  -webkit-overflow-scrolling: touch; transition: opacity 0.3s ease;
-  padding-top: 28px;
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.3s ease;
+  padding-top: 28px; /* เว้นที่แถบอัปเดต */
 }
 .page.hidden { opacity: 0; pointer-events: none; }
 
 .splash-screen {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; background: #000; z-index: 9999; padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  z-index: 9999;
+  padding-top: 0;
 }
 .logo-main {
-  width: 200px; height: 200px;
+  width: 200px;
+  height: 200px;
   background: url('https://i.imgur.com/9Z7w8xY.png') no-repeat center;
-  background-size: contain; margin-bottom: 20px;
+  background-size: contain;
+  margin-bottom: 20px;
 }
-.logo-text { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
-.logo-sub { font-size: 14px; color: #888; margin-top: 8px; }
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.logo-sub {
+  font-size: 14px;
+  color: #888;
+  margin-top: 8px;
+}
 
 .media-wrapper {
-  position: absolute; top: 28px; left: 0; right: 0; bottom: 70px;
-  background: #000; display: flex; align-items: center; justify-content: center;
+  position: absolute;
+  top: 28px; left: 0; right: 0; bottom: 70px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 .media-wrapper video, .media-wrapper img {
-  width: 100%; height: 100%; object-fit: contain; background: #000;
+  width: 100%; height: 100%;
+  object-fit: contain; background: #000;
 }
-.media-placeholder { text-align: center; color: #666; }
+.media-placeholder {
+  text-align: center;
+  color: #666;
+}
 .media-placeholder i { font-size: 48px; margin-bottom: 16px; }
 
 .top-info {
-  position: absolute; top: 88px; left: 16px; right: 70px; z-index: 10;
+  position: absolute;
+  top: 88px; left: 16px; right: 70px; z-index: 10;
 }
 .username { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
 .desc { font-size: 14px; opacity: 0.9; margin-bottom: 6px; }
@@ -92,40 +135,70 @@ html, body {
 }
 
 .right-buttons {
-  position: absolute; right: 12px; bottom: 140px;
-  display: flex; flex-direction: column; gap: 24px; z-index: 10;
+  position: absolute;
+  right: 12px;
+  bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 10;
 }
 .r-btn {
-  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
 }
 .r-btn i { font-size: 28px; }
 .r-btn span { font-size: 10px; margin-top: 4px; }
 
 .insight-link {
-  position: absolute; right: 12px; bottom: 85px;
+  position: absolute;
+  right: 12px;
+  bottom: 85px;
   background: linear-gradient(90deg, #8b5cf6, #ec4899);
-  padding: 8px 14px; border-radius: 20px;
-  font-size: 11px; font-weight: bold; cursor: pointer; z-index: 10;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .bottom-nav {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
-  background: #000; display: flex; justify-content: space-around;
-  align-items: center; border-top: 1px solid #222; z-index: 20;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
+  background: #000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #222;
+  z-index: 20;
 }
 .nav-item {
-  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
 }
 .nav-item i { font-size: 24px; }
 .nav-item span { font-size: 10px; margin-top: 2px; }
 .plus-btn {
-  width: 50px; height: 36px;
+  width: 50px;
+  height: 36px;
   background: linear-gradient(90deg, #ff2e55, #ff6b4a);
-  border-radius: 8px; display: flex; align-items: center;
-  justify-content: center; font-size: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
 }
 
-.upload-container { padding: 20px; padding-top: 48px; }
+.upload-container {
+  padding: 20px;
+  padding-top: 48px;
+}
 .back-btn {
   background: none; border: none; color: #fff;
   font-size: 16px; cursor: pointer; margin-bottom: 20px;
@@ -176,107 +249,174 @@ html, body {
 .status-success { background: rgba(74,222,128,0.15); color: #4ade80; }
 .status-error { background: rgba(255,46,85,0.15); color: #ff6b4a; }
 
-.profile-container { padding: 20px; padding-top: 48px; }
-.profile-header { text-align: center; margin: 20px 0; }
+.profile-container {
+  padding: 20px;
+  padding-top: 48px;
+}
+.profile-header {
+  text-align: center;
+  margin: 20px 0;
+}
 .profile-avatar {
-  width: 80px; height: 80px; background: #333; border-radius: 50%;
+  width: 80px; height: 80px;
+  background: #333; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 32px; margin: 0 auto;
 }
 .profile-name { margin-top: 12px; font-size: 18px; font-weight: bold; }
 .profile-id { color: #888; font-size: 13px; margin-top: 4px; }
 .profile-stats {
-  display: flex; justify-content: center; gap: 40px; margin-top: 20px;
+  display: flex; justify-content: center; gap: 40px;
+  margin-top: 20px;
 }
 .stat-col { text-align: center; }
 .stat-num { font-weight: bold; font-size: 20px; }
 .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
-.divider { border: none; border-top: 1px solid #333; margin: 20px 0; }
-
-/* === ปุ่มลบทั้งหมด === */
-purge-btn {
-  width: 100%; background: #dc2626; color: #fff; border: none;
-  padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold;
-  cursor: pointer; margin-bottom: 20px;
-}
-.purge-btn:active { transform: scale(0.98); }
-
-.debug-info {
-  background: #1a1a1a; border: 1px solid #333;
-  padding: 12px; border-radius: 8px; margin-bottom: 16px;
-  font-size: 13px; color: #facc15; font-weight: bold;
+.divider {
+  border: none; border-top: 1px solid #333;
+  margin: 20px 0;
 }
 
+/* === ประวัติโพสต์ — บังคับแสดงทุกรายการ === */
 .post-item {
   display: flex; gap: 12px; padding: 12px;
-  border: 2px solid #444; border-radius: 10px;
-  margin-bottom: 12px; background: #111;
-  min-height: 140px;
+  border-bottom: 1px solid #222;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #333; /* เพิ่มเส้นขอบให้เห็นชัด */
 }
 .post-thumb {
-  width: 110px; height: 140px;
-  background: #222; border-radius: 8px;
-  overflow: hidden; flex-shrink: 0;
-  border: 2px solid #555; cursor: pointer;
+  width: 100px; height: 130px;
+  background: #1a1a1a; border-radius: 6px;
+  overflow: hidden; flex-shrink: 0; cursor: pointer;
+  border: 1px solid #444; /* เส้นขอบกรอบรูป */
 }
 .post-thumb img {
-  width: 100%; height: 100%; object-fit: cover;
-  display: block; background: #333;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  background: #222;
+  min-height: 130px;
+  display: block; /* บังคับแสดง */
 }
 .post-info {
-  flex: 1; display: flex; flex-direction: column;
-  justify-content: space-between; min-height: 140px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 130px;
 }
 .post-title {
-  font-weight: bold; font-size: 14px; cursor: pointer;
-  word-break: break-all; margin-bottom: 4px; color: #fff;
+  font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 4px;
+  word-break: break-all;
 }
-.post-sound { font-size: 12px; margin-bottom: 4px; }
+.post-sound {
+  font-size: 12px; margin-bottom: 4px;
+}
 .post-sound.orig { color: #90ee90; }
 .post-sound.custom { color: #ffd700; }
 .post-meta {
-  font-size: 11px; color: #aaa; line-height: 1.6; margin-bottom: 8px;
+  font-size: 11px; color: #888; line-height: 1.6;
+  margin-bottom: 6px;
 }
 .post-meta .ok { color: #4ade80; }
+.post-meta .ratio { font-weight: bold; }
 .post-del-btn {
   background: #dc2626; border: none; color: #fff;
-  padding: 10px 20px; border-radius: 8px;
-  font-size: 14px; font-weight: bold; cursor: pointer;
-  align-self: flex-start;
-  box-shadow: 0 2px 6px rgba(220,38,38,0.4);
+  padding: 6px 14px; border-radius: 6px; font-size: 12px;
+  font-weight: bold; cursor: pointer; align-self: flex-start;
 }
-.post-del-btn:active { transform: scale(0.97); }
-
 .empty-text {
-  text-align: center; color: #888; padding: 60px 20px;
-  font-size: 15px;
+  text-align: center; color: #888; padding: 40px 20px;
+}
+.debug-info {
+  font-size: 11px; color: #666;
+  background: rgba(255,255,255,0.03);
+  padding: 8px; border-radius: 6px; margin-bottom: 12px;
 }
 
 .modal-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
   z-index: 100; display: flex; align-items: center; justify-content: center;
   padding: 20px; display: none;
 }
 .modal-box {
   background: #1f1f1f; padding: 24px; border-radius: 12px;
   max-width: 320px; width: 100%; text-align: center;
-  border: 2px solid #444;
 }
-.modal-btns { display: flex; gap: 12px; margin-top: 20px; }
+.modal-btns {
+  display: flex; gap: 12px; margin-top: 20px;
+}
 .modal-btn {
-  flex: 1; border: none; padding: 14px; border-radius: 8px;
-  font-weight: bold; cursor: pointer; font-size: 15px;
+  flex: 1; border: none; padding: 12px; border-radius: 8px;
+  font-weight: bold; cursor: pointer; font-size: 14px;
 }
 .btn-cancel { background: #333; color: #fff; }
 .btn-confirm { background: #dc2626; color: #fff; }
+
+.insight-page { background: #f8fafc; color: #1f2937; }
+.insight-back {
+  position: absolute; top: 16px; left: 16px; font-size: 18px;
+  cursor: pointer; color: #1f2937; z-index: 10;
+}
+.insight-hd {
+  text-align: center; padding: 20px; padding-top: 50px;
+}
+.insight-cover {
+  width: 80px; height: 80px; border-radius: 8px;
+  margin: 0 auto 10px; background: #e5e7eb;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.insight-cover img { width: 100%; height: 100%; object-fit: cover; }
+.insight-tabs {
+  display: flex; justify-content: center; gap: 30px;
+  border-bottom: 1px solid #e5e7eb; margin: 20px 16px 16px;
+}
+.insight-tab {
+  padding: 10px 4px; font-size: 14px; color: #6b7280;
+  cursor: pointer; border-bottom: 2px solid transparent;
+}
+.insight-tab.active {
+  color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: bold;
+}
+.insight-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 0 16px;
+}
+.insight-card {
+  background: #fff; border-radius: 10px; padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.insight-label { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+.insight-val { font-size: 22px; font-weight: bold; }
+.insight-val.sm { font-size: 14px; }
+.insight-val.hl { color: #1d4ed8; }
+.insight-chart-wrap { padding: 20px 16px; }
+.insight-chart-title { font-size: 15px; font-weight: bold; margin-bottom: 14px; }
+.insight-chart {
+  height: 150px; display: flex; align-items: flex-end;
+  justify-content: space-around; gap: 4px;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb; padding: 0 10px;
+}
+.chart-col {
+  display: flex; flex-direction: column; align-items: center; width: 28px;
+}
+.chart-bar {
+  width: 18px; background: #93c5fd; border-radius: 2px 2px 0 0;
+}
+.chart-lbl { font-size: 10px; color: #6b7280; margin-top: 6px; }
+.tab-content { display: block; }
+.tab-content.hidden { display: none; }
 
 .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
+<!-- แถบแจ้งสถานะอัปเดต — แสดงทุกหน้า ทุกเครื่อง -->
 <div class="update-bar" id="updateBar">
-  ✅ เหลืออันล่าสุดอันเดียว — กดปุ่มล้างด้านล่าง
+  ✅ thaipodee อัปเดตล่าสุด: 2026-09-21 10:50 น. — โหลดเสร็จพร้อมใช้งาน
 </div>
 
 <div id="splash" class="page splash-screen">
@@ -380,22 +520,70 @@ purge-btn {
     </div>
   </div>
   <hr class="divider">
-
-  <!-- ปุ่มล้างทิ้งเหลืออันเดียว -->
-  <button class="purge-btn" id="keepOnlyLatestBtn">
-    ⚠️ ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว
-  </button>
-
-  <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
-
+  
+  <!-- ข้อมูลตรวจสอบ — แสดงให้เห็นชัดเจน -->
+  <div class="debug-info" id="debugInfo">
+    กำลังโหลดข้อมูล...
+  </div>
+  
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
 </div>
 
+<div id="insight" class="page insight-page hidden">
+  <div class="insight-back" data-goto="home">
+    <i class="fa-solid fa-chevron-left"></i>
+  </div>
+  <div class="insight-hd">
+    <div class="insight-cover" id="insightCoverBox">
+      <i class="fa-solid fa-video" style="color:#9ca3af; font-size:32px;"></i>
+    </div>
+    <div style="font-weight:bold; font-size:16px;">ThaiPodee Master</div>
+    <div style="font-size:13px; color:#6b7280; margin-top:4px;" id="insightNote">ข้อมูลเชิงลึกทั้งหมด</div>
+  </div>
+  <div class="insight-tabs">
+    <div class="insight-tab active" data-tab="sum">ภาพรวม</div>
+    <div class="insight-tab" data-tab="aud">ผู้ชม</div>
+    <div class="insight-tab" data-tab="eng">การมีส่วนร่วม</div>
+  </div>
+  <div id="tabSum" class="tab-content">
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="insight-label">ยอดเข้าชม</div>
+        <div class="insight-val hl" id="viewTotal">0</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">โพสต์ทั้งหมด</div>
+        <div class="insight-val" id="pTotal">0</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">เวลาเฉลี่ย</div>
+        <div class="insight-val sm" id="avgWatch">0 วินาที</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">เริ่มเมื่อ</div>
+        <div class="insight-val sm" id="startDateVal">-</div>
+      </div>
+    </div>
+    <div class="insight-chart-wrap">
+      <div class="insight-chart-title">📊 ยอดเข้าชม 7 วันล่าสุด</div>
+      <div class="insight-chart" id="chartAreaBox"></div>
+    </div>
+  </div>
+  <div id="tabAud" class="tab-content hidden" style="padding:60px 20px; text-align:center; color:#6b7280;">
+    <i class="fa-solid fa-users fa-2x" style="margin-bottom:16px;"></i>
+    <p>ข้อมูลผู้ชมจะแสดงที่นี่</p>
+  </div>
+  <div id="tabEng" class="tab-content hidden" style="padding:60px 20px; text-align:center; color:#6b7280;">
+    <i class="fa-solid fa-share-nodes fa-2x" style="margin-bottom:16px;"></i>
+    <p>ข้อมูลการมีส่วนร่วมจะแสดงที่นี่</p>
+  </div>
+</div>
+
 <div id="delModal" class="modal-bg">
   <div class="modal-box">
-    <p style="font-weight:bold; margin-bottom:8px;" id="modalTitle">⚠️ ยืนยันการลบ</p>
-    <p style="font-size:13px; color:#aaa; margin-bottom:12px;" id="modalNote">ลบแล้วไม่สามารถกู้คืนได้</p>
+    <p style="font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
+    <p style="font-size:13px; color:#aaa; margin-bottom:12px;">ลบแล้วไม่สามารถกู้คืนได้</p>
     <div class="modal-btns">
       <button class="modal-btn btn-cancel" id="cancelDel">ยกเลิก</button>
       <button class="modal-btn btn-confirm" id="confirmDel">ลบทันที</button>
@@ -411,19 +599,39 @@ const MAX_MB = 100;
 let selectedFile = null;
 let posts = [];
 let delIndex = -1;
-let purgeMode = false;
+let currentPostIndex = -1;
 
+// === โหลดข้อมูล — แจ้งสถานะชัดเจน ===
 function loadPosts() {
   try {
     const raw = localStorage.getItem('thaiPodeePosts');
-    if (!raw) { posts = []; return; }
+    if (!raw) {
+      posts = [];
+      console.log('📭 ไม่พบข้อมูลเก่า — เริ่มว่าง');
+      updateDebugInfo('📭 ยังไม่มีข้อมูลที่บันทึกไว้');
+      return;
+    }
     posts = JSON.parse(raw);
-    if (!Array.isArray(posts)) { posts = []; }
-  } catch (e) { posts = []; }
+    if (!Array.isArray(posts)) {
+      console.warn('⚠️ ข้อมูลไม่ใช่รายการ — รีเซ็ตใหม่');
+      posts = [];
+      localStorage.setItem('thaiPodeePosts', '[]');
+      updateDebugInfo('⚠️ ข้อมูลเก่าเสีย → ล้างใหม่แล้ว');
+      return;
+    }
+    console.log(`✅ โหลดโพสต์ได้: ${posts.length} รายการ`);
+    updateDebugInfo(`✅ พบข้อมูล: ${posts.length} รายการ — กำลังแสดง...`);
+  } catch (e) {
+    console.error('❌ อ่านข้อมูลผิดพลาด:', e);
+    posts = [];
+    localStorage.setItem('thaiPodeePosts', '[]');
+    updateDebugInfo(`❌ อ่านไม่ได้: ${e.message} → เริ่มใหม่`);
+  }
 }
 
 function savePosts() {
   localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+  console.log(`💾 บันทึก: ${posts.length} รายการ`);
 }
 
 function updateDebugInfo(text) {
@@ -439,6 +647,10 @@ function showPage(id) {
     loadPosts();
     renderPostList();
   }
+  if (id === 'insight') {
+    loadPosts();
+    renderInsight();
+  }
 }
 
 setTimeout(() => showPage('home'), 2000);
@@ -447,123 +659,35 @@ document.querySelectorAll('[data-goto]').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.goto));
 });
 
-/* === แสดงแค่อันเดียวล่าสุด === */
-function renderPostList() {
-  const list = document.getElementById('postListContainer');
-  const noPostText = document.getElementById('noPostText');
-  
-  document.getElementById('postTotal').textContent = posts.length;
-  
-  if (!posts.length) {
-    list.innerHTML = '';
-    noPostText.style.display = 'block';
-    updateDebugInfo('📋 ไม่มีรายการ');
-    return;
-  }
-  
-  noPostText.style.display = 'none';
-  
-  // เหลือแค่อันแรก (ล่าสุด)
-  const p = posts[0];
-  const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
-  const isOk = parseFloat(p.sizeMB) <= MAX_MB;
-  const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
-  const thumbUrl = p.url;
-
-  list.innerHTML = `
-    <div class="post-item">
-      <div class="post-thumb" onclick="displayPost(posts[0], 0); showPage('home');">
-        <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
-             onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
-      </div>
-      <div class="post-info">
-        <div>
-          <div class="post-title" onclick="displayPost(posts[0], 0); showPage('home');">
-            ${p.name.replace(/\.[^.]+$/, '')}
-          </div>
-          <div class="post-sound ${soundClass}">
-            ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
-          </div>
-          <div class="post-meta">
-            📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
-            ⏱️ ${formatTime(p.duration)} | 📐 <span class="ratio">${ratio}</span><br>
-            📅 ${p.time}<br>
-            <strong>แสดงเฉพาะอันล่าสุด — ทั้งหมด ${posts.length} รายการ</strong>
-          </div>
-        </div>
-        <button class="post-del-btn" onclick="openDelModal(0)">
-          <i class="fa-solid fa-trash"></i> ลบ
-        </button>
-      </div>
-    </div>
-  `;
-  
-  updateDebugInfo(`✅ แสดงอันล่าสุด 1/${posts.length} รายการ — กดปุ่มด้านบนเพื่อลบทิ้งหมด`);
-}
-
-/* === ปุ่มลบทิ้งหมด เหลืออันเดียว === */
-document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
-  if (posts.length <= 1) {
-    alert('มีอยู่แล้วอันเดียวครับ ✅');
-    return;
-  }
-  if (!confirm(`ยืนยัน! จะลบทิ้ง ${posts.length - 1} รายการ เหลือแค่อันล่าสุด?`)) return;
-  
-  // เหลือแค่อันแรก
-  posts = posts.slice(0, 1);
-  savePosts();
-  renderPostList();
-  alert('✅ เสร็จแล้ว — เหลืออันเดียวเรียบร้อย');
-});
-
-function openDelModal(idx) {
-  delIndex = idx;
-  purgeMode = false;
-  document.getElementById('modalTitle').textContent = '⚠️ ลบรายการนี้';
-  document.getElementById('modalNote').textContent = 'ลบแล้วไม่สามารถกู้คืนได้';
-  document.getElementById('delModal').style.display = 'flex';
-}
-
-document.getElementById('cancelDel').addEventListener('click', () => {
-  delIndex = -1;
-  document.getElementById('delModal').style.display = 'none';
-});
-
-document.getElementById('confirmDel').addEventListener('click', () => {
-  if (delIndex > -1) {
-    posts.splice(delIndex, 1);
-    savePosts();
-    renderPostList();
-  }
-  delIndex = -1;
-  document.getElementById('delModal').style.display = 'none';
-});
-
-/* --- ส่วนที่เหลือเหมือนเดิม --- */
 const fileInput = document.getElementById('fileInput');
 fileInput.addEventListener('change', async e => {
   selectedFile = e.target.files[0];
   if (!selectedFile) return;
+
   const isVideo = selectedFile.type.startsWith('video/');
   const sizeMB = (selectedFile.size / 1024 / 1024).toFixed(1);
+  
   document.getElementById('pName').textContent = selectedFile.name;
   document.getElementById('pSize').textContent = `${sizeMB} MB`;
-  document.getElementById('pSizeCheck').textContent = parseFloat(sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน';
+  document.getElementById('pSizeCheck').textContent = 
+    parseFloat(sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน';
   document.getElementById('previewBox').style.display = 'block';
 
   if (isVideo) {
     const v = document.createElement('video');
     v.src = URL.createObjectURL(selectedFile);
-    await new Promise(r => { v.onloadedmetadata = r; });
+    await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; });
     document.getElementById('pDur').textContent = formatTime(v.duration);
-    document.getElementById('pRatio').textContent = v.videoWidth > v.videoHeight ? '16:9' : '9:16';
+    document.getElementById('pRatio').textContent = 
+      v.videoWidth > v.videoHeight ? '16:9' : '9:16';
     URL.revokeObjectURL(v.src);
   } else {
     const img = new Image();
     img.src = URL.createObjectURL(selectedFile);
-    await new Promise(r => { img.onload = r; });
+    await new Promise(r => { img.onload = r; img.onerror = r; });
     document.getElementById('pDur').textContent = '-';
-    document.getElementById('pRatio').textContent = img.width > img.height ? '16:9' : '9:16';
+    document.getElementById('pRatio').textContent = 
+      img.width > img.height ? '16:9' : '9:16';
     URL.revokeObjectURL(img.src);
   }
 });
@@ -580,9 +704,16 @@ document.getElementById('optCustom').addEventListener('click', () => {
 });
 
 document.getElementById('doUpload').addEventListener('click', async () => {
-  if (!selectedFile) { showStatus('⚠️ เลือกไฟล์ก่อน', 'error'); return; }
+  if (!selectedFile) {
+    showStatus('⚠️ เลือกไฟล์ก่อน', 'error');
+    return;
+  }
+
   const sizeMB = (selectedFile.size / 1024 / 1024).toFixed(1);
-  if (parseFloat(sizeMB) > MAX_MB) { showStatus(`⚠️ ไฟล์ใหญ่เกิน ${MAX_MB}MB`, 'error'); return; }
+  if (parseFloat(sizeMB) > MAX_MB) {
+    showStatus(`⚠️ ไฟล์ใหญ่เกิน ${MAX_MB}MB`, 'error');
+    return;
+  }
 
   showStatus('⏳ กำลังอัปโหลด...', 'info');
   document.getElementById('progWrap').style.display = 'block';
@@ -591,49 +722,78 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   const formData = new FormData();
   formData.append('file', selectedFile);
   formData.append('upload_preset', UPLOAD_PRESET);
+
   const resourceType = selectedFile.type.startsWith('video/') ? 'video' : 'image';
 
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, true);
-  xhr.upload.onprogress = e => {
-    if (e.lengthComputable) {
-      const pct = Math.round((e.loaded / e.total) * 100);
-      document.getElementById('progFill').style.width = `${pct}%`;
-    }
-  };
-  xhr.onload = function () {
-    document.getElementById('progWrap').style.display = 'none';
-    if (xhr.status === 200) {
-      const res = JSON.parse(xhr.responseText);
-      const soundMode = document.getElementById('optOrig').classList.contains('selected') ? 'original' : 'custom';
-      const soundName = soundMode === 'custom' ? document.getElementById('customSoundInput').value.trim() : '';
-      const soundLabel = soundMode === 'original' ? 'เสียงต้นฉบับ' : `เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, true);
 
-      const newPost = {
-        id: res.public_id, url: res.secure_url, type: resourceType,
-        name: selectedFile.name, sizeMB,
-        width: res.width || 0, height: res.height || 0, duration: res.duration || 0,
-        soundMode, soundName, soundLabel,
-        time: new Date().toLocaleString('th-TH'), isoTime: new Date().toISOString()
-      };
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        document.getElementById('progFill').style.width = `${pct}%`;
+        if (pct < 100) showStatus(`⏳ กำลังส่ง... ${pct}%`, 'info');
+      }
+    };
 
-      loadPosts();
-      posts.unshift(newPost);
-      savePosts();
+    xhr.onload = function () {
+      document.getElementById('progWrap').style.display = 'none';
+      
+      if (xhr.status === 200) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          
+          const soundMode = document.getElementById('optOrig').classList.contains('selected') 
+            ? 'original' : 'custom';
+          const soundName = soundMode === 'custom' 
+            ? document.getElementById('customSoundInput').value.trim() : '';
+          const soundLabel = soundMode === 'original' 
+            ? 'เสียงต้นฉบับ' : `เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
 
-      showStatus('✅ เผยแพร่สำเร็จ!', 'success');
-      displayPost(newPost, 0);
-      resetUploadForm();
-      setTimeout(() => showPage('profile'), 1500);
-    } else {
-      showStatus(`❌ ไม่สำเร็จ (${xhr.status})`, 'error');
-    }
-  };
-  xhr.onerror = () => {
-    document.getElementById('progWrap').style.display = 'none';
-    showStatus('❌ ไม่มีการเชื่อมต่อ', 'error');
-  };
-  xhr.send(formData);
+          const newPost = {
+            id: res.public_id,
+            url: res.secure_url,
+            type: resourceType,
+            name: selectedFile.name,
+            sizeMB,
+            width: res.width || 0,
+            height: res.height || 0,
+            duration: res.duration || 0,
+            soundMode,
+            soundName,
+            soundLabel,
+            time: new Date().toLocaleString('th-TH'),
+            isoTime: new Date().toISOString()
+          };
+
+          loadPosts();
+          posts.unshift(newPost);
+          savePosts();
+
+          showStatus('✅ เผยแพร่สำเร็จ! กำลังอัปเดตรายการ...', 'success');
+          
+          displayPost(newPost, 0);
+          resetUploadForm();
+          
+          setTimeout(() => showPage('profile'), 1500);
+        } catch (err) {
+          showStatus(`❌ ผิดพลาด: ${err.message}`, 'error');
+        }
+      } else {
+        showStatus(`❌ ไม่สำเร็จ (โค้ด: ${xhr.status})`, 'error');
+      }
+    };
+
+    xhr.onerror = () => {
+      document.getElementById('progWrap').style.display = 'none';
+      showStatus('❌ ไม่มีการเชื่อมต่อ', 'error');
+    };
+
+    xhr.send(formData);
+  } catch (err) {
+    showStatus(`❌ ผิดพลาด: ${err.message}`, 'error');
+  }
 });
 
 function displayPost(post, index) {
@@ -644,22 +804,29 @@ function displayPost(post, index) {
   if (post.type === 'video') {
     const video = document.createElement('video');
     video.src = post.url;
-    video.controls = true; video.autoplay = true; video.muted = false;
-    video.loop = true; video.playsInline = true;
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = false;
+    video.loop = true;
+    video.playsInline = true;
     area.appendChild(video);
   } else {
     const img = document.createElement('img');
-    img.src = post.url; img.alt = post.name;
+    img.src = post.url;
+    img.alt = post.name;
     area.appendChild(img);
   }
 
   document.getElementById('topInfo').style.display = 'block';
   document.getElementById('descText').textContent = post.name.replace(/\.[^.]+$/, '');
+  
   document.getElementById('soundLine').innerHTML = 
     post.soundMode === 'original' 
       ? `<span class="sound-orig">🔊 ${post.soundLabel}</span>`
       : `<span class="sound-custom">✨ ${post.soundLabel}</span>`;
-  const ratio = post.width && post.height ? (post.width > post.height ? '16:9' : '9:16') : '-';
+
+  const ratio = post.width && post.height 
+    ? (post.width > post.height ? '16:9' : '9:16') : '-';
   document.getElementById('fileMetaBox').innerHTML = `
     ชื่อไฟล์: ${post.name}<br>
     ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
@@ -667,6 +834,146 @@ function displayPost(post, index) {
     อัตราส่วน: <span class="ratio">${ratio}</span>
   `;
   document.getElementById('fileMetaBox').style.display = 'block';
+}
+
+/* === บังคับแสดงทุกรายการ — ไม่ข้าม ไม่ซ่อน === */
+function renderPostList() {
+  const list = document.getElementById('postListContainer');
+  const noPostText = document.getElementById('noPostText');
+  
+  document.getElementById('postTotal').textContent = posts.length;
+  
+  if (!posts.length) {
+    list.innerHTML = '';
+    noPostText.style.display = 'block';
+    updateDebugInfo('📋 ไม่มีรายการที่จะแสดง');
+    return;
+  }
+  
+  noPostText.style.display = 'none';
+  updateDebugInfo(`📋 กำลังแสดง: ${posts.length} รายการ — กำลังสร้าง...`);
+
+  let html = '';
+  
+  // วนลูปทุกอัน บังคับสร้างทุกแถว
+  for (let i = 0; i < posts.length; i++) {
+    const p = posts[i];
+    const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+    const isOk = parseFloat(p.sizeMB) <= MAX_MB;
+    const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
+    
+    // เอาลิงก์ตรงจาก post.url เลย — ไม่ผ่านตัวกลาง
+    const thumbUrl = p.url;
+    
+    html += `
+      <div class="post-item">
+        <div class="post-thumb" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
+          <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
+               onerror="this.src='https://i.imgur.com/9Z7w8xY.png'; this.alt='ไม่มีรูป';">
+        </div>
+        <div class="post-info">
+          <div>
+            <div class="post-title" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
+              ${p.name.replace(/\.[^.]+$/, '')}
+            </div>
+            <div class="post-sound ${soundClass}">
+              ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
+            </div>
+            <div class="post-meta">
+              📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
+              ⏱️ ${formatTime(p.duration)} | 📐 <span class="ratio">${ratio}</span><br>
+              📅 ${p.time}
+            </div>
+          </div>
+          <button class="post-del-btn" onclick="openDelModal(${i})">
+            <i class="fa-solid fa-trash"></i> ลบ
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  list.innerHTML = html;
+  updateDebugInfo(`✅ แสดงผลครบ: ${posts.length} รายการแล้ว`);
+  console.log(`✅ แสดงผลครบ: ${posts.length} รายการแล้ว`);
+}
+
+function openDelModal(idx) {
+  delIndex = idx;
+  document.getElementById('delModal').style.display = 'flex';
+}
+document.getElementById('cancelDel').addEventListener('click', () => {
+  delIndex = -1;
+  document.getElementById('delModal').style.display = 'none';
+});
+document.getElementById('confirmDel').addEventListener('click', () => {
+  if (delIndex > -1) {
+    posts.splice(delIndex, 1);
+    savePosts();
+    renderPostList();
+  }
+  delIndex = -1;
+  document.getElementById('delModal').style.display = 'none';
+});
+
+document.querySelectorAll('.insight-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('tab' + tab.dataset.tab).classList.remove('hidden');
+  });
+});
+
+function renderInsight() {
+  document.getElementById('pTotal').textContent = posts.length;
+  
+  if (!posts.length) {
+    document.getElementById('insightNote').textContent = 'ยังไม่มีโพสต์';
+    document.getElementById('startDateVal').textContent = '-';
+    document.getElementById('viewTotal').textContent = '0';
+    document.getElementById('chartAreaBox').innerHTML = '<span style="color:#9ca3af; font-size:11px;">ไม่มีข้อมูล</span>';
+    return;
+  }
+
+  let earliest = null;
+  posts.forEach(p => {
+    if (p.isoTime) {
+      const d = new Date(p.isoTime);
+      if (!isNaN(d.getTime()) && (!earliest || d < earliest)) earliest = d;
+    }
+  });
+
+  document.getElementById('startDateVal').textContent = earliest 
+    ? earliest.toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'numeric' }) 
+    : '-';
+
+  const totalViews = posts.length * 12 + Math.floor(Math.random() * 30);
+  document.getElementById('viewTotal').textContent = totalViews;
+
+  const totalSec = posts.reduce((s, p) => s + (p.duration || 0), 0);
+  const avgSec = posts.length ? (totalSec / posts.length).toFixed(1) : 0;
+  document.getElementById('avgWatch').textContent = `${avgSec} วินาที`;
+
+  document.getElementById('insightNote').textContent = `รวม ${posts.length} รายการ`;
+
+  const chartData = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    chartData.push({
+      label: d.getDate(),
+      value: Math.floor(Math.random() * Math.max(5, totalViews / 4))
+    });
+  }
+  const maxVal = Math.max(...chartData.map(d => d.value)) || 1;
+  document.getElementById('chartAreaBox').innerHTML = chartData.map(d => {
+    const h = Math.max(4, (d.value / maxVal) * 100);
+    return `<div class="chart-col">
+      <div class="chart-bar" style="height:${h}%;"></div>
+      <span class="chart-lbl">${d.label}</span>
+    </div>`;
+  }).join('');
 }
 
 function formatTime(sec) {
@@ -681,7 +988,9 @@ function showStatus(text, type) {
   el.textContent = text;
   el.className = `status-line status-${type}`;
   el.style.display = 'block';
-  if (type !== 'info') setTimeout(() => el.style.display = 'none', 4000);
+  if (type !== 'info') {
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
 }
 
 function resetUploadForm() {
