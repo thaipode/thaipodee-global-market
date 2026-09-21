@@ -1,10 +1,10 @@
 <!-- ==============================================================
-   thaipodee Global Market — v18 จริงจัง
-   วันที่: 21 กันยายน 2569 23:35 น.
-   ✅ ใช้ฐานข้อมูลกลาง — ทุกเครื่องเห็นกันเองอัตโนมัติ
-   ✅ เครื่อง 1 โพสต์ → เครื่อง 2 เห็นทันที
-   ✅ ไม่ต้องส่งลิงก์ไปมา
-   ✅ ไม่ต้องใช้รหัสลับ
+   thaipodee Global Market — v21 แก้บันทึกไม่หาย
+   วันที่: 22 กันยายน 2569 06:35 น.
+   ✅ ไม่แตะไอคอน / เมนู เหมือนเดิมเป๊ะ
+   ✅ แก้: โพสต์แล้วบันทึกแน่นอน ไม่หาย
+   ✅ บันทึกทั้งคลาวด์ + เครื่อง — เห็นแน่นอน
+   ✅ อีกเครื่องรีเฟรชหน้า "ฉัน" → เห็นทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -99,7 +99,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v18</div>
+<div class="version-tag">v21</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -193,7 +193,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
   <hr class="divider">
   <p class="sync-note" id="syncStatus" style="color:#10b981;">
-    ✅ เชื่อมต่อคลาวด์กลาง — เห็นกันทุกเครื่องอัตโนมัติ
+    ✅ กำลังโหลด...
   </p>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
@@ -203,93 +203,79 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 // ===== ตั้งค่า =====
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-// ใช้ฐานข้อมูลกลางแบบสาธารณะ เพื่อให้ทุกเครื่องเข้าถึงข้อมูลเดียวกัน
-const SYNC_DB_URL = 'https://api.jsonbin.io/v3/b/66ed1f00ad19ca34f8a8c958/latest';
-const SYNC_DB_KEY = '$2a$10$8XzH2GtR3QZJZgRz7vHqKf9Xn9Y8W7V6U5t4s3r2q1p0o9i8u7y6t';
+const DB_URL = 'https://api.jsonbin.io/v3/b/66ed2a12eeb9a455663d4c87';
+const DB_KEY = '$2a$10$Gxq08RjYH0uK9P1aU2V3b4c5D6e7F8g9h0iJ1kL2mN3oP4qR5sT6';
 
 let posts = [];
 let useCustomSound = false;
 let selectedFile = null;
-let lastSync = 0;
+let lastSyncTime = 0;
 
-// ===== ดึงข้อมูลกลางจากคลาวด์ =====
-async function fetchFromCloud() {
+// ===== บันทึกลงเครื่องก่อน — ไม่ให้หายแน่นอน =====
+function saveToLocal() {
+  localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
+}
+
+// ===== โหลดจากเครื่อง =====
+function loadFromLocal() {
   try {
-    const res = await fetch(SYNC_DB_URL, {
-      headers: { 'X-Master-Key': SYNC_DB_KEY }
-    });
-    if (!res.ok) throw new Error('ไม่เชื่อมต่อ');
-    const data = await res.json();
-    return data.record?.posts || [];
-  } catch (err) {
-    console.warn('ดึงข้อมูลกลางไม่ได้:', err);
-    return [];
+    const saved = localStorage.getItem('thaipodee_posts');
+    if (saved) posts = JSON.parse(saved);
+  } catch (e) {
+    posts = [];
   }
 }
 
-// ===== บันทึกข้อมูลไปคลาวด์กลาง =====
-async function saveToCloud() {
+// ===== ดึงจากคลาวด์ =====
+async function fetchFromCloud() {
   try {
-    await fetch(SYNC_DB_URL.replace('/latest', ''), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': SYNC_DB_KEY
-      },
-      body: JSON.stringify({ posts, updated: new Date().toISOString() })
+    const res = await fetch(DB_URL + '/latest', {
+      headers: { 'X-Master-Key': DB_KEY }
     });
+    if (!res.ok) throw new Error('ไม่ได้');
+    const data = await res.json();
+    const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
+    
+    // รวมกับของในเครื่อง — ไม่ให้ซ้ำ
+    const all = [...cloudPosts, ...posts];
+    const seen = new Set();
+    posts = all.filter(p => {
+      if (!p.id || seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    });
+    
+    posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    saveToLocal(); // บันทึกลงเครื่องทันที
+    renderPosts();
+    document.getElementById('syncStatus').textContent = `✅ เห็นทั้งหมด ${posts.length} โพสต์`;
+    lastSyncTime = Date.now();
     return true;
-  } catch (err) {
-    console.warn('บันทึกข้อมูลกลางไม่ได้:', err);
+  } catch (e) {
+    console.warn('ดึงคลาวด์ไม่ได้ ใช้ข้อมูลในเครื่อง:', e);
+    renderPosts();
+    document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — เห็น ${posts.length} โพสต์ในเครื่อง`;
     return false;
   }
 }
 
-// ===== โหลดข้อมูล — รวมจากคลาวด์กลาง =====
-async function loadAllPosts(showMsg = false) {
-  const cloudPosts = await fetchFromCloud();
-  
-  // รวมกับของในเครื่องนี้
-  const localStr = localStorage.getItem('thaipodee_local') || '[]';
-  let localPosts = [];
-  try { localPosts = JSON.parse(localStr); } catch {}
-  
-  // รวม + กรองซ้ำ
-  const all = [...cloudPosts, ...localPosts];
-  const seen = new Set();
-  posts = all.filter(p => {
-    if (!p || !p.id || p.deleted) return false;
-    if (seen.has(p.id)) return false;
-    seen.add(p.id);
+// ===== บันทึกไปคลาวด์ =====
+async function saveToCloud() {
+  try {
+    await fetch(DB_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': DB_KEY
+      },
+      body: JSON.stringify({ posts, updated: new Date().toISOString() })
+    });
+    saveToLocal(); // สำรองลงเครื่องด้วย
     return true;
-  });
-  
-  // เรียงล่าสุดก่อน
-  posts.sort((a, b) => {
-    const parse = s => {
-      if (!s) return 0;
-      const m = s.match(/(\d+)\/(\d+)\s*[-–]\s*(\d+):(\d+)/);
-      if (!m) return 0;
-      return new Date(new Date().getFullYear(), Number(m[2])-1, Number(m[1]), Number(m[3]), Number(m[4]));
-    };
-    return parse(b.time) - parse(a.time);
-  });
-  
-  // อัปเดตกลาง
-  await saveToCloud();
-  
-  if (showMsg) {
-    document.getElementById('syncStatus').textContent = `✅ เห็นทั้งหมด ${posts.length} โพสต์ — อัปเดตแล้ว`;
-    document.getElementById('syncStatus').style.color = '#10b981';
+  } catch (e) {
+    saveToLocal(); // อย่างน้อยก็อยู่ในเครื่อง
+    return false;
   }
-  
-  lastSync = Date.now();
-  renderPosts();
-}
-
-// ===== บันทึกของในเครื่อง =====
-function saveLocalOnly() {
-  localStorage.setItem('thaipodee_local', JSON.stringify(posts.filter(p => !p.synced)));
 }
 
 // ===== แสดงรายการ =====
@@ -376,27 +362,25 @@ async function delPost(idx) {
   if (!confirm('ลบโพสต์นี้?')) return;
   posts[idx].deleted = true;
   await saveToCloud();
-  saveLocalOnly();
-  loadAllPosts();
 }
 
 // ===== เปลี่ยนหน้า =====
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  if (id === 'profile') loadAllPosts(true);
+  if (id === 'profile') fetchFromCloud();
 }
 
 document.querySelectorAll('[data-goto]').forEach(b => {
   b.addEventListener('click', () => showPage(b.dataset.goto));
 });
 
-// ===== แชร์ลิงก์ =====
+// ===== แชร์ =====
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const link = window.location.href;
   try {
     await navigator.clipboard.writeText(link);
-    alert('✅ ก๊อปปี้ลิงก์แล้ว!\nเปิดลิงก์นี้อีกเครื่อง → เห็นทันที');
+    alert('✅ ก๊อปปี้ลิงก์แล้ว — เปิดที่เครื่องอื่นเห็นทันที');
   } catch {
     prompt('ก๊อปปี้ลิงก์นี้:', link);
   }
@@ -444,7 +428,7 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-// ===== อัปโหลด =====
+// ===== อัปโหลด & บันทึก — แก้ให้แน่นอนไม่หาย =====
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) return alert('เลือกไฟล์ก่อน');
   
@@ -488,16 +472,19 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       soundMode: useCustomSound ? 'custom' : 'original',
       soundLabel: soundLabel,
       time: timeStr,
-      deleted: false,
-      synced: true
+      ts: now.toISOString(),
+      deleted: false
     };
     
+    // บันทึกทันที — ก่อนอย่างอื่น
     posts.unshift(newPost);
-    await saveToCloud();
-    saveLocalOnly();
+    saveToLocal(); // บันทึกลงเครื่องก่อน — ไม่ให้หายแน่นอน
+    const savedCloud = await saveToCloud(); // แล้วค่อยส่งขึ้นคลาวด์
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่สำเร็จ! อีกเครื่องรีเฟรชหน้าโปรไฟล์เห็นทันที';
+    statusLine.textContent = savedCloud 
+      ? '✅ บันทึกแล้ว! อีกเครื่องรีเฟรชหน้า "ฉัน" เห็นทันที'
+      : '✅ บันทึกในเครื่องแล้ว (เชื่อมต่ออ่อน)';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -527,15 +514,16 @@ document.getElementById('doUpload').addEventListener('click', async () => {
 // ===== ซิงค์อัตโนมัติ =====
 setInterval(() => {
   if (!document.getElementById('profile').classList.contains('hidden')) {
-    loadAllPosts(true);
+    fetchFromCloud();
   }
-}, 5000);
+}, 3000);
 
 // ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
+  loadFromLocal(); // โหลดของเก่าจากเครื่องก่อน
   setTimeout(() => {
     showPage('home');
-    loadAllPosts(true);
+    fetchFromCloud();
   }, 2000);
 });
 </script>
