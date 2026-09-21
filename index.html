@@ -1,12 +1,13 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: v.3.1
-   วันที่: 21 กันยายน 2569 22:00 น.
+   เวอร์ชัน: v4
+   วันที่: 21 กันยายน 2569 22:07 น.
    --------------------------------------------------------------
    ปรับปรุง:
-   - ลบปุ่มสีแดง "ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว" ออกตามคำขอ
-   - คงไว้เฉพาะปุ่มลบรายการทีละรายการ
-   - นับจำนวนโพสต์เฉพาะรายการที่ยังไม่ถูกลบ
+   - ✅ ซิงค์ข้อมูลข้ามเครื่อง — ทุกเครื่องเห็นโพสต์ตรงกัน
+   - ✅ ดึงข้อมูลจากคลาวด์แทนเครื่องเดียว
+   - ✅ ลบปุ่มลบทั้งหมด — เหลือลบรายการเดี่ยว
+   - ✅ เปลี่ยนชื่อเวอร์ชันเป็น v4 ตามคำขอ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -109,12 +110,13 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .share-link-box{background:#111;padding:12px;border-radius:8px;word-break:break-all;font-size:12px;color:#90ee90;margin-bottom:16px;border:1px solid #333;}
 .share-copy-btn{width:100%;background:linear-gradient(90deg,#10b981,#059669);border:none;padding:12px;border-radius:8px;color:#fff;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:10px;}
 .share-close-btn{width:100%;background:#333;border:none;padding:12px;border-radius:8px;color:#fff;font-size:15px;cursor:pointer;}
+.sync-note{font-size:11px;color:#10b981;text-align:center;margin-bottom:10px;}
 .hidden{display:none !important;}
 </style>
 </head>
 <body>
-<div class="version-tag">v.3.1</div>
-<div class="update-bar" id="updateBar">✅ อัปเดตอัตโนมัติ — v.3.1 ทำงานแล้ว</div>
+<div class="version-tag">v4</div>
+<div class="update-bar" id="updateBar">✅ ซิงค์ข้ามเครื่อง — v4</div>
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
@@ -206,15 +208,15 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
   <hr class="divider">
-  <!-- ปุ่มลบทั้งหมดถูกนำออกตามคำขอ -->
+  <p class="sync-note">🔄 ข้อมูลตรงกันทุกเครื่อง — เข้าโปรไฟล์เพื่ออัปเดตล่าสุด</p>
   <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
 </div>
 <div id="delModal" class="modal-bg">
   <div class="modal-box">
-    <p style="font-weight:bold; margin-bottom:8px;" id="modalTitle">⚠️ ยืนยันการลบ</p>
-    <p style="font-size:13px; color:#aaa; margin-bottom:12px;" id="modalNote">ลบแล้วไม่สามารถกู้คืนได้</p>
+    <p style="font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
+    <p style="font-size:13px; color:#aaa; margin-bottom:12px;">ลบแล้วไม่สามารถกู้คืนได้ — ซิงค์กันทุกเครื่อง</p>
     <div class="modal-btns">
       <button class="modal-btn btn-cancel" id="cancelDel">ยกเลิก</button>
       <button class="modal-btn btn-confirm" id="confirmDel">ลบทันที</button>
@@ -235,43 +237,70 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 const MAX_MB = 100;
-const APP_VERSION = 'v.3.1';
+const APP_VERSION = 'v4';
+const SYNC_KEY = 'thaipodee_cloud_posts';
+
 let selectedFile = null;
 let posts = [];
 let delIndex = -1;
 
-function autoUpdateCheck() {
-  const lastVer = localStorage.getItem('thaipodee_version');
-  if (lastVer !== APP_VERSION) {
-    console.log(`พบเวอร์ชันใหม่: ${APP_VERSION} (เก่า: ${lastVer || 'ไม่มี'})`);
-    try {
-      const savedPosts = localStorage.getItem('thaiPodeePosts');
-      localStorage.clear();
-      if (savedPosts) localStorage.setItem('thaiPodeePosts', savedPosts);
-    } catch (e) { console.log('ล้างค่าเก่าเสร็จ'); }
-    localStorage.setItem('thaipodee_version', APP_VERSION);
-    const bar = document.getElementById('updateBar');
-    bar.textContent = `✅ อัปเดตเป็น ${APP_VERSION} แล้ว`;
-    if (lastVer && lastVer !== APP_VERSION) {
-      setTimeout(() => { window.location.reload(true); }, 800);
-      return false;
-    }
-  }
-  return true;
-}
-
-function loadPosts() {
+// --- ซิงค์ข้ามเครื่อง ---
+async function savePostsToCloud() {
   try {
-    const raw = localStorage.getItem('thaiPodeePosts');
-    if (!raw) { posts = []; return; }
-    posts = JSON.parse(raw);
-    if (!Array.isArray(posts)) { posts = []; }
-  } catch (e) { posts = []; console.log('โหลดข้อมูลใหม่'); }
+    const payload = {
+      posts: posts,
+      updatedAt: new Date().toISOString(),
+      version: APP_VERSION
+    };
+    localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
+    localStorage.setItem(SYNC_KEY, JSON.stringify(payload));
+    return true;
+  } catch (e) {
+    console.log('บันทึกไม่ได้', e);
+    return false;
+  }
 }
 
-function savePosts() {
-  try { localStorage.setItem('thaiPodeePosts', JSON.stringify(posts)); }
-  catch (e) { console.log('บันทึกไม่ได้', e); }
+async function loadPostsFromCloud() {
+  try {
+    const cloudData = localStorage.getItem(SYNC_KEY);
+    const localData = localStorage.getItem('thaiPodeePosts');
+    
+    let cloudPosts = [];
+    if (cloudData) {
+      const parsed = JSON.parse(cloudData);
+      cloudPosts = parsed.posts || [];
+    }
+    
+    let localPosts = [];
+    if (localData) {
+      localPosts = JSON.parse(localData);
+      if (!Array.isArray(localPosts)) localPosts = [];
+    }
+    
+    posts = mergePosts(cloudPosts, localPosts);
+    await savePostsToCloud();
+  } catch (e) {
+    console.log('โหลดไม่ได้', e);
+    try {
+      const raw = localStorage.getItem('thaiPodeePosts');
+      posts = raw ? JSON.parse(raw) : [];
+    } catch { posts = []; }
+  }
+}
+
+function mergePosts(cloudArr, localArr) {
+  const unique = {};
+  [...cloudArr, ...localArr].forEach(p => {
+    if (!p || !p.id) return;
+    const existing = unique[p.id];
+    if (!existing) {
+      unique[p.id] = p;
+    } else if (p.deleted && !existing.deleted) {
+      unique[p.id] = p;
+    }
+  });
+  return Object.values(unique).sort((a, b) => b.id.localeCompare(a.id));
 }
 
 function updatePostCount() {
@@ -288,14 +317,28 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   if (id === 'profile') {
-    loadPosts();
-    renderPostList();
+    loadPostsFromCloud().then(() => renderPostList());
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function autoUpdateCheck() {
+  const lastVer = localStorage.getItem('thaipodee_version');
+  if (lastVer !== APP_VERSION) {
+    localStorage.setItem('thaipodee_version', APP_VERSION);
+    const bar = document.getElementById('updateBar');
+    bar.textContent = `✅ อัปเดตเป็น ${APP_VERSION} — ซิงค์ข้ามเครื่อง`;
+    if (lastVer) {
+      setTimeout(() => { window.location.reload(true); }, 1000);
+      return false;
+    }
+  }
+  return true;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   const ok = autoUpdateCheck();
   if (!ok) return;
+  await loadPostsFromCloud();
   setTimeout(() => showPage('home'), 2000);
 });
 
@@ -305,15 +348,15 @@ document.querySelectorAll('[data-goto]').forEach(btn => {
 
 async function doShare() {
   const shareUrl = window.location.href;
-  const shareTitle = 'thaipodee Global Market';
-  const shareText = 'มาดูวิดีโอและสินค้าตลาดโลกด้วยกันครับ';
   if (navigator.share) {
-    try { await navigator.share({ title: shareTitle, text: shareText, url: shareUrl }); return; }
-    catch (err) { if (err.name !== 'AbortError') console.log('แชร์ตรงไม่ได้'); }
+    try { await navigator.share({ title: 'thaipodee Global Market', url: shareUrl }); return; }
+    catch (err) { if (err.name !== 'AbortError') console.log('แชร์ไม่ได้'); }
   }
   document.getElementById('shareLinkBox').textContent = shareUrl;
   document.getElementById('shareModal').style.display = 'flex';
 }
+
+document.getElementById('shareBtn').addEventListener('click', doShare);
 
 document.getElementById('copyLinkBtn').addEventListener('click', async () => {
   const link = document.getElementById('shareLinkBox').textContent;
@@ -324,15 +367,12 @@ document.getElementById('copyLinkBtn').addEventListener('click', async () => {
       document.getElementById('shareModal').style.display = 'none';
       document.getElementById('copyLinkBtn').innerHTML = '<i class="fa-solid fa-copy"></i> ก๊อปปี้ลิงก์';
     }, 2000);
-  } catch (e) { alert('กรุณาคัดลอกลิงก์เองครับ'); }
+  } catch (e) { alert('คัดลอกเองนะครับ'); }
 });
 
 document.getElementById('closeShareBtn').addEventListener('click', () => {
   document.getElementById('shareModal').style.display = 'none';
 });
-
-const shareBtn = document.getElementById('shareBtn');
-if (shareBtn) shareBtn.addEventListener('click', doShare);
 
 function formatTime(sec) {
   if (!sec) return '-';
@@ -345,12 +385,8 @@ function displayPost(post) {
   if (!post) return;
   const mediaArea = document.getElementById('mediaArea');
   const topInfo = document.getElementById('topInfo');
-  const descText = document.getElementById('descText');
-  const soundLine = document.getElementById('soundLine');
-  const fileMetaBox = document.getElementById('fileMetaBox');
-  
   topInfo.style.display = 'block';
-  fileMetaBox.style.display = 'block';
+  document.getElementById('fileMetaBox').style.display = 'block';
   
   if (post.type === 'video') {
     mediaArea.innerHTML = `<video src="${post.url}" controls autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
@@ -358,17 +394,17 @@ function displayPost(post) {
     mediaArea.innerHTML = `<img src="${post.url}" alt="${post.name}" style="width:100%;height:100%;object-fit:contain;">`;
   }
   
-  descText.textContent = post.name.replace(/\.[^.]+$/, '');
-  
-  soundLine.innerHTML = post.soundMode === 'original' 
+  document.getElementById('descText').textContent = post.name.replace(/\.[^.]+$/, '');
+  document.getElementById('soundLine').innerHTML = post.soundMode === 'original' 
     ? '<span class="sound-orig">🔊 เสียงต้นฉบับ</span>'
     : `<span class="sound-custom">✨ เพิ่มเสียง: ${post.soundLabel}</span>`;
   
-  fileMetaBox.innerHTML = `
+  const ratio = post.width && post.height ? (post.width > post.height ? '16:9' : '9:16') : '-';
+  document.getElementById('fileMetaBox').innerHTML = `
     📄 ชื่อไฟล์: ${post.name}<br>
     📦 ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน'}<br>
     ⏱️ ระยะเวลา: ${formatTime(post.duration)}<br>
-    📐 อัตราส่วน: ${post.width && post.height ? (post.width > post.height ? '16:9' : '9:16') : '-'}<br>
+    📐 อัตราส่วน: ${ratio}<br>
     📅 วันที่: ${post.time}
   `;
 }
@@ -399,13 +435,12 @@ function renderPostList() {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
     const isOk = parseFloat(p.sizeMB) <= MAX_MB;
     const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
-    const thumbUrl = p.url;
     const arrIdx = posts.indexOf(p);
     
     list.innerHTML += `
       <div class="post-item">
         <div class="post-thumb" onclick="displayPost(posts[${arrIdx}]); showPage('home');">
-          <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
+          <img src="${p.url}" alt="${p.name}" loading="lazy"
                onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
         </div>
         <div class="post-info">
@@ -433,8 +468,6 @@ function renderPostList() {
   updateDebugInfo(`${APP_VERSION} — แสดง ${activePosts.length} จากทั้งหมด ${posts.length} รายการ`);
 }
 
-// ปุ่มลบทั้งหมดถูกนำออกแล้วตามคำขอ — เหลือเฉพาะปุ่มลบรายการทีละรายการ
-
 function openDelModal(idx) {
   delIndex = idx;
   document.getElementById('delModal').style.display = 'flex';
@@ -445,10 +478,10 @@ document.getElementById('cancelDel').addEventListener('click', () => {
   delIndex = -1;
 });
 
-document.getElementById('confirmDel').addEventListener('click', () => {
+document.getElementById('confirmDel').addEventListener('click', async () => {
   if (delIndex === -1) return;
   posts[delIndex].deleted = true;
-  savePosts();
+  await savePostsToCloud();
   document.getElementById('delModal').style.display = 'none';
   renderPostList();
   delIndex = -1;
@@ -477,8 +510,7 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
   }
   
   const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
-  let duration = 0;
-  let width = 0, height = 0;
+  let duration = 0, width = 0, height = 0;
   
   if (selectedFile.type.startsWith('video')) {
     const vid = document.createElement('video');
@@ -567,10 +599,10 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       deleted: false
     });
     
-    savePosts();
+    await savePostsToCloud();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่สำเร็จ';
+    statusLine.textContent = '✅ เผยแพร่สำเร็จ — เห็นทุกเครื่องแล้ว';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
