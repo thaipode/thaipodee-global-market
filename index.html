@@ -1,21 +1,12 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: v.3
-   วันที่: 21 กันยายน 2569 21:37 น.
+   เวอร์ชัน: v.3.1
+   วันที่: 21 กันยายน 2569 22:00 น.
    --------------------------------------------------------------
-   ปัญหา:
-   - จำนวนโพสต์แสดงไม่ตรงกับความเป็นจริง
-   - แสดงเลขทั้งหมดที่เคยโพสต์ ไม่หักรายการที่ลบไปแล้ว
-   - ก่อนหน้านี้โค้ดขาดส่วนท้าย ทำให้หน้าจอว่างเปล่า
-   
-   สาเหตุ:
-   - ใช้ posts.length นับทุกรายการ ไม่สนใจสถานะการลบ
-   - ส่งโค้ดไม่ครบถ้วน ขาดส่วนปิดท้าย
-   
-   วิธีแก้ไข:
-   1. นับเฉพาะรายการที่ยังไม่ถูกลบ: posts.filter(p => !p.deleted).length
-   2. ส่งโค้ดเต็มทั้งหมด ตั้งแต่ <!DOCTYPE> ถึง </html>
-   3. ทุกจุดที่แสดงจำนวน ใช้สูตรเดียวกันให้ตรงกันเสมอ
+   ปรับปรุง:
+   - ลบปุ่มสีแดง "ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว" ออกตามคำขอ
+   - คงไว้เฉพาะปุ่มลบรายการทีละรายการ
+   - นับจำนวนโพสต์เฉพาะรายการที่ยังไม่ถูกลบ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -92,8 +83,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .stat-num{font-weight:bold;font-size:20px;}
 .stat-label{font-size:11px;color:#888;margin-top:2px;}
 .divider{border:none;border-top:1px solid #333;margin:20px 0;}
-.purge-btn{width:100%;background:#dc2626;color:#fff;border:none;padding:14px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:20px;}
-.purge-btn:active{transform:scale(.98);}
 .debug-info{background:#1a1a1a;border:1px solid #333;padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#facc15;font-weight:bold;}
 .post-item{display:flex;gap:12px;padding:12px;border:2px solid #444;border-radius:10px;margin-bottom:12px;background:#111;min-height:140px;}
 .post-thumb{width:110px;height:140px;background:#222;border-radius:8px;overflow:hidden;flex-shrink:0;border:2px solid #555;cursor:pointer;}
@@ -124,8 +113,8 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </style>
 </head>
 <body>
-<div class="version-tag">v.3</div>
-<div class="update-bar" id="updateBar">✅ อัปเดตอัตโนมัติ — v.3 ทำงานแล้ว</div>
+<div class="version-tag">v.3.1</div>
+<div class="update-bar" id="updateBar">✅ อัปเดตอัตโนมัติ — v.3.1 ทำงานแล้ว</div>
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
@@ -217,9 +206,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
   <hr class="divider">
-  <button class="purge-btn" id="keepOnlyLatestBtn">
-    ⚠️ ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว
-  </button>
+  <!-- ปุ่มลบทั้งหมดถูกนำออกตามคำขอ -->
   <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
@@ -248,7 +235,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 const MAX_MB = 100;
-const APP_VERSION = 'v.3';
+const APP_VERSION = 'v.3.1';
 let selectedFile = null;
 let posts = [];
 let delIndex = -1;
@@ -446,27 +433,7 @@ function renderPostList() {
   updateDebugInfo(`${APP_VERSION} — แสดง ${activePosts.length} จากทั้งหมด ${posts.length} รายการ`);
 }
 
-document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
-  loadPosts();
-  const activeNow = posts.filter(p => !p.deleted);
-  if (activeNow.length <= 1) {
-    alert(`✅ มี ${activeNow.length} รายการแล้ว ตรงกันครับ`);
-    return;
-  }
-  if (!confirm(`เหลือเฉพาะรายการล่าสุด? จะลบอีก ${activeNow.length - 1} รายการ`)) return;
-  
-  let foundLatest = false;
-  posts.forEach(p => {
-    if (!p.deleted) {
-      if (!foundLatest) foundLatest = true;
-      else p.deleted = true;
-    }
-  });
-  
-  savePosts();
-  renderPostList();
-  alert('✅ เหลือ 1 รายการเรียบร้อย');
-});
+// ปุ่มลบทั้งหมดถูกนำออกแล้วตามคำขอ — เหลือเฉพาะปุ่มลบรายการทีละรายการ
 
 function openDelModal(idx) {
   delIndex = idx;
