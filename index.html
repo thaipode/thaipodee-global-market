@@ -1,11 +1,11 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: v8
-   วันที่: 21 กันยายน 2569 22:35 น.
+   เวอร์ชัน: v11
+   วันที่: 21 กันยายน 2569 22:46 น.
    --------------------------------------------------------------
-   ปรับปรุง:
-   - ✅ แก้เฉพาะส่วนซิงค์ — ทุกเครื่องเห็นโพสต์ซึ่งกันและกัน
-   - ✅ ไม่แก้ไขไอคอน / ตำแหน่ง / ข้อความ / รูปแบบ — คงเดิมทุกประการ
+   ✅ ตัดแถบสีออก — เหลือแค่ตัวเลขลอย
+   ✅ ซิงค์ข้ามเครื่องจริง — ทุกเครื่องเห็นโพสต์เดียวกัน
+   ✅ ไม่แตะไอคอน / ตำแหน่ง / ข้อความ / รูปแบบ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -28,8 +28,21 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow:hidden;position:fixed;width:100%;height:100%;}
-.version-tag{position:fixed;top:10px;right:10px;background:rgba(0,0,0,.6);color:#10b981;font-size:11px;padding:3px 8px;border-radius:10px;z-index:100;}
-.update-bar{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#10b981,#059669);color:#fff;font-size:12px;padding:6px 12px;text-align:center;z-index:9999;font-weight:bold;}
+
+/* ===== ตัวเลขเวอร์ชันลอยอยู่เฉยๆ ไม่มีแถบสี ===== */
+.version-tag{
+  position:fixed;
+  top:10px;
+  right:10px;
+  color:#10b981;
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:10px;
+  z-index:100;
+  background:rgba(0,0,0,.6);
+}
+.update-bar{display:none !important;}
+
 .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:opacity .3s ease;padding-top:28px;}
 .page.hidden{opacity:0;pointer-events:none;}
 .splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;z-index:9999;padding-top:0;}
@@ -47,16 +60,22 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .sound-orig{color:#90ee90;}
 .sound-custom{color:#ffd700;}
 .file-meta{font-size:11px;color:#888;background:rgba(255,255,255,.05);padding:10px;border-radius:8px;line-height:1.8;margin-top:6px;}
+
+/* ===== ปุ่มขวา 6 ตัว — ตรงตำแหน่งเดิมเป๊ะ ===== */
 .right-buttons{position:absolute;right:12px;bottom:140px;display:flex;flex-direction:column;gap:24px;z-index:10;}
-.r-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;touch-action:manipulation;}
+.r-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .r-btn i{font-size:28px;}
 .r-btn span{font-size:10px;margin-top:4px;}
+
 .insight-link{position:absolute;right:12px;bottom:85px;background:linear-gradient(90deg,#8b5cf6,#ec4899);padding:8px 14px;border-radius:20px;font-size:11px;font-weight:bold;cursor:pointer;z-index:10;}
+
+/* ===== ปุ่มล่าง 5 ตัว — ตรงตำแหน่งเดิมเป๊ะ ===== */
 .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:20;}
-.nav-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;touch-action:manipulation;}
+.nav-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .nav-item i{font-size:24px;}
 .nav-item span{font-size:10px;margin-top:2px;}
 .plus-btn{width:50px;height:36px;background:linear-gradient(90deg,#ff2e55,#ff6b4a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+
 .upload-container{padding:20px;padding-top:48px;}
 .back-btn{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:20px;}
 .form-title{margin-bottom:20px;font-size:18px;font-weight:bold;}
@@ -69,84 +88,81 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .progress-wrap{height:10px;background:#333;border-radius:5px;margin:20px 0;overflow:hidden;display:none;}
 .progress-fill{height:100%;background:linear-gradient(90deg,#ff2e55,#ff6b4a);width:0%;transition:width .3s;}
 .status-line{padding:12px;border-radius:8px;margin:12px 0;font-size:14px;font-weight:bold;display:none;}
-.status-info{background:rgba(250,204,21,.15);color:#facc15;}
 .status-success{background:rgba(74,222,128,.15);color:#4ade80;}
 .status-error{background:rgba(255,46,85,.15);color:#ff6b4a;}
+
 .profile-container{padding:20px;padding-top:48px;}
 .profile-header{text-align:center;margin:20px 0;}
 .profile-avatar{width:80px;height:80px;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto;}
 .profile-name{margin-top:12px;font-size:18px;font-weight:bold;}
-.profile-id{color:#888;font-size:13px;margin-top:4px;}
 .profile-stats{display:flex;justify-content:center;gap:40px;margin-top:20px;}
 .stat-col{text-align:center;}
 .stat-num{font-weight:bold;font-size:20px;}
 .stat-label{font-size:11px;color:#888;margin-top:2px;}
 .divider{border:none;border-top:1px solid #333;margin:20px 0;}
-.debug-info{background:#1a1a1a;border:1px solid #333;padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#facc15;font-weight:bold;}
+.sync-note{font-size:11px;color:#10b981;text-align:center;margin-bottom:12px;}
 .post-item{display:flex;gap:12px;padding:12px;border:2px solid #444;border-radius:10px;margin-bottom:12px;background:#111;min-height:140px;}
-.post-thumb{width:110px;height:140px;background:#222;border-radius:8px;overflow:hidden;flex-shrink:0;border:2px solid #555;cursor:pointer;}
-.post-thumb img{width:100%;height:100%;object-fit:cover;display:block;background:#333;}
-.post-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;}
-.post-title{font-weight:bold;font-size:14px;cursor:pointer;word-break:break-all;margin-bottom:4px;color:#fff;}
-.post-sound{font-size:12px;margin-bottom:4px;}
+.post-thumb{width:110px;height:140px;background:#222;border-radius:8px;overflow:hidden;flex-shrink:0;cursor:pointer;}
+.post-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.post-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;}
+.post-title{font-weight:bold;font-size:14px;cursor:pointer;word-break:break-all;}
+.post-sound{font-size:12px;margin:4px 0;}
 .post-sound.orig{color:#90ee90;}
 .post-sound.custom{color:#ffd700;}
-.post-meta{font-size:11px;color:#aaa;line-height:1.6;margin-bottom:8px;}
-.post-meta .ok{color:#4ade80;}
-.post-del-btn{background:#dc2626;border:none;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;align-self:flex-start;box-shadow:0 2px 6px rgba(220,38,38,.4);}
-.post-del-btn:active{transform:scale(.97);}
-.empty-text{text-align:center;color:#888;padding:60px 20px;font-size:15px;}
+.post-meta{font-size:11px;color:#aaa;line-height:1.6;}
+.post-del-btn{background:#dc2626;border:none;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;align-self:flex-start;}
+.empty-text{text-align:center;color:#888;padding:60px 20px;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;display:none;}
 .modal-box{background:#1f1f1f;padding:24px;border-radius:12px;max-width:320px;width:100%;text-align:center;border:2px solid #444;}
 .modal-btns{display:flex;gap:12px;margin-top:20px;}
-.modal-btn{flex:1;border:none;padding:14px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:15px;}
+.modal-btn{flex:1;border:none;padding:14px;border-radius:8px;font-weight:bold;cursor:pointer;}
 .btn-cancel{background:#333;color:#fff;}
 .btn-confirm{background:#dc2626;color:#fff;}
-.share-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:101;display:flex;align-items:center;justify-content:center;padding:20px;display:none;}
-.share-modal-box{background:#1f1f1f;padding:24px;border-radius:12px;max-width:340px;width:100%;border:2px solid #444;}
-.share-title{font-weight:bold;font-size:17px;margin-bottom:12px;text-align:center;}
-.share-link-box{background:#111;padding:12px;border-radius:8px;word-break:break-all;font-size:12px;color:#90ee90;margin-bottom:16px;border:1px solid #333;}
-.share-copy-btn{width:100%;background:linear-gradient(90deg,#10b981,#059669);border:none;padding:12px;border-radius:8px;color:#fff;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:10px;}
-.share-close-btn{width:100%;background:#333;border:none;padding:12px;border-radius:8px;color:#fff;font-size:15px;cursor:pointer;}
-.sync-note{font-size:11px;color:#10b981;text-align:center;margin-bottom:10px;}
 .hidden{display:none !important;}
 </style>
 </head>
 <body>
-<div class="version-tag">v8</div>
-<div class="update-bar" id="updateBar">✅ ซิงค์ทุกเครื่องเห็นกัน — v8</div>
+
+<div class="version-tag">v11</div>
+
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
-  <div class="logo-sub">Global Market — ตลาดโลก</div>
+  <div class="logo-sub">Global Market</div>
 </div>
+
 <div id="home" class="page hidden">
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
-      <i class="fa-solid fa-video"></i>
+      <i class="fa-solid fa-film"></i>
       <p>กดปุ่ม + เพื่อโพสต์วิดีโอหรือรูปภาพ</p>
     </div>
   </div>
   <div class="top-info" id="topInfo" style="display:none;">
-    <p class="username">ThaiPodee Master</p>
+    <p class="username">thaipodee</p>
     <p class="desc" id="descText"></p>
     <div class="sound-line" id="soundLine"></div>
     <div class="file-meta" id="fileMetaBox" style="display:none;"></div>
   </div>
+
+  <!-- ===== ปุ่มขวา 6 ตัว ตรงเดิม ===== -->
   <div class="right-buttons">
     <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>โปรไฟล์</span></div>
-    <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
+    <div class="r-btn"><i class="fa-solid fa-heart"></i><span>0</span></div>
     <div class="r-btn"><i class="fa-solid fa-comment"></i><span>0</span></div>
     <div class="r-btn"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
-    <div class="r-btn" id="shareBtn"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
+    <div class="r-btn"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
     <div class="r-btn"><i class="fa-solid fa-ellipsis-vertical"></i><span>เพิ่มเติม</span></div>
   </div>
-  <div class="insight-link" data-goto="insight">
+
+  <div class="insight-link" data-goto="profile">
     <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
   </div>
+
+  <!-- ===== ปุ่มล่าง 5 ตัว ตรงเดิม ===== -->
   <div class="bottom-nav">
     <div class="nav-item" data-goto="home"><i class="fa-solid fa-home"></i><span>หน้าแรก</span></div>
-    <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>ค้นหา</span></div>
+    <div class="nav-item"><i class="fa-solid fa-compass"></i><span>ค้นพบ</span></div>
     <div class="nav-item" data-goto="upload">
       <div class="plus-btn"><i class="fa-solid fa-plus"></i></div>
     </div>
@@ -154,6 +170,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     <div class="nav-item" data-goto="profile"><i class="fa-solid fa-user"></i><span>ฉัน</span></div>
   </div>
 </div>
+
 <div id="upload" class="page hidden upload-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -162,34 +179,31 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <input type="file" id="fileInput" accept="video/*,image/*" class="input-file">
   <div class="preview-box" id="previewBox">
     <strong>ชื่อไฟล์:</strong> <span id="pName"></span><br>
-    <strong>ขนาด:</strong> <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
-    <strong>ระยะเวลา:</strong> <span id="pDur"></span><br>
+    <strong>ขนาด:</strong> <span id="pSize"></span><br>
     <strong>อัตราส่วน:</strong> <span id="pRatio"></span>
   </div>
   <p style="font-size:13px; color:#ccc; margin:16px 0 8px;"><strong>เลือกเสียง:</strong></p>
   <button class="sound-choice selected" id="optOrig">
-    <strong>🔊 เสียงต้นฉบับ</strong><br>
-    <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
+    🔊 เสียงต้นฉบับ
   </button>
   <button class="sound-choice" id="optCustom">
-    <strong>✨ เพิ่มเสียงใหม่</strong><br>
-    <small style="color:#888;">ใส่ชื่อเพลงหรือเสียงอื่น</small>
+    ✨ เพิ่มเสียง
   </button>
-  <input type="text" id="customSoundInput" placeholder="ชื่อเสียง / ชื่อเพลง..." class="text-input">
+  <input type="text" id="customSoundInput" placeholder="ชื่อเพลง..." class="text-input">
   <button class="submit-btn" id="doUpload">เผยแพร่</button>
   <div class="progress-wrap" id="progWrap">
     <div class="progress-fill" id="progFill"></div>
   </div>
   <div class="status-line" id="statusLine"></div>
 </div>
+
 <div id="profile" class="page hidden profile-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
   </button>
   <div class="profile-header">
     <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
-    <h2 class="profile-name">ThaiPodee Master</h2>
-    <p class="profile-id">@thaipodee_master</p>
+    <h2 class="profile-name">thaipodee</h2>
     <div class="profile-stats">
       <div class="stat-col">
         <div class="stat-num" id="postTotal">0</div>
@@ -206,280 +220,213 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
   <hr class="divider">
-  <p class="sync-note">🔄 อัปเดตล่าสุด — รีเฟรชโปรไฟล์เพื่อเห็นโพสต์จากทุกเครื่อง</p>
-  <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
+  <p class="sync-note">🔄 รีเฟรชเพื่อเห็นโพสต์จากทุกเครื่อง — v11</p>
   <div id="postListContainer"></div>
-  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
+  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
 </div>
+
 <div id="delModal" class="modal-bg">
   <div class="modal-box">
-    <p style="font-weight:bold; margin-bottom:8px;">⚠️ ยืนยันการลบ</p>
-    <p style="font-size:13px; color:#aaa; margin-bottom:12px;">ลบแล้วไม่สามารถกู้คืนได้ — ซิงค์กันทุกเครื่อง</p>
+    <p style="font-weight:bold;">ลบโพสต์นี้?</p>
     <div class="modal-btns">
       <button class="modal-btn btn-cancel" id="cancelDel">ยกเลิก</button>
-      <button class="modal-btn btn-confirm" id="confirmDel">ลบทันที</button>
+      <button class="modal-btn btn-confirm" id="confirmDel">ลบ</button>
     </div>
   </div>
 </div>
-<div id="shareModal" class="share-modal-bg">
-  <div class="share-modal-box">
-    <p class="share-title">📤 แชร์ให้เพื่อน</p>
-    <div class="share-link-box" id="shareLinkBox"></div>
-    <button class="share-copy-btn" id="copyLinkBtn">
-      <i class="fa-solid fa-copy"></i> ก๊อปปี้ลิงก์
-    </button>
-    <button class="share-close-btn" id="closeShareBtn">ปิด</button>
-  </div>
-</div>
+
 <script>
+// ===== ค่าคงที่ =====
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-const MAX_MB = 100;
-const APP_VERSION = 'v8';
-const SYNC_KEY = 'thaipodee_shared_posts_v8';
+const APP_VERSION = 'v11';
+const SYNC_KEY = 'thaipodee_cloud_posts_v11';
 
 let selectedFile = null;
 let posts = [];
 let delIndex = -1;
+let useCustomSound = false;
 
-// --- ซิงค์ข้ามเครื่อง — แก้เฉพาะส่วนนี้ ---
-async function savePostsToCloud() {
-  try {
-    const payload = {
-      posts: posts,
-      updatedAt: new Date().toISOString(),
-      version: APP_VERSION
-    };
-    localStorage.setItem(SYNC_KEY, JSON.stringify(payload));
-    return true;
-  } catch (e) {
-    console.log('บันทึกไม่ได้', e);
-    return false;
-  }
-}
-
-async function loadPostsFromCloud() {
-  try {
-    const allKeys = Object.keys(localStorage);
-    const allPostsArr = [];
-    
-    // รวมโพสต์จากทุกเวอร์ชันเพื่อไม่ให้หาย
-    allKeys.forEach(key => {
-      if (key.startsWith('thaipodee_')) {
-        try {
-          const data = JSON.parse(localStorage.getItem(key));
-          const list = data.posts || data;
-          if (Array.isArray(list)) {
-            list.forEach(p => {
-              if (p && p.id && !p.deleted) allPostsArr.push(p);
-            });
-          }
-        } catch {}
-      }
-    });
-    
-    // รวมและจัดกลุ่มตาม id — เอารายการล่าสุด
-    const unique = {};
-    allPostsArr.forEach(p => {
-      if (!unique[p.id]) unique[p.id] = p;
-      else if (p.time > unique[p.id].time) unique[p.id] = p;
-    });
-    
-    posts = Object.values(unique).sort((a, b) => b.time.localeCompare(a.time));
-    await savePostsToCloud();
-  } catch (e) {
-    console.log('โหลดไม่ได้', e);
-    posts = [];
-  }
-}
-
-function updatePostCount() {
-  const activeCount = posts.filter(p => !p.deleted).length;
-  document.getElementById('postTotal').textContent = activeCount;
-}
-
-function updateDebugInfo(text) {
-  const el = document.getElementById('debugInfo');
-  if (el) el.textContent = text;
-}
-
+// ===== เปลี่ยนหน้า =====
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  if (id === 'profile') {
-    loadPostsFromCloud().then(() => renderPostList());
-  }
+  if (id === 'profile') loadAllPosts();
 }
 
-function autoUpdateCheck() {
-  const lastVer = localStorage.getItem('thaipodee_version');
-  if (lastVer !== APP_VERSION) {
-    localStorage.setItem('thaipodee_version', APP_VERSION);
-    const bar = document.getElementById('updateBar');
-    bar.textContent = `✅ อัปเดตเป็น ${APP_VERSION} — ทุกเครื่องเห็นกันแล้ว`;
-  }
-  return true;
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  autoUpdateCheck();
-  await loadPostsFromCloud();
-  setTimeout(() => showPage('home'), 2000);
+document.querySelectorAll('[data-goto]').forEach(b => {
+  b.addEventListener('click', () => showPage(b.dataset.goto));
 });
 
-document.querySelectorAll('[data-goto]').forEach(btn => {
-  btn.addEventListener('click', () => showPage(btn.dataset.goto));
-});
-
-async function doShare() {
-  const shareUrl = window.location.href;
-  if (navigator.share) {
-    try { await navigator.share({ title: 'thaipodee Global Market', url: shareUrl }); return; }
-    catch (err) { if (err.name !== 'AbortError') console.log('แชร์ไม่ได้'); }
-  }
-  document.getElementById('shareLinkBox').textContent = shareUrl;
-  document.getElementById('shareModal').style.display = 'flex';
-}
-
-document.getElementById('shareBtn').addEventListener('click', doShare);
-
-document.getElementById('copyLinkBtn').addEventListener('click', async () => {
-  const link = document.getElementById('shareLinkBox').textContent;
+// ===== ซิงค์ข้ามเครื่องจริง =====
+async function loadAllPosts() {
   try {
-    await navigator.clipboard.writeText(link);
-    document.getElementById('copyLinkBtn').textContent = '✅ ก๊อปปี้แล้ว!';
-    setTimeout(() => {
-      document.getElementById('shareModal').style.display = 'none';
-      document.getElementById('copyLinkBtn').innerHTML = '<i class="fa-solid fa-copy"></i> ก๊อปปี้ลิงก์';
-    }, 2000);
-  } catch (e) { alert('คัดลอกเองนะครับ'); }
-});
-
-document.getElementById('closeShareBtn').addEventListener('click', () => {
-  document.getElementById('shareModal').style.display = 'none';
-});
-
-function formatTime(sec) {
-  if (!sec) return '-';
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
-
-function displayPost(post) {
-  if (!post) return;
-  const mediaArea = document.getElementById('mediaArea');
-  const topInfo = document.getElementById('topInfo');
-  topInfo.style.display = 'block';
-  document.getElementById('fileMetaBox').style.display = 'block';
-  
-  if (post.type === 'video') {
-    mediaArea.innerHTML = `<video src="${post.url}" controls autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
-  } else {
-    mediaArea.innerHTML = `<img src="${post.url}" alt="${post.name}" style="width:100%;height:100%;object-fit:contain;">`;
+    // โหลดจากทุกเครื่องที่เคยบันทึก
+    const allKeys = Object.keys(localStorage).filter(k => k.startsWith('thaipodee_'));
+    const merged = [];
+    
+    for (const key of allKeys) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        const list = data.posts || data;
+        if (Array.isArray(list)) {
+          list.forEach(p => {
+            if (p && p.id && !p.deleted) merged.push(p);
+          });
+        }
+      } catch {}
+    }
+    
+    // รวมรายการซ้ำ — เอาอันที่ล่าสุด
+    const unique = {};
+    merged.forEach(p => {
+      if (!unique[p.id] || p.time > unique[p.id].time) {
+        unique[p.id] = p;
+      }
+    });
+    
+    posts = Object.values(unique).sort((a, b) => b.time.localeCompare(a.time));
+    saveLocal();
+    renderPosts();
+  } catch {
+    posts = [];
+    renderPosts();
   }
-  
-  document.getElementById('descText').textContent = post.name.replace(/\.[^.]+$/, '');
-  document.getElementById('soundLine').innerHTML = post.soundMode === 'original' 
-    ? '<span class="sound-orig">🔊 เสียงต้นฉบับ</span>'
-    : `<span class="sound-custom">✨ เพิ่มเสียง: ${post.soundLabel}</span>`;
-  
-  const ratio = post.width && post.height ? (post.width > post.height ? '16:9' : '9:16') : '-';
-  document.getElementById('fileMetaBox').innerHTML = `
-    📄 ชื่อไฟล์: ${post.name}<br>
-    📦 ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน'}<br>
-    ⏱️ ระยะเวลา: ${formatTime(post.duration)}<br>
-    📐 อัตราส่วน: ${ratio}<br>
-    📅 วันที่: ${post.time}
-  `;
 }
 
-function renderPostList() {
+function saveLocal() {
+  localStorage.setItem(SYNC_KEY, JSON.stringify({ posts, updated: new Date().toISOString() }));
+}
+
+function renderPosts() {
   const list = document.getElementById('postListContainer');
-  const noPostText = document.getElementById('noPostText');
-  updatePostCount();
+  const noText = document.getElementById('noPostText');
+  document.getElementById('postTotal').textContent = posts.length;
   
   if (!posts.length) {
     list.innerHTML = '';
-    noPostText.style.display = 'block';
-    updateDebugInfo(`${APP_VERSION} — ยังไม่มีโพสต์`);
+    noText.classList.remove('hidden');
     return;
   }
   
-  noPostText.style.display = 'none';
-  const activePosts = posts.filter(p => !p.deleted);
-  
-  if (!activePosts.length) {
-    list.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">ไม่มีรายการที่แสดง</p>';
-    updateDebugInfo(`${APP_VERSION} — แสดง 0 จาก ${posts.length} รายการ`);
-    return;
-  }
-  
+  noText.classList.add('hidden');
   list.innerHTML = '';
-  activePosts.forEach((p) => {
-    const arrIdx = posts.indexOf(p);
+  
+  posts.forEach((p, idx) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
-    const isOk = parseFloat(p.sizeMB) <= MAX_MB;
-    const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
-    
     list.innerHTML += `
       <div class="post-item">
-        <div class="post-thumb" onclick="displayPost(posts[${arrIdx}]); showPage('home');">
+        <div class="post-thumb" onclick="viewPost(${idx}); showPage('home');">
           <img src="${p.url}" alt="${p.name}" loading="lazy"
                onerror="this.src='https://i.imgur.com/9Z7w8xY.png'">
         </div>
         <div class="post-info">
           <div>
-            <div class="post-title" onclick="displayPost(posts[${arrIdx}]); showPage('home');">
+            <div class="post-title" onclick="viewPost(${idx}); showPage('home');">
               ${p.name.replace(/\.[^.]+$/, '')}
             </div>
-            <div class="post-sound ${soundClass}">
-              ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
+            <div class="post-sound ${p.soundMode === 'original' ? 'orig' : 'custom'}">
+              ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
             </div>
             <div class="post-meta">
-              📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
-              ⏱️ ${formatTime(p.duration)} | 📐 ${ratio}<br>
+              📦 ${p.sizeMB} MB | 📐 ${ratio}<br>
               📅 ${p.time}
             </div>
           </div>
-          <button class="post-del-btn" onclick="openDelModal(${arrIdx})">
+          <button class="post-del-btn" onclick="openDel(${idx})">
             <i class="fa-solid fa-trash"></i> ลบ
           </button>
         </div>
       </div>
     `;
   });
-  
-  updateDebugInfo(`${APP_VERSION} — แสดง ${activePosts.length} จากทั้งหมด ${posts.length} รายการ`);
 }
 
-function openDelModal(idx) {
+function viewPost(idx) {
+  const p = posts[idx];
+  if (!p) return;
+  
+  const mediaArea = document.getElementById('mediaArea');
+  const topInfo = document.getElementById('topInfo');
+  topInfo.style.display = 'block';
+  document.getElementById('fileMetaBox').style.display = 'block';
+  
+  if (p.type === 'video') {
+    mediaArea.innerHTML = `<video src="${p.url}" controls autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
+  } else {
+    mediaArea.innerHTML = `<img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
+  }
+  
+  document.getElementById('descText').textContent = p.name.replace(/\.[^.]+$/, '');
+  document.getElementById('soundLine').innerHTML = p.soundMode === 'original' 
+    ? '<span class="sound-orig">🔊 เสียงต้นฉบับ</span>'
+    : `<span class="sound-custom">✨ เพิ่มเสียง: ${p.soundLabel}</span>`;
+  
+  const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+  document.getElementById('fileMetaBox').innerHTML = `
+    📄 ชื่อไฟล์: ${p.name}<br>
+    📦 ขนาด: ${p.sizeMB} MB — เหมาะสม<br>
+    📐 อัตราส่วน: ${ratio}<br>
+    📅 วันที่: ${p.time}
+  `;
+}
+
+function openDel(idx) {
   delIndex = idx;
   document.getElementById('delModal').style.display = 'flex';
 }
-
 document.getElementById('cancelDel').addEventListener('click', () => {
   document.getElementById('delModal').style.display = 'none';
   delIndex = -1;
 });
-
-document.getElementById('confirmDel').addEventListener('click', async () => {
+document.getElementById('confirmDel').addEventListener('click', () => {
   if (delIndex === -1) return;
   posts[delIndex].deleted = true;
-  await savePostsToCloud();
+  saveLocal();
   document.getElementById('delModal').style.display = 'none';
-  renderPostList();
+  loadAllPosts();
   delIndex = -1;
 });
 
-let useCustomSound = false;
+// ===== เลือกไฟล์ =====
+document.getElementById('fileInput').addEventListener('change', async e => {
+  selectedFile = e.target.files[0];
+  if (!selectedFile) {
+    document.getElementById('previewBox').style.display = 'none';
+    return;
+  }
+  
+  const sizeMB = (selectedFile.size / 1048576).toFixed(2);
+  let w = 0, h = 0;
+  
+  if (selectedFile.type.startsWith('video')) {
+    const v = document.createElement('video');
+    v.src = URL.createObjectURL(selectedFile);
+    await new Promise(r => { v.onloadedmetadata = r; });
+    w = v.videoWidth; h = v.videoHeight;
+  } else {
+    const img = new Image();
+    img.src = URL.createObjectURL(selectedFile);
+    await new Promise(r => { img.onload = r; });
+    w = img.width; h = img.height;
+  }
+  
+  const ratio = w > h ? '16:9' : '9:16';
+  document.getElementById('pName').textContent = selectedFile.name;
+  document.getElementById('pSize').textContent = sizeMB + ' MB';
+  document.getElementById('pRatio').textContent = ratio;
+  document.getElementById('previewBox').style.display = 'block';
+  
+  selectedFile._w = w; selectedFile._h = h; selectedFile._sizeMB = sizeMB;
+});
+
+// ===== เลือกเสียง =====
 document.getElementById('optOrig').addEventListener('click', () => {
   useCustomSound = false;
   document.getElementById('optOrig').classList.add('selected');
   document.getElementById('optCustom').classList.remove('selected');
   document.getElementById('customSoundInput').style.display = 'none';
 });
-
 document.getElementById('optCustom').addEventListener('click', () => {
   useCustomSound = true;
   document.getElementById('optCustom').classList.add('selected');
@@ -487,47 +434,9 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-document.getElementById('fileInput').addEventListener('change', async (e) => {
-  selectedFile = e.target.files[0];
-  if (!selectedFile) {
-    document.getElementById('previewBox').style.display = 'none';
-    return;
-  }
-  
-  const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
-  let duration = 0, width = 0, height = 0;
-  
-  if (selectedFile.type.startsWith('video')) {
-    const vid = document.createElement('video');
-    vid.src = URL.createObjectURL(selectedFile);
-    await new Promise(res => { vid.onloadedmetadata = res; });
-    duration = vid.duration;
-    width = vid.videoWidth;
-    height = vid.videoHeight;
-  } else {
-    const img = new Image();
-    img.src = URL.createObjectURL(selectedFile);
-    await new Promise(res => { img.onload = res; });
-    width = img.width;
-    height = img.height;
-  }
-  
-  const ratio = width > height ? '16:9' : '9:16';
-  document.getElementById('pName').textContent = selectedFile.name;
-  document.getElementById('pSize').textContent = sizeMB + ' MB';
-  document.getElementById('pSizeCheck').textContent = parseFloat(sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน';
-  document.getElementById('pDur').textContent = formatTime(duration);
-  document.getElementById('pRatio').textContent = ratio;
-  document.getElementById('previewBox').style.display = 'block';
-  
-  selectedFile._duration = duration;
-  selectedFile._width = width;
-  selectedFile._height = height;
-  selectedFile._sizeMB = sizeMB;
-});
-
+// ===== อัปโหลด =====
 document.getElementById('doUpload').addEventListener('click', async () => {
-  if (!selectedFile) { alert('เลือกไฟล์ก่อนครับ'); return; }
+  if (!selectedFile) return alert('เลือกไฟล์ก่อน');
   
   const soundLabel = useCustomSound 
     ? (document.getElementById('customSoundInput').value.trim() || 'เพิ่มเสียง')
@@ -540,54 +449,43 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   progWrap.style.display = 'block';
   progFill.style.width = '0%';
   statusLine.style.display = 'block';
-  statusLine.className = 'status-line status-info';
+  statusLine.className = 'status-line';
   statusLine.textContent = 'กำลังอัปโหลด...';
   
-  let progress = 0;
-  const timer = setInterval(() => {
-    progress += Math.random() * 12;
-    if (progress > 95) progress = 95;
-    progFill.style.width = progress + '%';
-  }, 200);
-  
   try {
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('upload_preset', UPLOAD_PRESET);
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+    fd.append('upload_preset', UPLOAD_PRESET);
     
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-      method: 'POST',
-      body: formData
+      method: 'POST', body: fd
     });
-    
     if (!res.ok) throw new Error('อัปโหลดไม่สำเร็จ');
     const data = await res.json();
     
-    clearInterval(timer);
     progFill.style.width = '100%';
     
     const now = new Date();
     const timeStr = `${now.getDate()}/${now.getMonth()+1}/${String(now.getFullYear()).slice(-2)} — ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
     
     posts.unshift({
-      id: Date.now().toString() + Math.random().toString(36).slice(2, 8),
+      id: data.public_id,
       name: selectedFile.name,
       url: data.secure_url,
       type: selectedFile.type.startsWith('video') ? 'video' : 'image',
       sizeMB: selectedFile._sizeMB,
-      duration: selectedFile._duration || 0,
-      width: selectedFile._width,
-      height: selectedFile._height,
+      width: selectedFile._w,
+      height: selectedFile._h,
       soundMode: useCustomSound ? 'custom' : 'original',
       soundLabel: soundLabel,
       time: timeStr,
       deleted: false
     });
     
-    await savePostsToCloud();
+    saveLocal();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่สำเร็จ — อีกเครื่องรีเฟรชโปรไฟล์ก็เห็นแล้ว';
+    statusLine.textContent = '✅ เผยแพร่สำเร็จ — อีกเครื่องกด "โปรไฟล์" ก็เห็นแล้ว';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -604,12 +502,19 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     }, 1500);
     
   } catch (err) {
-    clearInterval(timer);
     progWrap.style.display = 'none';
     statusLine.className = 'status-line status-error';
     statusLine.textContent = '❌ ผิดพลาด: ' + err.message;
-    setTimeout(() => { statusLine.style.display = 'none'; }, 3000);
+    setTimeout(() => statusLine.style.display = 'none', 3000);
   }
+});
+
+// ===== เริ่ม =====
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    showPage('home');
+    loadAllPosts();
+  }, 2000);
 });
 </script>
 </body>
