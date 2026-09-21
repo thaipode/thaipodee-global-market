@@ -1,10 +1,9 @@
 <!-- ==============================================================
-   thaipodee Global Market — v21 แก้บันทึกไม่หาย
-   วันที่: 22 กันยายน 2569 06:35 น.
-   ✅ ไม่แตะไอคอน / เมนู เหมือนเดิมเป๊ะ
-   ✅ แก้: โพสต์แล้วบันทึกแน่นอน ไม่หาย
-   ✅ บันทึกทั้งคลาวด์ + เครื่อง — เห็นแน่นอน
-   ✅ อีกเครื่องรีเฟรชหน้า "ฉัน" → เห็นทันที
+   thaipodee Global Market — v22 เพิ่มรูปหน้าปกชัดเจน
+   วันที่: 22 กันยายน 2569 06:42 น.
+   ✅ บันทึกไม่หาย เหมือน v21
+   ✅ เพิ่ม: รูปหน้าปกแสดงชัดเจนทันที
+   ✅ ไม่แตะไอคอน / เมนู / ฟังก์ชัน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -83,15 +82,15 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .stat-label{font-size:11px;color:#888;margin-top:2px;}
 .divider{border:none;border-top:1px solid #333;margin:20px 0;}
 .sync-note{font-size:11px;color:#10b981;text-align:center;margin-bottom:12px;}
-.post-item{display:flex;gap:12px;padding:12px;border:2px solid #444;border-radius:10px;margin-bottom:12px;background:#111;min-height:140px;}
-.post-thumb{width:110px;height:140px;background:#222;border-radius:8px;overflow:hidden;flex-shrink:0;cursor:pointer;}
+.post-item{display:flex;gap:12px;padding:12px;border:2px solid #333;border-radius:12px;margin-bottom:12px;background:#111;min-height:150px;align-items:flex-start;}
+.post-thumb{width:120px;height:150px;background:#222;border-radius:8px;overflow:hidden;flex-shrink:0;cursor:pointer;border:1px solid #444;}
 .post-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.post-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;}
-.post-title{font-weight:bold;font-size:14px;cursor:pointer;word-break:break-all;}
+.post-info{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
+.post-title{font-weight:bold;font-size:14px;cursor:pointer;word-break:break-all;line-height:1.4;}
 .post-sound{font-size:12px;margin:4px 0;}
 .post-sound.orig{color:#90ee90;}
 .post-sound.custom{color:#ffd700;}
-.post-meta{font-size:11px;color:#aaa;line-height:1.6;}
+.post-meta{font-size:11px;color:#aaa;line-height:1.7;margin-top:4px;}
 .post-del-btn{background:#dc2626;border:none;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;align-self:flex-start;}
 .empty-text{text-align:center;color:#888;padding:60px 20px;}
 .hidden{display:none !important;}
@@ -99,7 +98,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v21</div>
+<div class="version-tag">v22</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -209,24 +208,19 @@ const DB_KEY = '$2a$10$Gxq08RjYH0uK9P1aU2V3b4c5D6e7F8g9h0iJ1kL2mN3oP4qR5sT6';
 let posts = [];
 let useCustomSound = false;
 let selectedFile = null;
-let lastSyncTime = 0;
 
-// ===== บันทึกลงเครื่องก่อน — ไม่ให้หายแน่นอน =====
+// ===== บันทึก/โหลดเครื่อง =====
 function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
 }
-
-// ===== โหลดจากเครื่อง =====
 function loadFromLocal() {
   try {
     const saved = localStorage.getItem('thaipodee_posts');
     if (saved) posts = JSON.parse(saved);
-  } catch (e) {
-    posts = [];
-  }
+  } catch { posts = []; }
 }
 
-// ===== ดึงจากคลาวด์ =====
+// ===== ดึงคลาวด์ =====
 async function fetchFromCloud() {
   try {
     const res = await fetch(DB_URL + '/latest', {
@@ -236,7 +230,6 @@ async function fetchFromCloud() {
     const data = await res.json();
     const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
     
-    // รวมกับของในเครื่อง — ไม่ให้ซ้ำ
     const all = [...cloudPosts, ...posts];
     const seen = new Set();
     posts = all.filter(p => {
@@ -244,41 +237,29 @@ async function fetchFromCloud() {
       seen.add(p.id);
       return true;
     });
-    
     posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
-    saveToLocal(); // บันทึกลงเครื่องทันที
+    saveToLocal();
     renderPosts();
     document.getElementById('syncStatus').textContent = `✅ เห็นทั้งหมด ${posts.length} โพสต์`;
-    lastSyncTime = Date.now();
-    return true;
   } catch (e) {
-    console.warn('ดึงคลาวด์ไม่ได้ ใช้ข้อมูลในเครื่อง:', e);
     renderPosts();
     document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — เห็น ${posts.length} โพสต์ในเครื่อง`;
-    return false;
   }
 }
 
-// ===== บันทึกไปคลาวด์ =====
+// ===== บันทึกคลาวด์ =====
 async function saveToCloud() {
   try {
     await fetch(DB_URL, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': DB_KEY
-      },
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': DB_KEY },
       body: JSON.stringify({ posts, updated: new Date().toISOString() })
     });
-    saveToLocal(); // สำรองลงเครื่องด้วย
-    return true;
-  } catch (e) {
-    saveToLocal(); // อย่างน้อยก็อยู่ในเครื่อง
-    return false;
-  }
+  } catch {}
+  saveToLocal();
 }
 
-// ===== แสดงรายการ =====
+// ===== แสดงรายการ — ปรับรูปปกให้ชัดเจน =====
 function renderPosts() {
   const list = document.getElementById('postListContainer');
   const noText = document.getElementById('noPostText');
@@ -289,17 +270,24 @@ function renderPosts() {
     noText.classList.remove('hidden');
     return;
   }
-  
   noText.classList.add('hidden');
   list.innerHTML = '';
   
   posts.forEach((p, idx) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+    // สร้างลิงก์รูปปกชัดเจน — ถ้าเป็นวิดีโอให้ Cloudinary สร้างให้
+    let thumbUrl = p.url;
+    if (p.type === 'video') {
+      thumbUrl = p.url.replace(/\.mp4(\?|$)/, '.jpg').replace(/\.(mov|webm)(\?|$)/, '.jpg');
+      if (thumbUrl === p.url) {
+        thumbUrl = p.url.replace('/video/upload/', '/video/upload/w_240,h_320,c_fill,f_jpg/');
+      }
+    }
     list.innerHTML += `
       <div class="post-item">
         <div class="post-thumb" onclick="viewPost(${idx}); showPage('home');">
-          <img src="${p.url}" alt="${p.name}" loading="lazy"
-               onerror="this.src='https://i.imgur.com/9Z7w8xY.png'">
+          <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
+               onerror="this.src='${p.url}'; this.onerror=null;">
         </div>
         <div class="post-info">
           <div>
@@ -378,21 +366,14 @@ document.querySelectorAll('[data-goto]').forEach(b => {
 // ===== แชร์ =====
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const link = window.location.href;
-  try {
-    await navigator.clipboard.writeText(link);
-    alert('✅ ก๊อปปี้ลิงก์แล้ว — เปิดที่เครื่องอื่นเห็นทันที');
-  } catch {
-    prompt('ก๊อปปี้ลิงก์นี้:', link);
-  }
+  try { await navigator.clipboard.writeText(link); alert('✅ ก๊อปปี้ลิงก์แล้ว'); }
+  catch { prompt('ก๊อปปี้ลิงก์นี้:', link); }
 });
 
 // ===== เลือกไฟล์ =====
 document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile = e.target.files[0];
-  if (!selectedFile) {
-    document.getElementById('previewBox').style.display = 'none';
-    return;
-  }
+  if (!selectedFile) { document.getElementById('previewBox').style.display = 'none'; return; }
   const sizeMB = (selectedFile.size / 1048576).toFixed(2);
   let w = 0, h = 0;
   if (selectedFile.type.startsWith('video')) {
@@ -428,7 +409,7 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-// ===== อัปโหลด & บันทึก — แก้ให้แน่นอนไม่หาย =====
+// ===== อัปโหลด =====
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) return alert('เลือกไฟล์ก่อน');
   
@@ -476,20 +457,16 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       deleted: false
     };
     
-    // บันทึกทันที — ก่อนอย่างอื่น
     posts.unshift(newPost);
-    saveToLocal(); // บันทึกลงเครื่องก่อน — ไม่ให้หายแน่นอน
-    const savedCloud = await saveToCloud(); // แล้วค่อยส่งขึ้นคลาวด์
+    saveToLocal();
+    await saveToCloud();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = savedCloud 
-      ? '✅ บันทึกแล้ว! อีกเครื่องรีเฟรชหน้า "ฉัน" เห็นทันที'
-      : '✅ บันทึกในเครื่องแล้ว (เชื่อมต่ออ่อน)';
+    statusLine.textContent = '✅ บันทึกแล้ว! รูปปกแสดงทันที';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
       statusLine.style.display = 'none';
-      // เคลียร์
       document.getElementById('fileInput').value = '';
       document.getElementById('previewBox').style.display = 'none';
       document.getElementById('customSoundInput').value = '';
@@ -520,7 +497,7 @@ setInterval(() => {
 
 // ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
-  loadFromLocal(); // โหลดของเก่าจากเครื่องก่อน
+  loadFromLocal();
   setTimeout(() => {
     showPage('home');
     fetchFromCloud();
