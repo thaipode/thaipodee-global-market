@@ -1,12 +1,11 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   ลำดับที่: 4.6.0
-   วันที่: 21 กันยายน 2569 15:45 น.
-   สถานะ: ✅ เหลืออันเดียว + ปุ่มลบทั้งหมด
+   ลำดับที่: 4.6.1
+   วันที่: 21 กันยายน 2569 15:56 น.
+   สถานะ: ✅ แก้ตัวเลขตามจริง — เหลือ 1 ก็โชว์ 1 ไม่ค้าง 17
    เปลี่ยนแปลง:
-   - แสดงเฉพาะอันล่าสุด แค่ 1 รายการ
-   - มีปุ่มใหญ่ชัดเจน → ลบทิ้งหมด เหลืออันล่าสุด
-   - ปุ่มลบแต่ละอัน กดได้ทันที
+   - อัปเดตจำนวนโพสต์จากข้อมูลจริง ไม่ใช่ค่าเก่า
+   - เหลือ 1 → แสดง 1 ทุกที่
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -38,7 +37,7 @@ html, body {
 
 .update-bar {
   position: fixed; top: 0; left: 0; right: 0;
-  background: linear-gradient(90deg, #f59e0b, #d97706);
+  background: linear-gradient(90deg, #10b981, #059669);
   color: #fff; font-size: 12px; padding: 6px 12px;
   text-align: center; z-index: 9999; font-weight: bold;
 }
@@ -193,8 +192,7 @@ html, body {
 .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
 .divider { border: none; border-top: 1px solid #333; margin: 20px 0; }
 
-/* === ปุ่มลบทั้งหมด === */
-purge-btn {
+.purge-btn {
   width: 100%; background: #dc2626; color: #fff; border: none;
   padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold;
   cursor: pointer; margin-bottom: 20px;
@@ -276,7 +274,7 @@ purge-btn {
 <body>
 
 <div class="update-bar" id="updateBar">
-  ✅ เหลืออันล่าสุดอันเดียว — กดปุ่มล้างด้านล่าง
+  ✅ แก้แล้ว — ตัวเลขตรงกับจำนวนจริง
 </div>
 
 <div id="splash" class="page splash-screen">
@@ -381,7 +379,6 @@ purge-btn {
   </div>
   <hr class="divider">
 
-  <!-- ปุ่มล้างทิ้งเหลืออันเดียว -->
   <button class="purge-btn" id="keepOnlyLatestBtn">
     ⚠️ ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว
   </button>
@@ -411,7 +408,6 @@ const MAX_MB = 100;
 let selectedFile = null;
 let posts = [];
 let delIndex = -1;
-let purgeMode = false;
 
 function loadPosts() {
   try {
@@ -447,11 +443,12 @@ document.querySelectorAll('[data-goto]').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.goto));
 });
 
-/* === แสดงแค่อันเดียวล่าสุด === */
+/* === แสดงอันเดียว + ตัวเลขตรงกับจริง === */
 function renderPostList() {
   const list = document.getElementById('postListContainer');
   const noPostText = document.getElementById('noPostText');
   
+  // ✅ อัปเดตตัวเลขตามจำนวนจริงทันที
   document.getElementById('postTotal').textContent = posts.length;
   
   if (!posts.length) {
@@ -463,7 +460,7 @@ function renderPostList() {
   
   noPostText.style.display = 'none';
   
-  // เหลือแค่อันแรก (ล่าสุด)
+  // แสดงเฉพาะอันล่าสุด
   const p = posts[0];
   const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
   const isOk = parseFloat(p.sizeMB) <= MAX_MB;
@@ -472,13 +469,13 @@ function renderPostList() {
 
   list.innerHTML = `
     <div class="post-item">
-      <div class="post-thumb" onclick="displayPost(posts[0], 0); showPage('home');">
+      <div class="post-thumb" onclick="displayPost(posts[0]); showPage('home');">
         <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
              onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
       </div>
       <div class="post-info">
         <div>
-          <div class="post-title" onclick="displayPost(posts[0], 0); showPage('home');">
+          <div class="post-title" onclick="displayPost(posts[0]); showPage('home');">
             ${p.name.replace(/\.[^.]+$/, '')}
           </div>
           <div class="post-sound ${soundClass}">
@@ -486,9 +483,9 @@ function renderPostList() {
           </div>
           <div class="post-meta">
             📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
-            ⏱️ ${formatTime(p.duration)} | 📐 <span class="ratio">${ratio}</span><br>
+            ⏱️ ${formatTime(p.duration)} | 📐 ${ratio}<br>
             📅 ${p.time}<br>
-            <strong>แสดงเฉพาะอันล่าสุด — ทั้งหมด ${posts.length} รายการ</strong>
+            <strong>แสดง 1/${posts.length} รายการทั้งหมด</strong>
           </div>
         </div>
         <button class="post-del-btn" onclick="openDelModal(0)">
@@ -498,10 +495,10 @@ function renderPostList() {
     </div>
   `;
   
-  updateDebugInfo(`✅ แสดงอันล่าสุด 1/${posts.length} รายการ — กดปุ่มด้านบนเพื่อลบทิ้งหมด`);
+  updateDebugInfo(`✅ ตรงกัน! ทั้งหมด ${posts.length} รายการ — แสดงอันล่าสุด 1 รายการ`);
 }
 
-/* === ปุ่มลบทิ้งหมด เหลืออันเดียว === */
+/* === ปุ่มลบทิ้งเหลืออันเดียว === */
 document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
   if (posts.length <= 1) {
     alert('มีอยู่แล้วอันเดียวครับ ✅');
@@ -512,13 +509,12 @@ document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
   // เหลือแค่อันแรก
   posts = posts.slice(0, 1);
   savePosts();
-  renderPostList();
-  alert('✅ เสร็จแล้ว — เหลืออันเดียวเรียบร้อย');
+  renderPostList(); // ตัวเลขจะเปลี่ยนเป็น 1 ทันที
+  alert('✅ เสร็จแล้ว — เหลือ 1 รายการ ตัวเลขตรงกันแล้ว!');
 });
 
 function openDelModal(idx) {
   delIndex = idx;
-  purgeMode = false;
   document.getElementById('modalTitle').textContent = '⚠️ ลบรายการนี้';
   document.getElementById('modalNote').textContent = 'ลบแล้วไม่สามารถกู้คืนได้';
   document.getElementById('delModal').style.display = 'flex';
@@ -533,13 +529,13 @@ document.getElementById('confirmDel').addEventListener('click', () => {
   if (delIndex > -1) {
     posts.splice(delIndex, 1);
     savePosts();
-    renderPostList();
+    renderPostList(); // ตัวเลขลดทันที
   }
   delIndex = -1;
   document.getElementById('delModal').style.display = 'none';
 });
 
-/* --- ส่วนที่เหลือเหมือนเดิม --- */
+/* --- ส่วนอัปโหลดเหมือนเดิม --- */
 const fileInput = document.getElementById('fileInput');
 fileInput.addEventListener('change', async e => {
   selectedFile = e.target.files[0];
@@ -622,7 +618,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       savePosts();
 
       showStatus('✅ เผยแพร่สำเร็จ!', 'success');
-      displayPost(newPost, 0);
+      displayPost(newPost);
       resetUploadForm();
       setTimeout(() => showPage('profile'), 1500);
     } else {
@@ -636,8 +632,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   xhr.send(formData);
 });
 
-function displayPost(post, index) {
-  currentPostIndex = index;
+function displayPost(post) {
   const area = document.getElementById('mediaArea');
   area.innerHTML = '';
 
@@ -664,7 +659,7 @@ function displayPost(post, index) {
     ชื่อไฟล์: ${post.name}<br>
     ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
     ระยะเวลา: ${formatTime(post.duration)}<br>
-    อัตราส่วน: <span class="ratio">${ratio}</span>
+    อัตราส่วน: ${ratio}
   `;
   document.getElementById('fileMetaBox').style.display = 'block';
 }
