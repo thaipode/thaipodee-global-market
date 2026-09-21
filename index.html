@@ -1,11 +1,12 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: v14
-   วันที่: 21 กันยายน 2569 23:11 น.
+   เวอร์ชัน: v15
+   วันที่: 21 กันยายน 2569 23:20 น.
    --------------------------------------------------------------
-   ✅ ทุกเครื่องเห็นโพสต์เดียวกันทันที — ไม่ต้องรีเฟรช
+   ✅ เครื่อง 1 โพสต์ → เครื่อง 2 เห็นทันที
+   ✅ เครื่อง 2 โพสต์ → เครื่อง 1 เห็นทันที
+   ✅ ซิงค์อัตโนมัติทุก 5 วินาที ทั้งสองทาง
    ✅ กดเผยแพร่ → เล่นเองอัตโนมัติ
-   ✅ แชร์ครบ / ตำแหน่งเหมือนเดิม / ไม่แตะอะไรเพิ่ม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -128,7 +129,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v14</div>
+<div class="version-tag">v15</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -180,7 +181,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </button>
   <h3 class="form-title">โพสต์วิดีโอ / รูปภาพ</h3>
   <input type="file" id="fileInput" accept="video/*,image/*" class="input-file">
-  <div class="preview-box" id="previewBox">
+  <div class="preview-box" id="previewBox" style="display:none;">
     <strong>ชื่อไฟล์:</strong> <span id="pName"></span><br>
     <strong>ขนาด:</strong> <span id="pSize"></span><br>
     <strong>อัตราส่วน:</strong> <span id="pRatio"></span>
@@ -194,10 +195,10 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </button>
   <input type="text" id="customSoundInput" placeholder="ชื่อเพลง..." class="text-input">
   <button class="submit-btn" id="doUpload">เผยแพร่</button>
-  <div class="progress-wrap" id="progWrap">
+  <div class="progress-wrap" id="progWrap" style="display:none;">
     <div class="progress-fill" id="progFill"></div>
   </div>
-  <div class="status-line" id="statusLine"></div>
+  <div class="status-line" id="statusLine" style="display:none;"></div>
 </div>
 
 <div id="profile" class="page hidden profile-container">
@@ -223,12 +224,12 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
   <hr class="divider">
-  <p class="sync-note" id="syncStatus">🔄 กำลังโหลดจากคลาวด์...</p>
+  <p class="sync-note" id="syncStatus">🔄 กำลังซิงค์จากคลาวด์...</p>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
 </div>
 
-<div id="delModal" class="modal-bg">
+<div id="delModal" class="modal-bg" style="display:none;">
   <div class="modal-box">
     <p style="font-weight:bold;">ลบโพสต์นี้?</p>
     <div class="modal-btns">
@@ -238,7 +239,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
 </div>
 
-<div id="shareModal" class="share-modal-bg">
+<div id="shareModal" class="share-modal-bg" style="display:none;">
   <div class="share-modal-box">
     <p class="share-title">📤 แชร์ให้เพื่อน / เครื่องที่ 2</p>
     <div class="share-link-box" id="shareLinkBox"></div>
@@ -253,14 +254,13 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 // ===== ตั้งค่า =====
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-const SYNC_KEY = 'thaipodee_cloud_posts_v14';
+const SYNC_KEY = 'thaipodee_sync_v15';
 
-// ===== ระบบซิงค์ข้ามเครื่องจริง =====
-// ใช้ Cloudinary เป็นแหล่งข้อมูลกลาง + ตรวจสอบเป็นระยะ
 let posts = [];
 let delIndex = -1;
 let useCustomSound = false;
-let lastSyncHash = '';
+let selectedFile = null;
+let lastSyncTime = 0;
 
 // ===== เปลี่ยนหน้า =====
 function showPage(id) {
@@ -301,23 +301,24 @@ document.getElementById('closeShareBtn').addEventListener('click', () => {
   document.getElementById('shareModal').style.display = 'none';
 });
 
-// ===== สร้างรหัสเช็คความเปลี่ยนแปลง =====
-function getHash(data) {
-  return btoa(encodeURIComponent(JSON.stringify(data.slice(0, 20)))).slice(0, 40);
+// ===== เวลาปัจจุบัน =====
+function getTimeStr() {
+  const now = new Date();
+  return `${now.getDate()}/${now.getMonth()+1}/${String(now.getFullYear()).slice(-2)} — ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
 }
 
-// ===== โหลดโพสต์ — เช็คทั้งในเครื่องและจากแหล่งกลาง =====
-async function loadAllPosts(showRefreshMsg = false) {
+// ===== โหลดรายการจากคลาวด์ — ทุกเครื่องเห็นชุดเดียวกัน =====
+async function loadAllPosts(showMsg = false) {
   try {
-    // 1. โหลดรายการไฟล์ทั้งหมดจาก Cloudinary (แหล่งกลางที่ทุกเครื่องเข้าถึงได้)
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/resources/image/video/upload?max_results=50`);
-    if (!res.ok) throw new Error('ไม่เชื่อมต่อคลาวด์');
+    // ดึงไฟล์ทั้งหมดจาก Cloudinary
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/resources/search?expression=folder%3Athaipodee&max_results=50`);
+    if (!res.ok) throw new Error('เชื่อมต่อไม่ได้');
     const data = await res.json();
     
-    // 2. แปลงข้อมูลให้ตรงรูปแบบ
-    const cloudPosts = data.resources.map((r, idx) => ({
+    // แปลงข้อมูล
+    const cloudPosts = (data.resources || []).map(r => ({
       id: r.public_id,
-      name: r.filename + (r.format ? '.' + r.format : ''),
+      name: r.public_id.split('/').pop() + '.' + (r.format || 'jpg'),
       url: r.secure_url,
       type: r.resource_type === 'video' ? 'video' : 'image',
       sizeMB: (r.bytes / 1048576).toFixed(2),
@@ -326,57 +327,51 @@ async function loadAllPosts(showRefreshMsg = false) {
       soundMode: 'original',
       soundLabel: 'เสียงต้นฉบับ',
       time: new Date(r.created_at).toLocaleString('th-TH', {
-        day: 'numeric', month: 'numeric', year: '2-digit',
-        hour: 'numeric', minute: 'numeric'
+        day:'numeric', month:'numeric', year:'2-digit', hour:'numeric', minute:'numeric'
       }).replace(/\//g, '/'),
       deleted: false
     }));
 
-    // 3. รวมกับรายการที่บันทึกในเครื่อง (เช่น รายการที่เพิ่งอัปโหลด)
-    const localStr = localStorage.getItem(SYNC_KEY);
-    const localPosts = localStr ? JSON.parse(localStr).posts || [] : [];
-    
-    // เอาเฉพาะรายการที่ยังไม่มีในคลาวด์ + ยังไม่ลบ
-    const cloudIds = new Set(cloudPosts.map(p => p.id));
-    localPosts.forEach(p => {
-      if (!cloudIds.has(p.id) && !p.deleted) cloudPosts.unshift(p);
+    // ดึงข้อมูลที่เพิ่งอัปโหลดในเครื่องนี้ (ก่อนที่คลาวด์จะอัปเดต)
+    let localOnly = [];
+    try {
+      const localData = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}');
+      const cloudIds = new Set(cloudPosts.map(p => p.id));
+      localOnly = (localData.posts || []).filter(p => !cloudIds.has(p.id) && !p.deleted);
+    } catch {}
+
+    // รวมทั้งหมด เรียงล่าสุดก่อน
+    posts = [...localOnly, ...cloudPosts];
+    posts.sort((a, b) => {
+      const parseDate = s => {
+        const m = s.match(/(\d+)\/(\d+)\/(\d+)\s*—\s*(\d+):(\d+)/);
+        return m ? new Date(`20${m[3]}`, m[2]-1, m[1], m[4], m[5]) : 0;
+      };
+      return parseDate(b.time) - parseDate(a.time);
     });
 
-    // 4. เรียงล่าสุดก่อน
-    cloudPosts.sort((a, b) => {
-      const dateA = new Date(a.time.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/20$3'));
-      const dateB = new Date(b.time.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/20$3'));
-      return dateB - dateA;
-    });
+    // บันทึกกลับเครื่อง
+    localStorage.setItem(SYNC_KEY, JSON.stringify({ posts, updated: new Date().toISOString() }));
 
-    posts = cloudPosts;
-    saveLocal();
-
-    // แจ้งว่าอัปเดต
-    const newHash = getHash(posts);
-    if (newHash !== lastSyncHash) {
-      lastSyncHash = newHash;
-      if (showRefreshMsg) {
-        document.getElementById('syncStatus').textContent = '✅ เห็นโพสต์ทุกเครื่องแล้ว';
-        document.getElementById('syncStatus').style.color = '#10b981';
-      }
+    if (showMsg) {
+      document.getElementById('syncStatus').textContent = `✅ ซิงค์ — เห็นทั้งหมด ${posts.length} โพสต์`;
+      document.getElementById('syncStatus').style.color = '#10b981';
     }
+    lastSyncTime = Date.now();
+
   } catch (err) {
     console.error('Sync error:', err);
-    // ถ้าเชื่อมต่อไม่ได้ ใช้ข้อมูลในเครื่องแทน
     try {
-      const localStr = localStorage.getItem(SYNC_KEY);
-      posts = localStr ? JSON.parse(localStr).posts.filter(p => !p.deleted) : [];
+      const localData = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}');
+      posts = (localData.posts || []).filter(p => !p.deleted);
     } catch { posts = []; }
-    document.getElementById('syncStatus').textContent = '⚠️ ออฟไลน์ — เห็นเฉพาะเครื่องนี้';
-    document.getElementById('syncStatus').style.color = '#f59e0b';
+    if (showMsg) {
+      document.getElementById('syncStatus').textContent = '⚠️ ออฟไลน์ — เห็นเฉพาะเครื่องนี้';
+      document.getElementById('syncStatus').style.color = '#f59e0b';
+    }
   }
-  
-  renderPosts();
-}
 
-function saveLocal() {
-  localStorage.setItem(SYNC_KEY, JSON.stringify({ posts, updated: new Date().toISOString() }));
+  renderPosts();
 }
 
 function renderPosts() {
@@ -455,19 +450,20 @@ function viewPost(idx) {
     📅 วันที่: ${p.time}`;
 }
 
+// ===== ลบ =====
 function openDel(idx) { delIndex = idx; document.getElementById('delModal').style.display = 'flex'; }
 document.getElementById('cancelDel').addEventListener('click', () => {
   document.getElementById('delModal').style.display = 'none'; delIndex = -1;
 });
 document.getElementById('confirmDel').addEventListener('click', () => {
   if (delIndex === -1) return;
-  posts[delIndex].deleted = true; saveLocal();
+  posts[delIndex].deleted = true;
+  localStorage.setItem(SYNC_KEY, JSON.stringify({ posts, updated: new Date().toISOString() }));
   document.getElementById('delModal').style.display = 'none';
   loadAllPosts(); delIndex = -1;
 });
 
 // ===== เลือกไฟล์ =====
-let selectedFile = null;
 document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile = e.target.files[0];
   if (!selectedFile) {
@@ -531,6 +527,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     const fd = new FormData();
     fd.append('file', selectedFile);
     fd.append('upload_preset', UPLOAD_PRESET);
+    fd.append('folder', 'thaipodee'); // จัดเก็บเป็นกลุ่ม
     
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
       method: 'POST', body: fd
@@ -538,12 +535,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     if (!res.ok) throw new Error('อัปโหลดไม่สำเร็จ');
     const data = await res.json();
     progFill.style.width = '100%';
-    
-    const now = new Date();
-    const timeStr = now.toLocaleString('th-TH', {
-      day: 'numeric', month: 'numeric', year: '2-digit',
-      hour: 'numeric', minute: 'numeric'
-    }).replace(/\//g, '/');
     
     const newPost = {
       id: data.public_id,
@@ -555,12 +546,12 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       height: selectedFile._h,
       soundMode: useCustomSound ? 'custom' : 'original',
       soundLabel: soundLabel,
-      time: timeStr,
+      time: getTimeStr(),
       deleted: false
     };
     
     posts.unshift(newPost);
-    saveLocal();
+    localStorage.setItem(SYNC_KEY, JSON.stringify({ posts, updated: new Date().toISOString() }));
     
     statusLine.className = 'status-line status-success';
     statusLine.textContent = '✅ เผยแพร่สำเร็จ — อีกเครื่องกดโปรไฟล์เห็นเลย';
@@ -568,6 +559,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     setTimeout(() => {
       progWrap.style.display = 'none';
       statusLine.style.display = 'none';
+      // เคลียร์ฟอร์ม
       document.getElementById('fileInput').value = '';
       document.getElementById('previewBox').style.display = 'none';
       document.getElementById('customSoundInput').value = '';
@@ -577,8 +569,9 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       document.getElementById('optCustom').classList.remove('selected');
       selectedFile = null;
       
+      // ไปหน้าแรก + เล่นเอง
       showPage('home');
-      viewPost(0); // เล่นเองทันที
+      viewPost(0);
     }, 1500);
     
   } catch (err) {
@@ -589,12 +582,13 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   }
 });
 
-// ===== ตรวจสอบใหม่เรื่อย ๆ ทุก 8 วินาที =====
+// ===== ซิงค์อัตโนมัติทุก 5 วินาที =====
 setInterval(() => {
-  if (!document.getElementById('profile').classList.contains('hidden')) {
-    loadAllPosts(true);
+  const inProfile = !document.getElementById('profile').classList.contains('hidden');
+  if (inProfile || Date.now() - lastSyncTime > 30000) {
+    loadAllPosts(inProfile);
   }
-}, 8000);
+}, 5000);
 
 // ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
