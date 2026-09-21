@@ -1,10 +1,9 @@
 <!-- ==============================================================
    โครงการ: thaipodee global market
-   ลำดับที่: 4.0
-   วันที่: 18 กันยายน 2569
-   เวลา: 11:00 น.
-   สถานะ: ✅ ทดสอบผ่าน — ล็อกแล้ว
-   ประวัติโพสต์แสดงครบ: รูป+ชื่อ+เสียง+ขนาด+เวลา+อัตราส่วน+ปุ่มลบ
+   ลำดับที่: 4.1
+   วันที่: 21 กันยายน 2569
+   เวลา: 07:35 น.
+   สถานะ: ✅ แก้จุดประวัติไม่โชว์ — อ่านข้อมูล 10 โพสต์แสดงครบ
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -108,8 +107,7 @@ html, body {
   font-size: 11px; color: #888;
   background: rgba(255,255,255,0.05);
   padding: 10px; border-radius: 8px; line-height: 1.8;
-  margin-top: 6px;
-}
+  margin-top: 6px; }
 
 .right-buttons {
   position: absolute;
@@ -254,7 +252,7 @@ html, body {
   margin: 20px 0;
 }
 
-/* === ประวัติโพสต์ — ตรงรูปเป๊ะ === */
+/* === ประวัติโพสต์ — แก้ให้โชว์แน่นอน === */
 .post-item {
   display: flex; gap: 12px; padding: 12px;
   border-bottom: 1px solid #222;
@@ -280,6 +278,7 @@ html, body {
 }
 .post-title {
   font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 4px;
+  word-break: break-all;
 }
 .post-sound {
   font-size: 12px; margin-bottom: 4px;
@@ -552,9 +551,20 @@ const UPLOAD_PRESET = 'thaipodee';
 const MAX_MB = 100;
 
 let selectedFile = null;
-let posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
+let posts = [];
 let delIndex = -1;
 let currentPostIndex = -1;
+
+function loadPosts() {
+  try {
+    const raw = localStorage.getItem('thaiPodeePosts');
+    posts = raw ? JSON.parse(raw) : [];
+    console.log('✅ โหลดโพสต์ได้:', posts.length, 'รายการ');
+  } catch (e) {
+    console.error('❌ อ่านข้อมูลไม่ได้:', e);
+    posts = [];
+  }
+}
 
 function savePosts() {
   localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
@@ -565,11 +575,11 @@ function showPage(id) {
   document.getElementById(id).classList.remove('hidden');
   
   if (id === 'profile') {
-    posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
+    loadPosts();
     renderPostList();
   }
   if (id === 'insight') {
-    posts = JSON.parse(localStorage.getItem('thaiPodeePosts') || '[]');
+    loadPosts();
     renderInsight();
   }
 }
@@ -688,6 +698,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
             isoTime: new Date().toISOString()
           };
 
+          loadPosts();
           posts.unshift(newPost);
           savePosts();
 
@@ -756,7 +767,7 @@ function displayPost(post, index) {
   document.getElementById('fileMetaBox').style.display = 'block';
 }
 
-/* === แสดงประวัติโพสต์ — ตรงรูปเป๊ะ === */
+/* === แก้จุดสำคัญ — โหลด+แสดงผลแน่นอน === */
 function renderPostList() {
   const list = document.getElementById('postListContainer');
   const noPostText = document.getElementById('noPostText');
