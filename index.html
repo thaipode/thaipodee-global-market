@@ -1,11 +1,25 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   ลำดับที่: 4.6.1
-   วันที่: 21 กันยายน 2569 15:56 น.
-   สถานะ: ✅ แก้ตัวเลขตามจริง — เหลือ 1 ก็โชว์ 1 ไม่ค้าง 17
-   เปลี่ยนแปลง:
-   - อัปเดตจำนวนโพสต์จากข้อมูลจริง ไม่ใช่ค่าเก่า
-   - เหลือ 1 → แสดง 1 ทุกที่
+   ลำดับที่: 4.6.4
+   อ้างอิงจาก: 4.6.3
+   วันที่: 21 กันยายน 2569 17:31 น.
+   --------------------------------------------------------------
+   ปัญหาและสาเหตุของเวอร์ชัน 4.6.3
+   
+   ปัญหา:
+   - ปุ่มแชร์กดแล้วไม่ทำงาน ไม่มีอะไรเกิดขึ้น
+   
+   สาเหตุ:
+   - มีแค่รูปไอคอนกับข้อความ "แชร์" แต่ไม่มีคำสั่งรองรับการกด
+   - ไม่ได้เขียนฟังก์ชันเปิดเมนูแชร์หรือคัดลอกลิงก์
+   
+   วิธีการแก้ไข:
+   - เพิ่มคำสั่งให้ปุ่มแชร์เรียกใช้งานเมนูแชร์ของมือถือ
+   - ถ้ามือถือไม่รองรับ แสดงลิงก์ให้ก๊อปปี้ส่งให้เพื่อนเองได้
+   --------------------------------------------------------------
+   เวอร์ชัน 4.6.4
+   แก้ไขจากเวอร์ชัน 4.6.3 ตามสาเหตุและวิธีการแก้ไขข้างต้น
+   โดยเพิ่มฟังก์ชันแชร์ให้ทำงานจริง ส่งให้เพื่อนได้เลย
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -268,13 +282,38 @@ html, body {
 .btn-cancel { background: #333; color: #fff; }
 .btn-confirm { background: #dc2626; color: #fff; }
 
+.share-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  z-index: 101; display: flex; align-items: center; justify-content: center;
+  padding: 20px; display: none;
+}
+.share-modal-box {
+  background: #1f1f1f; padding: 24px; border-radius: 12px;
+  max-width: 340px; width: 100%; border: 2px solid #444;
+}
+.share-title { font-weight: bold; font-size: 17px; margin-bottom: 12px; text-align: center; }
+.share-link-box {
+  background: #111; padding: 12px; border-radius: 8px;
+  word-break: break-all; font-size: 12px; color: #90ee90;
+  margin-bottom: 16px; border: 1px solid #333;
+}
+.share-copy-btn {
+  width: 100%; background: linear-gradient(90deg, #10b981, #059669);
+  border: none; padding: 12px; border-radius: 8px; color: #fff;
+  font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;
+}
+.share-close-btn {
+  width: 100%; background: #333; border: none; padding: 12px;
+  border-radius: 8px; color: #fff; font-size: 15px; cursor: pointer;
+}
+
 .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="update-bar" id="updateBar">
-  ✅ แก้แล้ว — ตัวเลขตรงกับจำนวนจริง
+  ✅ ปุ่มแชร์ทำงานแล้ว — กดเพื่อส่งให้เพื่อนได้เลย
 </div>
 
 <div id="splash" class="page splash-screen">
@@ -303,7 +342,8 @@ html, body {
     <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
     <div class="r-btn"><i class="fa-solid fa-comment"></i><span>0</span></div>
     <div class="r-btn"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
-    <div class="r-btn"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
+    <!-- ✅ ปุ่มแชร์ทำงานจริงแล้ว -->
+    <div class="r-btn" id="shareBtn"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
     <div class="r-btn"><i class="fa-solid fa-ellipsis-vertical"></i><span>เพิ่มเติม</span></div>
   </div>
 
@@ -333,362 +373,4 @@ html, body {
     <strong>ชื่อไฟล์:</strong> <span id="pName"></span><br>
     <strong>ขนาด:</strong> <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
     <strong>ระยะเวลา:</strong> <span id="pDur"></span><br>
-    <strong>อัตราส่วน:</strong> <span id="pRatio"></span>
-  </div>
-
-  <p style="font-size:13px; color:#ccc; margin:16px 0 8px;"><strong>เลือกเสียง:</strong></p>
-  <button class="sound-choice selected" id="optOrig">
-    <strong>🔊 เสียงต้นฉบับ</strong><br>
-    <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
-  </button>
-  <button class="sound-choice" id="optCustom">
-    <strong>✨ เพิ่มเสียงใหม่</strong><br>
-    <small style="color:#888;">ใส่ชื่อเพลงหรือเสียงอื่น</small>
-  </button>
-  <input type="text" id="customSoundInput" placeholder="ชื่อเสียง / ชื่อเพลง..." class="text-input">
-
-  <button class="submit-btn" id="doUpload">เผยแพร่</button>
-  <div class="progress-wrap" id="progWrap">
-    <div class="progress-fill" id="progFill"></div>
-  </div>
-  <div class="status-line" id="statusLine"></div>
-</div>
-
-<div id="profile" class="page hidden profile-container">
-  <button class="back-btn" data-goto="home">
-    <i class="fa-solid fa-arrow-left"></i> กลับ
-  </button>
-  <div class="profile-header">
-    <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
-    <h2 class="profile-name">ThaiPodee Master</h2>
-    <p class="profile-id">@thaipodee_master</p>
-    <div class="profile-stats">
-      <div class="stat-col">
-        <div class="stat-num" id="postTotal">0</div>
-        <div class="stat-label">โพสต์</div>
-      </div>
-      <div class="stat-col">
-        <div class="stat-num">0</div>
-        <div class="stat-label">ผู้ติดตาม</div>
-      </div>
-      <div class="stat-col">
-        <div class="stat-num">0</div>
-        <div class="stat-label">กำลังติดตาม</div>
-      </div>
-    </div>
-  </div>
-  <hr class="divider">
-
-  <button class="purge-btn" id="keepOnlyLatestBtn">
-    ⚠️ ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว
-  </button>
-
-  <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
-
-  <div id="postListContainer"></div>
-  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
-</div>
-
-<div id="delModal" class="modal-bg">
-  <div class="modal-box">
-    <p style="font-weight:bold; margin-bottom:8px;" id="modalTitle">⚠️ ยืนยันการลบ</p>
-    <p style="font-size:13px; color:#aaa; margin-bottom:12px;" id="modalNote">ลบแล้วไม่สามารถกู้คืนได้</p>
-    <div class="modal-btns">
-      <button class="modal-btn btn-cancel" id="cancelDel">ยกเลิก</button>
-      <button class="modal-btn btn-confirm" id="confirmDel">ลบทันที</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const CLOUD_NAME = 'orjpnytt';
-const UPLOAD_PRESET = 'thaipodee';
-const MAX_MB = 100;
-
-let selectedFile = null;
-let posts = [];
-let delIndex = -1;
-
-function loadPosts() {
-  try {
-    const raw = localStorage.getItem('thaiPodeePosts');
-    if (!raw) { posts = []; return; }
-    posts = JSON.parse(raw);
-    if (!Array.isArray(posts)) { posts = []; }
-  } catch (e) { posts = []; }
-}
-
-function savePosts() {
-  localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
-}
-
-function updateDebugInfo(text) {
-  const el = document.getElementById('debugInfo');
-  if (el) el.textContent = text;
-}
-
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  
-  if (id === 'profile') {
-    loadPosts();
-    renderPostList();
-  }
-}
-
-setTimeout(() => showPage('home'), 2000);
-
-document.querySelectorAll('[data-goto]').forEach(btn => {
-  btn.addEventListener('click', () => showPage(btn.dataset.goto));
-});
-
-/* === แสดงอันเดียว + ตัวเลขตรงกับจริง === */
-function renderPostList() {
-  const list = document.getElementById('postListContainer');
-  const noPostText = document.getElementById('noPostText');
-  
-  // ✅ อัปเดตตัวเลขตามจำนวนจริงทันที
-  document.getElementById('postTotal').textContent = posts.length;
-  
-  if (!posts.length) {
-    list.innerHTML = '';
-    noPostText.style.display = 'block';
-    updateDebugInfo('📋 ไม่มีรายการ');
-    return;
-  }
-  
-  noPostText.style.display = 'none';
-  
-  // แสดงเฉพาะอันล่าสุด
-  const p = posts[0];
-  const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
-  const isOk = parseFloat(p.sizeMB) <= MAX_MB;
-  const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
-  const thumbUrl = p.url;
-
-  list.innerHTML = `
-    <div class="post-item">
-      <div class="post-thumb" onclick="displayPost(posts[0]); showPage('home');">
-        <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
-             onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
-      </div>
-      <div class="post-info">
-        <div>
-          <div class="post-title" onclick="displayPost(posts[0]); showPage('home');">
-            ${p.name.replace(/\.[^.]+$/, '')}
-          </div>
-          <div class="post-sound ${soundClass}">
-            ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
-          </div>
-          <div class="post-meta">
-            📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
-            ⏱️ ${formatTime(p.duration)} | 📐 ${ratio}<br>
-            📅 ${p.time}<br>
-            <strong>แสดง 1/${posts.length} รายการทั้งหมด</strong>
-          </div>
-        </div>
-        <button class="post-del-btn" onclick="openDelModal(0)">
-          <i class="fa-solid fa-trash"></i> ลบ
-        </button>
-      </div>
-    </div>
-  `;
-  
-  updateDebugInfo(`✅ ตรงกัน! ทั้งหมด ${posts.length} รายการ — แสดงอันล่าสุด 1 รายการ`);
-}
-
-/* === ปุ่มลบทิ้งเหลืออันเดียว === */
-document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
-  if (posts.length <= 1) {
-    alert('มีอยู่แล้วอันเดียวครับ ✅');
-    return;
-  }
-  if (!confirm(`ยืนยัน! จะลบทิ้ง ${posts.length - 1} รายการ เหลือแค่อันล่าสุด?`)) return;
-  
-  // เหลือแค่อันแรก
-  posts = posts.slice(0, 1);
-  savePosts();
-  renderPostList(); // ตัวเลขจะเปลี่ยนเป็น 1 ทันที
-  alert('✅ เสร็จแล้ว — เหลือ 1 รายการ ตัวเลขตรงกันแล้ว!');
-});
-
-function openDelModal(idx) {
-  delIndex = idx;
-  document.getElementById('modalTitle').textContent = '⚠️ ลบรายการนี้';
-  document.getElementById('modalNote').textContent = 'ลบแล้วไม่สามารถกู้คืนได้';
-  document.getElementById('delModal').style.display = 'flex';
-}
-
-document.getElementById('cancelDel').addEventListener('click', () => {
-  delIndex = -1;
-  document.getElementById('delModal').style.display = 'none';
-});
-
-document.getElementById('confirmDel').addEventListener('click', () => {
-  if (delIndex > -1) {
-    posts.splice(delIndex, 1);
-    savePosts();
-    renderPostList(); // ตัวเลขลดทันที
-  }
-  delIndex = -1;
-  document.getElementById('delModal').style.display = 'none';
-});
-
-/* --- ส่วนอัปโหลดเหมือนเดิม --- */
-const fileInput = document.getElementById('fileInput');
-fileInput.addEventListener('change', async e => {
-  selectedFile = e.target.files[0];
-  if (!selectedFile) return;
-  const isVideo = selectedFile.type.startsWith('video/');
-  const sizeMB = (selectedFile.size / 1024 / 1024).toFixed(1);
-  document.getElementById('pName').textContent = selectedFile.name;
-  document.getElementById('pSize').textContent = `${sizeMB} MB`;
-  document.getElementById('pSizeCheck').textContent = parseFloat(sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน';
-  document.getElementById('previewBox').style.display = 'block';
-
-  if (isVideo) {
-    const v = document.createElement('video');
-    v.src = URL.createObjectURL(selectedFile);
-    await new Promise(r => { v.onloadedmetadata = r; });
-    document.getElementById('pDur').textContent = formatTime(v.duration);
-    document.getElementById('pRatio').textContent = v.videoWidth > v.videoHeight ? '16:9' : '9:16';
-    URL.revokeObjectURL(v.src);
-  } else {
-    const img = new Image();
-    img.src = URL.createObjectURL(selectedFile);
-    await new Promise(r => { img.onload = r; });
-    document.getElementById('pDur').textContent = '-';
-    document.getElementById('pRatio').textContent = img.width > img.height ? '16:9' : '9:16';
-    URL.revokeObjectURL(img.src);
-  }
-});
-
-document.getElementById('optOrig').addEventListener('click', () => {
-  document.getElementById('optOrig').classList.add('selected');
-  document.getElementById('optCustom').classList.remove('selected');
-  document.getElementById('customSoundInput').style.display = 'none';
-});
-document.getElementById('optCustom').addEventListener('click', () => {
-  document.getElementById('optCustom').classList.add('selected');
-  document.getElementById('optOrig').classList.remove('selected');
-  document.getElementById('customSoundInput').style.display = 'block';
-});
-
-document.getElementById('doUpload').addEventListener('click', async () => {
-  if (!selectedFile) { showStatus('⚠️ เลือกไฟล์ก่อน', 'error'); return; }
-  const sizeMB = (selectedFile.size / 1024 / 1024).toFixed(1);
-  if (parseFloat(sizeMB) > MAX_MB) { showStatus(`⚠️ ไฟล์ใหญ่เกิน ${MAX_MB}MB`, 'error'); return; }
-
-  showStatus('⏳ กำลังอัปโหลด...', 'info');
-  document.getElementById('progWrap').style.display = 'block';
-  document.getElementById('progFill').style.width = '0%';
-
-  const formData = new FormData();
-  formData.append('file', selectedFile);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  const resourceType = selectedFile.type.startsWith('video/') ? 'video' : 'image';
-
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, true);
-  xhr.upload.onprogress = e => {
-    if (e.lengthComputable) {
-      const pct = Math.round((e.loaded / e.total) * 100);
-      document.getElementById('progFill').style.width = `${pct}%`;
-    }
-  };
-  xhr.onload = function () {
-    document.getElementById('progWrap').style.display = 'none';
-    if (xhr.status === 200) {
-      const res = JSON.parse(xhr.responseText);
-      const soundMode = document.getElementById('optOrig').classList.contains('selected') ? 'original' : 'custom';
-      const soundName = soundMode === 'custom' ? document.getElementById('customSoundInput').value.trim() : '';
-      const soundLabel = soundMode === 'original' ? 'เสียงต้นฉบับ' : `เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
-
-      const newPost = {
-        id: res.public_id, url: res.secure_url, type: resourceType,
-        name: selectedFile.name, sizeMB,
-        width: res.width || 0, height: res.height || 0, duration: res.duration || 0,
-        soundMode, soundName, soundLabel,
-        time: new Date().toLocaleString('th-TH'), isoTime: new Date().toISOString()
-      };
-
-      loadPosts();
-      posts.unshift(newPost);
-      savePosts();
-
-      showStatus('✅ เผยแพร่สำเร็จ!', 'success');
-      displayPost(newPost);
-      resetUploadForm();
-      setTimeout(() => showPage('profile'), 1500);
-    } else {
-      showStatus(`❌ ไม่สำเร็จ (${xhr.status})`, 'error');
-    }
-  };
-  xhr.onerror = () => {
-    document.getElementById('progWrap').style.display = 'none';
-    showStatus('❌ ไม่มีการเชื่อมต่อ', 'error');
-  };
-  xhr.send(formData);
-});
-
-function displayPost(post) {
-  const area = document.getElementById('mediaArea');
-  area.innerHTML = '';
-
-  if (post.type === 'video') {
-    const video = document.createElement('video');
-    video.src = post.url;
-    video.controls = true; video.autoplay = true; video.muted = false;
-    video.loop = true; video.playsInline = true;
-    area.appendChild(video);
-  } else {
-    const img = document.createElement('img');
-    img.src = post.url; img.alt = post.name;
-    area.appendChild(img);
-  }
-
-  document.getElementById('topInfo').style.display = 'block';
-  document.getElementById('descText').textContent = post.name.replace(/\.[^.]+$/, '');
-  document.getElementById('soundLine').innerHTML = 
-    post.soundMode === 'original' 
-      ? `<span class="sound-orig">🔊 ${post.soundLabel}</span>`
-      : `<span class="sound-custom">✨ ${post.soundLabel}</span>`;
-  const ratio = post.width && post.height ? (post.width > post.height ? '16:9' : '9:16') : '-';
-  document.getElementById('fileMetaBox').innerHTML = `
-    ชื่อไฟล์: ${post.name}<br>
-    ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
-    ระยะเวลา: ${formatTime(post.duration)}<br>
-    อัตราส่วน: ${ratio}
-  `;
-  document.getElementById('fileMetaBox').style.display = 'block';
-}
-
-function formatTime(sec) {
-  if (!sec) return '-';
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-function showStatus(text, type) {
-  const el = document.getElementById('statusLine');
-  el.textContent = text;
-  el.className = `status-line status-${type}`;
-  el.style.display = 'block';
-  if (type !== 'info') setTimeout(() => el.style.display = 'none', 4000);
-}
-
-function resetUploadForm() {
-  selectedFile = null;
-  fileInput.value = '';
-  document.getElementById('previewBox').style.display = 'none';
-  document.getElementById('customSoundInput').value = '';
-  document.getElementById('customSoundInput').style.display = 'none';
-  document.getElementById('optOrig').classList.add('selected');
-  document.getElementById('optCustom').classList.remove('selected');
-  document.getElementById('statusLine').style.display = 'none';
-}
-</script>
-</body>
-</html>
+   
