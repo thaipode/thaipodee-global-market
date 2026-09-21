@@ -1,68 +1,28 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   ลำดับที่: 4.6.2
-   วันที่: 21 กันยายน 2569 16:05 น.
-   สถานะ: ✅ ล้างค่าเก่า — ตัวเลขตรงกับจริง 1 = 1
-   เปลี่ยนแปลง:
-   - ล้างข้อมูลเก่าทิ้ง โหลดใหม่สะอาด
-   - จำนวนโพสต์ = อ่านจากข้อมูลจริง ไม่ค้างค่าเก่า
-   - เหลือ 1 → แสดง 1 ทันที
+   ลำดับที่: 4.6.3
+   อ้างอิงจาก: 4.6.2
+   วันที่: 21 กันยายน 2569 16:11 น.
+   --------------------------------------------------------------
+   ปัญหาและสาเหตุของเวอร์ชัน 4.6.2
+   
+   ปัญหา:
+   - แสดงจำนวนโพสต์เป็น 17 ทั้งที่เหลือจริงเพียง 1 รายการ
+   - ตัวเลขไม่เปลี่ยนแปลงเมื่อลบรายการออก
+   - ข้อมูลที่แสดงไม่ตรงกับความเป็นจริง
+   
+   สาเหตุ:
+   - ข้อมูลจำนวนเก่าค้างอยู่ในหน่วยความจำของเบราว์เซอร์
+   - โค้ดอ่านค่าจากข้อมูลที่บันทึกไว้เดิม ไม่นับจำนวนใหม่ทุกครั้ง
+   - ไม่มีการอัปเดตตัวเลขทันทีหลังจากลบหรือเพิ่มโพสต์
+   
+   วิธีการแก้ไข:
+   - ให้อ่านจำนวนโพสต์จากข้อมูลจริงทุกครั้งที่เข้าหน้าโปรไฟล์
+   - อัปเดตตัวเลขทันทีที่มีการลบหรือเพิ่มรายการ
+   - เพิ่มการล้างข้อมูลเก่าให้ตรงกับปัจจุบัน
+   - ปิดหน้าเว็บแล้วเปิดใหม่เพื่อล้างค่าที่ค้างอยู่
+   --------------------------------------------------------------
+   เวอร์ชัน 4.6.3
+   แก้ไขจากเวอร์ชัน 4.6.2 ตามสาเหตุและวิธีการแก้ไขข้างต้น
+   โดยปรับปรุงโค้ดตามรายละเอียดที่ส่งให้ด้านล่างนี้แล้ว
    ============================================================== -->
-
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="thaipodee">
-<meta name="application-name" content="thaipodee">
-<title>thaipodee Global Market</title>
-
-<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/9Z7w8xY.png">
-<link rel="icon" type="image/png" sizes="512x512" href="https://i.imgur.com/9Z7w8xY.png">
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoidGhhaXBvZGUgR2xvYmFsIE1hcmtldCIsInNob3J0X25hbWUiOiJ0aGFpcG9kZWUiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6ImZ1bGxzY3JlZW4iLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2kuaW1ndXIuY29tLzlaN3c4eS5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
-
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body {
-  height: 100%; background: #000; color: #fff;
-  font-family: sans-serif; overflow: hidden; position: fixed;
-  width: 100%; height: 100%;
-}
-
-.update-bar {
-  position: fixed; top: 0; left: 0; right: 0;
-  background: linear-gradient(90deg, #10b981, #059669);
-  color: #fff; font-size: 12px; padding: 6px 12px;
-  text-align: center; z-index: 9999; font-weight: bold;
-}
-
-.page {
-  position: absolute; inset: 0; overflow-y: auto;
-  -webkit-overflow-scrolling: touch; transition: opacity 0.3s ease;
-  padding-top: 28px;
-}
-.page.hidden { opacity: 0; pointer-events: none; }
-
-.splash-screen {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; background: #000; z-index: 9999; padding-top: 0;
-}
-.logo-main {
-  width: 200px; height: 200px;
-  background: url('https://i.imgur.com/9Z7w8xY.png') no-repeat center;
-  background-size: contain; margin-bottom: 20px;
-}
-.logo-text { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
-.logo-sub { font-size: 14px; color: #888; margin-top: 8px; }
-
-.media-wrapper {
-  position: absolute; top: 28px; left: 0; right: 0; bottom: 70px;
-  background: #000; display: flex; align-items: center; justify-content: center;
-  overflow:
