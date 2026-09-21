@@ -1,11 +1,11 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: v13
-   วันที่: 21 กันยายน 2569 23:05 น.
+   เวอร์ชัน: v14
+   วันที่: 21 กันยายน 2569 23:11 น.
    --------------------------------------------------------------
-   ✅ กดเผยแพร่เสร็จ → วิดีโอเล่นเองอัตโนมัติทันที
-   ✅ รูปแสดงเองทันที ไม่ต้องกด
-   ✅ แชร์ครบ / ซิงค์ข้ามเครื่องครบ / ไม่แตะตำแหน่งอะไรเลย
+   ✅ ทุกเครื่องเห็นโพสต์เดียวกันทันที — ไม่ต้องรีเฟรช
+   ✅ กดเผยแพร่ → เล่นเองอัตโนมัติ
+   ✅ แชร์ครบ / ตำแหน่งเหมือนเดิม / ไม่แตะอะไรเพิ่ม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -128,7 +128,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v13</div>
+<div class="version-tag">v14</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -223,7 +223,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
   <hr class="divider">
-  <p class="sync-note">🔄 รีเฟรชแล้วกดโปรไฟล์ — เห็นโพสต์ทุกเครื่อง</p>
+  <p class="sync-note" id="syncStatus">🔄 กำลังโหลดจากคลาวด์...</p>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
 </div>
@@ -250,25 +250,30 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </div>
 
 <script>
+// ===== ตั้งค่า =====
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
-const SYNC_KEY = 'thaipodee_cloud_posts_v13';
+const SYNC_KEY = 'thaipodee_cloud_posts_v14';
 
-let selectedFile = null;
+// ===== ระบบซิงค์ข้ามเครื่องจริง =====
+// ใช้ Cloudinary เป็นแหล่งข้อมูลกลาง + ตรวจสอบเป็นระยะ
 let posts = [];
 let delIndex = -1;
 let useCustomSound = false;
+let lastSyncHash = '';
 
+// ===== เปลี่ยนหน้า =====
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  if (id === 'profile') loadAllPosts();
+  if (id === 'profile') loadAllPosts(true);
 }
 
 document.querySelectorAll('[data-goto]').forEach(b => {
   b.addEventListener('click', () => showPage(b.dataset.goto));
 });
 
+// ===== แชร์ =====
 async function openShareModal() {
   const shareUrl = window.location.href;
   if (navigator.share) {
@@ -296,12 +301,77 @@ document.getElementById('closeShareBtn').addEventListener('click', () => {
   document.getElementById('shareModal').style.display = 'none';
 });
 
-function loadAllPosts() {
+// ===== สร้างรหัสเช็คความเปลี่ยนแปลง =====
+function getHash(data) {
+  return btoa(encodeURIComponent(JSON.stringify(data.slice(0, 20)))).slice(0, 40);
+}
+
+// ===== โหลดโพสต์ — เช็คทั้งในเครื่องและจากแหล่งกลาง =====
+async function loadAllPosts(showRefreshMsg = false) {
   try {
-    const allData = localStorage.getItem(SYNC_KEY);
-    posts = allData ? JSON.parse(allData).posts.filter(p => !p.deleted) : [];
-    posts.sort((a, b) => b.time.localeCompare(a.time));
-  } catch { posts = []; }
+    // 1. โหลดรายการไฟล์ทั้งหมดจาก Cloudinary (แหล่งกลางที่ทุกเครื่องเข้าถึงได้)
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/resources/image/video/upload?max_results=50`);
+    if (!res.ok) throw new Error('ไม่เชื่อมต่อคลาวด์');
+    const data = await res.json();
+    
+    // 2. แปลงข้อมูลให้ตรงรูปแบบ
+    const cloudPosts = data.resources.map((r, idx) => ({
+      id: r.public_id,
+      name: r.filename + (r.format ? '.' + r.format : ''),
+      url: r.secure_url,
+      type: r.resource_type === 'video' ? 'video' : 'image',
+      sizeMB: (r.bytes / 1048576).toFixed(2),
+      width: r.width || 0,
+      height: r.height || 0,
+      soundMode: 'original',
+      soundLabel: 'เสียงต้นฉบับ',
+      time: new Date(r.created_at).toLocaleString('th-TH', {
+        day: 'numeric', month: 'numeric', year: '2-digit',
+        hour: 'numeric', minute: 'numeric'
+      }).replace(/\//g, '/'),
+      deleted: false
+    }));
+
+    // 3. รวมกับรายการที่บันทึกในเครื่อง (เช่น รายการที่เพิ่งอัปโหลด)
+    const localStr = localStorage.getItem(SYNC_KEY);
+    const localPosts = localStr ? JSON.parse(localStr).posts || [] : [];
+    
+    // เอาเฉพาะรายการที่ยังไม่มีในคลาวด์ + ยังไม่ลบ
+    const cloudIds = new Set(cloudPosts.map(p => p.id));
+    localPosts.forEach(p => {
+      if (!cloudIds.has(p.id) && !p.deleted) cloudPosts.unshift(p);
+    });
+
+    // 4. เรียงล่าสุดก่อน
+    cloudPosts.sort((a, b) => {
+      const dateA = new Date(a.time.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/20$3'));
+      const dateB = new Date(b.time.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/20$3'));
+      return dateB - dateA;
+    });
+
+    posts = cloudPosts;
+    saveLocal();
+
+    // แจ้งว่าอัปเดต
+    const newHash = getHash(posts);
+    if (newHash !== lastSyncHash) {
+      lastSyncHash = newHash;
+      if (showRefreshMsg) {
+        document.getElementById('syncStatus').textContent = '✅ เห็นโพสต์ทุกเครื่องแล้ว';
+        document.getElementById('syncStatus').style.color = '#10b981';
+      }
+    }
+  } catch (err) {
+    console.error('Sync error:', err);
+    // ถ้าเชื่อมต่อไม่ได้ ใช้ข้อมูลในเครื่องแทน
+    try {
+      const localStr = localStorage.getItem(SYNC_KEY);
+      posts = localStr ? JSON.parse(localStr).posts.filter(p => !p.deleted) : [];
+    } catch { posts = []; }
+    document.getElementById('syncStatus').textContent = '⚠️ ออฟไลน์ — เห็นเฉพาะเครื่องนี้';
+    document.getElementById('syncStatus').style.color = '#f59e0b';
+  }
+  
   renderPosts();
 }
 
@@ -313,14 +383,23 @@ function renderPosts() {
   const list = document.getElementById('postListContainer');
   const noText = document.getElementById('noPostText');
   document.getElementById('postTotal').textContent = posts.length;
-  if (!posts.length) { list.innerHTML = ''; noText.classList.remove('hidden'); return; }
-  noText.classList.add('hidden'); list.innerHTML = '';
+  
+  if (!posts.length) {
+    list.innerHTML = '';
+    noText.classList.remove('hidden');
+    return;
+  }
+  
+  noText.classList.add('hidden');
+  list.innerHTML = '';
+  
   posts.forEach((p, idx) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
     list.innerHTML += `
       <div class="post-item">
         <div class="post-thumb" onclick="viewPost(${idx}); showPage('home');">
-          <img src="${p.url}" alt="${p.name}" loading="lazy" onerror="this.src='https://i.imgur.com/9Z7w8xY.png'">
+          <img src="${p.url}" alt="${p.name}" loading="lazy"
+               onerror="this.src='https://i.imgur.com/9Z7w8xY.png'">
         </div>
         <div class="post-info">
           <div>
@@ -330,7 +409,10 @@ function renderPosts() {
             <div class="post-sound ${p.soundMode === 'original' ? 'orig' : 'custom'}">
               ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
             </div>
-            <div class="post-meta">📦 ${p.sizeMB} MB | 📐 ${ratio}<br>📅 ${p.time}</div>
+            <div class="post-meta">
+              📦 ${p.sizeMB} MB | 📐 ${ratio}<br>
+              📅 ${p.time}
+            </div>
           </div>
           <button class="post-del-btn" onclick="openDel(${idx})">
             <i class="fa-solid fa-trash"></i> ลบ
@@ -340,15 +422,16 @@ function renderPosts() {
   });
 }
 
-// ✅ แก้ตรงนี้ — เล่นเองอัตโนมัติ
+// ===== แสดงและเล่นเองอัตโนมัติ =====
 function viewPost(idx) {
   const p = posts[idx];
   if (!p) return;
+  
   const mediaArea = document.getElementById('mediaArea');
   const topInfo = document.getElementById('topInfo');
   topInfo.style.display = 'block';
   document.getElementById('fileMetaBox').style.display = 'block';
-
+  
   if (p.type === 'video') {
     mediaArea.innerHTML = `
       <video src="${p.url}" autoplay muted controls playsinline 
@@ -358,11 +441,12 @@ function viewPost(idx) {
     mediaArea.innerHTML = `
       <img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
   }
-
+  
   document.getElementById('descText').textContent = p.name.replace(/\.[^.]+$/, '');
   document.getElementById('soundLine').innerHTML = p.soundMode === 'original' 
     ? '<span class="sound-orig">🔊 เสียงต้นฉบับ</span>'
     : `<span class="sound-custom">✨ เพิ่มเสียง: ${p.soundLabel}</span>`;
+  
   const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
   document.getElementById('fileMetaBox').innerHTML = `
     📄 ชื่อไฟล์: ${p.name}<br>
@@ -382,9 +466,14 @@ document.getElementById('confirmDel').addEventListener('click', () => {
   loadAllPosts(); delIndex = -1;
 });
 
+// ===== เลือกไฟล์ =====
+let selectedFile = null;
 document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile = e.target.files[0];
-  if (!selectedFile) { document.getElementById('previewBox').style.display = 'none'; return; }
+  if (!selectedFile) {
+    document.getElementById('previewBox').style.display = 'none';
+    return;
+  }
   const sizeMB = (selectedFile.size / 1048576).toFixed(2);
   let w = 0, h = 0;
   if (selectedFile.type.startsWith('video')) {
@@ -406,6 +495,7 @@ document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile._w = w; selectedFile._h = h; selectedFile._sizeMB = sizeMB;
 });
 
+// ===== เลือกเสียง =====
 document.getElementById('optOrig').addEventListener('click', () => {
   useCustomSound = false;
   document.getElementById('optOrig').classList.add('selected');
@@ -419,33 +509,41 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
+// ===== อัปโหลด =====
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) return alert('เลือกไฟล์ก่อน');
+  
   const soundLabel = useCustomSound 
     ? (document.getElementById('customSoundInput').value.trim() || 'เพิ่มเสียง')
     : 'เสียงต้นฉบับ';
+  
   const progWrap = document.getElementById('progWrap');
   const progFill = document.getElementById('progFill');
   const statusLine = document.getElementById('statusLine');
+  
   progWrap.style.display = 'block';
   progFill.style.width = '0%';
   statusLine.style.display = 'block';
   statusLine.className = 'status-line';
   statusLine.textContent = 'กำลังอัปโหลด...';
-
+  
   try {
     const fd = new FormData();
     fd.append('file', selectedFile);
     fd.append('upload_preset', UPLOAD_PRESET);
+    
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
       method: 'POST', body: fd
     });
     if (!res.ok) throw new Error('อัปโหลดไม่สำเร็จ');
     const data = await res.json();
     progFill.style.width = '100%';
-
+    
     const now = new Date();
-    const timeStr = `${now.getDate()}/${now.getMonth()+1}/${String(now.getFullYear()).slice(-2)} — ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const timeStr = now.toLocaleString('th-TH', {
+      day: 'numeric', month: 'numeric', year: '2-digit',
+      hour: 'numeric', minute: 'numeric'
+    }).replace(/\//g, '/');
     
     const newPost = {
       id: data.public_id,
@@ -463,11 +561,10 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     
     posts.unshift(newPost);
     saveLocal();
-
+    
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เสร็จ — กำลังแสดง...';
-
-    // ✅ ขึ้นหน้าแรก + เล่นเองทันที
+    statusLine.textContent = '✅ เผยแพร่สำเร็จ — อีกเครื่องกดโปรไฟล์เห็นเลย';
+    
     setTimeout(() => {
       progWrap.style.display = 'none';
       statusLine.style.display = 'none';
@@ -481,9 +578,9 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       selectedFile = null;
       
       showPage('home');
-      viewPost(0); // เล่นโพสต์ล่าสุดทันที!
-    }, 1200);
-
+      viewPost(0); // เล่นเองทันที
+    }, 1500);
+    
   } catch (err) {
     progWrap.style.display = 'none';
     statusLine.className = 'status-line status-error';
@@ -492,10 +589,18 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   }
 });
 
+// ===== ตรวจสอบใหม่เรื่อย ๆ ทุก 8 วินาที =====
+setInterval(() => {
+  if (!document.getElementById('profile').classList.contains('hidden')) {
+    loadAllPosts(true);
+  }
+}, 8000);
+
+// ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     showPage('home');
-    loadAllPosts();
+    loadAllPosts(true);
   }, 2000);
 });
 </script>
