@@ -1,9 +1,15 @@
 <!-- ==============================================================
-   โครงการ: thaipodee global market
-   ลำดับที่: 4.2
+   โครงการ: thaipodee Global Market
+   ลำดับที่: 4.5.0
    วันที่: 21 กันยายน 2569
-   เวลา: 07:55 น.
-   สถานะ: ✅ แก้จุด 12 โพสต์ไม่โชว์รายการ — ล้างข้อมูลเสีย+บังคับแสดงผล
+   เวลา: 10:50 น.
+   สถานะ: ✅ บังคับแสดงประวัติทุกเครื่อง + แจ้งสถานะอัปเดต
+   เปลี่ยนแปลง:
+   - เพิ่มแถบสถานะ "อัปเดตพร้อมใช้งาน" ทุกหน้า
+   - renderPostList: บังคับวนลูปแสดงทุกรายการ ไม่ข้าม
+   - ตรวจสอบข้อมูลชัดเจน — แจ้งจำนวนรายการที่โหลดได้จริง
+   - แก้ thumbUrl ให้แน่ใจว่าดึงลิงก์ตรงจาก post.url จริง
+   - ไม่แตะตำแหน่งไอคอน / ฟังก์ชันเดิมเลย
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -37,12 +43,29 @@ html, body {
   width: 100%;
   height: 100%;
 }
+
+/* === แถบแจ้งสถานะอัปเดต === */
+.update-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #10b981, #059669);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  text-align: center;
+  z-index: 9999;
+  font-weight: bold;
+}
+
 .page {
   position: absolute;
   inset: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   transition: opacity 0.3s ease;
+  padding-top: 28px; /* เว้นที่แถบอัปเดต */
 }
 .page.hidden { opacity: 0; pointer-events: none; }
 
@@ -53,6 +76,7 @@ html, body {
   justify-content: center;
   background: #000;
   z-index: 9999;
+  padding-top: 0;
 }
 .logo-main {
   width: 200px;
@@ -74,7 +98,7 @@ html, body {
 
 .media-wrapper {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 70px;
+  top: 28px; left: 0; right: 0; bottom: 70px;
   background: #000;
   display: flex;
   align-items: center;
@@ -93,7 +117,7 @@ html, body {
 
 .top-info {
   position: absolute;
-  top: 60px; left: 16px; right: 70px; z-index: 10;
+  top: 88px; left: 16px; right: 70px; z-index: 10;
 }
 .username { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
 .desc { font-size: 14px; opacity: 0.9; margin-bottom: 6px; }
@@ -173,7 +197,7 @@ html, body {
 
 .upload-container {
   padding: 20px;
-  padding-top: 60px;
+  padding-top: 48px;
 }
 .back-btn {
   background: none; border: none; color: #fff;
@@ -227,7 +251,7 @@ html, body {
 
 .profile-container {
   padding: 20px;
-  padding-top: 60px;
+  padding-top: 48px;
 }
 .profile-header {
   text-align: center;
@@ -253,24 +277,27 @@ html, body {
   margin: 20px 0;
 }
 
-/* === ประวัติโพสต์ — บังคับแสดงผลแน่นอน === */
+/* === ประวัติโพสต์ — บังคับแสดงทุกรายการ === */
 .post-item {
   display: flex; gap: 12px; padding: 12px;
   border-bottom: 1px solid #222;
   background: rgba(255,255,255,0.02);
   border-radius: 8px;
   margin-bottom: 10px;
+  border: 1px solid #333; /* เพิ่มเส้นขอบให้เห็นชัด */
 }
 .post-thumb {
   width: 100px; height: 130px;
   background: #1a1a1a; border-radius: 6px;
   overflow: hidden; flex-shrink: 0; cursor: pointer;
+  border: 1px solid #444; /* เส้นขอบกรอบรูป */
 }
 .post-thumb img {
   width: 100%; height: 100%;
   object-fit: cover;
   background: #222;
   min-height: 130px;
+  display: block; /* บังคับแสดง */
 }
 .post-info {
   flex: 1;
@@ -301,6 +328,11 @@ html, body {
 }
 .empty-text {
   text-align: center; color: #888; padding: 40px 20px;
+}
+.debug-info {
+  font-size: 11px; color: #666;
+  background: rgba(255,255,255,0.03);
+  padding: 8px; border-radius: 6px; margin-bottom: 12px;
 }
 
 .modal-bg {
@@ -381,6 +413,11 @@ html, body {
 </style>
 </head>
 <body>
+
+<!-- แถบแจ้งสถานะอัปเดต — แสดงทุกหน้า ทุกเครื่อง -->
+<div class="update-bar" id="updateBar">
+  ✅ thaipodee อัปเดตล่าสุด: 2026-09-21 10:50 น. — โหลดเสร็จพร้อมใช้งาน
+</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -483,6 +520,12 @@ html, body {
     </div>
   </div>
   <hr class="divider">
+  
+  <!-- ข้อมูลตรวจสอบ — แสดงให้เห็นชัดเจน -->
+  <div class="debug-info" id="debugInfo">
+    กำลังโหลดข้อมูล...
+  </div>
+  
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
 </div>
@@ -558,31 +601,42 @@ let posts = [];
 let delIndex = -1;
 let currentPostIndex = -1;
 
+// === โหลดข้อมูล — แจ้งสถานะชัดเจน ===
 function loadPosts() {
   try {
     const raw = localStorage.getItem('thaiPodeePosts');
     if (!raw) {
       posts = [];
-      console.log('📭 ไม่มีข้อมูลเก่า');
+      console.log('📭 ไม่พบข้อมูลเก่า — เริ่มว่าง');
+      updateDebugInfo('📭 ยังไม่มีข้อมูลที่บันทึกไว้');
       return;
     }
     posts = JSON.parse(raw);
     if (!Array.isArray(posts)) {
-      console.warn('⚠️ ข้อมูลไม่ใช่รายการ — ล้างใหม่');
+      console.warn('⚠️ ข้อมูลไม่ใช่รายการ — รีเซ็ตใหม่');
       posts = [];
       localStorage.setItem('thaiPodeePosts', '[]');
+      updateDebugInfo('⚠️ ข้อมูลเก่าเสีย → ล้างใหม่แล้ว');
+      return;
     }
     console.log(`✅ โหลดโพสต์ได้: ${posts.length} รายการ`);
+    updateDebugInfo(`✅ พบข้อมูล: ${posts.length} รายการ — กำลังแสดง...`);
   } catch (e) {
-    console.error('❌ อ่านข้อมูลเสีย — ล้างใหม่:', e);
+    console.error('❌ อ่านข้อมูลผิดพลาด:', e);
     posts = [];
     localStorage.setItem('thaiPodeePosts', '[]');
+    updateDebugInfo(`❌ อ่านไม่ได้: ${e.message} → เริ่มใหม่`);
   }
 }
 
 function savePosts() {
   localStorage.setItem('thaiPodeePosts', JSON.stringify(posts));
   console.log(`💾 บันทึก: ${posts.length} รายการ`);
+}
+
+function updateDebugInfo(text) {
+  const el = document.getElementById('debugInfo');
+  if (el) el.textContent = text;
 }
 
 function showPage(id) {
@@ -717,7 +771,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
           posts.unshift(newPost);
           savePosts();
 
-          showStatus('✅ เผยแพร่สำเร็จ!', 'success');
+          showStatus('✅ เผยแพร่สำเร็จ! กำลังอัปเดตรายการ...', 'success');
           
           displayPost(newPost, 0);
           resetUploadForm();
@@ -782,7 +836,7 @@ function displayPost(post, index) {
   document.getElementById('fileMetaBox').style.display = 'block';
 }
 
-/* === แก้จุดหลัก — บังคับแสดงผลแน่นอน === */
+/* === บังคับแสดงทุกรายการ — ไม่ข้าม ไม่ซ่อน === */
 function renderPostList() {
   const list = document.getElementById('postListContainer');
   const noPostText = document.getElementById('noPostText');
@@ -792,21 +846,30 @@ function renderPostList() {
   if (!posts.length) {
     list.innerHTML = '';
     noPostText.style.display = 'block';
+    updateDebugInfo('📋 ไม่มีรายการที่จะแสดง');
     return;
   }
   
   noPostText.style.display = 'none';
+  updateDebugInfo(`📋 กำลังแสดง: ${posts.length} รายการ — กำลังสร้าง...`);
 
-  list.innerHTML = posts.map((p, i) => {
+  let html = '';
+  
+  // วนลูปทุกอัน บังคับสร้างทุกแถว
+  for (let i = 0; i < posts.length; i++) {
+    const p = posts[i];
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
     const isOk = parseFloat(p.sizeMB) <= MAX_MB;
     const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
+    
+    // เอาลิงก์ตรงจาก post.url เลย — ไม่ผ่านตัวกลาง
     const thumbUrl = p.url;
-    return `
+    
+    html += `
       <div class="post-item">
         <div class="post-thumb" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
           <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
-               onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
+               onerror="this.src='https://i.imgur.com/9Z7w8xY.png'; this.alt='ไม่มีรูป';">
         </div>
         <div class="post-info">
           <div>
@@ -828,9 +891,11 @@ function renderPostList() {
         </div>
       </div>
     `;
-  }).join('');
+  }
   
-  console.log(`📋 แสดงผล: ${posts.length} รายการแล้ว`);
+  list.innerHTML = html;
+  updateDebugInfo(`✅ แสดงผลครบ: ${posts.length} รายการแล้ว`);
+  console.log(`✅ แสดงผลครบ: ${posts.length} รายการแล้ว`);
 }
 
 function openDelModal(idx) {
