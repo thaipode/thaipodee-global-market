@@ -1,333 +1,1080 @@
 <!-- ==============================================================
    โครงการ: thaipodee Global Market
-   เวอร์ชัน: 1
-   วันที่: 21 กันยายน 2569 21:18 น.
+   ลำดับที่: 2
+   อ้างอิงจาก: 4.6.6
+   วันที่: 21 กันยายน 2569 21:30 น.
    --------------------------------------------------------------
    ปัญหา:
    - จำนวนโพสต์แสดงไม่ตรงกับความเป็นจริง
-   - ตัวเลขแสดง 18 แต่เหลือเห็นจริงเพียง 1 รายการ
-   - นับจำนวนทั้งหมดที่เคยโพสต์ ไม่หักรายการที่ลบไปแล้ว
+   - แสดงเลขทั้งหมดที่เคยโพสต์ ไม่หักรายการที่ลบไป
    
    สาเหตุ:
    - ใช้ posts.length นับทุกรายการ ไม่สนใจสถานะการลบ
-   - ตอนลบโพสต์ไม่อัปเดตตัวเลขใหม่
+   - ตอนลบไม่อัปเดตตัวเลขใหม่
    
    วิธีแก้ไข:
-   1. เปลี่ยนนับเฉพาะรายการที่ยังไม่ถูกลบ: posts.filter(p => !p.deleted).length
-   2. ตอนลบโพสต์ เรียกอัปเดตจำนวนทันที
-   3. ทุกจุดที่แสดงจำนวน ใช้สูตรเดียวกันให้ตรงกัน
+   - เปลี่ยนนับเฉพาะรายการที่ยังมีอยู่จริง
+   - ทุกจุดแสดงจำนวน ใช้สูตรเดียวกันให้ตรงกัน
    ============================================================== -->
-
+<!-- 001 -->
 <!DOCTYPE html>
+<!-- 002 -->
 <html lang="th">
+<!-- 003 -->
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="thaipodee">
-
-  <link rel="icon" type="image/png" sizes="192x192" href="./thaipodee_logo_icon.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="./thaipodee_logo_icon.png">
-
-  <title>thaipodee Global Market</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%; background: #000; color: #fff;
-      font-family: sans-serif;
-      -webkit-overflow-scrolling: touch;
-    }
-    .version-tag {
-      position: fixed; top: 10px; right: 10px;
-      background: rgba(0,0,0,0.6); color: #10b981;
-      font-size: 11px; padding: 3px 8px; border-radius: 10px;
-      z-index: 100;
-    }
-    .status-bar {
-      position: fixed; top: 10px; left: 10px; right: 80px;
-      background: rgba(22, 163, 74, 0.2); color: #4ade80;
-      font-size: 12px; padding: 6px 10px; border-radius: 6px;
-      z-index: 100; display: none;
-    }
-    .status-bar.show { display: block; }
-    .page {
-      display: none; min-height: 100vh; padding-bottom: 80px; padding-top: 45px;
-    }
-    .page.active { display: block; }
-    .splash {
-      position: fixed; inset: 0; background: #000;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 200; transition: opacity 0.4s ease;
-    }
-    .splash.hide { opacity: 0; pointer-events: none; }
-    .logo {
-      width: 180px; height: 180px;
-      background: url('./thaipodee_logo_icon.png') no-repeat center;
-      background-size: contain; margin-bottom: 16px;
-    }
-    .logo-text { font-size: 22px; font-weight: bold; }
-    .logo-sub { font-size: 13px; color: #888; margin-top: 6px; }
-
-    .post-card {
-      border-bottom: 1px solid #222; padding: 16px; background: #000;
-    }
-    .post-card.deleted { display: none; }
-    .media-box {
-      width: 100%; aspect-ratio: 9/16; background: #1a1a1a; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; margin: 10px 0;
-      position: relative; overflow: hidden;
-      background-size: cover; background-position: center;
-    }
-    .media-box i { font-size: 48px; color: #666; }
-    .meta { font-size: 12px; color: #888; margin: 4px 0; }
-    .title { font-weight: bold; font-size: 15px; margin: 6px 0; }
-    .del-btn {
-      background: #dc2626; border: none; color: #fff; padding: 6px 12px;
-      border-radius: 4px; font-size: 13px; margin-top: 8px; cursor 10;
-    }
-    .r-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer 0; right: 0; height: 70px; background: #; flex-direction: column; align-items: center; cursor: pointer; }
-    .nav-item i { font55, #ff6b4a);
-      border-radius: 6px border-radius: 3px; margin-top: 10px; display: none: 0%; transition: width 0.3s ease;
-    }
-2px; margin: 12px 0;
-    }
-  </">thaipodee</div>
-  <div class="logo-sub">Global-page="home"><i class="fas fa-home"></i><span>หน้าแรก</span></div>
-    <div class="nav-item"><i class="fas fa-search"></i><span>ค้นหา</span></div>
-    <div class="nav-item" data-page="upload"><div class="plus-btn"><i class="fas fa-plus"></i></div></div>
-    <div class="nav-item"><i class="far fa-comment-dots"></i><span>ข้อความ</span></div>
-    <div class="nav-item" data-page="profile"><i class="far fa-user"></i><span>ฉัน</span></div>
-  </div>
+<!-- 004 -->
+<meta charset="UTF-8">
+<!-- 005 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- 006 -->
+<meta name="theme-color" content="#000000">
+<!-- 007 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<!-- 008 -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 009 -->
+<meta name="apple-mobile-web-app-title" content="thaipodee">
+<!-- 010 -->
+<meta name="application-name" content="thaipodee">
+<!-- 011 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<!-- 012 -->
+<meta http-equiv="Pragma" content="no-cache">
+<!-- 013 -->
+<meta http-equiv="Expires" content="0">
+<!-- 014 -->
+<title>thaipodee Global Market</title>
+<!-- 015 -->
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/9Z7w8xY.png?v=466">
+<!-- 016 -->
+<link rel="icon" type="image/png" sizes="512x512" href="https://i.imgur.com/9Z7w8xY.png?v=466">
+<!-- 017 -->
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoidGhhaXBvZGUgR2xvYmFsIE1hcmtldCIsInNob3J0X25hbWUiOiJ0aGFpcG9kZWUiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6ImZ1bGxzY3JlZW4iLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImNhY2hlX2NvbnRyb2wiOiJuby1jYWNoZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2kuaW1ndXIuY29tLzlaN3c4eS5wbmcgP3Y9NDY2Iiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJdfX0=">
+<!-- 018 -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- 019 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- 020 -->
+<style>
+<!-- 021 -->
+* { margin: 0; padding: 0; box-sizing: border-box; }
+<!-- 022 -->
+html, body {
+<!-- 023 -->
+  height: 100%; background: #000; color: #fff;
+<!-- 024 -->
+  font-family: sans-serif; overflow: hidden; position: fixed;
+<!-- 025 -->
+  width: 100%; height: 100%;
+<!-- 026 -->
+}
+<!-- 027 -->
+.update-bar {
+<!-- 028 -->
+  position: fixed; top: 0; left: 0; right: 0;
+<!-- 029 -->
+  background: linear-gradient(90deg, #10b981, #059669);
+<!-- 030 -->
+  color: #fff; font-size: 12px; padding: 6px 12px;
+<!-- 031 -->
+  text-align: center; z-index: 9999; font-weight: bold;
+<!-- 032 -->
+}
+<!-- 033 -->
+.page {
+<!-- 034 -->
+  position: absolute; inset: 0; overflow-y: auto;
+<!-- 035 -->
+  -webkit-overflow-scrolling: touch; transition: opacity 0.3s ease;
+<!-- 036 -->
+  padding-top: 28px;
+<!-- 037 -->
+}
+<!-- 038 -->
+.page.hidden { opacity: 0; pointer-events: none; }
+<!-- 039 -->
+.splash-screen {
+<!-- 040 -->
+  display: flex; flex-direction: column; align-items: center;
+<!-- 041 -->
+  justify-content: center; background: #000; z-index: 9999; padding-top: 0;
+<!-- 042 -->
+}
+<!-- 043 -->
+.logo-main {
+<!-- 044 -->
+  width: 200px; height: 200px;
+<!-- 045 -->
+  background: url('https://i.imgur.com/9Z7w8xY.png?v=466') no-repeat center;
+<!-- 046 -->
+  background-size: contain; margin-bottom: 20px;
+<!-- 047 -->
+}
+<!-- 048 -->
+.logo-text { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+<!-- 049 -->
+.logo-sub { font-size: 14px; color: #888; margin-top: 8px; }
+<!-- 050 -->
+.media-wrapper {
+<!-- 051 -->
+  position: absolute; top: 28px; left: 0; right: 0; bottom: 70px;
+<!-- 052 -->
+  background: #000; display: flex; align-items: center; justify-content: center;
+<!-- 053 -->
+  overflow: hidden;
+<!-- 054 -->
+}
+<!-- 055 -->
+.media-wrapper video, .media-wrapper img {
+<!-- 056 -->
+  width: 100%; height: 100%; object-fit: contain; background: #000;
+<!-- 057 -->
+}
+<!-- 058 -->
+.media-placeholder { text-align: center; color: #666; }
+<!-- 059 -->
+.media-placeholder i { font-size: 48px; margin-bottom: 16px; }
+<!-- 060 -->
+.top-info {
+<!-- 061 -->
+  position: absolute; top: 88px; left: 16px; right: 70px; z-index: 10;
+<!-- 062 -->
+}
+<!-- 063 -->
+.username { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+<!-- 064 -->
+.desc { font-size: 14px; opacity: 0.9; margin-bottom: 6px; }
+<!-- 065 -->
+.sound-line {
+<!-- 066 -->
+  display: flex; align-items: center; gap: 6px;
+<!-- 067 -->
+  font-size: 13px; margin-bottom: 8px;
+<!-- 068 -->
+}
+<!-- 069 -->
+.sound-orig { color: #90ee90; }
+<!-- 070 -->
+.sound-custom { color: #ffd700; }
+<!-- 071 -->
+.file-meta {
+<!-- 072 -->
+  font-size: 11px; color: #888;
+<!-- 073 -->
+  background: rgba(255,255,255,0.05);
+<!-- 074 -->
+  padding: 10px; border-radius: 8px; line-height: 1.8;
+<!-- 075 -->
+  margin-top: 6px;
+<!-- 076 -->
+}
+<!-- 077 -->
+.right-buttons {
+<!-- 078 -->
+  position: absolute; right: 12px; bottom: 140px;
+<!-- 079 -->
+  display: flex; flex-direction: column; gap: 24px; z-index: 10;
+<!-- 080 -->
+}
+<!-- 081 -->
+.r-btn {
+<!-- 082 -->
+  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+<!-- 083 -->
+  touch-action: manipulation;
+<!-- 084 -->
+}
+<!-- 085 -->
+.r-btn i { font-size: 28px; }
+<!-- 086 -->
+.r-btn span { font-size: 10px; margin-top: 4px; }
+<!-- 087 -->
+.insight-link {
+<!-- 088 -->
+  position: absolute; right: 12px; bottom: 85px;
+<!-- 089 -->
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+<!-- 090 -->
+  padding: 8px 14px; border-radius: 20px;
+<!-- 091 -->
+  font-size: 11px; font-weight: bold; cursor: pointer; z-index: 10;
+<!-- 092 -->
+}
+<!-- 093 -->
+.bottom-nav {
+<!-- 094 -->
+  position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+<!-- 095 -->
+  background: #000; display: flex; justify-content: space-around;
+<!-- 096 -->
+  align-items: center; border-top: 1px solid #222; z-index: 20;
+<!-- 097 -->
+}
+<!-- 098 -->
+.nav-item {
+<!-- 099 -->
+  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+<!-- 100 -->
+  touch-action: manipulation;
+<!-- 101 -->
+}
+<!-- 102 -->
+.nav-item i { font-size: 24px; }
+<!-- 103 -->
+.nav-item span { font-size: 10px; margin-top: 2px; }
+<!-- 104 -->
+.plus-btn {
+<!-- 105 -->
+  width: 50px; height: 36px;
+<!-- 106 -->
+  background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+<!-- 107 -->
+  border-radius: 8px; display: flex; align-items: center;
+<!-- 108 -->
+  justify-content: center; font-size: 20px;
+<!-- 109 -->
+}
+<!-- 110 -->
+.upload-container { padding: 20px; padding-top: 48px; }
+<!-- 111 -->
+.back-btn {
+<!-- 112 -->
+  background: none; border: none; color: #fff;
+<!-- 113 -->
+  font-size: 16px; cursor: pointer; margin-bottom: 20px;
+<!-- 114 -->
+}
+<!-- 115 -->
+.form-title { margin-bottom: 20px; font-size: 18px; font-weight: bold; }
+<!-- 116 -->
+.input-file {
+<!-- 117 -->
+  background: #222; border: none; padding: 14px;
+<!-- 118 -->
+  border-radius: 8px; color: #fff; width: 100%; margin-bottom: 12px;
+<!-- 119 -->
+}
+<!-- 120 -->
+.preview-box {
+<!-- 121 -->
+  background: rgba(255,255,255,0.05); padding: 14px;
+<!-- 122 -->
+  border-radius: 8px; margin-bottom: 16px;
+<!-- 123 -->
+  font-size: 13px; line-height: 2; display: none;
+<!-- 124 -->
+}
+<!-- 125 -->
+.sound-choice {
+<!-- 126 -->
+  border: none; background: transparent; width: 100%;
+<!-- 127 -->
+  text-align: left; padding: 12px; color: #fff;
+<!-- 128 -->
+  cursor: pointer; border-radius: 8px; margin-bottom: 8px;
+<!-- 129 -->
+}
+<!-- 130 -->
+.sound-choice.selected {
+<!-- 131 -->
+  background: rgba(255,255,0,0.1); outline: 2px solid #ffd700;
+<!-- 132 -->
+}
+<!-- 133 -->
+.text-input {
+<!-- 134 -->
+  background: #222; border: none; padding: 12px;
+<!-- 135 -->
+  border-radius: 8px; color: #fff; width: 100%;
+<!-- 136 -->
+  margin-bottom: 12px; display: none;
+<!-- 137 -->
+}
+<!-- 138 -->
+.submit-btn {
+<!-- 139 -->
+  background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+<!-- 140 -->
+  border: none; padding: 14px; border-radius: 8px;
+<!-- 141 -->
+  color: #fff; font-weight: bold; width: 100%;
+<!-- 142 -->
+  font-size: 16px; cursor: pointer; margin-top: 8px;
+<!-- 143 -->
+}
+<!-- 144 -->
+.progress-wrap {
+<!-- 145 -->
+  height: 10px; background: #333; border-radius: 5px;
+<!-- 146 -->
+  margin: 20px 0; overflow: hidden; display: none;
+<!-- 147 -->
+}
+<!-- 148 -->
+.progress-fill {
+<!-- 149 -->
+  height: 100%;
+<!-- 150 -->
+  background: linear-gradient(90deg, #ff2e55, #ff6b4a);
+<!-- 151 -->
+  width: 0%; transition: width 0.3s;
+<!-- 152 -->
+}
+<!-- 153 -->
+.status-line {
+<!-- 154 -->
+  padding: 12px; border-radius: 8px; margin: 12px 0;
+<!-- 155 -->
+  font-size: 14px; font-weight: bold; display: none;
+<!-- 156 -->
+}
+<!-- 157 -->
+.status-info { background: rgba(250,204,21,0.15); color: #facc15; }
+<!-- 158 -->
+.status-success { background: rgba(74,222,128,0.15); color: #4ade80; }
+<!-- 159 -->
+.status-error { background: rgba(255,46,85,0.15); color: #ff6b4a; }
+<!-- 160 -->
+.profile-container { padding: 20px; padding-top: 48px; }
+<!-- 161 -->
+.profile-header { text-align: center; margin: 20px 0; }
+<!-- 162 -->
+.profile-avatar {
+<!-- 163 -->
+  width: 80px; height: 80px; background: #333; border-radius: 50%;
+<!-- 164 -->
+  display: flex; align-items: center; justify-content: center;
+<!-- 165 -->
+  font-size: 32px; margin: 0 auto;
+<!-- 166 -->
+}
+<!-- 167 -->
+.profile-name { margin-top: 12px; font-size: 18px; font-weight: bold; }
+<!-- 168 -->
+.profile-id { color: #888; font-size: 13px; margin-top: 4px; }
+<!-- 169 -->
+.profile-stats {
+<!-- 170 -->
+  display: flex; justify-content: center; gap: 40px; margin-top: 20px;
+<!-- 171 -->
+}
+<!-- 172 -->
+.stat-col { text-align: center; }
+<!-- 173 -->
+.stat-num { font-weight: bold; font-size: 20px; }
+<!-- 174 -->
+.stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+<!-- 175 -->
+.divider { border: none; border-top: 1px solid #333; margin: 20px 0; }
+<!-- 176 -->
+.purge-btn {
+<!-- 177 -->
+  width: 100%; background: #dc2626; color: #fff; border: none;
+<!-- 178 -->
+  padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold;
+<!-- 179 -->
+  cursor: pointer; margin-bottom: 20px;
+<!-- 180 -->
+}
+<!-- 181 -->
+.purge-btn:active { transform: scale(0.98); }
+<!-- 182 -->
+.debug-info {
+<!-- 183 -->
+  background: #1a1a1a; border: 1px solid #333;
+<!-- 184 -->
+  padding: 12px; border-radius: 8px; margin-bottom: 16px;
+<!-- 185 -->
+  font-size: 13px; color: #facc15; font-weight: bold;
+<!-- 186 -->
+}
+<!-- 187 -->
+.post-item {
+<!-- 188 -->
+  display: flex; gap: 12px; padding: 12px;
+<!-- 189 -->
+  border: 2px solid #444; border-radius: 10px;
+<!-- 190 -->
+  margin-bottom: 12px; background: #111;
+<!-- 191 -->
+  min-height: 140px;
+<!-- 192 -->
+}
+<!-- 193 -->
+.post-thumb {
+<!-- 194 -->
+  width: 110px; height: 140px;
+<!-- 195 -->
+  background: #222; border-radius: 8px;
+<!-- 196 -->
+  overflow: hidden; flex-shrink: 0;
+<!-- 197 -->
+  border: 2px solid #555; cursor: pointer;
+<!-- 198 -->
+}
+<!-- 199 -->
+.post-thumb img {
+<!-- 200 -->
+  width: 100%; height: 100%; object-fit: cover;
+<!-- 201 -->
+  display: block; background: #333;
+<!-- 202 -->
+}
+<!-- 203 -->
+.post-info {
+<!-- 204 -->
+  flex: 1; display: flex; flex-direction: column;
+<!-- 205 -->
+  justify-content: space-between; min-height: 140px;
+<!-- 206 -->
+}
+<!-- 207 -->
+.post-title {
+<!-- 208 -->
+  font-weight: bold; font-size: 14px; cursor: pointer;
+<!-- 209 -->
+  word-break: break-all; margin-bottom: 4px; color: #fff;
+<!-- 210 -->
+}
+<!-- 211 -->
+.post-sound { font-size: 12px; margin-bottom: 4px; }
+<!-- 212 -->
+.post-sound.orig { color: #90ee90; }
+<!-- 213 -->
+.post-sound.custom { color: #ffd700; }
+<!-- 214 -->
+.post-meta {
+<!-- 215 -->
+  font-size: 11px; color: #aaa; line-height: 1.6; margin-bottom: 8px;
+<!-- 216 -->
+}
+<!-- 217 -->
+.post-meta .ok { color: #4ade80; }
+<!-- 218 -->
+.post-del-btn {
+<!-- 219 -->
+  background: #dc2626; border: none; color: #fff;
+<!-- 220 -->
+  padding: 10px 20px; border-radius: 8px;
+<!-- 221 -->
+  font-size: 14px; font-weight: bold; cursor: pointer;
+<!-- 222 -->
+  align-self: flex-start;
+<!-- 223 -->
+  box-shadow: 0 2px 6px rgba(220,38,38,0.4);
+<!-- 224 -->
+}
+<!-- 225 -->
+.post-del-btn:active { transform: scale(0.97); }
+<!-- 226 -->
+.empty-text {
+<!-- 227 -->
+  text-align: center; color: #888; padding: 60px 20px;
+<!-- 228 -->
+  font-size: 15px;
+<!-- 229 -->
+}
+<!-- 230 -->
+.modal-bg {
+<!-- 231 -->
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+<!-- 232 -->
+  z-index: 100; display: flex; align-items: center; justify-content: center;
+<!-- 233 -->
+  padding: 20px; display: none;
+<!-- 234 -->
+}
+<!-- 235 -->
+.modal-box {
+<!-- 236 -->
+  background: #1f1f1f; padding: 24px; border-radius: 12px;
+<!-- 237 -->
+  max-width: 320px; width: 100%; text-align: center;
+<!-- 238 -->
+  border: 2px solid #444;
+<!-- 239 -->
+}
+<!-- 240 -->
+.modal-btns { display: flex; gap: 12px; margin-top: 20px; }
+<!-- 241 -->
+.modal-btn {
+<!-- 242 -->
+  flex: 1; border: none; padding: 14px; border-radius: 8px;
+<!-- 243 -->
+  font-weight: bold; cursor: pointer; font-size: 15px;
+<!-- 244 -->
+}
+<!-- 245 -->
+.btn-cancel { background: #333; color: #fff; }
+<!-- 246 -->
+.btn-confirm { background: #dc2626; color: #fff; }
+<!-- 247 -->
+.share-modal-bg {
+<!-- 248 -->
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+<!-- 249 -->
+  z-index: 101; display: flex; align-items: center; justify-content: center;
+<!-- 250 -->
+  padding: 20px; display: none;
+<!-- 251 -->
+}
+<!-- 252 -->
+.share-modal-box {
+<!-- 253 -->
+  background: #1f1f1f; padding: 24px; border-radius: 12px;
+<!-- 254 -->
+  max-width: 340px; width: 100%; border: 2px solid #444;
+<!-- 255 -->
+}
+<!-- 256 -->
+.share-title { font-weight: bold; font-size: 17px; margin-bottom: 12px; text-align: center; }
+<!-- 257 -->
+.share-link-box {
+<!-- 258 -->
+  background: #111; padding: 12px; border-radius: 8px;
+<!-- 259 -->
+  word-break: break-all; font-size: 12px; color: #90ee90;
+<!-- 260 -->
+  margin-bottom: 16px; border: 1px solid #333;
+<!-- 261 -->
+}
+<!-- 262 -->
+.share-copy-btn {
+<!-- 263 -->
+  width: 100%; background: linear-gradient(90deg, #10b981, #059669);
+<!-- 264 -->
+  border: none; padding: 12px; border-radius: 8px; color: #fff;
+<!-- 265 -->
+  font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;
+<!-- 266 -->
+}
+<!-- 267 -->
+.share-close-btn {
+<!-- 268 -->
+  width: 100%; background: #333; border: none; padding: 12px;
+<!-- 269 -->
+  border-radius: 8px; color: #fff; font-size: 15px; cursor: pointer;
+<!-- 270 -->
+}
+<!-- 271 -->
+.hidden { display: none !important; }
+<!-- 272 -->
+</style>
+<!-- 273 -->
+</head>
+<!-- 274 -->
+<body>
+<!-- 275 -->
+<div class="update-bar" id="updateBar">
+<!-- 276 -->
+  ✅ อัปเดตอัตโนมัติ — เวอร์ชันล่าสุดทำงานแล้ว
+<!-- 277 -->
 </div>
-
-<div id="upload" class="page">
-  <div class="p-4">
-    <button class="mb-4 text-lg" data-page="home"><i class="fas fa-arrow-left"></i> กลับ</button>
-    <h3 class="text-xl font-bold mb-4">โพสต์วิดีโอ / รูปภาพ</h3>
-    <input type="file" id="fileInput" accept="video/*,image/*" class="w-full p-3 bg-gray-800 rounded-lg mb-3">
-    <div class="progress-bar" id="progressBar">
-      <div class="progress-fill" id="progressFill"></div>
+<!-- 278 -->
+<div id="splash" class="page splash-screen">
+<!-- 279 -->
+  <div class="logo-main"></div>
+<!-- 280 -->
+  <div class="logo-text">thaipodee</div>
+<!-- 281 -->
+  <div class="logo-sub">Global Market — ตลาดโลก</div>
+<!-- 282 -->
+</div>
+<!-- 283 -->
+<div id="home" class="page hidden">
+<!-- 284 -->
+  <div class="media-wrapper" id="mediaArea">
+<!-- 285 -->
+    <div class="media-placeholder">
+<!-- 286 -->
+      <i class="fa-solid fa-video"></i>
+<!-- 287 -->
+      <p>กดปุ่ม + เพื่อโพสต์วิดีโอหรือรูปภาพ</p>
+<!-- 288 -->
     </div>
-    <button id="postBtn" class="w-full py-3 rounded-lg font-bold bg-gradient-to-r from-pink-600 to-orange-500 mt-3">เผยแพร่</button>
+<!-- 289 -->
   </div>
-</div>
-
-<div id="profile" class="page">
-  <div class="p-4">
-    <button class="mb-4 text-lg" data-page="home"><i class="fas fa-arrow-left"></i> กลับ</button>
-    <h3 class="text-xl font-bold mb-3">โปรไฟล์</h3>
-    <p class="text-gray-400 mb-2">ชื่อ: ThaiPodee Master</p>
-    <p class="text-gray-400 mb-2">จำนวนโพสต์: <span id="postCount">0</span></p>
-    <p class="text-gray-400 mb-4">เริ่มใช้งาน: 21 กันยายน 2569</p>
-    
-    <div class="danger-box">
-      <p class="text-yellow-400 text-sm"><i class="fas fa-exclamation-triangle"></i> ลบทั้งหมด — เหลือเฉพาะล่าสุดอันเดียว</p>
-      <button id="keepLatestBtn" class="del-btn mt-2">เหลืออันล่าสุดเพียง 1 รายการ</button>
+<!-- 290 -->
+  <div class="top-info" id="topInfo" style="display:none;">
+<!-- 291 -->
+    <p class="username">ThaiPodee Master</p>
+<!-- 292 -->
+    <p class="desc" id="descText"></p>
+<!-- 293 -->
+    <div class="sound-line" id="soundLine"></div>
+<!-- 294 -->
+    <div class="file-meta" id="fileMetaBox" style="display:none;"></div>
+<!-- 295 -->
+  </div>
+<!-- 296 -->
+  <div class="right-buttons">
+<!-- 297 -->
+    <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>โปรไฟล์</span></div>
+<!-- 298 -->
+    <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
+<!-- 299 -->
+    <div class="r-btn"><i class="fa-solid fa-comment"></i><span>0</span></div>
+<!-- 300 -->
+    <div class="r-btn"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
+<!-- 301 -->
+    <div class="r-btn" id="shareBtn"><i class="fa-solid fa-share"></i><span>แชร์</span></div>
+<!-- 302 -->
+    <div class="r-btn"><i class="fa-solid fa-ellipsis-vertical"></i><span>เพิ่มเติม</span></div>
+<!-- 303 -->
+  </div>
+<!-- 304 -->
+  <div class="insight-link" data-goto="insight">
+<!-- 305 -->
+    <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
+<!-- 306 -->
+  </div>
+<!-- 307 -->
+  <div class="bottom-nav">
+<!-- 308 -->
+    <div class="nav-item" data-goto="home"><i class="fa-solid fa-home"></i><span>หน้าแรก</span></div>
+<!-- 309 -->
+    <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>ค้นหา</span></div>
+<!-- 310 -->
+    <div class="nav-item" data-goto="upload">
+<!-- 311 -->
+      <div class="plus-btn"><i class="fa-solid fa-plus"></i></div>
+<!-- 312 -->
     </div>
-    
-    <div id="profilePostsContainer"></div>
+<!-- 313 -->
+    <div class="nav-item"><i class="fa-solid fa-message"></i><span>ข้อความ</span></div>
+<!-- 314 -->
+    <div class="nav-item" data-goto="profile"><i class="fa-solid fa-user"></i><span>ฉัน</span></div>
+<!-- 315 -->
   </div>
+<!-- 316 -->
 </div>
-
+<!-- 317 -->
+<div id="upload" class="page hidden upload-container">
+<!-- 318 -->
+  <button class="back-btn" data-goto="home">
+<!-- 319 -->
+    <i class="fa-solid fa-arrow-left"></i> กลับ
+<!-- 320 -->
+  </button>
+<!-- 321 -->
+  <h3 class="form-title">โพสต์วิดีโอ / รูปภาพ</h3>
+<!-- 322 -->
+  <input type="file" id="fileInput" accept="video/*,image/*" class="input-file">
+<!-- 323 -->
+  <div class="preview-box" id="previewBox">
+<!-- 324 -->
+    <strong>ชื่อไฟล์:</strong> <span id="pName"></span><br>
+<!-- 325 -->
+    <strong>ขนาด:</strong> <span id="pSize"></span> — <span id="pSizeCheck"></span><br>
+<!-- 326 -->
+    <strong>ระยะเวลา:</strong> <span id="pDur"></span><br>
+<!-- 327 -->
+    <strong>อัตราส่วน:</strong> <span id="pRatio"></span>
+<!-- 328 -->
+  </div>
+<!-- 329 -->
+  <p style="font-size:13px; color:#ccc; margin:16px 0 8px;"><strong>เลือกเสียง:</strong></p>
+<!-- 330 -->
+  <button class="sound-choice selected" id="optOrig">
+<!-- 331 -->
+    <strong>🔊 เสียงต้นฉบับ</strong><br>
+<!-- 332 -->
+    <small style="color:#888;">ใช้เสียงจากไฟล์เดิม</small>
+<!-- 333 -->
+  </button>
+<!-- 334 -->
+  <button class="sound-choice" id="optCustom">
+<!-- 335 -->
+    <strong>✨ เพิ่มเสียงใหม่</strong><br>
+<!-- 336 -->
+    <small style="color:#888;">ใส่ชื่อเพลงหรือเสียงอื่น</small>
+<!-- 337 -->
+  </button>
+<!-- 338 -->
+  <input type="text" id="customSoundInput" placeholder="ชื่อเสียง / ชื่อเพลง..." class="text-input">
+<!-- 339 -->
+  <button class="submit-btn" id="doUpload">เผยแพร่</button>
+<!-- 340 -->
+  <div class="progress-wrap" id="progWrap">
+<!-- 341 -->
+    <div class="progress-fill" id="progFill"></div>
+<!-- 342 -->
+  </div>
+<!-- 343 -->
+  <div class="status-line" id="statusLine"></div>
+<!-- 344 -->
+</div>
+<!-- 345 -->
+<div id="profile" class="page hidden profile-container">
+<!-- 346 -->
+  <button class="back-btn" data-goto="home">
+<!-- 347 -->
+    <i class="fa-solid fa-arrow-left"></i> กลับ
+<!-- 348 -->
+  </button>
+<!-- 349 -->
+  <div class="profile-header">
+<!-- 350 -->
+    <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+<!-- 351 -->
+    <h2 class="profile-name">ThaiPodee Master</h2>
+<!-- 352 -->
+    <p class="profile-id">@thaipodee_master</p>
+<!-- 353 -->
+    <div class="profile-stats">
+<!-- 354 -->
+      <div class="stat-col">
+<!-- 355 -->
+        <div class="stat-num" id="postTotal">0</div>
+<!-- 356 -->
+        <div class="stat-label">โพสต์</div>
+<!-- 357 -->
+      </div>
+<!-- 358 -->
+      <div class="stat-col">
+<!-- 359 -->
+        <div class="stat-num">0</div>
+<!-- 360 -->
+        <div class="stat-label">ผู้ติดตาม</div>
+<!-- 361 -->
+      </div>
+<!-- 362 -->
+      <div class="stat-col">
+<!-- 363 -->
+        <div class="stat-num">0</div>
+<!-- 364 -->
+        <div class="stat-label">กำลังติดตาม</div>
+<!-- 365 -->
+      </div>
+<!-- 366 -->
+    </div>
+<!-- 367 -->
+  </div>
+<!-- 368 -->
+  <hr class="divider">
+<!-- 369 -->
+  <button class="purge-btn" id="keepOnlyLatestBtn">
+<!-- 370 -->
+    ⚠️ ลบทิ้งหมด — เหลืออันล่าสุดอันเดียว
+<!-- 371 -->
+  </button>
+<!-- 372 -->
+  <div class="debug-info" id="debugInfo">กำลังโหลด...</div>
+<!-- 373 -->
+  <div id="postListContainer"></div>
+<!-- 374 -->
+  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์เลย — กด + เพื่อสร้างโพสต์แรก</p>
+<!-- 375 -->
+</div>
+<!-- 376 -->
+<div id="delModal" class="modal-bg">
+<!-- 377 -->
+  <div class="modal-box">
+<!-- 378 -->
+    <p style="font-weight:bold; margin-bottom:8px;" id="modalTitle">⚠️ ยืนยันการลบ</p>
+<!-- 379 -->
+    <p style="font-size:13px; color:#aaa; margin-bottom:12px;" id="modalNote">ลบแล้วไม่สามารถกู้คืนได้</p>
+<!-- 380 -->
+    <div class="modal-btns">
+<!-- 381 -->
+      <button class="modal-btn btn-cancel" id="cancelDel">ยกเลิก</button>
+<!-- 382 -->
+      <button class="modal-btn btn-confirm" id="confirmDel">ลบทันที</button>
+<!-- 383 -->
+    </div>
+<!-- 384 -->
+  </div>
+<!-- 385 -->
+</div>
+<!-- 386 -->
+<div id="shareModal" class="share-modal-bg">
+<!-- 387 -->
+  <div class="share-modal-box">
+<!-- 388 -->
+    <p class="share-title">📤 แชร์ให้เพื่อน</p>
+<!-- 389 -->
+    <div class="share-link-box" id="shareLinkBox"></div>
+<!-- 390 -->
+    <button class="share-copy-btn" id="copyLinkBtn">
+<!-- 391 -->
+      <i class="fa-solid fa-copy"></i> ก๊อปปี้ลิงก์
+<!-- 392 -->
+    </button>
+<!-- 393 -->
+    <button class="share-close-btn" id="closeShareBtn">ปิด</button>
+<!-- 394 -->
+  </div>
+<!-- 395 -->
+</div>
+<!-- 396 -->
 <script>
+<!-- 397 -->
+const CLOUD_NAME = 'orjpnytt';
+<!-- 398 -->
+const UPLOAD_PRESET = 'thaipodee';
+<!-- 399 -->
+const MAX_MB = 100;
+<!-- 400 -->
+const APP_VERSION = '2';
+<!-- 401 -->
+let selectedFile = null;
+<!-- 402 -->
 let posts = [];
-
-function loadPosts() {
-  const saved = localStorage.getItem('thaipodee_posts');
-  if (saved) {
-    posts = JSON.parse(saved);
-  }
-  renderPosts();
-  renderProfilePosts();
-  updatePostCount();
-}
-
-function savePosts() {
-  localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
-}
-
-function updatePostCount() {
-  const activeCount = posts.filter(p => !p.deleted).length;
-  document.getElementById('postCount').textContent = activeCount;
-}
-
-function renderPosts() {
-  const container = document.getElementById('postsContainer');
-  container.innerHTML = '';
-  
-  posts.filter(p => !p.deleted).forEach(p => {
-    let bg = p.thumbnail ? `background-image:url('${p.thumbnail}');` : '';
-    container.innerHTML += `
-      <div class="post-card">
-        <div class="meta">${p.author} · ${p.date} · ${p.source}</div>
-        <div class="title">${p.title}</div>
-        <div class="media-box" style="${bg}">
-          <i class="fas fa-${p.type==='video'?'play-circle':'image'}"></i>
-          <div class="right-buttons">
-            <div class="r-btn"><i class="fas fa-user"></i><span>${p.author}</span></div>
-            <div class="r-btn"><i class="far fa-heart"></i><span>0</span></div>
-            <div class="r-btn"><i class="far fa-comment"></i><span>0</span></div>
-            <div class="r-btn"><i class="far fa-bookmark"></i><span>บันทึก</span></div>
-            <div class="r-btn" onclick="shareThis()"><i class="fas fa-share"></i><span>แชร์</span></div>
-            <div class="r-btn" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i><span>ลบ</span></div>
-          </div>
-        </div>
-        <div class="meta">${p.aspect} · ${p.size || ''}</div>
-      </div>
-    `;
-  });
-}
-
-function renderProfilePosts() {
-  const container = document.getElementById('profilePostsContainer');
-  if (!container) return;
-  container.innerHTML = '';
-  
-  posts.filter(p => !p.deleted).forEach(p => {
-    let bg = p.thumbnail ? `background-image:url('${p.thumbnail}');` : '';
-    container.innerHTML += `
-      <div class="post-card">
-        <div class="meta">${p.author} · ${p.date} · ${p.source}</div>
-        <div class="title">${p.title}</div>
-        <div class="media-box" style="${bg}">
-          <i class="fas fa-${p.type==='video'?'play-circle':'image'}"></i>
-        </div>
-        <div class="meta">${p.aspect} · ${p.size || ''}</div>
-        <button class="del-btn" onclick="deletePost('${p.id}')">ลบรายการนี้</button>
-      </div>
-    `;
-  });
-}
-
-function deletePost(id) {
-  if (!confirm('ยืนยันการลบ?')) return;
-  const idx = posts.findIndex(p => p.id === id);
-  if (idx !== -1) {
-    posts[idx].deleted = true;
-    savePosts();
-    renderPosts();
-    renderProfilePosts();
-    updatePostCount();
-    showStatus('ลบเรียบร้อย ✅');
-  }
-}
-
-function keepOnlyLatest() {
-  if (!confirm('เหลือเฉพาะรายการล่าสุด? รายการอื่นจะหายไป')) return;
-  const active = posts.filter(p => !p.deleted);
-  if (active.length <= 1) {
-    showStatus('มีรายการเดียวอยู่แล้ว ✅');
-    return;
-  }
-  active.slice(1).forEach(p => {
-    const idx = posts.findIndex(x => x.id === p.id);
-    if (idx !== -1) posts[idx].deleted = true;
-  });
-  savePosts();
-  renderPosts();
-  renderProfilePosts();
-  updatePostCount();
-  showStatus('เหลือ 1 รายการเรียบร้อย ✅');
-}
-
-function showStatus(text, duration = 2000) {
-  const bar = document.getElementById('statusBar');
-  bar.textContent = text;
-  bar.classList.add('show');
-  if (duration > 0) setTimeout(() => bar.classList.remove('show'), duration);
-}
-
-function shareThis() {
-  const txt = `✅ thaipodee Global Market
-🔗 ลิงก์: ${window.location.href}
-📌 เปิดใน Chrome → กดจุด 3 → เพิ่มไปที่หน้าจอหลัก`;
-  if (navigator.share) {
-    navigator.share({title: 'thaipodee', text: txt});
-  } else {
-    navigator.clipboard.writeText(txt).then(() => alert('คัดลอกลิงก์แล้ว ✅'));
-  }
-}
-
-setTimeout(() => {
-  document.getElementById('splash').classList.add('hide');
-  loadPosts();
-}, 1200);
-
-document.querySelectorAll('[data-page]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(btn.dataset.page).classList.add('active');
-    window.scrollTo(0, 0);
-    if (btn.dataset.page === 'profile') {
-      renderProfilePosts();
-      updatePostCount();
+<!-- 403 -->
+let delIndex = -1;
+<!-- 404 -->
+function autoUpdateCheck() {
+<!-- 405 -->
+  const lastVer = localStorage.getItem('thaipodee_version');
+<!-- 406 -->
+  if (lastVer !== APP_VERSION) {
+<!-- 407 -->
+    console.log(`พบเวอร์ชันใหม่: ${APP_VERSION} (เก่า: ${lastVer || 'ไม่มี'})`);
+<!-- 408 -->
+    try {
+<!-- 409 -->
+      const savedPosts = localStorage.getItem('thaiPodeePosts');
+<!-- 410 -->
+      localStorage.clear();
+<!-- 411 -->
+      if (savedPosts) localStorage.setItem('thaiPodeePosts', savedPosts);
+<!-- 412 -->
+    } catch (e) { console.log('ล้างค่าเก่าเสร็จ'); }
+<!-- 413 -->
+    localStorage.setItem('thaipodee_version', APP_VERSION);
+<!-- 414 -->
+    const bar = document.getElementById('updateBar');
+<!-- 415 -->
+    bar.textContent = `✅ อัปเดตเป็นเวอร์ชัน ${APP_VERSION} แล้ว`;
+<!-- 416 -->
+    if (lastVer && lastVer !== APP_VERSION) {
+<!-- 417 -->
+      setTimeout(() => { window.location.reload(true); }, 800);
+<!-- 418 -->
+      return false;
+<!-- 419 -->
     }
-  });
+<!-- 420 -->
+  }
+<!-- 421 -->
+  return true;
+<!-- 422 -->
+}
+<!-- 423 -->
+function loadPosts() {
+<!-- 424 -->
+  try {
+<!-- 425 -->
+    const raw = localStorage.getItem('thaiPodeePosts');
+<!-- 426 -->
+    if (!raw) { posts = []; return; }
+<!-- 427 -->
+    posts = JSON.parse(raw);
+<!-- 428 -->
+    if (!Array.isArray(posts)) { posts = []; }
+<!-- 429 -->
+  } catch (e) { posts = []; console.log('โหลดข้อมูลใหม่'); }
+<!-- 430 -->
+}
+<!-- 431 -->
+function savePosts() {
+<!-- 432 -->
+  try { localStorage.setItem('thaiPodeePosts', JSON.stringify(posts)); }
+<!-- 433 -->
+  catch (e) { console.log('บันทึกไม่ได้', e); }
+<!-- 434 -->
+}
+<!-- 435 -->
+function updatePostCount() {
+<!-- 436 -->
+  const activeCount = posts.filter(p => !p.deleted).length;
+<!-- 437 -->
+  document.getElementById('postTotal').textContent = activeCount;
+<!-- 438 -->
+}
+<!-- 439 -->
+function updateDebugInfo(text) {
+<!-- 440 -->
+  const el = document.getElementById('debugInfo');
+<!-- 441 -->
+  if (el) el.textContent = text;
+<!-- 442 -->
+}
+<!-- 443 -->
+function showPage(id) {
+<!-- 444 -->
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+<!-- 445 -->
+  document.getElementById(id).classList.remove('hidden');
+<!-- 446 -->
+  if (id === 'profile') {
+<!-- 447 -->
+    loadPosts();
+<!-- 448 -->
+    renderPostList();
+<!-- 449 -->
+  }
+<!-- 450 -->
+}
+<!-- 451 -->
+document.addEventListener('DOMContentLoaded', () => {
+<!-- 452 -->
+  const ok = autoUpdateCheck();
+<!-- 453 -->
+  if (!ok) return;
+<!-- 454 -->
+  setTimeout(() => showPage('home'), 2000);
+<!-- 455 -->
 });
-
-document.getElementById('keepLatestBtn').addEventListener('click', keepOnlyLatest);
-
-document.getElementById('postBtn').addEventListener('click', async () => {
-  const file = document.getElementById('fileInput').files[0];
-  if (!file) return alert('เลือกไฟล์ก่อนครับ');
-
-  showStatus('กำลังเตรียม...', 0);
-  document.getElementById('progressBar').classList.add('show');
-
-  let progress = 0;
-  const fill = document.getElementById('progressFill');
-  const timer = setInterval(() => {
-    progress += Math.random() * 15;
-    if (progress > 95) progress = 95;
-    fill.style.width = progress + '%';
-  }, 200);
-
-  const isVideo = file.type.startsWith('video');
-  const videoUrl = URL.createObjectURL(file);
-  const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-
-  setTimeout(() => {
-    clearInterval(timer);
-    fill.style.width = '100%';
-
-    const now = new Date();
-    const dateStr = `${now.getDate()} ก.ย. ${String(now.getFullYear()).slice(-2)}`;
-
-    posts.unshift({
-      id: Date.now().toString(),
-      title: file.name.replace(/\.[^/.]+$/, ''),
-      author: 'ThaiPodee Master',
-      date: dateStr,
-      type: isVideo ? 'video' : 'image',
-      aspect: '9:16',
-      source: 'ต้นฉบับ',
-      size: sizeMB + ' MB',
-      thumbnail: videoUrl,
-      videoUrl: videoUrl,
-      deleted: false
-    });
-
-    savePosts();
-    renderPosts();
-    renderProfilePosts();
-    updatePostCount();
-
-    showStatus('เผยแพร่สำเร็จ ✅');
-
+<!-- 456 -->
+document.querySelectorAll('[data-goto]').forEach(btn => {
+<!-- 457 -->
+  btn.addEventListener('click', () => showPage(btn.dataset.goto));
+<!-- 458 -->
+});
+<!-- 459 -->
+async function doShare() {
+<!-- 460 -->
+  const shareUrl = window.location.href;
+<!-- 461 -->
+  const shareTitle = 'thaipodee Global Market';
+<!-- 462 -->
+  const shareText = 'มาดูวิดีโอและสินค้าตลาดโลกด้วยกันครับ';
+<!-- 463 -->
+  if (navigator.share) {
+<!-- 464 -->
+    try { await navigator.share({ title: shareTitle, text: shareText, url: shareUrl }); return; }
+<!-- 465 -->
+    catch (err) { if (err.name !== 'AbortError') console.log('แชร์ตรงไม่ได้'); }
+<!-- 466 -->
+  }
+<!-- 467 -->
+  document.getElementById('shareLinkBox').textContent = shareUrl;
+<!-- 468 -->
+  document.getElementById('shareModal').style.display = 'flex';
+<!-- 469 -->
+}
+<!-- 470 -->
+document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+<!-- 471 -->
+  const link = document.getElementById('shareLinkBox').textContent;
+<!-- 472 -->
+  try {
+<!-- 473 -->
+    await navigator.clipboard.writeText(link);
+<!-- 474 -->
+    document.getElementById('copyLinkBtn').textContent = '✅ ก๊อปปี้แล้ว!';
+<!-- 475 -->
     setTimeout(() => {
-      document.getElementById('progressBar').classList.remove('show');
-      fill.style.width = '0%';
-      document.getElementById('fileInput').value = '';
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('home').classList.add('active');
-    }, 1500);
-  }, 2000);
+<!-- 476 -->
+      document.getElementById('shareModal').style.display = 'none';
+<!-- 477 -->
+      document.getElementById('copyLinkBtn').innerHTML = '<i class="fa-solid fa-copy"></i> ก๊อปปี้ลิงก์';
+<!-- 478 -->
+    }, 2000);
+<!-- 479 -->
+  } catch (e) { alert('กรุณาคัดลอกลิงก์เองครับ'); }
+<!-- 480 -->
 });
-</script>
-</body>
-</html>
+<!-- 481 -->
+document.getElementById('closeShareBtn').addEventListener('click', () => {
+<!-- 482 -->
+  document.getElementById('shareModal').style.display = 'none';
+<!-- 483 -->
+});
+<!-- 484 -->
+const shareBtn = document.getElementById('shareBtn');
+<!-- 485 -->
+if (shareBtn) shareBtn.addEventListener('click', doShare);
+<!-- 486 -->
+function renderPostList() {
+<!-- 487 -->
+  const list = document.getElementById('postListContainer');
+<!-- 488 -->
+  const noPostText = document.getElementById('noPostText');
+<!-- 489 -->
+  updatePostCount();
+<!-- 490 -->
+  if (!posts.length) {
+<!-- 491 -->
+    list.innerHTML = '';
+<!-- 492 -->
+    noPostText.style.display = 'block';
+<!-- 493 -->
+    updateDebugInfo(`📋 เวอร์ชัน ${APP_VERSION} — ยังไม่มีโพสต์`);
+<!-- 494 -->
+    return;
+<!-- 495 -->
+  }
+<!-- 496 -->
+  noPostText.style.display = 'none';
+<!-- 497 -->
+  const activePosts = posts.filter(p => !p.deleted);
+<!-- 498 -->
+  if (!activePosts.length) {
+<!-- 499 -->
+    list.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">ไม่มีรายการที่แสดง</p>';
+<!-- 500 -->
+    updateDebugInfo(`✅ เวอร์ชัน ${APP_VERSION} — แสดง ${activePosts.length} รายการ`);
+<!-- 501 -->
+    return;
+<!-- 502 -->
+  }
+<!-- 503 -->
+  list.innerHTML = '';
+<!-- 504 -->
+  activePosts.forEach((p, idx) => {
+<!-- 505 -->
+    const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+<!-- 506 -->
+    const isOk = parseFloat(p.sizeMB) <= MAX_MB;
+<!-- 507 -->
+    const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
+<!-- 508 -->
+    const thumbUrl = p.url;
+<!-- 509 -->
+    list.innerHTML += `
+      <div class="post-item">
+        <div class="post-thumb" onclick="displayPost(posts[${posts.indexOf(p)}]); showPage('home');">
+          <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
+               onerror="this.src='https://i.imgur.com/9Z7w8xY.png?v=466';">
+        </div>
+        <div class="post-info">
+          <div>
+            <div class="post-title" onclick="displayPost(posts[${posts.indexOf(p)}]); showPage('home');">
+              ${p.name.replace(/\.[^.]+$/, '')}
+            </div>
+            <div class="post-sound ${soundClass}">
+              ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
+            </div>
+            <div class="post-meta">
+              📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
+              ⏱️ ${formatTime(p.duration)} | 📐 ${ratio}<br>
+              📅 ${p.time}<br>
+              <strong>ทั้งหมด ${activePosts.length} รายการ</strong>
+            </div>
+          </div>
+          <button class="post-del-btn" onclick="openDelModal(${posts.indexOf(p)})">
+            <i class="fa-solid fa-trash"></i> ลบ
+          </button>
+        </div>
+      </div>
+    `;
+<!-- 510 -->
+  });
+<!-- 511 -->
+  updateDebugInfo(`✅ เวอร์ชัน ${APP_VERSION} — แสดง ${activePosts.length} จากทั้งหมด ${posts.length} รายการ`);
+<!-- 512 -->
+}
+<!-- 513 -->
+document.getElementById('keepOnlyLatestBtn').addEventListener('click', () => {
+<!-- 514 -->
+  loadPosts();
+<!-- 515 -->
+  const activeNow = posts.filter(p => !p.deleted);
+<!-- 516 -->
+  if (activeNow.length <= 1) {
+<!-- 517 -->
+    alert(`✅ มี ${activeNow.length} รายการแล้ว ตรงกันครับ`);
+<!-- 518 -->
+   
