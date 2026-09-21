@@ -4,6 +4,7 @@
    วันที่: 18 กันยายน 2569
    เวลา: 11:00 น.
    สถานะ: ✅ ทดสอบผ่าน — ล็อกแล้ว
+   ประวัติโพสต์แสดงครบ: รูป+ชื่อ+เสียง+ขนาด+เวลา+อัตราส่วน+ปุ่มลบ
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -252,9 +253,14 @@ html, body {
   border: none; border-top: 1px solid #333;
   margin: 20px 0;
 }
+
+/* === ประวัติโพสต์ — ตรงรูปเป๊ะ === */
 .post-item {
-  display: flex; gap: 12px; padding: 12px 0;
+  display: flex; gap: 12px; padding: 12px;
   border-bottom: 1px solid #222;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 .post-thumb {
   width: 100px; height: 130px;
@@ -266,16 +272,30 @@ html, body {
   object-fit: cover;
   background: #222;
 }
+.post-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .post-title {
   font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 4px;
 }
-.post-meta {
-  font-size: 11px; color: #777; line-height: 1.7; margin-top: 4px;
+.post-sound {
+  font-size: 12px; margin-bottom: 4px;
 }
-.del-btn {
+.post-sound.orig { color: #90ee90; }
+.post-sound.custom { color: #ffd700; }
+.post-meta {
+  font-size: 11px; color: #888; line-height: 1.6;
+  margin-bottom: 6px;
+}
+.post-meta .ok { color: #4ade80; }
+.post-meta .ratio { font-weight: bold; }
+.post-del-btn {
   background: #dc2626; border: none; color: #fff;
-  padding: 6px 12px; border-radius: 6px; font-size: 11px;
-  margin-top: 8px; cursor: pointer;
+  padding: 6px 14px; border-radius: 6px; font-size: 12px;
+  font-weight: bold; cursor: pointer; align-self: flex-start;
 }
 .empty-text {
   text-align: center; color: #888; padding: 40px 20px;
@@ -375,7 +395,7 @@ html, body {
   </div>
 
   <div class="top-info" id="topInfo" style="display:none;">
-    <p class="username">thaipodee_master</p>
+    <p class="username">ThaiPodee Master</p>
     <p class="desc" id="descText"></p>
     <div class="sound-line" id="soundLine"></div>
     <div class="file-meta" id="fileMetaBox" style="display:none;"></div>
@@ -443,7 +463,7 @@ html, body {
   </button>
   <div class="profile-header">
     <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
-    <h2 class="profile-name">thaipodee_master</h2>
+    <h2 class="profile-name">ThaiPodee Master</h2>
     <p class="profile-id">@thaipodee_master</p>
     <div class="profile-stats">
       <div class="stat-col">
@@ -473,7 +493,7 @@ html, body {
     <div class="insight-cover" id="insightCoverBox">
       <i class="fa-solid fa-video" style="color:#9ca3af; font-size:32px;"></i>
     </div>
-    <div style="font-weight:bold; font-size:16px;">thaipodee_master</div>
+    <div style="font-weight:bold; font-size:16px;">ThaiPodee Master</div>
     <div style="font-size:13px; color:#6b7280; margin-top:4px;" id="insightNote">ข้อมูลเชิงลึกทั้งหมด</div>
   </div>
   <div class="insight-tabs">
@@ -650,7 +670,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
           const soundName = soundMode === 'custom' 
             ? document.getElementById('customSoundInput').value.trim() : '';
           const soundLabel = soundMode === 'original' 
-            ? '🔊 เสียงต้นฉบับ' : `✨ เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
+            ? 'เสียงต้นฉบับ' : `เพิ่มเสียง: ${soundName || 'ไม่ระบุ'}`;
 
           const newPost = {
             id: res.public_id,
@@ -676,7 +696,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
           displayPost(newPost, 0);
           resetUploadForm();
           
-          setTimeout(() => showPage('home'), 1500);
+          setTimeout(() => showPage('profile'), 1500);
         } catch (err) {
           showStatus(`❌ ผิดพลาด: ${err.message}`, 'error');
         }
@@ -722,20 +742,21 @@ function displayPost(post, index) {
   
   document.getElementById('soundLine').innerHTML = 
     post.soundMode === 'original' 
-      ? `<span class="sound-orig">${post.soundLabel}</span>`
-      : `<span class="sound-custom">${post.soundLabel}</span>`;
+      ? `<span class="sound-orig">🔊 ${post.soundLabel}</span>`
+      : `<span class="sound-custom">✨ ${post.soundLabel}</span>`;
 
   const ratio = post.width && post.height 
     ? (post.width > post.height ? '16:9' : '9:16') : '-';
   document.getElementById('fileMetaBox').innerHTML = `
     ชื่อไฟล์: ${post.name}<br>
-    ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '✅ เหมาะสม' : '⚠️ ใหญ่เกิน'}<br>
+    ขนาด: ${post.sizeMB} MB — ${parseFloat(post.sizeMB) <= MAX_MB ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
     ระยะเวลา: ${formatTime(post.duration)}<br>
-    อัตราส่วน: ${ratio}
+    อัตราส่วน: <span class="ratio">${ratio}</span>
   `;
   document.getElementById('fileMetaBox').style.display = 'block';
 }
 
+/* === แสดงประวัติโพสต์ — ตรงรูปเป๊ะ === */
 function renderPostList() {
   const list = document.getElementById('postListContainer');
   const noPostText = document.getElementById('noPostText');
@@ -752,6 +773,8 @@ function renderPostList() {
 
   list.innerHTML = posts.map((p, i) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
+    const isOk = parseFloat(p.sizeMB) <= MAX_MB;
+    const soundClass = p.soundMode === 'original' ? 'orig' : 'custom';
     const thumbUrl = p.url;
     return `
       <div class="post-item">
@@ -759,19 +782,21 @@ function renderPostList() {
           <img src="${thumbUrl}" alt="${p.name}" loading="lazy"
                onerror="this.src='https://i.imgur.com/9Z7w8xY.png';">
         </div>
-        <div style="flex:1;">
-          <div class="post-title" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
-            ${p.name.replace(/\.[^.]+$/, '')}
+        <div class="post-info">
+          <div>
+            <div class="post-title" onclick="displayPost(posts[${i}], ${i}); showPage('home');">
+              ${p.name.replace(/\.[^.]+$/, '')}
+            </div>
+            <div class="post-sound ${soundClass}">
+              ${p.soundMode === 'original' ? '🔊' : '✨'} ${p.soundLabel}
+            </div>
+            <div class="post-meta">
+              📦 ${p.sizeMB} MB — ${isOk ? '<span class="ok">✅ เหมาะสม</span>' : '⚠️ ใหญ่เกิน'}<br>
+              ⏱️ ${formatTime(p.duration)} | 📐 <span class="ratio">${ratio}</span><br>
+              📅 ${p.time}
+            </div>
           </div>
-          <small style="color:${p.soundMode==='original'?'#90ee90':'#ffd700'};">
-            ${p.soundLabel}
-          </small>
-          <div class="post-meta">
-            📦 ${p.sizeMB} MB — ${parseFloat(p.sizeMB)<=MAX_MB?'✅ เหมาะสม':'⚠️ ใหญ่เกิน'}<br>
-            ⏱️ ${formatTime(p.duration)} | 📐 ${ratio}<br>
-            📅 ${p.time}
-          </div>
-          <button class="del-btn" onclick="openDelModal(${i})">
+          <button class="post-del-btn" onclick="openDelModal(${i})">
             <i class="fa-solid fa-trash"></i> ลบ
           </button>
         </div>
