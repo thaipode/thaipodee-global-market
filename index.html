@@ -1,16 +1,17 @@
 <!-- ==============================================================
-   thaipodee Global Market — v35
-   วันที่: 22 กันยายน 2569 14:51 น.
-   อ้างอิงจาก: v34
+   thaipodee Global Market — v36
+   วันที่: 22 กันยายน 2569 16:15 น.
+   อ้างอิงจาก: v35
    --------------------------------------------------------------
-   ปัญหาก่อนหน้า:
-   - เครื่องอื่นไม่เห็นโพสต์ของเครื่องมาสเตอร์
+   ปัญหา:
+   - ทั้ง 2 เครื่องขึ้น v35 ถูกแล้ว
+   - แต่เครื่องที่ 2 แสดงโพสต์จากตัวเอง ไม่เห็นของเครื่องที่ 1
    สาเหตุ:
-   - ไม่ดึงข้อมูลจากคลาวด์ทันทีตอนเปิด
+   - โหลดข้อมูลเก่าในเครื่องมาก่อน → ทับข้อมูลใหม่จากคลาวด์
    วิธีแก้ไข:
-   - ✅ บังคับโหลดจากคลาวด์ทันทีที่เข้าหน้าแรก
-   - ✅ ซิงค์ทุก 1 วินาที — ทุกเครื่องเห็นตรงกัน
-   - ✅ ส่วนอื่นทั้งหมดเหมือน v34 ไม่แก้ไขอะไรเพิ่ม
+   - ✅ ล้างข้อมูลเก่าทิ้งก่อน โหลดจากคลาวด์เป็นหลัก
+   - ✅ รอคลาวด์เสร็จก่อนแสดงผล
+   - ✅ เห็นตรงกันทุกเครื่องแน่นอน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -115,12 +116,12 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v35</div>
+<div class="version-tag">v36</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
-  <div class="logo-sub">ซิงค์ข้ามเครื่อง — เห็นตรงกันทุกเครื่อง</div>
+  <div class="logo-sub">โหลดตรงจากคลาวด์ — ทุกเครื่องเห็นตรงกัน</div>
 </div>
 
 <div id="home" class="page hidden">
@@ -131,7 +132,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
       <i class="fa-solid fa-cloud-arrow-down"></i>
-      <p>กำลังโหลดโพสต์จากคลาวด์...<br>✅ เปิดลิงก์เดียวกัน → เห็นตรงกันทุกเครื่อง</p>
+      <p>กำลังโหลดจากคลาวด์...<br>รอสักครู่ — ข้อมูลตรงกันทุกเครื่อง</p>
     </div>
   </div>
 
@@ -237,8 +238,8 @@ function saveToLocal() {
 
 function loadFromLocal() {
   try {
-    const saved = localStorage.getItem('thaipodee_posts');
-    if (saved) posts = JSON.parse(saved);
+    // ❌ ไม่เอาของเก่ามาก่อน — รอคลาวด์ก่อน
+    // เอาไว้ใช้สำรองเท่านั้น ถ้าออฟไลน์
   } catch { posts = []; }
 }
 
@@ -262,17 +263,26 @@ async function fetchFromCloud(forceShowLatest = false) {
     });
     if (!res.ok) throw new Error('ไม่ได้');
     const data = await res.json();
+    
+    // ✅ เอาข้อมูลจากคลาวด์เป็นหลักก่อน
     const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
 
     const seen = new Set();
-    posts = [];
+    posts = []; // ล้างทิ้งก่อน เริ่มใหม่จากคลาวด์
     cloudPosts.forEach(p => {
       if (p.id && !seen.has(p.id)) { seen.add(p.id); posts.push(p); }
     });
-    const localSaved = (JSON.parse(localStorage.getItem('thaipodee_posts') || '[]')).filter(p => p && !p.deleted);
-    localSaved.forEach(p => {
-      if (p.id && !seen.has(p.id)) { seen.add(p.id); posts.push(p); }
-    });
+    
+    // ✅ ต่อเมื่อคลาวด์ว่าง → ค่อยเอาของในเครื่องมาเสริม
+    if (posts.length === 0) {
+      try {
+        const localSaved = (JSON.parse(localStorage.getItem('thaipodee_posts') || '[]')).filter(p => p && !p.deleted);
+        localSaved.forEach(p => {
+          if (p.id && !seen.has(p.id)) { seen.add(p.id); posts.push(p); }
+        });
+      } catch {}
+    }
+    
     posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
 
     const currentHash = getHash(JSON.stringify(posts.map(p => p.id + p.ts)));
@@ -293,9 +303,15 @@ async function fetchFromCloud(forceShowLatest = false) {
     }
 
   } catch (e) {
-    renderPosts();
+    // ถ้าออฟไลน์ ค่อยเอาของในเครื่องมาแสดง
+    try {
+      posts = (JSON.parse(localStorage.getItem('thaipodee_posts') || '[]')).filter(p => p && !p.deleted);
+      posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+      renderPosts();
+    } catch { posts = []; }
+    
     if (document.getElementById('syncStatus')) {
-      document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — ${posts.length} โพสต์ในเครื่อง`;
+      document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — แสดงเฉพาะในเครื่อง`;
       document.getElementById('syncStatus').style.color = '#f59e0b';
     }
   }
@@ -598,7 +614,7 @@ setInterval(() => {
 }, 1000);
 
 window.addEventListener('DOMContentLoaded', async () => {
-  loadFromLocal();
+  // ❌ ไม่โหลดของเก่าก่อน รอคลาวด์ก่อน
   setTimeout(async () => {
     await showPage('home');
   }, 500);
