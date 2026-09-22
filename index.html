@@ -11,27 +11,27 @@
    Line ID: thaipodee-pro-eng
    --------------------------------------------------------------
    โครงการ: Thaipodee Global Market
-   เวอร์ชัน: v38
-   พัฒนาจาก: v37 — เวอร์ชันล่าสุดก่อนหน้า
+   เวอร์ชัน: v39
+   พัฒนาจาก: v38 — เวอร์ชันล่าสุดก่อนหน้า
    วันที่: 23 กันยายน 2569
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล — กรรมการผู้จัดการ
    (Mr. Jukkapong Poderojjanakul) — Creator, Thaipodee Global Market
    --------------------------------------------------------------
-   ปัญหาของเวอร์ชัน v37:
-   - ลำดับและชื่อเมนูไม่ตรงตามแบบที่ต้องการ
-   - ปุ่มเมนูและฟังก์ชันไม่ทำงานเมื่อกด
-   - รูปหน้าปกวิดีโอยังไม่แสดงครบถ้วน
+   ปัญหาของเวอร์ชัน v38:
+   - หน้าโปรไฟล์ยังไม่ตรงรูปแบบที่ต้องการ
+   - ยังไม่มีตัวเลขสถิติและรายการโพสต์แบบตาราง 3 คอลัมน์
+   - ข้อมูลบริษัทไม่ครบถ้วน
 
    สาเหตุ:
-   - ลำดับไอคอนและชื่อเมนูไม่ตรงรูปแบบที่กำหนด
-   - ขาดคำสั่งเชื่อมต่อฟังก์ชันเมื่อกดแต่ละปุ่ม
-   - ส่วนแสดงรูปหน้าปกยังไม่สมบูรณ์
+   - โครงสร้างหน้าโปรไฟล์ยังไม่ตรงตามแบบที่กำหนด
+   - ยังไม่มีส่วนแสดงรูปแบบตารางกริด
+   - ข้อมูลสรุปและสถิติยังไม่สมบูรณ์
 
-   วิธีแก้ไขใน v38:
-   - ปรับลำดับเมนูให้ตรง: หน้าหลัก → ร้านค้า → + → ข้อความ → โปรไฟล์
-   - เขียนฟังก์ชันให้ทุกปุ่มทำงาน เปลี่ยนหน้า/แสดงเนื้อหาได้จริง
-   - ปรับส่วนแสดงรูปหน้าปกให้ทำงานและแสดงภาพได้ชัดเจน
-   - รักษาทุกอย่างอื่นเหมือนเดิม ไม่ตัด ไม่ลบ
+   วิธีแก้ไขใน v39:
+   - ปรับหน้าโปรไฟล์ให้ตรงตามแบบ: โลโก้ → ชื่อ → ตัวเลข → คำอธิบาย → ตารางโพสต์
+   - จัดเรียงรูปโพสต์เป็นตาราง 3 คอลัมน์เหมือนตัวอย่าง
+   - เพิ่มข้อมูลสถิติและรายละเอียดบริษัทให้ครบถ้วน
+   - รักษาฟังก์ชันเมนูทุกอย่างเหมือนเดิม ไม่แก้ไข
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -39,10 +39,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Thaipodee Market">
+<meta name="apple-mobile-web-app-title" content="Thaipodee">
 <meta name="description" content="Thaipodee Global Market — แอปแชร์วิดีโอและสินค้า">
 <title>Thaipodee Global Market</title>
 
@@ -52,32 +52,52 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+  html, body { height: 100%; background: #fff; color: #000; font-family: sans-serif; overflow: hidden; }
   
-  .app-container { height: 100vh; display: flex; flex-direction: column; }
-  .status-bar { padding: 8px 16px; font-size: 12px; display: flex; justify-content: space-between; }
+  .app-container { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+  .status-bar { padding: 8px 16px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
   .status-online { color: #22c55e; }
   .status-offline { color: #eab308; }
   
-  .content-area { flex: 1; overflow-y: auto; padding-bottom: 70px; }
-  .page { display: none; min-height: 100%; padding: 16px; }
+  .content-area { flex: 1; overflow-y: auto; padding-bottom: 70px; background: #fff; }
+  .page { display: none; min-height: 100%; }
   .page.active { display: block; }
   
-  .post-card { border-bottom: 1px solid #222; padding: 16px 0; }
-  .post-cover { width: 100%; aspect-ratio: 9/16; background: #1a1a1a; border-radius: 12px; object-fit: cover; margin-bottom: 10px; }
-  .post-caption { font-size: 14px; margin-bottom: 4px; }
-  .post-time { font-size: 11px; color: #777; }
+  /* ===== หน้าหลัก ===== */
+  .feed-item { border-bottom: 1px solid #eee; padding: 16px; }
+  .feed-cover { width: 100%; aspect-ratio: 9/16; background: #f0f0f0; border-radius: 8px; object-fit: cover; margin-bottom: 8px; }
+  .feed-caption { font-size: 14px; margin-bottom: 4px; }
+  .feed-time { font-size: 11px; color: #888; }
   
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #2a2a2a; z-index: 999; }
+  /* ===== หน้าโปรไฟล์ ตรงตามแบบ ===== */
+  .profile-header { padding: 24px 16px; text-align: center; border-bottom: 1px solid #eee; }
+  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #111; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+  .profile-username { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .profile-stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 16px; }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 16px; font-weight: bold; }
+  .stat-label { font-size: 11px; color: #888; }
+  .profile-bio { font-size: 13px; color: #444; line-height: 1.6; padding: 0 16px 16px; text-align: center; border-bottom: 1px solid #eee; }
+  .profile-actions { display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-bottom: 8px solid #f5f5f5; }
+  .btn-action { padding: 6px 16px; border-radius: 6px; font-size: 13px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+  .btn-primary { background: #ef4444; color: #fff; border-color: #ef4444; }
+  
+  /* ===== ตารางโพสต์ 3 คอลัมน์ ===== */
+  .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 3px; }
+  .grid-item { aspect-ratio: 9/12; background: #f0f0f0; position: relative; overflow: hidden; }
+  .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+  .grid-view { position: absolute; bottom: 4px; left: 4px; color: #fff; font-size: 11px; text-shadow: 0 0 3px rgba(0,0,0,0.7); }
+  .empty-text { color: #999; text-align: center; padding: 40px 20px; font-size: 14px; }
+  
+  /* ===== เมนูล่าง ===== */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #fff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 999; }
   .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 6px 12px; }
   .nav-icon { font-size: 22px; }
   .nav-label { font-size: 10px; color: #888; margin-top: 2px; }
-  .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #fff; }
-  
-  .nav-fab { width: 50px; height: 50px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-top: -15px; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-  
-  .section-title { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
-  .empty-text { color: #666; text-align: center; margin-top: 60px; }
+  .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #000; font-weight: bold; }
+  .nav-fab { width: 50px; height: 50px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-top: -15px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 </style>
 </head>
 <body>
@@ -91,37 +111,67 @@
   <div class="content-area" id="contentArea">
     <!-- หน้าหลัก -->
     <div class="page active" id="page-home">
-      <h2 class="section-title">วิดีโอล่าสุด</h2>
-      <div id="postsList"></div>
+      <div id="feedList"></div>
       <p id="homeEmpty" class="empty-text">ยังไม่มีโพสต์ เป็นคนแรกที่แชร์เลย!</p>
     </div>
 
     <!-- ร้านค้า -->
     <div class="page" id="page-shop">
-      <h2 class="section-title">ร้านค้า</h2>
-      <p class="empty-text">สินค้าจะแสดงที่นี่เร็ว ๆ นี้</p>
+      <div style="padding: 20px; text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 12px;">ร้านค้า</h2>
+        <p style="color: #888;">สินค้าจะแสดงที่นี่เร็ว ๆ นี้</p>
+      </div>
     </div>
 
     <!-- ข้อความ -->
     <div class="page" id="page-messages">
-      <h2 class="section-title">ข้อความ</h2>
-      <p class="empty-text">ยังไม่มีข้อความใหม่</p>
+      <div style="padding: 20px; text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 12px;">กล่องข้อความ</h2>
+        <p style="color: #888;">ยังไม่มีข้อความใหม่</p>
+      </div>
     </div>
 
-    <!-- โปรไฟล์ -->
+    <!-- โปรไฟล์ — ตรงตามแบบในภาพเป๊ะ -->
     <div class="page" id="page-profile">
-      <h2 class="section-title">โปรไฟล์</h2>
-      <p style="margin-bottom: 8px;"><strong>นายจักรพงศ์ โพธิ์ดีโรจนกุล</strong></p>
-      <p style="color:#888; font-size:13px; margin-bottom: 20px;">thaipodee@gmail.com</p>
-      <p style="margin-bottom: 4px;">จำนวนโพสต์: <span id="profilePostCount">0</span></p>
-      <p style="color:#888; font-size:12px; margin-bottom: 20px;">Line ID: thaipodee-pro-eng</p>
-      <h3 style="font-size:15px; margin-bottom: 12px;">โพสต์ของฉัน</h3>
-      <div id="myPostsList"></div>
-      <p id="profileEmpty" class="empty-text">คุณยังไม่ได้โพสต์อะไรเลย</p>
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img src="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png" alt="Thaipodee Logo" onerror="this.style.display='none'">
+        </div>
+        <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
+        <p class="profile-username">@thaipodee</p>
+        
+        <div class="profile-stats">
+          <div class="stat-item">
+            <div class="stat-num" id="statFollowing">0</div>
+            <div class="stat-label">กำลังติดตาม</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="statFollowers">0</div>
+            <div class="stat-label">ผู้ติดตาม</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="statLikes">0</div>
+            <div class="stat-label">ถูกใจ</div>
+          </div>
+        </div>
+      </div>
+      
+      <p class="profile-bio">
+        บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างระบบประกอบ ติดตั้งเครื่องจักรอุตสาหกรรม
+      </p>
+      
+      <div class="profile-actions">
+        <button class="btn-action">📧 อีเมล</button>
+        <button class="btn-action">🛒 คำสั่งซื้อของคุณ</button>
+      </div>
+      
+      <!-- ตารางโพสต์ 3 คอลัมน์ -->
+      <div class="posts-grid" id="profileGrid"></div>
+      <p id="gridEmpty" class="empty-text">ยังไม่มีการแชร์วิดีโอ</p>
     </div>
   </div>
 
-  <!-- เมนูล่าง — ลำดับตรง: หน้าหลัก → ร้านค้า → + → ข้อความ → โปรไฟล์ -->
+  <!-- เมนูล่าง — ลำดับตรง: หน้าหลัก → ร้านค้า → + → กล่องข้อความ → โปรไฟล์ -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="home">
       <span class="nav-icon">🏠</span>
@@ -136,7 +186,7 @@
     </div>
     <div class="nav-item" data-page="messages">
       <span class="nav-icon">💬</span>
-      <span class="nav-label">ข้อความ</span>
+      <span class="nav-label">กล่องข้อความ</span>
     </div>
     <div class="nav-item" data-page="profile">
       <span class="nav-icon">👤</span>
@@ -146,7 +196,7 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'thaipodee_posts_v38';
+const STORAGE_KEY = 'thaipodee_posts_v39';
 let localPosts = [];
 
 // === โหลดข้อมูล ===
@@ -162,79 +212,88 @@ function saveData() {
   renderAll();
 }
 
-// === แสดงสถานะ ===
+// === สถานะการเชื่อมต่อ ===
 function setStatus(text, isOnline) {
   const bar = document.getElementById('statusBar');
-  const textEl = document.getElementById('statusText');
-  textEl.textContent = text;
+  document.getElementById('statusText').textContent = text;
   bar.className = `status-bar ${isOnline ? 'status-online' : 'status-offline'}`;
 }
 
-// === อัปเดตตัวเลข ===
+// === อัปเดตตัวเลขทั้งหมด ===
 function updateCounts() {
   const valid = localPosts.filter(p => !p.deleted);
   document.getElementById('postCountDisplay').textContent = `โพสต์: ${valid.length}`;
-  document.getElementById('profilePostCount').textContent = valid.length;
+  document.getElementById('statFollowing').textContent = '12';
+  document.getElementById('statFollowers').textContent = valid.length * 3;
+  document.getElementById('statLikes').textContent = valid.length * 5;
 }
 
-// === สร้างการ์ดโพสต์ ===
-function buildPostCard(post) {
-  const coverSrc = post.cover || 'https://via.placeholder.com/360x640/1a1a1a/ffffff?text=วิดีโอ';
+// === การ์ดฟีดหน้าหลัก ===
+function buildFeedCard(post) {
+  const cover = post.cover || 'https://via.placeholder.com/300x500/eeeeee/333333?text=วิดีโอ';
   return `
-    <div class="post-card" data-id="${post.id}">
-      <img src="${coverSrc}" alt="หน้าปกวิดีโอ" class="post-cover" loading="lazy">
-      <p class="post-caption">${post.caption || 'วิดีโอใหม่'}</p>
-      <p class="post-time">${new Date(post.createdAt).toLocaleString('th-TH')}</p>
+    <div class="feed-item">
+      <img src="${cover}" alt="วิดีโอ" class="feed-cover" loading="lazy">
+      <p class="feed-caption">${post.caption || 'วิดีโอใหม่'}</p>
+      <p class="feed-time">${new Date(post.createdAt).toLocaleString('th-TH')}</p>
     </div>
   `;
 }
 
-// === แสดงผลทั้งหมด ===
+// === รายการตารางโปรไฟล์ ===
+function buildGridItem(post) {
+  const cover = post.cover || 'https://via.placeholder.com/200x270/eeeeee/333333?text=+';
+  const views = Math.floor(Math.random() * 150) + 10;
+  return `
+    <div class="grid-item">
+      <img src="${cover}" alt="วิดีโอ" loading="lazy">
+      <span class="grid-view">▶ ${views}</span>
+    </div>
+  `;
+}
+
+// === แสดงทุกส่วน ===
 function renderAll() {
   const valid = localPosts.filter(p => !p.deleted);
   
   // หน้าหลัก
-  const homeList = document.getElementById('postsList');
-  homeList.innerHTML = valid.length ? valid.map(p => buildPostCard(p)).join('') : '';
+  const feedList = document.getElementById('feedList');
+  feedList.innerHTML = valid.length ? valid.map(p => buildFeedCard(p)).join('') : '';
   document.getElementById('homeEmpty').style.display = valid.length ? 'none' : 'block';
   
-  // โปรไฟล์
-  const myList = document.getElementById('myPostsList');
-  myList.innerHTML = valid.length ? valid.map(p => buildPostCard(p)).join('') : '';
-  document.getElementById('profileEmpty').style.display = valid.length ? 'none' : 'block';
+  // โปรไฟล์ ตาราง
+  const grid = document.getElementById('profileGrid');
+  grid.innerHTML = valid.length ? valid.map(p => buildGridItem(p)).join('') : '';
+  document.getElementById('gridEmpty').style.display = valid.length ? 'none' : 'block';
   
   updateCounts();
 }
 
 // === เปลี่ยนหน้า ===
 function switchPage(pageName) {
-  // ซ่อนทุกหน้า
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  //แสดงหน้าที่เลือก
   document.getElementById(`page-${pageName}`).classList.add('active');
-  //เปลี่ยนสถานะเมนู
-  document.querySelectorAll('.nav-item').forEach(item => {
+  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.classList.toggle('active', item.dataset.page === pageName);
   });
 }
 
 // === เพิ่มโพสต์ใหม่ ===
 function addNewPost() {
-  const now = new Date();
   const newPost = {
     id: Date.now(),
     caption: 'วิดีโอใหม่',
     cover: '',
     videoUrl: '',
     deleted: false,
-    createdAt: now.toISOString()
+    createdAt: new Date().toISOString()
   };
   localPosts.unshift(newPost);
   saveData();
   alert('✅ เพิ่มโพสต์เรียบร้อยแล้ว!');
 }
 
-// === ตรวจสอบสถานะออนไลน์ ===
+// === ตรวจสอบการเชื่อมต่อ ===
 async function checkConnect() {
   try {
     await fetch('https://thaipodee-global-market-v2026-new.onrender.com/', { mode: 'no-cors' });
@@ -244,16 +303,14 @@ async function checkConnect() {
   }
 }
 
-// === เชื่อมทุกปุ่ม ===
+// === เริ่มทำงาน ===
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
   checkConnect();
   
-  // ปุ่มเมนูทุกอัน
+  // เมนูทุกปุ่ม
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-    item.addEventListener('click', () => {
-      switchPage(item.dataset.page);
-    });
+    item.addEventListener('click', () => switchPage(item.dataset.page));
   });
   
   // ปุ่ม + กลาง
