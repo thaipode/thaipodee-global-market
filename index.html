@@ -1,18 +1,18 @@
 <!-- ==============================================================
-   thaipodee Global Market — v30
-   วันที่: 22 กันยายน 2569 13:19 น.
-   อ้างอิงจาก: v29
+   thaipodee Global Market — v31
+   วันที่: 22 กันยายน 2569 13:38 น.
+   อ้างอิงจาก: v30
    --------------------------------------------------------------
    ปัญหาก่อนหน้า:
-   - ปุ่มแชร์ทำงานแค่ก๊อปปี้ลิงก์ ไม่ใช่แชร์จริง
-   - ผู้ใช้ต้องการส่งผ่านระบบแชร์โดยตรง
+   - เครื่องที่ 2 ไม่เห็นวิดีโอ/โพสต์ของเครื่องที่ 1 อัตโนมัติ
+   - ดึงข้อมูลล่าช้า ไม่อัปเดตทันทีเมื่อเปิดแอป
 
    วิธีแก้ไข:
-   - ✅ ใช้ navigator.share → ขึ้นเมนูแชร์มือถือโดยตรง
-   - ✅ ส่งไลน์, เฟซบุ๊ก, อะไรก็ได้ที่มีในเครื่อง
-   - ✅ ถ้าเครื่องไม่รองรับ → ถอยกลับไปก๊อปปี้ลิงก์อัตโนมัติ
-   - ✅ เสียงออกปกติ, ซิงค์ข้ามเครื่องทำงานเหมือนเดิม
-   - ✅ ปุ่มโปรไฟล์ 2 ตัว: บนซ้าย + ขวาล่าง
+   - ✅ ทุกครั้งที่เข้าหน้าแรก → ดึงข้อมูลล่าสุดทันที ไม่รอ
+   - ✅ ทุกครั้งที่โพสต์เสร็จ → บังคับดึงข้อมูลใหม่ทันที
+   - ✅ ปรับเวลาซิงค์จาก 3 วินาที → 1 วินาที เร็วขึ้น
+   - ✅ ปุ่มแชร์ระบบมือถือทำงานเหมือนเดิม
+   - ✅ ปุ่มโปรไฟล์ 2 ตัว, เสียงออกปกติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -116,12 +116,12 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v30</div>
+<div class="version-tag">v31</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
-  <div class="logo-sub">Global Market — แชร์ตรงไปยังแอปอื่นได้เลย</div>
+  <div class="logo-sub">ซิงค์ทันที — ทุกเครื่องเห็นกันเร็วขึ้น</div>
 </div>
 
 <div id="home" class="page hidden">
@@ -132,7 +132,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
       <i class="fa-solid fa-film"></i>
-      <p>กด + เพื่อโพสต์<br>กดปุ่มแชร์ → ส่งให้เครื่องอื่นผ่านไลน์/แอปได้เลย</p>
+      <p>กำลังโหลดโพสต์ล่าสุด...<br>✅ เปิดเครื่องที่ 2 แล้วจะเห็นทันที</p>
     </div>
   </div>
 
@@ -187,7 +187,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <button class="sound-choice selected" id="optOrig">🔊 เสียงต้นฉบับ</button>
   <button class="sound-choice" id="optCustom">✨ เพิ่มเสียง</button>
   <input type="text" id="customSoundInput" placeholder="ชื่อเพลง..." class="text-input">
-  <button class="submit-btn" id="doUpload">เผยแพร่</button>
+  <button class="submit-btn" id="doUpload">เผยแพร่ — ทุกเครื่องเห็นทันที</button>
   <div class="progress-wrap" id="progWrap">
     <div class="progress-fill" id="progFill"></div>
   </div>
@@ -221,7 +221,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     🔄 กำลังซิงค์...
   </p>
   <div id="postListContainer"></div>
-  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
+  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม<br>✅ อีกเครื่องจะเห็นทันที</p>
 </div>
 
 <script>
@@ -237,6 +237,7 @@ let currentViewingIndex = -1;
 let isMuted = false;
 let currentVideoEl = null;
 let lastSyncHash = '';
+let isSyncing = false; // ป้องกันดึงซ้ำซ้อน
 
 function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
@@ -257,9 +258,16 @@ function getHash(str) {
   return h.toString();
 }
 
-async function fetchFromCloud() {
+// ===== ดึงข้อมูลจากคลาวด์ — แก้: ป้องกันซ้ำซ้อน + บังคับโหลดทันที =====
+async function fetchFromCloud(forceShowLatest = false) {
+  if (isSyncing) return; // กำลังดึงอยู่ → ข้าม
+  isSyncing = true;
+
   try {
-    const res = await fetch(DB_URL + '/latest', { headers: { 'X-Master-Key': DB_KEY } });
+    const res = await fetch(DB_URL + '/latest', { 
+      headers: { 'X-Master-Key': DB_KEY },
+      cache: 'no-store' // ไม่เอาของเก่าจากแคช
+    });
     if (!res.ok) throw new Error('ไม่ได้');
     const data = await res.json();
     const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
@@ -274,21 +282,29 @@ async function fetchFromCloud() {
     posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
     
     const currentHash = getHash(JSON.stringify(posts.map(p => p.id + p.ts)));
-    if (currentHash !== lastSyncHash) {
+    const hasNew = currentHash !== lastSyncHash;
+    
+    if (hasNew) {
       lastSyncHash = currentHash;
       saveToLocal();
       renderPosts();
-      if (!document.getElementById('home').classList.contains('hidden') && posts.length > 0 && currentViewingIndex === -1) {
+      
+      // ✅ ถ้าโพสต์ใหม่ หรือบังคับ → โชว์อันล่าสุดทันที
+      if ((forceShowLatest || hasNew) && posts.length > 0) {
         viewPost(0);
       }
     }
+    
     document.getElementById('syncStatus').textContent = `✅ ซิงค์ล่าสุด — ${posts.length} โพสต์`;
     document.getElementById('syncStatus').style.color = '#10b981';
+    
   } catch (e) {
     renderPosts();
     document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — ${posts.length} โพสต์ในเครื่อง`;
     document.getElementById('syncStatus').style.color = '#f59e0b';
   }
+  
+  isSyncing = false;
 }
 
 async function saveToCloud() {
@@ -413,6 +429,12 @@ async function delPost(idx) {
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
+  
+  // ✅ ทุกครั้งที่เข้าหน้าแรก → ดึงข้อมูลล่าสุดทันที
+  if (id === 'home') {
+    fetchFromCloud(true); // true = โชว์อันล่าสุดทันที
+  }
+  
   if (id !== 'home') {
     document.getElementById('bottomInfoBar').style.display = 'none';
     document.getElementById('soundToggle').style.display = 'none';
@@ -424,7 +446,7 @@ document.querySelectorAll('[data-goto]').forEach(b => {
   b.addEventListener('click', () => showPage(b.dataset.goto));
 });
 
-// ===== แชร์จริง ผ่านระบบแชร์ของมือถือ =====
+// ===== แชร์ระบบมือถือ =====
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const shareData = {
     title: 'thaipodee Global Market',
@@ -434,16 +456,13 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 
   try {
     if (navigator.share) {
-      // ✅ มีระบบแชร์ → ขึ้นเมนูให้เลือกเลย
       await navigator.share(shareData);
       alert('✅ แชร์สำเร็จ!');
     } else {
-      // ⚠️ ไม่มีระบบแชร์ → ถอยไปก๊อปปี้ลิงก์
       await navigator.clipboard.writeText(shareData.url);
       alert('✅ ก๊อปปี้ลิงก์แล้ว — ส่งเองทางไลน์ได้เลย');
     }
   } catch (err) {
-    // ถ้ายกเลิกหรือผิดพลาด → ก๊อปปี้ลิงก์สำรอง
     try {
       await navigator.clipboard.writeText(shareData.url);
       alert('✅ ก๊อปปี้ลิงก์แล้ว');
@@ -544,8 +563,11 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     saveToLocal();
     await saveToCloud();
     
+    // ✅ บังคับดึงข้อมูลใหม่ทันที → อีกเครื่องเห็นเร็วขึ้น
+    setTimeout(() => fetchFromCloud(true), 300);
+    
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่แล้ว! ทุกเครื่องเห็นทันที';
+    statusLine.textContent = '✅ เผยแพร่แล้ว! อีกเครื่องจะเห็นทันที';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -559,7 +581,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       document.getElementById('optCustom').classList.remove('selected');
       selectedFile = null;
       showPage('home');
-      viewPost(0);
     }, 2000);
     
   } catch (err) {
@@ -570,15 +591,16 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   }
 });
 
+// ✅ ซิงค์ทุก 1 วินาที เร็วขึ้น
 setInterval(() => {
+  if (document.getElementById('home').classList.contains('hidden')) return;
   fetchFromCloud();
-}, 3000);
+}, 1000);
 
 window.addEventListener('DOMContentLoaded', () => {
   loadFromLocal();
   setTimeout(() => {
     showPage('home');
-    fetchFromCloud();
   }, 2000);
 });
 </script>
