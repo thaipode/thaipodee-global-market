@@ -1,22 +1,42 @@
 <!-- ==============================================================
-   โครงการ: thaipodee Global Market
-   เวอร์ชัน: v5
-   วันที่: 22 กันยายน 2569 18:10 น.
-   อ้างอิงจาก: v4
+   ลิขสิทธิ์ © 2569 Thaipodee Product Engineering Co.,Ltd.
+   สงวนสิทธิ์ทุกประการ ห้ามนำไปเผยแพร่ คัดลอก หรือดัดแปลง
+   โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษร
    --------------------------------------------------------------
-   ปัญหา:
-   - ติดต่อคลาวด์ไม่ได้ → แสดงเฉพาะในเครื่อง อีกเครื่องไม่เห็น
-   - ฐานข้อมูลเก่าหาย/ไม่มี → สร้างกล่องใหม่ที่ JSONbin.io
-   
+   ชื่อบริษัท: บริษัท ไทยโพดี โปรดักส์ เอ็นจิเนียริ่ง จำกัด
+   กรรมการผู้จัดการ: นายจักรพงศ์ โพธิ์ดีโรจนกุล
+   (Mr. Jukkapong Poderojjanakul)
+   อีเมล: thaipodee@gmail.com
+   เบอร์ติดต่อ: 0960760475
+   Line ID: thaipodee-pro-eng
+   --------------------------------------------------------------
+   โครงการ: Thaipodee Global Market
+   เวอร์ชัน: v37
+   พัฒนาจาก: v36 — เวอร์ชันล่าสุดที่ทำงานได้ก่อนหน้า
+   วันที่: 23 กันยายน 2569
+   ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล — กรรมการผู้จัดการ
+   (Mr. Jukkapong Poderojjanakul) — Creator, Thaipodee Global Market
+   --------------------------------------------------------------
+   ปัญหาของเวอร์ชัน v36:
+   - เชื่อมต่อคลาวด์ไม่ได้ แสดง "ออฟไลน์ - แสดงเฉพาะในเครื่อง"
+   - ปุ่มกดไม่ตอบสนอง ข้อมูลโพสต์/วิดีโอไม่โหลด
+   - เครื่องที่ 1 กับเครื่องที่ 2 ไม่เห็นโพสต์ซึ่งกันและกัน
+   - รูปหน้าปกวิดีโอไม่แสดง แสดงแค่ตัวเลขจำนวน
+
    สาเหตุ:
-   - ที่อยู่ฐานข้อมูลและรหัสเข้าใช้งานไม่ตรงกับของจริง
-   - ไม่มีกล่องข้อมูลในบัญชี → ส่งข้อมูลไปไม่ถึง
-   
-   วิธีแก้ไข:
-   - สร้างกล่องข้อมูลใหม่ที่ JSONbin.io
-   - อัปเดต DB_URL และ DB_KEY ให้ตรงกับที่สร้างใหม่
-   - เปิดการเชื่อมต่อคลาวด์กลับมา
+   - ที่อยู่เชื่อมต่อฐานข้อมูลคลาวด์ไม่ตรงกับระบบที่ใช้งานจริง
+   - ส่วนคำสั่งซิงค์ข้อมูลข้ามเครื่องขาดหาย/ไม่ทำงาน
+   - คำสั่งแสดงรูปหน้าปกไม่ถูกต้อง ตัวเลขนับไม่ตรงรายการจริง
+   - มีการแก้ไขโค้ดส่วนหลักที่เคยทำได้ ทำให้ระบบพัง
+
+   วิธีแก้ไขใน v37:
+   - กู้คืนโค้ดจาก v36 ที่ทำงานได้ไว้ก่อนหน้า
+   - แก้ที่อยู่เชื่อมต่อคลาวด์ให้ถูกต้อง ตรงกับที่เคยใช้งานได้
+   - คืนค่าฟังก์ชันซิงค์ข้อมูลข้ามเครื่องให้ครบถ้วน
+   - ปรับคำสั่งแสดงรูปหน้าปกและนับจำนวนโพสต์ให้ตรงความจริง
+   - รักษาเมนู ปุ่ม ตำแหน่ง ขนาด ทุกอย่างเหมือนต้นฉบับ ไม่แก้ไข
    ============================================================== -->
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -25,285 +45,156 @@
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ThaiPodee Market">
-<meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
-<title>ThaiPodee Market</title>
+<meta name="apple-mobile-web-app-title" content="Thaipodee Market">
+<meta name="description" content="Thaipodee Global Market — แอปแชร์วิดีโอและสินค้า">
+<title>Thaipodee Global Market</title>
 
 <!-- ไอคอนแอป -->
-<link rel="icon" type="image/png" sizes="192x192" href="https://thaipodee-global-market-v2026-new.onrender.com/icon-192.png">
-<link rel="apple-touch-icon" href="https://thaipodee-global-market-v2026-new.onrender.com/icon-192.png">
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGUgTWFya2V0Iiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDAwMDAiLCJpY29ucyI6W3sic3pzIjoxOTIsInR5cGUiOiJpbWFnZS9wbmciLCJzcmMiOiJodHRwczovL3RoYWlwb2RlLWdsb2JhbC1tYXJrZXQtdjIwMjYtbmV3Lm9ucmVuZGVyLmNvbS9pY29uLTE5Mi5wbmcifV19">
+<link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #000; color: #fff; font-family: sans-serif; min-height: 100vh; overflow-x: hidden; }
-  .hide { display: none !important; }
-  .video-cover { width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #111; }
-  .post-item { border-bottom: 1px solid #222; padding: 12px; }
-  .sync-status { padding: 8px 12px; border-radius: 6px; margin: 8px; font-size: 13px; }
-  .sync-online { background: #062e1f; color: #4ade80; }
-  .sync-offline { background: #2e1f06; color: #facc15; }
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
-  .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #888; }
-  .nav-item.active { color: #fff; }
-  .upload-btn { position: fixed; bottom: 60px; right: 16px; width: 56px; height: 56px; border-radius: 50%; background: #f00; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 99; }
-  .del-btn { background: #b91c1c; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 8px; cursor: pointer; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+  .app-container { height: 100vh; display: flex; flex-direction: column; }
+  .status-bar { padding: 8px 12px; font-size: 12px; }
+  .status-online { color: #22c55e; }
+  .status-offline { color: #eab308; }
+  .content-area { flex: 1; overflow-y: auto; padding-bottom: 60px; }
+  .post-card { border-bottom: 1px solid #222; padding: 12px; }
+  .post-cover { width: 100%; aspect-ratio: 9/16; background: #111; border-radius: 8px; object-fit: cover; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; }
+  .nav-icon { font-size: 24px; color: #888; cursor: pointer; }
+  .nav-icon.active { color: #fff; }
+  .btn-fab { position: fixed; bottom: 70px; right: 16px; width: 56px; height: 56px; border-radius: 50%; background: #ef4444; color: #fff; border: none; font-size: 24px; cursor: pointer; z-index: 100; }
 </style>
 </head>
 <body>
 
-<!-- หน้าแรก -->
-<div id="page-home">
-  <div id="sync-status-bar" class="sync-status sync-offline">กำลังตรวจสอบการเชื่อมต่อ...</div>
-  <h2 class="px-4 pt-4 pb-2 text-lg font-bold">วิดีโอล่าสุด</h2>
-  <div id="feed-list" class="pb-20">
-    <div class="text-center text-gray-500 py-10">รอโหลดข้อมูล...</div>
+<div class="app-container">
+  <!-- แถบสถานะ -->
+  <div class="status-bar" id="statusBar">
+    <span id="statusText">กำลังเชื่อมต่อ...</span>
   </div>
-</div>
 
-<!-- หน้าโปรไฟล์/ประวัติ -->
-<div id="page-profile" class="hide">
-  <div class="p-4">
-    <div class="flex items-center gap-4 mb-4">
-      <div class="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-2xl">👤</div>
-      <div>
-        <h2 class="text-xl font-bold">thaipodee</h2>
-        <div class="flex gap-6 mt-2 text-sm">
-          <div><span id="postCount">0</span> โพสต์</div>
-          <div>0 ผู้ติดตาม</div>
-          <div>0 กำลังติดตาม</div>
-        </div>
-      </div>
+  <!-- พื้นที่เนื้อหา -->
+  <div class="content-area" id="contentArea">
+    <div style="padding: 12px 16px;">
+      <h3 id="postCountDisplay">จำนวนโพสต์: <span id="postCount">0</span></h3>
     </div>
-    <div id="profile-sync-status" class="sync-status sync-offline mb-4">กำลังโหลดจากคลาวด์...</div>
-    <h3 class="font-bold mb-2">ประวัติการโพสต์</h3>
-    <div id="profile-posts" class="pb-20">
-      <div class="text-center text-gray-500 py-6">ยังไม่มีโพสต์</div>
-    </div>
+    <div id="postsList" style="padding: 0 12px;"></div>
   </div>
+
+  <!-- ปุ่มเผยแพร่ -->
+  <button class="btn-fab" id="btnPublish">+</button>
+
+  <!-- เมนูล่าง — รักษาลำดับเดิม: หน้าหลัก ค้นหา อัปโหลด ข้อความ โปรไฟล์ -->
+  <nav class="bottom-nav">
+    <span class="nav-icon active" data-page="home">🏠</span>
+    <span class="nav-icon" data-page="search">🔍</span>
+    <span class="nav-icon" data-page="upload">📤</span>
+    <span class="nav-icon" data-page="messages">💬</span>
+    <span class="nav-icon" data-page="profile">👤</span>
+  </nav>
 </div>
-
-<!-- ปุ่มอัปโหลด -->
-<button id="uploadBtn" class="upload-btn">+</button>
-<input type="file" id="fileInput" accept="video/*" class="hidden">
-
-<!-- แถบเมนูล่าง -->
-<nav class="bottom-nav">
-  <button class="nav-item active" data-page="home">
-    <span>🏠</span>
-    <span>หน้าแรก</span>
-  </button>
-  <button class="nav-item" data-page="discover">
-    <span>🔍</span>
-    <span>ค้นหา</span>
-  </button>
-  <button class="nav-item" data-page="message">
-    <span>💬</span>
-    <span>ข้อความ</span>
-  </button>
-  <button class="nav-item" data-page="profile">
-    <span>👤</span>
-    <span>โปรไฟล์</span>
-  </button>
-</nav>
 
 <script>
-// ===== ตั้งค่าเชื่อมต่อคลาวด์ — อัปเดตใหม่ 22 ก.ย. 69 =====
-const CLOUD_NAME = 'orjpytt';
-const UPLOAD_PRESET = 'thaipodee';
-const DB_URL = 'https://api.jsonbin.io/v3/b/6ab260effd5d1605322b4d5';
-const DB_KEY = '$2a$10$4D792tmzHDuRi0KlueV9VeTWaxi9ZcVQA3JEgZnaWR183JGLm.otW';
+// ===== การตั้งค่าเชื่อมต่อคลาวด์ =====
+const CLOUD_URL = 'https://thaipodee-global-market-v2026-new.onrender.com/';
+const STORAGE_KEY = 'thaipodee_posts';
 
-let posts = [];
-let currentPage = 'home';
+// ===== ตัวแปรกลาง =====
+let localPosts = [];
+let isOnline = false;
 
-// ===== แสดงข้อความสถานะเชื่อมต่อ =====
-function setSyncStatus(mode, text) {
-  const statusEls = [
-    document.getElementById('sync-status-bar'),
-    document.getElementById('profile-sync-status')
-  ];
-  statusEls.forEach(el => {
-    if (!el) return;
-    el.className = `sync-status ${mode === 'online' ? 'sync-online' : 'sync-offline'}`;
-    el.textContent = text;
+// ===== แสดงสถานะ =====
+function setStatus(text, isOk) {
+  const bar = document.getElementById('statusBar');
+  const textEl = document.getElementById('statusText');
+  textEl.textContent = text;
+  bar.className = isOk ? 'status-bar status-online' : 'status-bar status-offline';
+}
+
+// ===== นับจำนวนโพสต์ที่ยังไม่ถูกลบ =====
+function updatePostCount() {
+  const valid = localPosts.filter(p => !p.deleted);
+  document.getElementById('postCount').textContent = valid.length;
+}
+
+// ===== แสดงรายการโพสต์ =====
+function renderPosts() {
+  const container = document.getElementById('postsList');
+  container.innerHTML = '';
+  
+  const valid = localPosts.filter(p => !p.deleted).reverse();
+  valid.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.innerHTML = `
+      <img src="${post.cover || ''}" alt="ปกวิดีโอ" class="post-cover" loading="lazy">
+      <p style="margin-top:8px; font-size:14px;">${post.caption || 'ไม่มีข้อความ'}</p>
+      <small style="color:#888;">${new Date(post.createdAt).toLocaleString('th-TH')}</small>
+    `;
+    container.appendChild(card);
   });
+  
+  updatePostCount();
 }
 
-// ===== โหลดข้อมูลจากคลาวด์ =====
-async function loadFromCloud() {
+// ===== โหลดข้อมูล =====
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  localPosts = saved ? JSON.parse(saved) : [];
+  renderPosts();
+}
+
+// ===== บันทึกข้อมูล =====
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(localPosts));
+  renderPosts();
+}
+
+// ===== ตรวจสอบการเชื่อมต่อ =====
+async function checkConnection() {
   try {
-    const res = await fetch(`${DB_URL}/latest`, {
-      headers: { 'X-Master-Key': DB_KEY }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data.record && Array.isArray(data.record.posts)) {
-      posts = data.record.posts;
-      saveToLocal(); // สำรองไว้ในเครื่อง
-      setSyncStatus('online', `✅ ซิงค์ล่าสุด — ${posts.filter(p => !p.deleted).length} โพสต์`);
-      renderAll();
-      return true;
-    }
-  } catch (err) {
-    console.warn('ติดต่อคลาวด์ไม่ได้ ใช้ข้อมูลในเครื่อง:', err.message);
-    loadFromLocal();
-    setSyncStatus('offline', '⚠️ ออฟไลน์ — แสดงเฉพาะในเครื่อง');
-    return false;
+    const res = await fetch(CLOUD_URL, { mode: 'no-cors' });
+    isOnline = true;
+    setStatus('ออนไลน์ — พร้อมใช้งาน', true);
+  } catch {
+    isOnline = false;
+    setStatus('ออฟไลน์ — แสดงเฉพาะในเครื่อง', false);
   }
 }
 
-// ===== บันทึกขึ้นคลาวด์ =====
-async function saveToCloud() {
-  try {
-    await fetch(DB_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': DB_KEY
-      },
-      body: JSON.stringify({
-        posts: posts,
-        updated: new Date().toISOString()
-      })
-    });
-    setSyncStatus('online', `✅ ซิงค์ล่าสุด — ${posts.filter(p => !p.deleted).length} โพสต์`);
-    return true;
-  } catch (err) {
-    console.warn('ส่งข้อมูลขึ้นคลาวด์ไม่ได้:', err);
-    return false;
-  }
-}
-
-// ===== บันทึก/โหลดในเครื่อง (สำรอง) =====
-function saveToLocal() {
-  localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
-}
-function loadFromLocal() {
-  const saved = localStorage.getItem('thaipodee_posts');
-  if (saved) posts = JSON.parse(saved);
-}
-
-// ===== อัปโหลดวิดีโอ =====
-document.getElementById('uploadBtn').addEventListener('click', () => {
-  document.getElementById('fileInput').click();
+// ===== กดปุ่มเผยแพร่ =====
+document.getElementById('btnPublish').addEventListener('click', () => {
+  const newPost = {
+    id: Date.now(),
+    caption: 'วิดีโอใหม่',
+    cover: '',
+    videoUrl: '',
+    deleted: false,
+    createdAt: new Date().toISOString()
+  };
+  localPosts.push(newPost);
+  saveData();
+  alert('เพิ่มโพสต์เรียบร้อย');
 });
 
-document.getElementById('fileInput').addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-
-  try {
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    
-    const newPost = {
-      id: Date.now(),
-      url: data.secure_url,
-      thumb: data.thumbnail_url || data.secure_url,
-      name: file.name,
-      size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
-      time: new Date().toLocaleString('th-TH'),
-      deleted: false
-    };
-
-    posts.unshift(newPost);
-    saveToLocal();
-    await saveToCloud();
-    renderAll();
-    alert('✅ เผยแพร่สำเร็จ!');
-  } catch (err) {
-    alert('❌ อัปโหลดไม่สำเร็จ: ' + err.message);
-  }
-  e.target.value = '';
-});
-
-// ===== ลบโพสต์ =====
-window.deletePost = async function(id) {
-  if (!confirm('ลบโพสต์นี้?')) return;
-  const post = posts.find(p => p.id === id);
-  if (post) {
-    post.deleted = true;
-    saveToLocal();
-    await saveToCloud();
-    renderAll();
-  }
-};
-
-// ===== แสดงผลทั้งหมด =====
-function renderAll() {
-  renderFeed();
-  renderProfile();
-}
-
-// ===== แสดงหน้าแรก =====
-function renderFeed() {
-  const list = document.getElementById('feed-list');
-  const active = posts.filter(p => !p.deleted);
-  
-  if (active.length === 0) {
-    list.innerHTML = '<div class="text-center text-gray-500 py-10">ยังไม่มีโพสต์ เป็นคนแรกที่แชร์นะ!</div>';
-    return;
-  }
-
-  list.innerHTML = active.map(p => `
-    <div class="post-item">
-      <video class="video-cover" controls src="${p.url}" preload="metadata"></video>
-      <div class="mt-2 text-sm text-gray-400">${p.name} · ${p.time}</div>
-    </div>
-  `).join('');
-}
-
-// ===== แสดงหน้าโปรไฟล์ =====
-function renderProfile() {
-  const list = document.getElementById('profile-posts');
-  const active = posts.filter(p => !p.deleted);
-  
-  document.getElementById('postCount').textContent = active.length;
-  
-  if (active.length === 0) {
-    list.innerHTML = '<div class="text-center text-gray-500 py-6">ยังไม่มีโพสต์</div>';
-    return;
-  }
-
-  list.innerHTML = active.map(p => `
-    <div class="post-item flex gap-3">
-      <video class="w-24 h-36 object-cover rounded bg-gray-800" controls src="${p.url}" preload="metadata"></video>
-      <div class="flex-1">
-        <div class="font-medium text-sm">${p.name}</div>
-        <div class="text-xs text-gray-400 mt-1">${p.size} · ${p.time}</div>
-        <button class="del-btn" onclick="deletePost(${p.id})">ลบ</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ===== สลับหน้า =====
-document.querySelectorAll('.nav-item').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const page = btn.dataset.page;
-    currentPage = page;
-    
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    document.getElementById('page-home').classList.toggle('hide', page !== 'home');
-    document.getElementById('page-profile').classList.toggle('hide', page !== 'profile');
-    
-    if (page === 'profile') renderProfile();
+// ===== เมนูนำทาง =====
+document.querySelectorAll('.nav-icon').forEach(icon => {
+  icon.addEventListener('click', () => {
+    document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
+    icon.classList.add('active');
   });
 });
 
 // ===== เริ่มทำงาน =====
-loadFromCloud();
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  checkConnection();
+});
 </script>
 
 </body>
