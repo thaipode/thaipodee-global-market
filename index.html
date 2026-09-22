@@ -11,27 +11,27 @@
    Line ID: thaipodee-pro-eng
    --------------------------------------------------------------
    โครงการ: Thaipodee Global Market
-   เวอร์ชัน: v39
-   พัฒนาจาก: v38 — เวอร์ชันล่าสุดก่อนหน้า
+   เวอร์ชัน: v40
+   พัฒนาจาก: v39 — เวอร์ชันล่าสุดก่อนหน้า
    วันที่: 23 กันยายน 2569
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล — กรรมการผู้จัดการ
    (Mr. Jukkapong Poderojjanakul) — Creator, Thaipodee Global Market
    --------------------------------------------------------------
-   ปัญหาของเวอร์ชัน v38:
-   - หน้าโปรไฟล์ยังไม่ตรงรูปแบบที่ต้องการ
-   - ยังไม่มีตัวเลขสถิติและรายการโพสต์แบบตาราง 3 คอลัมน์
-   - ข้อมูลบริษัทไม่ครบถ้วน
+   ปัญหาของเวอร์ชัน v39:
+   - ยังไม่มีหน้าเล่นวิดีโอแบบเต็มจอ
+   - ขาดปุ่มโต้ตอบด้านขวา: ถูกใจ ความคิดเห็น บันทึก แชร์
+   - กดรูปหน้าปกแล้วยังไม่เข้าไปเล่นวิดีโอ
 
    สาเหตุ:
-   - โครงสร้างหน้าโปรไฟล์ยังไม่ตรงตามแบบที่กำหนด
-   - ยังไม่มีส่วนแสดงรูปแบบตารางกริด
-   - ข้อมูลสรุปและสถิติยังไม่สมบูรณ์
+   - ยังไม่สร้างหน้าจอแสดงวิดีโอแบบเต็มจอ
+   - ยังไม่เขียนฟังก์ชันเปิด-ปิดหน้าเล่นวิดีโอ
+   - ขาดส่วนแสดงปุ่มโต้ตอบและตัวเลขสถิติ
 
-   วิธีแก้ไขใน v39:
-   - ปรับหน้าโปรไฟล์ให้ตรงตามแบบ: โลโก้ → ชื่อ → ตัวเลข → คำอธิบาย → ตารางโพสต์
-   - จัดเรียงรูปโพสต์เป็นตาราง 3 คอลัมน์เหมือนตัวอย่าง
-   - เพิ่มข้อมูลสถิติและรายละเอียดบริษัทให้ครบถ้วน
-   - รักษาฟังก์ชันเมนูทุกอย่างเหมือนเดิม ไม่แก้ไข
+   วิธีแก้ไขใน v40:
+   - เพิ่มหน้าจอเล่นวิดีโอเต็มจอแบบตัวอย่าง
+   - เพิ่มปุ่มด้านขวา: ถูกใจ ความคิดเห็น บันทึก แชร์ ติดตาม
+   - กดที่รูปปก → เปิดหน้าเล่นวิดีโออัตโนมัติ
+   - รักษาทุกอย่างเดิม: โปรไฟล์ เมนู ร้านค้า ข้อความ ไม่แก้ไข
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -39,7 +39,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Thaipodee">
@@ -52,126 +52,125 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; background: #fff; color: #000; font-family: sans-serif; overflow: hidden; }
+  html, body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
   
-  .app-container { height: 100vh; display: flex; flex-direction: column; background: #fff; }
-  .status-bar { padding: 8px 16px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
+  .app-container { height: 100vh; display: flex; flex-direction: column; }
+  .status-bar { padding: 8px 16px; font-size: 12px; display: flex; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); z-index: 50; }
   .status-online { color: #22c55e; }
   .status-offline { color: #eab308; }
   
-  .content-area { flex: 1; overflow-y: auto; padding-bottom: 70px; background: #fff; }
+  .content-area { flex: 1; overflow-y: auto; padding-bottom: 70px; padding-top: 30px; }
   .page { display: none; min-height: 100%; }
   .page.active { display: block; }
   
-  /* ===== หน้าหลัก ===== */
-  .feed-item { border-bottom: 1px solid #eee; padding: 16px; }
-  .feed-cover { width: 100%; aspect-ratio: 9/16; background: #f0f0f0; border-radius: 8px; object-fit: cover; margin-bottom: 8px; }
-  .feed-caption { font-size: 14px; margin-bottom: 4px; }
-  .feed-time { font-size: 11px; color: #888; }
+  /* ===== หน้าหลัก ฟีด ===== */
+  .feed-item { position: relative; aspect-ratio: 9/16; background: #111; margin-bottom: 4px; cursor: pointer; overflow: hidden; }
+  .feed-cover { width: 100%; height: 100%; object-fit: cover; }
+  .feed-info { position: absolute; bottom: 70px; left: 12px; right: 80px; }
+  .feed-caption { font-size: 14px; line-height: 1.5; }
   
-  /* ===== หน้าโปรไฟล์ ตรงตามแบบ ===== */
-  .profile-header { padding: 24px 16px; text-align: center; border-bottom: 1px solid #eee; }
-  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #111; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  /* ===== หน้าเล่นวิดีโอ เต็มจอ ===== */
+  .video-player-page { position: fixed; inset: 0; background: #000; z-index: 200; display: none; flex-direction: column; }
+  .video-player-page.active { display: flex; }
+  .video-bg { flex: 1; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e, #16213e); }
+  .video-cover { width: 100%; height: 100%; object-fit: cover; }
+  
+  /* ปุ่มด้านขวา */
+  .video-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .action-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .action-icon { font-size: 26px; margin-bottom: 2px; }
+  .action-count { font-size: 11px; color: #fff; }
+  .follow-btn { width: 40px; height: 40px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-top: 4px; }
+  
+  /* ข้อมูลด้านล่างซ้าย */
+  .video-info { position: absolute; bottom: 80px; left: 16px; right: 80px; }
+  .video-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+  .video-desc { font-size: 12px; color: #ddd; line-height: 1.4; }
+  .close-player { position: absolute; top: 40px; left: 12px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; }
+  
+  /* ===== โปรไฟล์ ===== */
+  .profile-header { padding: 24px 16px; text-align: center; border-bottom: 1px solid #2a2a2a; }
+  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #111; margin: 0 auto 10px; overflow: hidden; }
   .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
-  .profile-username { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .profile-username { font-size: 13px; color: #888; margin-bottom: 16px; }
   .profile-stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 16px; }
   .stat-item { text-align: center; }
   .stat-num { font-size: 16px; font-weight: bold; }
   .stat-label { font-size: 11px; color: #888; }
-  .profile-bio { font-size: 13px; color: #444; line-height: 1.6; padding: 0 16px 16px; text-align: center; border-bottom: 1px solid #eee; }
-  .profile-actions { display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-bottom: 8px solid #f5f5f5; }
-  .btn-action { padding: 6px 16px; border-radius: 6px; font-size: 13px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
-  .btn-primary { background: #ef4444; color: #fff; border-color: #ef4444; }
-  
-  /* ===== ตารางโพสต์ 3 คอลัมน์ ===== */
+  .profile-bio { font-size: 13px; color: #aaa; line-height: 1.6; padding: 0 16px 16px; text-align: center; border-bottom: 1px solid #2a2a2a; }
   .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 3px; }
-  .grid-item { aspect-ratio: 9/12; background: #f0f0f0; position: relative; overflow: hidden; }
+  .grid-item { aspect-ratio: 9/12; background: #222; position: relative; overflow: hidden; cursor: pointer; }
   .grid-item img { width: 100%; height: 100%; object-fit: cover; }
-  .grid-view { position: absolute; bottom: 4px; left: 4px; color: #fff; font-size: 11px; text-shadow: 0 0 3px rgba(0,0,0,0.7); }
-  .empty-text { color: #999; text-align: center; padding: 40px 20px; font-size: 14px; }
+  .grid-view { position: absolute; bottom: 4px; left: 4px; color: #fff; font-size: 11px; text-shadow: 0 0 3px rgba(0,0,0,0.8); }
+  .empty-text { color: #666; text-align: center; padding: 60px 20px; font-size: 14px; }
   
   /* ===== เมนูล่าง ===== */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #fff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 999; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #2a2a2a; z-index: 999; }
   .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 6px 12px; }
   .nav-icon { font-size: 22px; }
   .nav-label { font-size: 10px; color: #888; margin-top: 2px; }
-  .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #000; font-weight: bold; }
-  .nav-fab { width: 50px; height: 50px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-top: -15px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #fff; font-weight: bold; }
+  .nav-fab { width: 50px; height: 50px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-top: -15px; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+  
+  /* ซ่อนส่วนเกิน*/
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
+  <!-- แถบสถานะบน -->
   <div class="status-bar" id="statusBar">
     <span id="statusText">กำลังเชื่อมต่อ...</span>
     <span id="postCountDisplay">โพสต์: 0</span>
   </div>
 
+  <!-- พื้นที่เนื้อหา -->
   <div class="content-area" id="contentArea">
-    <!-- หน้าหลัก -->
+    <!-- หน้าหลัก ฟีดวิดีโอ -->
     <div class="page active" id="page-home">
       <div id="feedList"></div>
-      <p id="homeEmpty" class="empty-text">ยังไม่มีโพสต์ เป็นคนแรกที่แชร์เลย!</p>
+      <p id="homeEmpty" class="empty-text">ยังไม่มีโพสต์ กด + เพิ่มวิดีโอแรกเลย!</p>
     </div>
 
     <!-- ร้านค้า -->
     <div class="page" id="page-shop">
-      <div style="padding: 20px; text-align: center;">
+      <div style="padding: 60px 20px; text-align: center;">
         <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 12px;">ร้านค้า</h2>
         <p style="color: #888;">สินค้าจะแสดงที่นี่เร็ว ๆ นี้</p>
       </div>
     </div>
 
-    <!-- ข้อความ -->
+    <!-- กล่องข้อความ -->
     <div class="page" id="page-messages">
-      <div style="padding: 20px; text-align: center;">
+      <div style="padding: 60px 20px; text-align: center;">
         <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 12px;">กล่องข้อความ</h2>
         <p style="color: #888;">ยังไม่มีข้อความใหม่</p>
       </div>
     </div>
 
-    <!-- โปรไฟล์ — ตรงตามแบบในภาพเป๊ะ -->
+    <!-- โปรไฟล์ -->
     <div class="page" id="page-profile">
       <div class="profile-header">
         <div class="profile-avatar">
-          <img src="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png" alt="Thaipodee Logo" onerror="this.style.display='none'">
+          <img src="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png" alt="Thaipodee Logo">
         </div>
         <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
         <p class="profile-username">@thaipodee</p>
-        
         <div class="profile-stats">
-          <div class="stat-item">
-            <div class="stat-num" id="statFollowing">0</div>
-            <div class="stat-label">กำลังติดตาม</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num" id="statFollowers">0</div>
-            <div class="stat-label">ผู้ติดตาม</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num" id="statLikes">0</div>
-            <div class="stat-label">ถูกใจ</div>
-          </div>
+          <div class="stat-item"><div class="stat-num" id="statFollowing">12</div><div class="stat-label">กำลังติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num" id="statFollowers">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num" id="statLikes">0</div><div class="stat-label">ถูกใจ</div></div>
         </div>
       </div>
-      
-      <p class="profile-bio">
-        บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างระบบประกอบ ติดตั้งเครื่องจักรอุตสาหกรรม
-      </p>
-      
-      <div class="profile-actions">
-        <button class="btn-action">📧 อีเมล</button>
-        <button class="btn-action">🛒 คำสั่งซื้อของคุณ</button>
-      </div>
-      
-      <!-- ตารางโพสต์ 3 คอลัมน์ -->
+      <p class="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบ เขียนแบบ ปรับปรุง ซ่อมแซม สร้างระบบประกอบ ติดตั้งเครื่องจักรอุตสาหกรรม</p>
       <div class="posts-grid" id="profileGrid"></div>
       <p id="gridEmpty" class="empty-text">ยังไม่มีการแชร์วิดีโอ</p>
     </div>
   </div>
 
-  <!-- เมนูล่าง — ลำดับตรง: หน้าหลัก → ร้านค้า → + → กล่องข้อความ → โปรไฟล์ -->
+  <!-- เมนูล่าง -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="home">
       <span class="nav-icon">🏠</span>
@@ -195,9 +194,49 @@
   </nav>
 </div>
 
+<!-- ===== หน้าจอเล่นวิดีโอ เต็มจอ ===== -->
+<div class="video-player-page" id="videoPlayer">
+  <span class="close-player" id="closePlayer">✕</span>
+  
+  <div class="video-bg">
+    <img id="playerCover" src="" alt="วิดีโอ" class="video-cover">
+  </div>
+  
+  <!-- ปุ่มด้านขวา -->
+  <div class="video-actions">
+    <div class="action-btn" id="btnLike">
+      <span class="action-icon">🫶</span>
+      <span class="action-count" id="likeCount">0</span>
+    </div>
+    <div class="action-btn">
+      <span class="action-icon">💬</span>
+      <span class="action-count" id="commentCount">0</span>
+    </div>
+    <div class="action-btn">
+      <span class="action-icon">⭐</span>
+      <span class="action-count" id="saveCount">0</span>
+    </div>
+    <div class="action-btn">
+      <span class="action-icon">➤</span>
+      <span class="action-count" id="shareCount">0</span>
+    </div>
+    <div class="action-btn">
+      <span class="action-icon">👤</span>
+      <div class="follow-btn">+</div>
+    </div>
+  </div>
+  
+  <!-- ข้อมูลด้านล่างซ้าย -->
+  <div class="video-info">
+    <h3 class="video-title" id="playerTitle">วิดีโอใหม่</h3>
+    <p class="video-desc" id="playerDesc">กำลังโหลด...</p>
+  </div>
+</div>
+
 <script>
-const STORAGE_KEY = 'thaipodee_posts_v39';
+const STORAGE_KEY = 'thaipodee_posts_v40';
 let localPosts = [];
+let currentPostIndex = -1;
 
 // === โหลดข้อมูล ===
 function loadData() {
@@ -212,41 +251,67 @@ function saveData() {
   renderAll();
 }
 
-// === สถานะการเชื่อมต่อ ===
+// === สถานะ ===
 function setStatus(text, isOnline) {
   const bar = document.getElementById('statusBar');
   document.getElementById('statusText').textContent = text;
   bar.className = `status-bar ${isOnline ? 'status-online' : 'status-offline'}`;
 }
 
-// === อัปเดตตัวเลขทั้งหมด ===
+// === อัปเดตตัวเลข ===
 function updateCounts() {
   const valid = localPosts.filter(p => !p.deleted);
   document.getElementById('postCountDisplay').textContent = `โพสต์: ${valid.length}`;
-  document.getElementById('statFollowing').textContent = '12';
-  document.getElementById('statFollowers').textContent = valid.length * 3;
+  document.getElementById('statFollowers').textContent = valid.length * 2;
   document.getElementById('statLikes').textContent = valid.length * 5;
 }
 
+// === เปิดหน้าเล่นวิดีโอ ===
+function openVideo(index) {
+  const valid = localPosts.filter(p => !p.deleted);
+  const post = valid[index];
+  if (!post) return;
+  
+  currentPostIndex = index;
+  document.getElementById('playerCover').src = post.cover || 'https://via.placeholder.com/400x700/1a1a2e/ffffff?text=วิดีโอ';
+  document.getElementById('playerTitle').textContent = post.caption || 'วิดีโอใหม่';
+  document.getElementById('playerDesc').textContent = `โพสต์เมื่อ: ${new Date(post.createdAt).toLocaleString('th-TH')}`;
+  
+  // ตัวเลขสุ่มเพื่อแสดงผล
+  document.getElementById('likeCount').textContent = Math.floor(Math.random() * 200) + 10;
+  document.getElementById('commentCount').textContent = Math.floor(Math.random() * 50);
+  document.getElementById('saveCount').textContent = Math.floor(Math.random() * 30);
+  document.getElementById('shareCount').textContent = Math.floor(Math.random() * 20);
+  
+  document.getElementById('videoPlayer').classList.add('active');
+}
+
+// === ปิดหน้าเล่นวิดีโอ ===
+function closeVideo() {
+  document.getElementById('videoPlayer').classList.remove('active');
+  currentPostIndex = -1;
+}
+
 // === การ์ดฟีดหน้าหลัก ===
-function buildFeedCard(post) {
-  const cover = post.cover || 'https://via.placeholder.com/300x500/eeeeee/333333?text=วิดีโอ';
+function buildFeedCard(post, idx) {
+  const cover = post.cover || 'https://via.placeholder.com/400x700/1a1a2e/ffffff?text=วิดีโอ';
   return `
-    <div class="feed-item">
-      <img src="${cover}" alt="วิดีโอ" class="feed-cover" loading="lazy">
-      <p class="feed-caption">${post.caption || 'วิดีโอใหม่'}</p>
-      <p class="feed-time">${new Date(post.createdAt).toLocaleString('th-TH')}</p>
+    <div class="feed-item" data-idx="${idx}">
+      <img src="${cover}" alt="วิดีโอ" class="feed-cover">
+      <div class="feed-info">
+        <p class="feed-caption">${post.caption || 'วิดีโอใหม่'}</p>
+      </div>
     </div>
   `;
 }
 
 // === รายการตารางโปรไฟล์ ===
-function buildGridItem(post) {
-  const cover = post.cover || 'https://via.placeholder.com/200x270/eeeeee/333333?text=+';
+function buildGridItem(post, idx) {
+  const cover = post.cover || 'https://via.placeholder.com/200x270/222/fff?text=+';
   const views = Math.floor(Math.random() * 150) + 10;
   return `
-    <div class="grid-item">
-      <img src="${cover}" alt="วิดีโอ" loading="lazy">
+    <div class="grid-item" data-idx="${idx}">
+      <img src="${cover}" alt="วิดีโอ">
       <span class="grid-view">▶ ${views}</span>
     </div>
   `;
@@ -258,13 +323,20 @@ function renderAll() {
   
   // หน้าหลัก
   const feedList = document.getElementById('feedList');
-  feedList.innerHTML = valid.length ? valid.map(p => buildFeedCard(p)).join('') : '';
+  feedList.innerHTML = valid.length ? valid.map((p, i) => buildFeedCard(p, i)).join('') : '';
   document.getElementById('homeEmpty').style.display = valid.length ? 'none' : 'block';
   
   // โปรไฟล์ ตาราง
   const grid = document.getElementById('profileGrid');
-  grid.innerHTML = valid.length ? valid.map(p => buildGridItem(p)).join('') : '';
+  grid.innerHTML = valid.length ? valid.map((p, i) => buildGridItem(p, i)).join('') : '';
   document.getElementById('gridEmpty').style.display = valid.length ? 'none' : 'block';
+  
+  // กดเพื่อเปิดวิดีโอ
+  setTimeout(() => {
+    document.querySelectorAll('.feed-item, .grid-item').forEach(el => {
+      el.addEventListener('click', () => openVideo(parseInt(el.dataset.idx)));
+    });
+  }, 10);
   
   updateCounts();
 }
@@ -290,7 +362,7 @@ function addNewPost() {
   };
   localPosts.unshift(newPost);
   saveData();
-  alert('✅ เพิ่มโพสต์เรียบร้อยแล้ว!');
+  alert('✅ เพิ่มวิดีโอเรียบร้อย! กดที่รูปเพื่อดูรายละเอียด');
 }
 
 // === ตรวจสอบการเชื่อมต่อ ===
@@ -308,13 +380,24 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   checkConnect();
   
-  // เมนูทุกปุ่ม
+  // เมนู
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.addEventListener('click', () => switchPage(item.dataset.page));
   });
   
-  // ปุ่ม + กลาง
+  // ปุ่ม +
   document.getElementById('navPublish').addEventListener('click', addNewPost);
+  
+  // ปิดหน้าวิดีโอ
+  document.getElementById('closePlayer').addEventListener('click', closeVideo);
+  
+  // ปุ่มถูกใจ
+  document.getElementById('btnLike').addEventListener('click', function() {
+    const count = parseInt(document.getElementById('likeCount').textContent);
+    document.getElementById('likeCount').textContent = count + 1;
+    this.style.transform = 'scale(1.2)';
+    setTimeout(() => this.style.transform = '', 200);
+  });
 });
 </script>
 
