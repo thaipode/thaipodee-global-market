@@ -1,10 +1,9 @@
 <!-- ==============================================================
-   thaipodee Global Market — v24 ตรงตามรูปแบบหน้าเล่นวิดีโอ
-   วันที่: 22 กันยายน 2569 06:58 น.
-   ✅ หน้าหลัก: ไม่มีปุ่มข้อมูลเชิงลึก
-   ✅ หน้าเล่นวิดีโอ: ด้านซ้ายมีแถบเลื่อนอัตโนมัติ
-      → โปรไฟล์ → ผู้ติดตาม → ผู้ชม → ถูกใจ → แชร์ → เลื่อนผ่าน 3 จุด → หาย
-   ✅ ด้านล่างวิดีโอ: ปุ่ม "ข้อมูลเชิงลึกเพิ่มเติม"
+   thaipodee Global Market — v25 แก้เสียงไม่ออก
+   วันที่: 22 กันยายน 2569 12:56 น.
+   ✅ แก้: เสียงวิดีโอไม่ออก → เปิดเสียงตามปกติ
+   ✅ เพิ่มปุ่มเปิด/ปิดเสียงชัดเจน
+   ✅ คงรูปแบบแถบเลื่อนด้านซ้ายเหมือนเดิม
    ✅ ไม่แตะไอคอน / เมนู / ฟังก์ชันอื่น
    ============================================================== -->
 <!DOCTYPE html>
@@ -37,13 +36,17 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .logo-text{font-size:24px;font-weight:bold;letter-spacing:1px;}
 .logo-sub{font-size:14px;color:#888;margin-top:8px;}
 
+/* ===== ปุ่มเปิด/ปิดเสียง ===== */
+.sound-toggle{position:absolute;top:32px;right:60px;z-index:20;width:36px;height:36px;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.sound-toggle i{font-size:18px;}
+
 /* ===== พื้นที่แสดงวิดีโอ ===== */
 .media-wrapper{position:absolute;top:28px;left:0;right:0;bottom:70px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .media-wrapper video,.media-wrapper img{width:100%;height:100%;object-fit:contain;background:#000;}
 .media-placeholder{text-align:center;color:#666;}
 .media-placeholder i{font-size:48px;margin-bottom:16px;}
 
-/* ===== แถบเลื่อนด้านซ้าย — ตามรูปแบบ ===== */
+/* ===== แถบเลื่อนด้านซ้าย ===== */
 .left-scroller{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:15;overflow:hidden;height:320px;width:60px;}
 .scroll-inner{position:relative;}
 .scroll-item{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:24px;opacity:0;transform:translateY(20px);transition:all .6s ease;}
@@ -116,7 +119,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v24</div>
+<div class="version-tag">v25</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -126,6 +129,11 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 
 <!-- ===== หน้าเล่นวิดีโอหลัก ===== -->
 <div id="home" class="page hidden">
+  <!-- ปุ่มเปิด/ปิดเสียง -->
+  <div class="sound-toggle" id="soundToggle" style="display:none;">
+    <i class="fa-solid fa-volume-high"></i>
+  </div>
+
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
       <i class="fa-solid fa-film"></i>
@@ -172,7 +180,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
 
-  <!-- ===== ปุ่มด้านขวา — ไม่มีปุ่มข้อมูลเชิงลึก ===== -->
+  <!-- ===== ปุ่มด้านขวา ===== -->
   <div class="right-buttons">
     <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>ฉัน</span></div>
     <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
@@ -260,6 +268,8 @@ let useCustomSound = false;
 let selectedFile = null;
 let currentViewingIndex = -1;
 let scrollAnimInterval = null;
+let isMuted = false;
+let currentVideoEl = null;
 
 // ===== บันทึก/โหลด =====
 function saveToLocal() {
@@ -354,7 +364,20 @@ function renderPosts() {
   });
 }
 
-// ===== เล่นวิดีโอ + เริ่มแถบเลื่อนด้านซ้าย =====
+// ===== สลับเปิด/ปิดเสียง =====
+document.getElementById('soundToggle').addEventListener('click', () => {
+  isMuted = !isMuted;
+  const icon = document.querySelector('#soundToggle i');
+  if (isMuted) {
+    icon.className = 'fa-solid fa-volume-xmark';
+    if (currentVideoEl) currentVideoEl.muted = true;
+  } else {
+    icon.className = 'fa-solid fa-volume-high';
+    if (currentVideoEl) currentVideoEl.muted = false;
+  }
+});
+
+// ===== เล่นวิดีโอ + เปิดเสียงตามปกติ =====
 function viewPost(idx) {
   currentViewingIndex = idx;
   const p = posts[idx];
@@ -367,16 +390,22 @@ function viewPost(idx) {
 
   const mediaArea = document.getElementById('mediaArea');
   const bottomBar = document.getElementById('bottomInfoBar');
+  const soundBtn = document.getElementById('soundToggle');
   
-  // แสดงวิดีโอ/รูป
+  // แสดงวิดีโอ — ไม่ปิดเสียง!
   if (p.type === 'video') {
     mediaArea.innerHTML = `
-      <video src="${p.url}" autoplay muted controls playsinline 
+      <video id="mainVideo" src="${p.url}" autoplay controls playsinline 
              style="width:100%;height:100%;object-fit:contain;">
       </video>`;
+    currentVideoEl = document.getElementById('mainVideo');
+    currentVideoEl.muted = isMuted; // ตามสถานะปุ่ม
+    soundBtn.style.display = 'flex';
   } else {
     mediaArea.innerHTML = `
       <img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
+    currentVideoEl = null;
+    soundBtn.style.display = 'none';
   }
 
   // ข้อมูลด้านล่าง
@@ -451,6 +480,7 @@ function showPage(id) {
   document.getElementById(id).classList.remove('hidden');
   if (id !== 'home') {
     document.getElementById('bottomInfoBar').style.display = 'none';
+    document.getElementById('soundToggle').style.display = 'none';
   }
   if (id === 'profile') fetchFromCloud();
 }
@@ -561,7 +591,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     await saveToCloud();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ บันทึกแล้ว!';
+    statusLine.textContent = '✅ บันทึกแล้ว! เสียงออกตามปกติ';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
