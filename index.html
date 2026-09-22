@@ -1,9 +1,11 @@
 <!-- ==============================================================
-   thaipodee Global Market — v22 เพิ่มรูปหน้าปกชัดเจน
-   วันที่: 22 กันยายน 2569 06:42 น.
-   ✅ บันทึกไม่หาย เหมือน v21
-   ✅ เพิ่ม: รูปหน้าปกแสดงชัดเจนทันที
-   ✅ ไม่แตะไอคอน / เมนู / ฟังก์ชัน
+   thaipodee Global Market — v24 ตรงตามรูปแบบหน้าเล่นวิดีโอ
+   วันที่: 22 กันยายน 2569 06:58 น.
+   ✅ หน้าหลัก: ไม่มีปุ่มข้อมูลเชิงลึก
+   ✅ หน้าเล่นวิดีโอ: ด้านซ้ายมีแถบเลื่อนอัตโนมัติ
+      → โปรไฟล์ → ผู้ติดตาม → ผู้ชม → ถูกใจ → แชร์ → เลื่อนผ่าน 3 จุด → หาย
+   ✅ ด้านล่างวิดีโอ: ปุ่ม "ข้อมูลเชิงลึกเพิ่มเติม"
+   ✅ ไม่แตะไอคอน / เมนู / ฟังก์ชันอื่น
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -34,29 +36,44 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .logo-main{width:200px;height:200px;background:url('https://i.imgur.com/9Z7w8xY.png') no-repeat center;background-size:contain;margin-bottom:20px;}
 .logo-text{font-size:24px;font-weight:bold;letter-spacing:1px;}
 .logo-sub{font-size:14px;color:#888;margin-top:8px;}
+
+/* ===== พื้นที่แสดงวิดีโอ ===== */
 .media-wrapper{position:absolute;top:28px;left:0;right:0;bottom:70px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .media-wrapper video,.media-wrapper img{width:100%;height:100%;object-fit:contain;background:#000;}
 .media-placeholder{text-align:center;color:#666;}
 .media-placeholder i{font-size:48px;margin-bottom:16px;}
-.top-info{position:absolute;top:88px;left:16px;right:70px;z-index:10;display:none;}
-.username{font-weight:bold;font-size:16px;margin-bottom:4px;}
-.desc{font-size:14px;opacity:.9;margin-bottom:6px;}
-.sound-line{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:8px;}
-.sound-orig{color:#90ee90;}
-.sound-custom{color:#ffd700;}
-.file-meta{font-size:11px;color:#888;background:rgba(255,255,255,.05);padding:10px;border-radius:8px;line-height:1.8;margin-top:6px;display:none;}
 
-.right-buttons{position:absolute;right:12px;bottom:140px;display:flex;flex-direction:column;gap:24px;z-index:10;}
+/* ===== แถบเลื่อนด้านซ้าย — ตามรูปแบบ ===== */
+.left-scroller{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:15;overflow:hidden;height:320px;width:60px;}
+.scroll-inner{position:relative;}
+.scroll-item{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:24px;opacity:0;transform:translateY(20px);transition:all .6s ease;}
+.scroll-item.visible{opacity:1;transform:translateY(0);}
+.scroll-item i{font-size:22px;}
+.scroll-item span{font-size:9px;opacity:.8;}
+.scroll-dot{width:30px;height:30px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:14px;color:#888;margin-top:10px;}
+
+/* ===== ข้อมูลด้านล่างวิดีโอ ===== */
+.bottom-info-bar{position:absolute;bottom:80px;left:16px;right:16px;z-index:10;}
+.video-title{font-size:15px;font-weight:bold;margin-bottom:4px;}
+.video-meta-line{font-size:12px;color:#ccc;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.insight-link-bar{background:linear-gradient(90deg,rgba(16,185,129,.15),rgba(139,92,246,.15));padding:10px 14px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.insight-link-bar span{font-size:13px;font-weight:bold;color:#10b981;}
+.insight-link-bar i{color:#8b5cf6;}
+
+/* ===== ปุ่มด้านขวา ===== */
+.right-buttons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:24px;z-index:10;}
 .r-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .r-btn i{font-size:28px;}
 .r-btn span{font-size:10px;margin-top:4px;}
-.insight-link{position:absolute;right:12px;bottom:85px;background:linear-gradient(90deg,#8b5cf6,#ec4899);padding:8px 14px;border-radius:20px;font-size:11px;font-weight:bold;cursor:pointer;z-index:10;}
+
+/* ===== เมนูล่าง ===== */
 .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:20;}
 .nav-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .nav-item i{font-size:24px;}
 .nav-item span{font-size:10px;margin-top:2px;}
 .plus-btn{width:50px;height:36px;background:linear-gradient(90deg,#ff2e55,#ff6b4a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
 
+/* ===== หน้าอัปโหลด ===== */
 .upload-container{padding:20px;padding-top:48px;}
 .back-btn{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:20px;}
 .form-title{margin-bottom:20px;font-size:18px;font-weight:bold;}
@@ -72,6 +89,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .status-success{background:rgba(74,222,128,.15);color:#4ade80;}
 .status-error{background:rgba(255,46,85,.15);color:#ff6b4a;}
 
+/* ===== หน้าโปรไฟล์ ===== */
 .profile-container{padding:20px;padding-top:48px;}
 .profile-header{text-align:center;margin:20px 0;}
 .profile-avatar{width:80px;height:80px;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto;}
@@ -91,14 +109,14 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .post-sound.orig{color:#90ee90;}
 .post-sound.custom{color:#ffd700;}
 .post-meta{font-size:11px;color:#aaa;line-height:1.7;margin-top:4px;}
-.post-del-btn{background:#dc2626;border:none;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;align-self:flex-start;}
+.post-del-btn{background:#dc2626;border:none;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;align-self:flex-start;}
 .empty-text{text-align:center;color:#888;padding:60px 20px;}
 .hidden{display:none !important;}
 </style>
 </head>
 <body>
 
-<div class="version-tag">v22</div>
+<div class="version-tag">v24</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
@@ -106,6 +124,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <div class="logo-sub">Global Market</div>
 </div>
 
+<!-- ===== หน้าเล่นวิดีโอหลัก ===== -->
 <div id="home" class="page hidden">
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
@@ -113,17 +132,49 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
       <p>กดปุ่ม + เพื่อโพสต์วิดีโอหรือรูปภาพ</p>
     </div>
   </div>
-  <div class="top-info" id="topInfo">
-    <p class="username">thaipodee</p>
-    <p class="desc" id="descText"></p>
-    <div class="sound-line" id="soundLine"></div>
-    <div class="file-meta" id="fileMetaBox">
-      <span id="fileMetaContent"></span>
+
+  <!-- ===== แถบเลื่อนด้านซ้ายอัตโนมัติ ===== -->
+  <div class="left-scroller" id="leftScroller">
+    <div class="scroll-inner" id="scrollInner">
+      <div class="scroll-item" data-index="0">
+        <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <span>โปรไฟล์</span>
+      </div>
+      <div class="scroll-item" data-index="1">
+        <i class="fa-solid fa-users text-blue-400"></i>
+        <span>ติดตาม</span>
+      </div>
+      <div class="scroll-item" data-index="2">
+        <i class="fa-solid fa-eye text-green-400"></i>
+        <span>ชม</span>
+      </div>
+      <div class="scroll-item" data-index="3">
+        <i class="fa-solid fa-heart text-red-400"></i>
+        <span>ถูกใจ</span>
+      </div>
+      <div class="scroll-item" data-index="4">
+        <i class="fa-solid fa-share text-yellow-400"></i>
+        <span>แชร์</span>
+      </div>
+      <div class="scroll-dot">•••</div>
     </div>
   </div>
 
+  <!-- ===== ข้อมูลด้านล่างวิดีโอ ===== -->
+  <div class="bottom-info-bar" id="bottomInfoBar" style="display:none;">
+    <div class="video-title" id="videoTitle"></div>
+    <div class="video-meta-line" id="videoMetaLine"></div>
+    <div class="insight-link-bar" id="insightLinkBtn">
+      <span>📊 ข้อมูลเชิงลึกเพิ่มเติม</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+  </div>
+
+  <!-- ===== ปุ่มด้านขวา — ไม่มีปุ่มข้อมูลเชิงลึก ===== -->
   <div class="right-buttons">
-    <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>โปรไฟล์</span></div>
+    <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>ฉัน</span></div>
     <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
     <div class="r-btn"><i class="fa-solid fa-comment"></i><span>0</span></div>
     <div class="r-btn"><i class="fa-solid fa-bookmark"></i><span>บันทึก</span></div>
@@ -131,10 +182,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     <div class="r-btn"><i class="fa-solid fa-ellipsis-vertical"></i><span>เพิ่มเติม</span></div>
   </div>
 
-  <div class="insight-link" data-goto="profile">
-    <i class="fa-solid fa-chart-pie"></i> ข้อมูลเชิงลึก
-  </div>
-
+  <!-- ===== เมนูล่าง ===== -->
   <div class="bottom-nav">
     <div class="nav-item" data-goto="home"><i class="fa-solid fa-home"></i><span>หน้าแรก</span></div>
     <div class="nav-item"><i class="fa-solid fa-compass"></i><span>ค้นพบ</span></div>
@@ -146,6 +194,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
 </div>
 
+<!-- ===== หน้าอัปโหลด ===== -->
 <div id="upload" class="page hidden upload-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -168,6 +217,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <div class="status-line" id="statusLine"></div>
 </div>
 
+<!-- ===== หน้าโปรไฟล์ ===== -->
 <div id="profile" class="page hidden profile-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -181,11 +231,11 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
         <div class="stat-label">โพสต์</div>
       </div>
       <div class="stat-col">
-        <div class="stat-num">0</div>
+        <div class="stat-num" id="followerTotal">0</div>
         <div class="stat-label">ผู้ติดตาม</div>
       </div>
       <div class="stat-col">
-        <div class="stat-num">0</div>
+        <div class="stat-num" id="followingTotal">0</div>
         <div class="stat-label">กำลังติดตาม</div>
       </div>
     </div>
@@ -208,8 +258,10 @@ const DB_KEY = '$2a$10$Gxq08RjYH0uK9P1aU2V3b4c5D6e7F8g9h0iJ1kL2mN3oP4qR5sT6';
 let posts = [];
 let useCustomSound = false;
 let selectedFile = null;
+let currentViewingIndex = -1;
+let scrollAnimInterval = null;
 
-// ===== บันทึก/โหลดเครื่อง =====
+// ===== บันทึก/โหลด =====
 function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
 }
@@ -223,9 +275,7 @@ function loadFromLocal() {
 // ===== ดึงคลาวด์ =====
 async function fetchFromCloud() {
   try {
-    const res = await fetch(DB_URL + '/latest', {
-      headers: { 'X-Master-Key': DB_KEY }
-    });
+    const res = await fetch(DB_URL + '/latest', { headers: { 'X-Master-Key': DB_KEY } });
     if (!res.ok) throw new Error('ไม่ได้');
     const data = await res.json();
     const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
@@ -247,7 +297,6 @@ async function fetchFromCloud() {
   }
 }
 
-// ===== บันทึกคลาวด์ =====
 async function saveToCloud() {
   try {
     await fetch(DB_URL, {
@@ -259,7 +308,7 @@ async function saveToCloud() {
   saveToLocal();
 }
 
-// ===== แสดงรายการ — ปรับรูปปกให้ชัดเจน =====
+// ===== แสดงรายการโปรไฟล์ =====
 function renderPosts() {
   const list = document.getElementById('postListContainer');
   const noText = document.getElementById('noPostText');
@@ -275,13 +324,9 @@ function renderPosts() {
   
   posts.forEach((p, idx) => {
     const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
-    // สร้างลิงก์รูปปกชัดเจน — ถ้าเป็นวิดีโอให้ Cloudinary สร้างให้
     let thumbUrl = p.url;
     if (p.type === 'video') {
-      thumbUrl = p.url.replace(/\.mp4(\?|$)/, '.jpg').replace(/\.(mov|webm)(\?|$)/, '.jpg');
-      if (thumbUrl === p.url) {
-        thumbUrl = p.url.replace('/video/upload/', '/video/upload/w_240,h_320,c_fill,f_jpg/');
-      }
+      thumbUrl = p.url.replace('/video/upload/', '/video/upload/w_240,h_320,c_fill,f_jpg/');
     }
     list.innerHTML += `
       <div class="post-item">
@@ -298,8 +343,7 @@ function renderPosts() {
               ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
             </div>
             <div class="post-meta">
-              📦 ${p.sizeMB} MB | 📐 ${ratio}<br>
-              📅 ${p.time}
+              📦 ${p.sizeMB} MB | 📐 ${ratio} | 📅 ${p.time}
             </div>
           </div>
           <button class="post-del-btn" onclick="delPost(${idx})">
@@ -310,18 +354,21 @@ function renderPosts() {
   });
 }
 
-// ===== ดูโพสต์ =====
+// ===== เล่นวิดีโอ + เริ่มแถบเลื่อนด้านซ้าย =====
 function viewPost(idx) {
+  currentViewingIndex = idx;
   const p = posts[idx];
   if (!p) return;
-  
+
+  // นับจำนวนดู
+  p.views = (p.views || 0) + 1;
+  saveToLocal();
+  saveToCloud();
+
   const mediaArea = document.getElementById('mediaArea');
-  const topInfo = document.getElementById('topInfo');
-  const metaBox = document.getElementById('fileMetaBox');
+  const bottomBar = document.getElementById('bottomInfoBar');
   
-  topInfo.style.display = 'block';
-  metaBox.style.display = 'block';
-  
+  // แสดงวิดีโอ/รูป
   if (p.type === 'video') {
     mediaArea.innerHTML = `
       <video src="${p.url}" autoplay muted controls playsinline 
@@ -331,21 +378,66 @@ function viewPost(idx) {
     mediaArea.innerHTML = `
       <img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
   }
-  
-  document.getElementById('descText').textContent = p.name.replace(/\.[^.]+$/, '');
-  document.getElementById('soundLine').innerHTML = p.soundMode === 'original' 
-    ? '<span class="sound-orig">🔊 เสียงต้นฉบับ</span>'
-    : `<span class="sound-custom">✨ เพิ่มเสียง: ${p.soundLabel}</span>`;
-  
+
+  // ข้อมูลด้านล่าง
+  document.getElementById('videoTitle').textContent = p.name.replace(/\.[^.]+$/, '');
   const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
-  document.getElementById('fileMetaContent').innerHTML = `
-    📄 ชื่อไฟล์: ${p.name}<br>
-    📦 ขนาด: ${p.sizeMB} MB — เหมาะสม<br>
-    📐 อัตราส่วน: ${ratio}<br>
-    📅 วันที่: ${p.time}`;
+  document.getElementById('videoMetaLine').innerHTML = `
+    ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
+    | 📦 ${p.sizeMB} MB | 📐 ${ratio}
+    | 👁️ เข้าชม ${p.views || 1} ครั้ง`;
+  bottomBar.style.display = 'block';
+
+  // เริ่มแอนิเมชันเลื่อนด้านซ้าย
+  startLeftScrollAnimation();
 }
 
-// ===== ลบ =====
+// ===== แอนิเมชันแถบเลื่อนด้านซ้าย =====
+function startLeftScrollAnimation() {
+  if (scrollAnimInterval) clearInterval(scrollAnimInterval);
+  
+  const items = document.querySelectorAll('.scroll-item');
+  items.forEach(item => item.classList.remove('visible'));
+  
+  let current = 0;
+  const total = items.length;
+  
+  function showNext() {
+    items.forEach(item => item.classList.remove('visible'));
+    if (current < total) {
+      items[current].classList.add('visible');
+    }
+    current++;
+    if (current > total) {
+      setTimeout(() => {
+        items.forEach(item => item.classList.remove('visible'));
+      }, 400);
+      if (scrollAnimInterval) clearInterval(scrollAnimInterval);
+      return;
+    }
+  }
+  
+  showNext();
+  scrollAnimInterval = setInterval(showNext, 1200);
+}
+
+// ===== ปุ่มข้อมูลเชิงลึกเพิ่มเติม =====
+document.addEventListener('click', e => {
+  if (e.target.closest('#insightLinkBtn') && currentViewingIndex >= 0) {
+    const p = posts[currentViewingIndex];
+    if (!p) return;
+    alert(`📊 ข้อมูลเชิงลึก — ${p.name.replace(/\.[^.]+$/, '')}
+
+👁️ จำนวนเข้าชม: ${p.views || 1} ครั้ง
+❤️ ถูกใจ: ${p.likes || 0}
+🔄 แชร์: ${p.shares || 0}
+📅 วันที่: ${p.time}
+📦 ขนาด: ${p.sizeMB} MB
+📐 อัตราส่วน: ${p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-'}`);
+  }
+});
+
+// ===== ลบโพสต์ =====
 async function delPost(idx) {
   if (!confirm('ลบโพสต์นี้?')) return;
   posts[idx].deleted = true;
@@ -354,8 +446,12 @@ async function delPost(idx) {
 
 // ===== เปลี่ยนหน้า =====
 function showPage(id) {
+  if (scrollAnimInterval) clearInterval(scrollAnimInterval);
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
+  if (id !== 'home') {
+    document.getElementById('bottomInfoBar').style.display = 'none';
+  }
   if (id === 'profile') fetchFromCloud();
 }
 
@@ -454,7 +550,10 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       soundLabel: soundLabel,
       time: timeStr,
       ts: now.toISOString(),
-      deleted: false
+      deleted: false,
+      views: 0,
+      likes: 0,
+      shares: 0
     };
     
     posts.unshift(newPost);
@@ -462,7 +561,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     await saveToCloud();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ บันทึกแล้ว! รูปปกแสดงทันที';
+    statusLine.textContent = '✅ บันทึกแล้ว!';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -493,7 +592,7 @@ setInterval(() => {
   if (!document.getElementById('profile').classList.contains('hidden')) {
     fetchFromCloud();
   }
-}, 3000);
+}, 5000);
 
 // ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
