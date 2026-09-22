@@ -1,20 +1,18 @@
 <!-- ==============================================================
-   thaipodee Global Market — v29
-   วันที่: 22 กันยายน 2569 13:03 น.
-   อ้างอิงจาก: v28
+   thaipodee Global Market — v30
+   วันที่: 22 กันยายน 2569 13:19 น.
+   อ้างอิงจาก: v29
    --------------------------------------------------------------
    ปัญหาก่อนหน้า:
-   - เครื่องที่ 2 ไม่เห็นวิดีโอของเครื่องที่ 1
-   - เครื่องที่ 1 ไม่เห็นวิดีโอของเครื่องที่ 2
-   - ต้องกดรีเฟรสเอง ไม่อัปเดตอัตโนมัติ
+   - ปุ่มแชร์ทำงานแค่ก๊อปปี้ลิงก์ ไม่ใช่แชร์จริง
+   - ผู้ใช้ต้องการส่งผ่านระบบแชร์โดยตรง
 
    วิธีแก้ไข:
-   - ✅ ซิงค์ข้อมูลจากคลาวด์ทุก 3 วินาที → เห็นโพสต์กันทันที
-   - ✅ เครื่องที่ 1 โพสต์ → เครื่องที่ 2 เห็นเองอัตโนมัติ
-   - ✅ เครื่องที่ 2 โพสต์ → เครื่องที่ 1 เห็นเองอัตโนมัติ
-   - ✅ เสียงออกปกติ ไม่ปิดอัตโนมัติ
-   - ✅ ปุ่มโปรไฟล์ 2 ตัวเท่านั้น: บนซ้าย + ขวาล่าง
-   - ✅ ปุ่มแชร์ทำงานได้
+   - ✅ ใช้ navigator.share → ขึ้นเมนูแชร์มือถือโดยตรง
+   - ✅ ส่งไลน์, เฟซบุ๊ก, อะไรก็ได้ที่มีในเครื่อง
+   - ✅ ถ้าเครื่องไม่รองรับ → ถอยกลับไปก๊อปปี้ลิงก์อัตโนมัติ
+   - ✅ เสียงออกปกติ, ซิงค์ข้ามเครื่องทำงานเหมือนเดิม
+   - ✅ ปุ่มโปรไฟล์ 2 ตัว: บนซ้าย + ขวาล่าง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -46,23 +44,19 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .logo-text{font-size:24px;font-weight:bold;letter-spacing:1px;}
 .logo-sub{font-size:14px;color:#888;margin-top:8px;}
 
-/* ===== ปุ่มเปิด/ปิดเสียง ===== */
 .sound-toggle{position:absolute;top:32px;right:60px;z-index:20;width:36px;height:36px;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .sound-toggle i{font-size:18px;}
 
-/* ===== ปุ่มโปรไฟล์บนสุดด้านซ้าย ===== */
 .top-left-profile{position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:15;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .top-left-profile .avatar-circle{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;}
 .top-left-profile .avatar-circle i{font-size:24px;}
 .top-left-profile span{font-size:9px;opacity:.8;}
 
-/* ===== พื้นที่แสดงวิดีโอ ===== */
 .media-wrapper{position:absolute;top:28px;left:0;right:0;bottom:70px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .media-wrapper video,.media-wrapper img{width:100%;height:100%;object-fit:contain;background:#000;}
 .media-placeholder{text-align:center;color:#666;}
 .media-placeholder i{font-size:48px;margin-bottom:16px;}
 
-/* ===== ข้อมูลด้านล่างวิดีโอ ===== */
 .bottom-info-bar{position:absolute;bottom:80px;left:16px;right:16px;z-index:10;}
 .video-title{font-size:15px;font-weight:bold;margin-bottom:4px;}
 .video-meta-line{font-size:12px;color:#ccc;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
@@ -70,20 +64,17 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .insight-link-bar span{font-size:13px;font-weight:bold;color:#10b981;}
 .insight-link-bar i{color:#8b5cf6;}
 
-/* ===== ปุ่มด้านขวา — มุมขวาล่างสุดมี "ฉัน" ===== */
 .right-buttons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:24px;z-index:10;}
 .r-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .r-btn i{font-size:28px;}
 .r-btn span{font-size:10px;margin-top:4px;}
 
-/* ===== เมนูล่าง ===== */
 .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:20;}
 .nav-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
 .nav-item i{font-size:24px;}
 .nav-item span{font-size:10px;margin-top:2px;}
 .plus-btn{width:50px;height:36px;background:linear-gradient(90deg,#ff2e55,#ff6b4a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
 
-/* ===== หน้าอัปโหลด ===== */
 .upload-container{padding:20px;padding-top:48px;}
 .back-btn{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-bottom:20px;}
 .form-title{margin-bottom:20px;font-size:18px;font-weight:bold;}
@@ -99,7 +90,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 .status-success{background:rgba(74,222,128,.15);color:#4ade80;}
 .status-error{background:rgba(255,46,85,.15);color:#ff6b4a;}
 
-/* ===== หน้าโปรไฟล์ ===== */
 .profile-container{padding:20px;padding-top:48px;}
 .profile-header{text-align:center;margin:20px 0;}
 .profile-avatar{width:80px;height:80px;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto;}
@@ -126,17 +116,15 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v29</div>
+<div class="version-tag">v30</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
-  <div class="logo-sub">Global Market — ซิงค์อัตโนมัติทุกเครื่อง</div>
+  <div class="logo-sub">Global Market — แชร์ตรงไปยังแอปอื่นได้เลย</div>
 </div>
 
-<!-- ===== หน้าเล่นวิดีโอหลัก ===== -->
 <div id="home" class="page hidden">
-  <!-- ปุ่มเปิด/ปิดเสียง -->
   <div class="sound-toggle" id="soundToggle" style="display:none;">
     <i class="fa-solid fa-volume-high"></i>
   </div>
@@ -144,11 +132,10 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
       <i class="fa-solid fa-film"></i>
-      <p>กดปุ่ม + เพื่อโพสต์วิดีโอหรือรูปภาพ<br>✅ ทุกเครื่องเห็นกันทันทีเมื่อโพสต์</p>
+      <p>กด + เพื่อโพสต์<br>กดปุ่มแชร์ → ส่งให้เครื่องอื่นผ่านไลน์/แอปได้เลย</p>
     </div>
   </div>
 
-  <!-- ===== ปุ่มโปรไฟล์บนสุดด้านซ้าย ===== -->
   <div class="top-left-profile" data-goto="profile">
     <div class="avatar-circle">
       <i class="fa-solid fa-user"></i>
@@ -156,7 +143,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     <span>โปรไฟล์</span>
   </div>
 
-  <!-- ===== ข้อมูลด้านล่างวิดีโอ ===== -->
   <div class="bottom-info-bar" id="bottomInfoBar" style="display:none;">
     <div class="video-title" id="videoTitle"></div>
     <div class="video-meta-line" id="videoMetaLine"></div>
@@ -166,7 +152,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     </div>
   </div>
 
-  <!-- ===== ปุ่มด้านขวา — มุมขวาล่างสุดมี "ฉัน" ===== -->
   <div class="right-buttons">
     <div class="r-btn" data-goto="profile"><i class="fa-solid fa-user"></i><span>ฉัน</span></div>
     <div class="r-btn"><i class="fa-solid fa-heart"></i><span id="likeNum">0</span></div>
@@ -176,7 +161,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
     <div class="r-btn"><i class="fa-solid fa-ellipsis-vertical"></i><span>เพิ่มเติม</span></div>
   </div>
 
-  <!-- ===== เมนูล่าง ===== -->
   <div class="bottom-nav">
     <div class="nav-item" data-goto="home"><i class="fa-solid fa-home"></i><span>หน้าแรก</span></div>
     <div class="nav-item"><i class="fa-solid fa-compass"></i><span>ค้นพบ</span></div>
@@ -188,7 +172,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
 </div>
 
-<!-- ===== หน้าอัปโหลด ===== -->
 <div id="upload" class="page hidden upload-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -204,14 +187,13 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <button class="sound-choice selected" id="optOrig">🔊 เสียงต้นฉบับ</button>
   <button class="sound-choice" id="optCustom">✨ เพิ่มเสียง</button>
   <input type="text" id="customSoundInput" placeholder="ชื่อเพลง..." class="text-input">
-  <button class="submit-btn" id="doUpload">เผยแพร่ — ทุกเครื่องเห็นทันที</button>
+  <button class="submit-btn" id="doUpload">เผยแพร่</button>
   <div class="progress-wrap" id="progWrap">
     <div class="progress-fill" id="progFill"></div>
   </div>
   <div class="status-line" id="statusLine"></div>
 </div>
 
-<!-- ===== หน้าโปรไฟล์ ===== -->
 <div id="profile" class="page hidden profile-container">
   <button class="back-btn" data-goto="home">
     <i class="fa-solid fa-arrow-left"></i> กลับ
@@ -236,14 +218,13 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
   <hr class="divider">
   <p class="sync-note" id="syncStatus">
-    🔄 กำลังซิงค์กับคลาวด์...
+    🔄 กำลังซิงค์...
   </p>
   <div id="postListContainer"></div>
-  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม<br>✅ ทุกเครื่องจะเห็นพร้อมกันทันที</p>
+  <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
 </div>
 
 <script>
-// ===== ตั้งค่า =====
 const CLOUD_NAME = 'orjpnytt';
 const UPLOAD_PRESET = 'thaipodee';
 const DB_URL = 'https://api.jsonbin.io/v3/b/66ed2a12eeb9a455663d4c87';
@@ -257,7 +238,6 @@ let isMuted = false;
 let currentVideoEl = null;
 let lastSyncHash = '';
 
-// ===== บันทึก/โหลดเครื่อง =====
 function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(posts));
 }
@@ -268,7 +248,6 @@ function loadFromLocal() {
   } catch { posts = []; }
 }
 
-// ===== สร้างแฮชเช็คการเปลี่ยนแปลง =====
 function getHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) {
@@ -278,7 +257,6 @@ function getHash(str) {
   return h.toString();
 }
 
-// ===== ดึงจากคลาวด์ — อัปเดตอัตโนมัติ =====
 async function fetchFromCloud() {
   try {
     const res = await fetch(DB_URL + '/latest', { headers: { 'X-Master-Key': DB_KEY } });
@@ -300,19 +278,15 @@ async function fetchFromCloud() {
       lastSyncHash = currentHash;
       saveToLocal();
       renderPosts();
-      // ถ้าอยู่หน้าแรกและมีโพสต์ใหม่ → โหลดอันล่าสุดให้เลย
-      if (!document.getElementById('home').classList.contains('hidden') && posts.length > 0) {
-        if (currentViewingIndex === -1) {
-          viewPost(0);
-        }
+      if (!document.getElementById('home').classList.contains('hidden') && posts.length > 0 && currentViewingIndex === -1) {
+        viewPost(0);
       }
     }
-    
-    document.getElementById('syncStatus').textContent = `✅ ซิงค์ล่าสุด — ทั้งหมด ${posts.length} โพสต์`;
+    document.getElementById('syncStatus').textContent = `✅ ซิงค์ล่าสุด — ${posts.length} โพสต์`;
     document.getElementById('syncStatus').style.color = '#10b981';
   } catch (e) {
     renderPosts();
-    document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — เห็น ${posts.length} โพสต์ในเครื่อง`;
+    document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — ${posts.length} โพสต์ในเครื่อง`;
     document.getElementById('syncStatus').style.color = '#f59e0b';
   }
 }
@@ -328,7 +302,6 @@ async function saveToCloud() {
   saveToLocal();
 }
 
-// ===== แสดงรายการโปรไฟล์ =====
 function renderPosts() {
   const list = document.getElementById('postListContainer');
   const noText = document.getElementById('noPostText');
@@ -374,25 +347,17 @@ function renderPosts() {
   });
 }
 
-// ===== สลับเปิด/ปิดเสียง =====
 document.getElementById('soundToggle').addEventListener('click', () => {
   isMuted = !isMuted;
   const icon = document.querySelector('#soundToggle i');
-  if (isMuted) {
-    icon.className = 'fa-solid fa-volume-xmark';
-    if (currentVideoEl) currentVideoEl.muted = true;
-  } else {
-    icon.className = 'fa-solid fa-volume-high';
-    if (currentVideoEl) currentVideoEl.muted = false;
-  }
+  icon.className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+  if (currentVideoEl) currentVideoEl.muted = isMuted;
 });
 
-// ===== เล่นวิดีโอ — เสียงออกตามปกติ =====
 function viewPost(idx) {
   currentViewingIndex = idx;
   const p = posts[idx];
   if (!p) return;
-
   p.views = (p.views || 0) + 1;
   saveToLocal();
   saveToCloud();
@@ -402,16 +367,12 @@ function viewPost(idx) {
   const soundBtn = document.getElementById('soundToggle');
   
   if (p.type === 'video') {
-    mediaArea.innerHTML = `
-      <video id="mainVideo" src="${p.url}" autoplay controls playsinline 
-             style="width:100%;height:100%;object-fit:contain;">
-      </video>`;
+    mediaArea.innerHTML = `<video id="mainVideo" src="${p.url}" autoplay controls playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
     currentVideoEl = document.getElementById('mainVideo');
-    currentVideoEl.muted = isMuted; // ตามที่ผู้ใช้ตั้งไว้ ไม่บังคับปิด
+    currentVideoEl.muted = isMuted;
     soundBtn.style.display = 'flex';
   } else {
-    mediaArea.innerHTML = `
-      <img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
+    mediaArea.innerHTML = `<img src="${p.url}" style="width:100%;height:100%;object-fit:contain;" alt="${p.name}">`;
     currentVideoEl = null;
     soundBtn.style.display = 'none';
   }
@@ -420,28 +381,24 @@ function viewPost(idx) {
   const ratio = p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-';
   document.getElementById('videoMetaLine').innerHTML = `
     ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
-    | 📦 ${p.sizeMB} MB | 📐 ${ratio}
-    | 👁️ เข้าชม ${p.views || 1} ครั้ง`;
+    | 📦 ${p.sizeMB} MB | 📐 ${ratio} | 👁️ ${p.views || 1} ครั้ง`;
   bottomBar.style.display = 'block';
 }
 
-// ===== ปุ่มข้อมูลเชิงลึก =====
 document.addEventListener('click', e => {
   if (e.target.closest('#insightLinkBtn') && currentViewingIndex >= 0) {
     const p = posts[currentViewingIndex];
     if (!p) return;
     alert(`📊 ข้อมูลเชิงลึก — ${p.name.replace(/\.[^.]+$/, '')}
 
-👁️ จำนวนเข้าชม: ${p.views || 1} ครั้ง
+👁️ เข้าชม: ${p.views || 1} ครั้ง
 ❤️ ถูกใจ: ${p.likes || 0}
 🔄 แชร์: ${p.shares || 0}
 📅 วันที่: ${p.time}
-📦 ขนาด: ${p.sizeMB} MB
-📐 อัตราส่วน: ${p.width && p.height ? (p.width > p.height ? '16:9' : '9:16') : '-'}`);
+📦 ขนาด: ${p.sizeMB} MB`);
   }
 });
 
-// ===== ลบโพสต์ =====
 async function delPost(idx) {
   if (!confirm('ลบโพสต์นี้?')) return;
   posts[idx].deleted = true;
@@ -449,11 +406,10 @@ async function delPost(idx) {
   if (currentViewingIndex === idx) {
     currentViewingIndex = -1;
     document.getElementById('bottomInfoBar').style.display = 'none';
-    document.getElementById('mediaArea').innerHTML = `<div class="media-placeholder"><i class="fa-solid fa-film"></i><p>กด + เพื่อโพสต์วิดีโอหรือรูปภาพ</p></div>`;
+    document.getElementById('mediaArea').innerHTML = `<div class="media-placeholder"><i class="fa-solid fa-film"></i><p>กด + เพื่อโพสต์</p></div>`;
   }
 }
 
-// ===== เปลี่ยนหน้า =====
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
@@ -468,14 +424,35 @@ document.querySelectorAll('[data-goto]').forEach(b => {
   b.addEventListener('click', () => showPage(b.dataset.goto));
 });
 
-// ===== แชร์ =====
+// ===== แชร์จริง ผ่านระบบแชร์ของมือถือ =====
 document.getElementById('shareBtn').addEventListener('click', async () => {
-  const link = window.location.href;
-  try { await navigator.clipboard.writeText(link); alert('✅ ก๊อปปี้ลิงก์แล้ว → ส่งให้เครื่องอื่นได้เลย'); }
-  catch { prompt('ก๊อปปี้ลิงก์นี้แล้วส่งให้อีกเครื่อง:', link); }
+  const shareData = {
+    title: 'thaipodee Global Market',
+    text: 'มาดูวิดีโอและสินค้าในแอป thaipodee กัน',
+    url: window.location.href
+  };
+
+  try {
+    if (navigator.share) {
+      // ✅ มีระบบแชร์ → ขึ้นเมนูให้เลือกเลย
+      await navigator.share(shareData);
+      alert('✅ แชร์สำเร็จ!');
+    } else {
+      // ⚠️ ไม่มีระบบแชร์ → ถอยไปก๊อปปี้ลิงก์
+      await navigator.clipboard.writeText(shareData.url);
+      alert('✅ ก๊อปปี้ลิงก์แล้ว — ส่งเองทางไลน์ได้เลย');
+    }
+  } catch (err) {
+    // ถ้ายกเลิกหรือผิดพลาด → ก๊อปปี้ลิงก์สำรอง
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      alert('✅ ก๊อปปี้ลิงก์แล้ว');
+    } catch {
+      prompt('ก๊อปปี้ลิงก์นี้:', shareData.url);
+    }
+  }
 });
 
-// ===== เลือกไฟล์ =====
 document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile = e.target.files[0];
   if (!selectedFile) { document.getElementById('previewBox').style.display = 'none'; return; }
@@ -500,7 +477,6 @@ document.getElementById('fileInput').addEventListener('change', async e => {
   selectedFile._w = w; selectedFile._h = h; selectedFile._sizeMB = sizeMB;
 });
 
-// ===== เลือกเสียง =====
 document.getElementById('optOrig').addEventListener('click', () => {
   useCustomSound = false;
   document.getElementById('optOrig').classList.add('selected');
@@ -514,7 +490,6 @@ document.getElementById('optCustom').addEventListener('click', () => {
   document.getElementById('customSoundInput').style.display = 'block';
 });
 
-// ===== อัปโหลด & เผยแพร่ → ทุกเครื่องเห็นทันที =====
 document.getElementById('doUpload').addEventListener('click', async () => {
   if (!selectedFile) return alert('เลือกไฟล์ก่อน');
   
@@ -570,7 +545,7 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     await saveToCloud();
     
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่แล้ว! ทุกเครื่องเห็นทันที — เสียงออกปกติ';
+    statusLine.textContent = '✅ เผยแพร่แล้ว! ทุกเครื่องเห็นทันที';
     
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -583,7 +558,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
       document.getElementById('optOrig').classList.add('selected');
       document.getElementById('optCustom').classList.remove('selected');
       selectedFile = null;
-      
       showPage('home');
       viewPost(0);
     }, 2000);
@@ -596,12 +570,10 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   }
 });
 
-// ===== ซิงค์อัตโนมัติทุก 3 วินาที → ทุกเครื่องเห็นกันทันที =====
 setInterval(() => {
   fetchFromCloud();
 }, 3000);
 
-// ===== เริ่มต้น =====
 window.addEventListener('DOMContentLoaded', () => {
   loadFromLocal();
   setTimeout(() => {
