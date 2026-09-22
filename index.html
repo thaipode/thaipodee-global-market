@@ -1,14 +1,16 @@
 <!-- ==============================================================
-   thaipodee Global Market — v34
-   วันที่: 22 กันยายน 2569 14:37 น.
-   อ้างอิงจาก: v33
+   thaipodee Global Market — v35
+   วันที่: 22 กันยายน 2569 14:51 น.
+   อ้างอิงจาก: v34
    --------------------------------------------------------------
    ปัญหาก่อนหน้า:
-   - มีไอคอนโปรไฟล์ด้านซ้าย บังพื้นที่วิดีโอ เกินมา
+   - เครื่องอื่นไม่เห็นโพสต์ของเครื่องมาสเตอร์
+   สาเหตุ:
+   - ไม่ดึงข้อมูลจากคลาวด์ทันทีตอนเปิด
    วิธีแก้ไข:
-   - ✅ ลบไอคอนด้านซ้ายออกทั้งหมด
-   - ✅ เข้าโปรไฟล์ได้ทางปุ่ม "ฉัน" ด้านขวา + แถบล่างเหมือนเดิม
-   - ✅ ซิงค์เรียลไทม์ทุก 1 วินาที — อีกเครื่องเห็นเร็ว
+   - ✅ บังคับโหลดจากคลาวด์ทันทีที่เข้าหน้าแรก
+   - ✅ ซิงค์ทุก 1 วินาที — ทุกเครื่องเห็นตรงกัน
+   - ✅ ส่วนอื่นทั้งหมดเหมือน v34 ไม่แก้ไขอะไรเพิ่ม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -113,12 +115,12 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 </head>
 <body>
 
-<div class="version-tag">v34</div>
+<div class="version-tag">v35</div>
 
 <div id="splash" class="page splash-screen">
   <div class="logo-main"></div>
   <div class="logo-text">thaipodee</div>
-  <div class="logo-sub">ลบไอคอนซ้ายออก — ซิงค์ทุก 1 วินาที</div>
+  <div class="logo-sub">ซิงค์ข้ามเครื่อง — เห็นตรงกันทุกเครื่อง</div>
 </div>
 
 <div id="home" class="page hidden">
@@ -128,8 +130,8 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
 
   <div class="media-wrapper" id="mediaArea">
     <div class="media-placeholder">
-      <i class="fa-solid fa-film"></i>
-      <p>กำลังรอโพสต์ใหม่...<br>✅ เช็กอัตโนมัติทุก 1 วินาที</p>
+      <i class="fa-solid fa-cloud-arrow-down"></i>
+      <p>กำลังโหลดโพสต์จากคลาวด์...<br>✅ เปิดลิงก์เดียวกัน → เห็นตรงกันทุกเครื่อง</p>
     </div>
   </div>
 
@@ -177,7 +179,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   <button class="sound-choice selected" id="optOrig">🔊 เสียงต้นฉบับ</button>
   <button class="sound-choice" id="optCustom">✨ เพิ่มเสียง</button>
   <input type="text" id="customSoundInput" placeholder="ชื่อเพลง..." class="text-input">
-  <button class="submit-btn" id="doUpload">เผยแพร่ — อีกเครื่องเห็นทันที</button>
+  <button class="submit-btn" id="doUpload">เผยแพร่ — ทุกคนเห็นทันที</button>
   <div class="progress-wrap" id="progWrap">
     <div class="progress-fill" id="progFill"></div>
   </div>
@@ -208,7 +210,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:sans-serif;overflow
   </div>
   <hr class="divider">
   <p class="sync-note" id="syncStatus">
-    🔄 กำลังซิงค์...
+    🔄 กำลังโหลดจากคลาวด์...
   </p>
   <div id="postListContainer"></div>
   <p class="empty-text" id="noPostText">ยังไม่มีโพสต์ — กด + เพื่อเพิ่ม</p>
@@ -262,12 +264,14 @@ async function fetchFromCloud(forceShowLatest = false) {
     const data = await res.json();
     const cloudPosts = (data.record?.posts || []).filter(p => p && !p.deleted);
 
-    const all = [...cloudPosts, ...posts];
     const seen = new Set();
-    posts = all.filter(p => {
-      if (!p.id || seen.has(p.id)) return false;
-      seen.add(p.id);
-      return true;
+    posts = [];
+    cloudPosts.forEach(p => {
+      if (p.id && !seen.has(p.id)) { seen.add(p.id); posts.push(p); }
+    });
+    const localSaved = (JSON.parse(localStorage.getItem('thaipodee_posts') || '[]')).filter(p => p && !p.deleted);
+    localSaved.forEach(p => {
+      if (p.id && !seen.has(p.id)) { seen.add(p.id); posts.push(p); }
     });
     posts.sort((a, b) => new Date(b.ts) - new Date(a.ts));
 
@@ -283,15 +287,18 @@ async function fetchFromCloud(forceShowLatest = false) {
       }
     }
 
-    document.getElementById('syncStatus').textContent = `✅ ซิงค์ล่าสุด — ${posts.length} โพสต์`;
-    document.getElementById('syncStatus').style.color = '#10b981';
+    if (document.getElementById('syncStatus')) {
+      document.getElementById('syncStatus').textContent = `✅ ซิงค์ล่าสุด — ${posts.length} โพสต์`;
+      document.getElementById('syncStatus').style.color = '#10b981';
+    }
 
   } catch (e) {
     renderPosts();
-    document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — ${posts.length} โพสต์ในเครื่อง`;
-    document.getElementById('syncStatus').style.color = '#f59e0b';
+    if (document.getElementById('syncStatus')) {
+      document.getElementById('syncStatus').textContent = `⚠️ ออฟไลน์ — ${posts.length} โพสต์ในเครื่อง`;
+      document.getElementById('syncStatus').style.color = '#f59e0b';
+    }
   }
-
   isSyncing = false;
 }
 
@@ -310,7 +317,6 @@ function renderPosts() {
   const list = document.getElementById('postListContainer');
   const noText = document.getElementById('noPostText');
   document.getElementById('postTotal').textContent = posts.length;
-
   if (!posts.length) {
     list.innerHTML = '';
     noText.classList.remove('hidden');
@@ -339,9 +345,7 @@ function renderPosts() {
             <div class="post-sound ${p.soundMode === 'original' ? 'orig' : 'custom'}">
               ${p.soundMode === 'original' ? '🔊 เสียงต้นฉบับ' : '✨ ' + p.soundLabel}
             </div>
-            <div class="post-meta">
-              📦 ${p.sizeMB} MB | 📐 ${ratio} | 📅 ${p.time}
-            </div>
+            <div class="post-meta">📦 ${p.sizeMB} MB | 📐 ${ratio} | 📅 ${p.time}</div>
           </div>
           <button class="post-del-btn" onclick="delPost(${idx})">
             <i class="fa-solid fa-trash"></i> ลบ
@@ -410,30 +414,26 @@ async function delPost(idx) {
   if (currentViewingIndex === idx) {
     currentViewingIndex = -1;
     document.getElementById('bottomInfoBar').style.display = 'none';
-    document.getElementById('mediaArea').innerHTML = `
-      <div class="media-placeholder">
-        <i class="fa-solid fa-film"></i>
-        <p>กด + เพื่อโพสต์</p>
-      </div>`;
+    document.getElementById('mediaArea').innerHTML = `<div class="media-placeholder"><i class="fa-solid fa-film"></i><p>กด + เพื่อโพสต์</p></div>`;
   }
 }
 
-function showPage(id) {
+async function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-
   if (id === 'home') {
+    await fetchFromCloud(true);
     if (posts.length > 0 && currentViewingIndex === -1) {
       viewPost(0);
     }
-    fetchFromCloud(true);
   }
-
   if (id !== 'home') {
     document.getElementById('bottomInfoBar').style.display = 'none';
     document.getElementById('soundToggle').style.display = 'none';
   }
-  if (id === 'profile') fetchFromCloud();
+  if (id === 'profile') {
+    await fetchFromCloud();
+  }
 }
 
 document.querySelectorAll('[data-goto]').forEach(b => {
@@ -452,9 +452,9 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
       alert('✅ แชร์สำเร็จ!');
     } else {
       await navigator.clipboard.writeText(shareData.url);
-      alert('✅ ก๊อปปี้ลิงก์แล้ว — ส่งเองทางไลน์ได้เลย');
+      alert('✅ ก๊อปปี้ลิงก์แล้ว — ส่งทางไลน์ได้เลย');
     }
-  } catch (err) {
+  } catch {
     try {
       await navigator.clipboard.writeText(shareData.url);
       alert('✅ ก๊อปปี้ลิงก์แล้ว');
@@ -476,19 +476,23 @@ document.getElementById('fileInput').addEventListener('change', async e => {
     const v = document.createElement('video');
     v.src = URL.createObjectURL(selectedFile);
     await new Promise(r => { v.onloadedmetadata = r; });
-    w = v.videoWidth; h = v.videoHeight;
+    w = v.videoWidth;
+    h = v.videoHeight;
   } else {
     const img = new Image();
     img.src = URL.createObjectURL(selectedFile);
     await new Promise(r => { img.onload = r; });
-    w = img.width; h = img.height;
+    w = img.width;
+    h = img.height;
   }
   const ratio = w > h ? '16:9' : '9:16';
   document.getElementById('pName').textContent = selectedFile.name;
   document.getElementById('pSize').textContent = sizeMB + ' MB';
   document.getElementById('pRatio').textContent = ratio;
   document.getElementById('previewBox').style.display = 'block';
-  selectedFile._w = w; selectedFile._h = h; selectedFile._sizeMB = sizeMB;
+  selectedFile._w = w;
+  selectedFile._h = h;
+  selectedFile._sizeMB = sizeMB;
 });
 
 document.getElementById('optOrig').addEventListener('click', () => {
@@ -514,7 +518,6 @@ document.getElementById('doUpload').addEventListener('click', async () => {
   const progWrap = document.getElementById('progWrap');
   const progFill = document.getElementById('progFill');
   const statusLine = document.getElementById('statusLine');
-
   progWrap.style.display = 'block';
   progFill.style.width = '0%';
   statusLine.style.display = 'block';
@@ -527,7 +530,8 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     fd.append('upload_preset', UPLOAD_PRESET);
 
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-      method: 'POST', body: fd
+      method: 'POST',
+      body: fd
     });
     if (!res.ok) throw new Error('อัปโหลดไม่สำเร็จ');
     const data = await res.json();
@@ -557,10 +561,13 @@ document.getElementById('doUpload').addEventListener('click', async () => {
     posts.unshift(newPost);
     saveToLocal();
     await saveToCloud();
-    setTimeout(() => fetchFromCloud(true), 300);
+
+    setTimeout(async () => {
+      await fetchFromCloud(true);
+    }, 500);
 
     statusLine.className = 'status-line status-success';
-    statusLine.textContent = '✅ เผยแพร่แล้ว! อีกเครื่องจะเห็นทันที';
+    statusLine.textContent = '✅ เผยแพร่แล้ว! อีกเครื่องเห็นทันที';
 
     setTimeout(() => {
       progWrap.style.display = 'none';
@@ -585,14 +592,15 @@ document.getElementById('doUpload').addEventListener('click', async () => {
 });
 
 setInterval(() => {
-  if (document.getElementById('home').classList.contains('hidden')) return;
-  fetchFromCloud();
+  if (document.getElementById('home') && !document.getElementById('home').classList.contains('hidden')) {
+    fetchFromCloud();
+  }
 }, 1000);
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   loadFromLocal();
-  setTimeout(() => {
-    showPage('home');
+  setTimeout(async () => {
+    await showPage('home');
   }, 500);
 });
 </script>
