@@ -1,7 +1,7 @@
 <!-- ==============================================================
-   Thaipodee Global Market — v52
-   วันที่: 23 กันยายน 2569 07:40 น.
-   เขียนใหม่เรียบง่าย: 5 ปุ่มล่าง ครบทุกอัน ไม่หาย
+   Thaipodee Market — v57
+   วันที่: 23 กันยายน 2569 07:57 น.
+   ตรงตามรูป: ปุ่มขวา + เมนูล่าง ครบทุกอัน
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -12,25 +12,168 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Thaipodee v52</title>
+<title>ThaiPodee Market</title>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
     height: 100%;
-    background: #000;
-    color: #fff;
-    font-family: sans-serif;
+    background: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
   }
 
   /* แถบบน */
-  .top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+  .top-bar {
+    position: fixed; top: 0; left: 0; right: 0;
     height: 44px;
     background: #000;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+  }
+  .tab { padding: 0 12px; font-size: 14px; color: #999; }
+  .tab.active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 4px; }
+
+  /* กลางหน้าจอ */
+  .center-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+  }
+  .center-text .small { font-size: 12px; margin-bottom: 8px; }
+
+  /* ===== ปุ่มด้านขวา ตามรูป ===== */
+  .side-buttons {
+    position: fixed;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 24px;
+    z-index: 150;
+  }
+  .side-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    cursor: pointer;
+  }
+  .side-icon { font-size: 24px; margin-bottom: 2px; }
+  .side-num { font-size: 10px; }
+
+  /* ===== เมนูล่าง 5 ปุ่ม ตามรูปเป๊ะ! ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: #000;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid #222;
+    z-index: 99999;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #999;
+    cursor: pointer;
+  }
+  .nav-btn.active { color: #fff; }
+  .nav-icon { font-size: 20px; line-height: 1; }
+  .nav-label { font-size: 10px; margin-top: 2px; }
+
+  /* ปุ่มกลาง + */
+  .plus-wrap {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plus-btn {
+    width: 46px; height: 32px;
+    background: #fff; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: bold; color: #000;
+    position: relative;
+  }
+  .plus-btn::before {
+    content: '';
+    position: absolute;
+    width: 40px; height: 40px;
+    background: #fff; border-radius: 50%;
+    top: -4px; z-index: -1;
+  }
+</style>
+</head>
+<body>
+
+<!-- แถบบน -->
+<div class="top-bar">
+  <span class="tab">กำลังติดตาม</span>
+  <span class="tab active">สำหรับคุณ</span>
+</div>
+
+<!-- กลางหน้าจอ -->
+<div class="center-text">
+  <p class="small">กดปุ่ม + เพื่อเลือกไฟล์วิดีโอ</p>
+  <p>เริ่มใช้งาน ThaiPodee Market</p>
+</div>
+
+<!-- ปุ่มด้านขวา ตามรูป -->
+<div class="side-buttons">
+  <div class="side-btn">
+    <span class="side-icon">❤️</span>
+    <span class="side-num">0</span>
+  </div>
+  <div class="side-btn">
+    <span class="side-icon">💬</span>
+    <span class="side-num">0</span>
+  </div>
+  <div class="side-btn">
+    <span class="side-icon">⭐</span>
+    <span class="side-num">0</span>
+  </div>
+  <div class="side-btn">
+    <span class="side-icon">↗️</span>
+    <span class="side-num" style="font-size:9px;">แชร์</span>
+  </div>
+</div>
+
+<!-- เมนูล่าง 5 ปุ่ม ครบ! -->
+<nav class="bottom-nav">
+  <div class="nav-btn active">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">หน้าหลัก</span>
+  </div>
+  <div class="nav-btn">
+    <span class="nav-icon">🛒</span>
+    <span class="nav-label">ร้านค้า</span>
+  </div>
+  <div class="plus-wrap">
+    <div class="plus-btn">+</div>
+  </div>
+  <div class="nav-btn">
+    <span class="nav-icon">📥</span>
+    <span class="nav-label">กล่องข้อความ</span>
+  </div>
+  <div class="nav-btn">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">ฉัน</span>
+  </div>
+</nav>
+
+<script>
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  };
+});
+</script>
+
+</body>
+</html>
