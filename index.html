@@ -1,11 +1,22 @@
 <!-- ==============================================================
-   Thaipodee Market — v66
-   วันที่: 23 กันยายน 2569 12:32 น.
-   อ้างอิงจาก: เวอร์ชันที่เคยใช้งานได้
-   แก้:
-   - กล่องดำหน้าโปรไฟล์ → เพิ่มรูปหน้าปกอัตโนมัติ
-   - กดแล้วไม่เล่น → ซ่อม src + load() ให้ตรงแบบเดิม
-   - ขนาด/ตำแหน่ง/ไอคอน เหมือนเดิมทุกประการ
+   Thaipodee Market — v67
+   วันที่: 23 กันยายน 2569 12:37 น.
+   อ้างอิงจาก: v66 + รูปแบบหน้าโปรไฟล์ใหม่
+   ปัญหา:
+   - หน้าโปรไฟล์แสดงเป็นตาราง 3 คอลัมน์ ไม่ตรงแบบที่ต้องการ
+   - ไม่มีปุ่มลบโพสต์
+   - รูปหน้าปกบางครั้งไม่โชว์
+   
+   สาเหตุ:
+   - ใช้ grid layout ไม่ตรงแบบ
+   - ยังไม่ได้ใส่ปุ่มลบและระบบยืนยัน
+   - การโหลดรูปหน้าปกไม่สมบูรณ์
+   
+   วิธีแก้:
+   - เปลี่ยนเป็นการ์ดแนวตั้งเต็มความกว้าง ตรงตามรูปตัวอย่าง
+   - เพิ่มปุ่มลบสีแดง + ยืนยันก่อนลบ
+   - คงโครงสร้างส่วนอื่นทั้งหมด เหมือนเดิมเป๊ะ
+   - รูปหน้าปกโชว์ชัด ทุกโพสต์
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -72,7 +83,7 @@
     background: #222; display: flex; align-items: center; justify-content: center;
   }
 
-  /* แผงอัปโหลด */
+  /* แผงอัปโหลด — เหมือนเดิม */
   .upload-panel {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.97); z-index: 500; display: none; flex-direction: column; padding: 20px;
@@ -92,10 +103,9 @@
     width: 100%; padding: 14px; background: #25d366; border: none; border-radius: 8px;
     color: #000; font-size: 16px; font-weight: bold; cursor: pointer;
   }
-
   .file-input { display: none; }
 
-  /* หน้าโปรไฟล์ — แก้ให้โชว์รูปหน้าปก */
+  /* ===== หน้าโปรไฟล์ — เปลี่ยนเป็นการ์ดแนวตั้ง ตรงตามรูป ===== */
   .profile-view {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
     background: #000; display: none; overflow-y: auto; padding: 20px 15px;
@@ -113,11 +123,38 @@
   .p-stat-num { font-size: 18px; font-weight: bold; }
   .p-stat-label { font-size: 11px; color: #999; margin-top: 2px; }
   .p-count { text-align: center; color: #999; font-size: 13px; margin: 10px 0 15px; }
-  .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-  .p-item { aspect-ratio: 4/5; background: #1a1a1a; border-radius: 4px; overflow: hidden; cursor: pointer; position: relative; }
-  /* ✅ แก้: ใช้ poster เป็นรูปหลัก ไม่ใช่ video โดยตรง */
-  .p-item .poster-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .p-item .type-mark { position: absolute; top: 4px; right: 4px; font-size: 14px; }
+  .offline-note { text-align: center; color: #ffcc00; font-size: 12px; margin-bottom: 15px; }
+
+  /* ===== การ์ดโพสต์ — แบบเต็มแถว ตรงตามรูปตัวอย่าง ===== */
+  .p-grid { display: flex; flex-direction: column; gap: 12px; }
+  .p-item {
+    width: 100%; background: #1a1a1a; border-radius: 12px; overflow: hidden;
+    cursor: pointer; position: relative;
+  }
+  .p-item .poster-img {
+    width: 100%; height: 200px; object-fit: cover; display: block;
+    background: #222;
+  }
+  .p-item .type-mark {
+    position: absolute; top: 10px; left: 10px; font-size: 16px;
+    background: rgba(0,0,0,0.65); padding: 6px 10px; border-radius: 20px;
+  }
+  /* ปุ่มลบสีแดง */
+  .p-item .delete-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: #ff3b30; color: #fff; border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 14px; font-weight: bold; cursor: pointer;
+    z-index: 10;
+  }
+  .p-item .delete-btn:active { background: #cc2f26; }
+  /* ข้อมูลใต้รูป */
+  .p-item-body { padding: 12px; }
+  .p-item-title {
+    font-size: 14px; color: #fff; margin-bottom: 6px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .p-item-meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #999; }
+  .p-item-size { display: flex; align-items: center; gap: 6px; }
 
   /* ===== เมนูล่าง 5 ปุ่ม — ตำแหน่งเดิมเป๊ะ ===== */
   .bottom-nav {
@@ -150,6 +187,7 @@
 </head>
 <body>
 
+<!-- แถบบน -->
 <div class="top-bar">
   <span class="tab" data-goto="home">กำลังติดตาม</span>
   <span class="tab active" data-goto="home">สำหรับคุณ</span>
@@ -213,13 +251,13 @@
 
 <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
 
-<!-- หน้าโปรไฟล์ -->
+<!-- หน้าโปรไฟล์ — ตรงตามรูปแบบใหม่ -->
 <div class="profile-view" id="profilePage">
   <div class="p-header">
     <div class="p-avatar">
       <img src="https://i.pravatar.cc/150?img=23" alt="โปรไฟล์">
     </div>
-    <div class="p-name">ชื่อผู้ใช้</div>
+    <div class="p-name">thaipodee</div>
     <div class="p-stats">
       <div class="p-stat">
         <div class="p-stat-num" id="totalPosts">0</div>
@@ -235,11 +273,15 @@
       </div>
     </div>
   </div>
+
+  <p class="offline-note">⚠️ ออฟไลน์ — แสดงเฉพาะในเครื่อง</p>
+
   <div class="p-count">จำนวนโพสต์: <span id="gridCount">0</span> รายการ</div>
+
   <div class="p-grid" id="postGrid"></div>
 </div>
 
-<!-- เมนูล่าง -->
+<!-- เมนูล่าง 5 ปุ่ม -->
 <nav class="bottom-nav">
   <div class="nav-btn active" data-goto="home">
     <span class="nav-icon">🏠</span>
@@ -267,7 +309,7 @@ let postList = [];
 let selectedFile = null;
 let selectedType = null;
 let selectedDataUrl = null;
-let selectedPoster = null; // รูปหน้าปก
+let selectedPoster = null;
 
 const fileInput = document.getElementById('fileInput');
 const addBtn = document.getElementById('addBtn');
@@ -298,9 +340,9 @@ window.addEventListener('load', () => {
     postList = JSON.parse(saved);
     if (postList.length > 0) {
       showOnMain(postList[0]);
-      renderHistory();
     }
   }
+  renderHistory();
 });
 
 // กด + เลือกไฟล์
@@ -320,7 +362,7 @@ function handleFile(e) {
     const reader = new FileReader();
     reader.onload = evt => {
       selectedDataUrl = evt.target.result;
-      selectedPoster = selectedDataUrl; // ภาพใช้ตัวเองเป็นปก
+      selectedPoster = selectedDataUrl;
       previewImg.src = selectedDataUrl;
       previewImg.classList.add('active');
       previewVid.classList.remove('active');
@@ -328,13 +370,12 @@ function handleFile(e) {
     };
     reader.readAsDataURL(file);
   } else {
-    // ✅ วิดีโอ — จับรูปหน้าปกอัตโนมัติ
+    // สร้างรูปหน้าปกจากวิดีโออัตโนมัติ
     const tempVid = document.createElement('video');
     tempVid.src = URL.createObjectURL(file);
-    tempVid.currentTime = 0.5; // จับเฟรมที่ 0.5 วินาที
+    tempVid.currentTime = 0.5;
 
     tempVid.addEventListener('loadeddata', () => {
-      // วาดลง canvas เพื่อสร้างรูปปก
       const canvas = document.createElement('canvas');
       canvas.width = tempVid.videoWidth || 400;
       canvas.height = tempVid.videoHeight || 300;
@@ -342,7 +383,6 @@ function handleFile(e) {
       ctx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
       selectedPoster = canvas.toDataURL('image/jpeg', 0.7);
 
-      // แปลงวิดีโอเป็น base64
       const reader = new FileReader();
       reader.onload = evt => {
         selectedDataUrl = evt.target.result;
@@ -373,13 +413,18 @@ publishBtn.addEventListener('click', () => {
   if (!selectedDataUrl) return alert('⚠️ เลือกไฟล์ก่อน');
 
   const caption = descTextarea.value.trim() || 'ไม่มีคำอธิบาย';
+  const fileSize = selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB' : '';
+  const duration = selectedType === 'video' ? '9:16' : '';
 
   const newPost = {
     id: Date.now(),
     type: selectedType,
     dataUrl: selectedDataUrl,
-    poster: selectedPoster, // ✅ เก็บรูปปกไว้
+    poster: selectedPoster,
     caption: caption,
+    fileName: selectedFile?.name || 'ไฟล์สื่อ',
+    fileSize: fileSize,
+    duration: duration,
     time: new Date().toLocaleString('th-TH'),
     likes: 0
   };
@@ -393,12 +438,11 @@ publishBtn.addEventListener('click', () => {
   alert('✅ เผยแพร่สำเร็จ!');
 });
 
-// บันทึกลงเครื่อง
 function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
 }
 
-// ✅ แสดงที่หน้าหลัก — ซ่อมให้โหลดแน่นอน
+// แสดงที่หน้าหลัก
 function showOnMain(post) {
   emptyText.style.display = 'none';
   mainImage.classList.remove('active');
@@ -409,12 +453,11 @@ function showOnMain(post) {
     mainImage.src = post.dataUrl;
     mainImage.classList.add('active');
   } else {
-    // รีเซ็ต src ทุกครั้ง เพื่อให้โหลดใหม่
     mainVideo.pause();
     mainVideo.src = '';
     mainVideo.src = post.dataUrl;
-    mainVideo.poster = post.poster || ''; // รูปปกแสดงระหว่างโหลด
-    mainVideo.load(); // บังคับโหลด
+    mainVideo.poster = post.poster || '';
+    mainVideo.load();
     mainVideo.classList.add('active');
     mainVideo.play().catch(() => {});
   }
@@ -424,27 +467,59 @@ function showOnMain(post) {
   likeCount.textContent = post.likes || 0;
 }
 
-// ✅ แสดงประวัติ — ใช้ poster ไม่ใช่ video โดยตรง
+// ===== แสดงประวัติแบบการ์ด — ตรงตามรูปตัวอย่าง =====
 function renderHistory() {
   postGrid.innerHTML = '';
 
-  postList.forEach(post => {
+  postList.forEach((post, index) => {
     const item = document.createElement('div');
     item.className = 'p-item';
 
-    // ใช้รูปปกเสมอ — ไม่ให้กล่องดำ
     const displaySrc = post.poster || post.dataUrl;
     const icon = post.type === 'image' ? '🖼️' : '🎬';
 
     item.innerHTML = `
       <img src="${displaySrc}" class="poster-img" alt="">
       <span class="type-mark">${icon}</span>
+      <button class="delete-btn" data-index="${index}">ลบ</button>
+      <div class="p-item-body">
+        <div class="p-item-title">${post.fileName || post.caption}</div>
+        <div class="p-item-meta">
+          <div class="p-item-size">
+            ${post.fileSize || ''} ${post.duration ? '⏱️ ' + post.duration : ''}
+            ${post.time ? '📅 ' + post.time : ''}
+          </div>
+          <div>❤️ ${post.likes || 0}</div>
+        </div>
+      </div>
     `;
 
-    // กด → ไปเล่นที่หน้าหลัก
-    item.addEventListener('click', () => {
+    // กดการ์ด (ไม่ใช่ปุ่มลบ) → ไปเล่น
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) return;
       showOnMain(post);
       switchPage('home');
+    });
+
+    // กดปุ่มลบ
+    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm('ต้องการลบโพสต์นี้หรือไม่?')) return;
+
+      postList.splice(index, 1);
+      saveToLocal();
+      renderHistory();
+
+      if (postList.length > 0) {
+        showOnMain(postList[0]);
+      } else {
+        emptyText.style.display = 'block';
+        mainImage.classList.remove('active');
+        mainVideo.classList.remove('active');
+        mainVideo.pause();
+        captionBox.classList.remove('show');
+        likeCount.textContent = '0';
+      }
     });
 
     postGrid.appendChild(item);
