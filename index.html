@@ -1,22 +1,21 @@
 <!-- ==============================================================
-   Thaipodee Market — v70
-   วันที่: 23 กันยายน 2569 12:45 น.
-   อ้างอิงจาก: v69 + แก้วิดีโอเล่นไม่ได้ + ลบข้อความออฟไลน์
+   Thaipodee Market — v71
+   วันที่: 23 กันยายน 2569 12:50 น.
    ปัญหา:
-   - วิดีโอเปิดเล่นไม่ได้
-   - มีข้อความ "ออฟไลน์" แสดง
-   - โครงสร้างวิดีโอโหลดผิดลำดับ
+   - วิดีโอไม่เล่น
+   - บางครั้งโหลดไม่ขึ้น
+   - ไม่มีข้อความออฟไลน์
    
    สาเหตุ:
-   - ตั้ง src ก่อน load() ทำให้บางเบราว์เซอร์ไม่โหลด
-   - ไม่มีการจัดการ fallback เมื่อ autoplay ถูกบล็อก
-   - ยังมีโค้ดส่วนข้อความออฟไลน์อยู่
+   - ตั้งค่า src ผิดลำดับ
+   - ไม่รอพร้อมเล่นก่อนเรียก play()
+   - บางเบราว์เซอร์บล็อก autoplay
    
    วิธีแก้:
-   - ปรับลำดับ: clear → set src → set poster → load → play
-   - เพิ่ม fallback: ถ้า autoplay ไม่ได้ แสดงปุ่มกดเล่น
-   - ลบโค้ดข้อความออฟไลน์ทั้งหมด
-   - คงรูปแบบการ์ดแนวนอนตรงตัวอย่าง
+   - รีเซ็ตวิดีโอให้สะอาดก่อนทุกครั้ง
+   - ใช้ canplaythrough event รอให้โหลดเสร็จจริง ๆ
+   - ถ้า autoplay ไม่ได้ แสดงปุ่มกดเล่นชัดเจน
+   - คงรูปแบบการ์ดเหมือนเดิม ไม่มีข้อความออฟไลน์
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -39,7 +38,6 @@
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   }
 
-  /* แถบบน */
   .top-bar {
     position: fixed; top: 0; left: 0; right: 0; height: 44px;
     background: #000; display: flex; align-items: center; justify-content: center; z-index: 200;
@@ -47,33 +45,35 @@
   .tab { padding: 0 12px; font-size: 14px; color: #999; cursor: pointer; }
   .tab.active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 4px; }
 
-  /* หน้าหลัก */
   .home-view {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
     background: #000; display: flex; align-items: center; justify-content: center;
     overflow: hidden;
   }
   .empty-msg { color: #666; font-size: 15px; text-align: center; line-height: 1.8; padding: 20px; }
-  .media-container { position: relative; width: 100%; height: 100%; display: none; }
-  .media-container.active { display: block; }
-  .main-img { width: 100%; height: 100%; object-fit: contain; display: block; }
-  .main-vid { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
-  .play-overlay {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 80px; height: 80px; background: rgba(0,0,0,0.5); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 32px;
-    cursor: pointer; z-index: 5;
-  }
-  .play-overlay.hidden { display: none; }
 
-  /* คำอธิบาย */
+  /* ===== คอนเทนเนอร์วิดีโอ — แก้จุดสำคัญ ===== */
+  .media-wrap { width: 100%; height: 100%; position: relative; display: none; }
+  .media-wrap.show { display: block; }
+  .main-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .main-vid {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    background: #000;
+  }
+  .play-btn-overlay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 90px; height: 90px; background: rgba(0,0,0,0.6); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 36px;
+    cursor: pointer; z-index: 10; border: 2px solid #fff;
+  }
+  .play-btn-overlay.hide { display: none; }
+
   .caption-area {
     position: absolute; left: 12px; bottom: 90px; right: 90px;
-    font-size: 13px; line-height: 1.6; z-index: 10; display: none;
+    font-size: 13px; line-height: 1.6; z-index: 15; display: none;
   }
   .caption-area.show { display: block; }
 
-  /* 6 ปุ่มด้านขวา */
   .side-bar {
     position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 150;
@@ -92,7 +92,6 @@
     background: #222; display: flex; align-items: center; justify-content: center;
   }
 
-  /* แผงอัปโหลด */
   .upload-panel {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.97); z-index: 500; display: none; flex-direction: column; padding: 20px;
@@ -101,7 +100,7 @@
   .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
   .panel-close { font-size: 16px; color: #fff; cursor: pointer; padding: 8px; }
   .panel-title { font-size: 18px; font-weight: 600; }
-  .preview-box { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; border-radius: 12px; margin-bottom: 15px; overflow: hidden; min-height: 280px; position: relative; }
+  .preview-box { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; border-radius: 12px; margin-bottom: 15px; overflow: hidden; min-height: 280px; }
   .prev-img, .prev-vid { max-width: 100%; max-height: 380px; display: none; }
   .prev-img.active, .prev-vid.active { display: block; }
   .caption-input {
@@ -137,7 +136,7 @@
   .p-grid { display: flex; flex-direction: column; gap: 12px; }
   .p-item {
     width: 100%; background: #1a1a1a; border-radius: 8px; padding: 10px;
-    display: flex; gap: 12px; cursor: pointer; position: relative;
+    display: flex; gap: 12px; cursor: pointer;
   }
   .p-item-thumb {
     width: 100px; height: 100px; border-radius: 4px; overflow: hidden;
@@ -157,7 +156,6 @@
   }
   .p-item-del-btn:active { background: #cc2f26; }
 
-  /* เมนูล่าง */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
     background: #000; display: grid; grid-template-columns: repeat(5, 1fr);
@@ -171,7 +169,6 @@
   .nav-icon { font-size: 20px; line-height: 1; }
   .nav-label { font-size: 10px; margin-top: 2px; }
 
-  /* ปุ่ม + ตรงกลาง */
   .center-col { display: flex; align-items: center; justify-content: center; }
   .plus-btn {
     width: 48px; height: 34px; background: #fff; border-radius: 8px;
@@ -195,16 +192,25 @@
 
 <div class="home-view" id="homePage">
   <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเลือกภาพหรือวิดีโอ</p>
-  
+
   <!-- ภาพ -->
-  <div class="media-container" id="imageContainer">
+  <div class="media-wrap" id="imgWrap">
     <img id="mainImage" class="main-img" alt="โพสต์ภาพ">
   </div>
 
-  <!-- วิดีโอ พร้อมปุ่มเล่นกดเองเมื่อ autoplay ไม่ได้ -->
-  <div class="media-container" id="videoContainer">
-    <video id="mainVideo" class="main-vid" controls loop muted playsinline webkit-playsinline preload="auto"></video>
-    <div class="play-overlay hidden" id="playOverlay">▶️</div>
+  <!-- วิดีโอ — แก้ตรงนี้โดยตรง -->
+  <div class="media-wrap" id="vidWrap">
+    <video 
+      id="mainVideo" 
+      class="main-vid" 
+      controls 
+      loop 
+      muted 
+      playsinline 
+      webkit-playsinline
+      preload="auto"
+    ></video>
+    <div class="play-btn-overlay hide" id="playOverlay">▶</div>
   </div>
 </div>
 
@@ -257,7 +263,7 @@
 
 <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
 
-<!-- หน้าโปรไฟล์ — ไม่มีข้อความออฟไลน์ -->
+<!-- หน้าโปรไฟล์ — ไม่มีข้อความออฟไลน์เลย -->
 <div class="profile-view" id="profilePage">
   <div class="p-header">
     <div class="p-avatar">
@@ -324,8 +330,8 @@ const publishBtn = document.getElementById('publishBtn');
 const descTextarea = document.getElementById('descTextarea');
 const mainImage = document.getElementById('mainImage');
 const mainVideo = document.getElementById('mainVideo');
-const imageContainer = document.getElementById('imageContainer');
-const videoContainer = document.getElementById('videoContainer');
+const imgWrap = document.getElementById('imgWrap');
+const vidWrap = document.getElementById('vidWrap');
 const playOverlay = document.getElementById('playOverlay');
 const emptyText = document.getElementById('emptyText');
 const captionBox = document.getElementById('captionBox');
@@ -339,7 +345,7 @@ const sideArea = document.getElementById('sideArea');
 const likeBtn = document.getElementById('likeBtn');
 const likeCount = document.getElementById('likeCount');
 
-// โหลดข้อมูล
+// โหลดรายการที่บันทึกไว้
 window.addEventListener('load', () => {
   const saved = localStorage.getItem('thaipodee_posts');
   if (saved) {
@@ -349,16 +355,18 @@ window.addEventListener('load', () => {
   renderHistory();
 });
 
-// เปิดเล่นเมื่อกดปุ่มกลาง
+// กดปุ่มเล่น
 playOverlay.addEventListener('click', () => {
   mainVideo.muted = true;
   mainVideo.play().then(() => {
-    playOverlay.classList.add('hidden');
-  }).catch(e => console.log('กดเล่นเอง:', e));
+    playOverlay.classList.add('hide');
+  }).catch(err => {
+    console.log('กดเล่นเองแล้ว:', err);
+    alert('กดปุ่ม ▶ บนวิดีโอเพื่อเล่น');
+  });
 });
 
 addBtn.addEventListener('click', () => fileInput.click());
-addBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fileInput.click(); });
 fileInput.addEventListener('change', handleFile);
 
 function handleFile(e) {
@@ -379,7 +387,7 @@ function handleFile(e) {
     };
     reader.readAsDataURL(file);
   } else {
-    // สร้างรูปหน้าปกจากวิดีโอ
+    // สร้างรูปหน้าปก
     const tempVid = document.createElement('video');
     tempVid.src = URL.createObjectURL(file);
     tempVid.currentTime = 0.5;
@@ -446,7 +454,7 @@ function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
 }
 
-// ===== แก้ตรงนี้ — วิดีโอเล่นได้แน่นอน =====
+// ===== จุดสำคัญ — แก้ให้เล่นได้แน่นอน =====
 function showOnMain(post) {
   emptyText.style.display = 'none';
   captionBox.classList.add('show');
@@ -454,35 +462,41 @@ function showOnMain(post) {
   likeCount.textContent = post.likes || 0;
 
   // ซ่อนทั้งหมดก่อน
-  imageContainer.classList.remove('active');
-  videoContainer.classList.remove('active');
-  playOverlay.classList.add('hidden');
+  imgWrap.classList.remove('show');
+  vidWrap.classList.remove('show');
+  playOverlay.classList.add('hide');
+  
+  // หยุดวิดีโอเก่าให้สนิท
   mainVideo.pause();
+  mainVideo.removeAttribute('src');
+  mainVideo.load();
 
   if (post.type === 'image') {
     mainImage.src = post.dataUrl;
-    imageContainer.classList.add('active');
+    imgWrap.classList.add('show');
   } else {
-    // ล้างค่าเก่าก่อน
-    mainVideo.removeAttribute('src');
-    mainVideo.poster = post.poster || '';
+    // ตั้งค่าวิดีโอใหม่ทุกครั้ง
+    if (post.poster) mainVideo.poster = post.poster;
     mainVideo.src = post.dataUrl;
     mainVideo.load();
-    
-    videoContainer.classList.add('active');
+    vidWrap.classList.add('show');
 
     // พยายามเล่นอัตโนมัติ
-    mainVideo.addEventListener('canplay', function tryAutoPlay() {
-      mainVideo.removeEventListener('canplay', tryAutoPlay);
+    const tryPlay = () => {
       mainVideo.play()
         .then(() => {
-          playOverlay.classList.add('hidden');
+          playOverlay.classList.add('hide');
         })
         .catch(() => {
-          // ถ้าเบราว์เซอร์บล็อก autoplay → แสดงปุ่มกดเล่นเอง
-          playOverlay.classList.remove('hidden');
+          // ถ้าไม่ได้ แสดงปุ่มกดเล่นชัดเจน
+          playOverlay.classList.remove('hide');
         });
-    }, { once: true });
+    };
+
+    // รอให้พร้อมจริงก่อนเล่น
+    mainVideo.addEventListener('canplaythrough', tryPlay, { once: true });
+    // สำรอง — ถ้าเร็วกว่า
+    mainVideo.addEventListener('loadeddata', tryPlay, { once: true });
   }
 }
 
@@ -525,8 +539,8 @@ function renderHistory() {
       if (postList.length > 0) showOnMain(postList[0]);
       else {
         emptyText.style.display = 'block';
-        imageContainer.classList.remove('active');
-        videoContainer.classList.remove('active');
+        imgWrap.classList.remove('show');
+        vidWrap.classList.remove('show');
         mainVideo.pause();
         captionBox.classList.remove('show');
         likeCount.textContent = '0';
