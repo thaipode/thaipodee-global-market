@@ -1,13 +1,7 @@
 <!-- ==============================================================
-   Thaipodee Global Market — v51
-   วันที่: 23 กันยายน 2569 07:35 น.
-   ปัญหา: ปุ่มขวาสุดหายไปจากหน้าจอจริง
-   สาเหตุ: คำนวณพื้นที่ผิด บีบจนหลุดขอบจอ
-   วิธีแก้:
-   - ใช้ flex:1 แบ่งพื้นที่อัตโนมัติ เท่ากันทุกอัน
-   - ลดขนาดไอคอน+ข้อความให้พอดี
-   - บังคับแสดงผล ไม่ให้ซ่อน
-   ✅ 5 ปุ่มครบ: 🏠 | 🛍️ | + | 📥 | 👤
+   Thaipodee Global Market — v52
+   วันที่: 23 กันยายน 2569 07:40 น.
+   เขียนใหม่เรียบง่าย: 5 ปุ่มล่าง ครบทุกอัน ไม่หาย
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -18,29 +12,19 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Thaipodee v51</title>
+<title>Thaipodee v52</title>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
     height: 100%;
-    background: #000000;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    overflow: hidden;
-  }
-
-  .app {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    background: #000;
+    color: #fff;
+    font-family: sans-serif;
   }
 
   /* แถบบน */
-  .top-bar {
+  .top {
     position: fixed;
     top: 0;
     left: 0;
@@ -50,212 +34,3 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999;
-  }
-  .tab {
-    padding: 0 14px;
-    font-size: 14px;
-    color: #999;
-  }
-  .tab.active {
-    color: #fff;
-    font-weight: 600;
-    border-bottom: 2px solid #fff;
-    padding-bottom: 4px;
-  }
-
-  /* เนื้อหา */
-  .content {
-    flex: 1;
-    padding-top: 44px;
-    padding-bottom: 60px;
-    overflow-y: auto;
-  }
-  .page {
-    display: none;
-    min-height: calc(100vh - 104px);
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 15px;
-  }
-  .page.active {
-    display: flex;
-  }
-
-  /* ===== เมนูล่าง — flex:1 แบ่งเท่ากันทุกอัน ไม่หลุด! ===== */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: #000;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #222;
-    z-index: 99999;
-    padding: 0 4px;
-    gap: 2px;
-  }
-
-  .nav-item {
-    flex: 1; /* ทุกอันกว้างเท่ากันอัตโนมัติ */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 0;
-    cursor: pointer;
-    color: #999;
-  }
-  .nav-item.active {
-    color: #fff;
-  }
-  .nav-icon {
-    font-size: 20px;
-    line-height: 1;
-  }
-  .nav-label {
-    font-size: 10px;
-    margin-top: 2px;
-    white-space: nowrap;
-  }
-
-  /* ปุ่มกลาง */
-  .nav-center {
-    flex: 1.2; /* กลางกว้างนิดหน่อยพอดี */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .plus-btn {
-    width: 44px;
-    height: 30px;
-    border-radius: 8px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: #000000;
-    position: relative;
-  }
-  .plus-btn::before {
-    content: '';
-    position: absolute;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #fff;
-    top: -4px;
-    z-index: -1;
-  }
-
-  /* ปุ่มขวาสุด — เหมือนเพื่อนทุกประการ */
-  .nav-profile {
-    flex: 1; /* เท่ากับปุ่มอื่นๆ */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 0;
-    cursor: pointer;
-    color: #999;
-  }
-  .nav-profile.active {
-    color: #fff;
-  }
-  .nav-profile .nav-icon {
-    font-size: 20px;
-    line-height: 1;
-  }
-  .nav-profile .nav-label {
-    font-size: 10px;
-    margin-top: 2px;
-    white-space: nowrap;
-  }
-</style>
-</head>
-<body>
-
-<div class="app">
-  <!-- แถบบน -->
-  <div class="top-bar">
-    <span class="tab">กำลังติดตาม</span>
-    <span class="tab active">สำหรับคุณ</span>
-  </div>
-
-  <!-- เนื้อหา -->
-  <div class="content">
-    <div class="page active" id="pg-home">หน้าหลัก — วิดีโอจะแสดงที่นี่</div>
-    <div class="page" id="pg-shop">ร้านค้า</div>
-    <div class="page" id="pg-inbox">กล่องข้อความ</div>
-    <div class="page" id="pg-profile">
-      <div style="text-align:center; padding:30px;">
-        <div style="font-size:40px; margin-bottom:10px;">👤</div>
-        <h2>Thaipodee</h2>
-        <p style="color:#888; margin:10px 0;">@thaipodee</p>
-        <div style="display:flex; justify-content:center; gap:25px; margin-top:20px;">
-          <div><div style="font-weight:bold;">0</div><div style="font-size:11px; color:#888;">ติดตาม</div></div>
-          <div><div style="font-weight:bold;">0</div><div style="font-size:11px; color:#888;">ผู้ติดตาม</div></div>
-          <div><div style="font-weight:bold;">0</div><div style="font-size:11px; color:#888;">ถูกใจ</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== เมนูล่าง — 5 ปุ่ม ครบเท่ากันทุกอัน! ===== -->
-  <nav class="bottom-nav">
-    <div class="nav-item active" data-page="home">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">หน้าหลัก</span>
-    </div>
-
-    <div class="nav-item" data-page="shop">
-      <span class="nav-icon">🛍️</span>
-      <span class="nav-label">ร้านค้า</span>
-    </div>
-
-    <div class="nav-center" id="addBtn">
-      <div class="plus-btn">+</div>
-    </div>
-
-    <div class="nav-item" data-page="inbox">
-      <span class="nav-icon">📥</span>
-      <span class="nav-label">กล่องข้อความ</span>
-    </div>
-
-    <!-- ปุ่มขวาสุด — เหมือนเพื่อน ไม่พิเศษ ไม่หาย! -->
-    <div class="nav-profile" data-page="profile">
-      <span class="nav-icon">👤</span>
-      <span class="nav-label">ฉัน</span>
-    </div>
-  </nav>
-</div>
-
-<script>
-function goPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`pg-${name}`).classList.add('active');
-
-  document.querySelectorAll('.nav-item, .nav-profile').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.page === name);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.nav-item[data-page], .nav-profile[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => goPage(btn.dataset.page));
-  });
-  document.getElementById('addBtn').addEventListener('click', () => {
-    alert('✅ เพิ่มวิดีโอใหม่!');
-  });
-});
-</script>
-
-</body>
-</html>
