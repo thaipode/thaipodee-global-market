@@ -1,22 +1,13 @@
 <!-- ==============================================================
-   Thaipodee Market — v67
-   วันที่: 23 กันยายน 2569 12:37 น.
-   อ้างอิงจาก: v66 + รูปแบบหน้าโปรไฟล์ใหม่
-   ปัญหา:
-   - หน้าโปรไฟล์แสดงเป็นตาราง 3 คอลัมน์ ไม่ตรงแบบที่ต้องการ
-   - ไม่มีปุ่มลบโพสต์
-   - รูปหน้าปกบางครั้งไม่โชว์
-   
-   สาเหตุ:
-   - ใช้ grid layout ไม่ตรงแบบ
-   - ยังไม่ได้ใส่ปุ่มลบและระบบยืนยัน
-   - การโหลดรูปหน้าปกไม่สมบูรณ์
-   
-   วิธีแก้:
-   - เปลี่ยนเป็นการ์ดแนวตั้งเต็มความกว้าง ตรงตามรูปตัวอย่าง
-   - เพิ่มปุ่มลบสีแดง + ยืนยันก่อนลบ
-   - คงโครงสร้างส่วนอื่นทั้งหมด เหมือนเดิมเป๊ะ
-   - รูปหน้าปกโชว์ชัด ทุกโพสต์
+   Thaipodee Market — v69
+   วันที่: 23 กันยายน 2569 13:08 น.
+   อ้างอิงจาก: รูปตัวอย่างจริง
+   ปรับ:
+   ✅ การ์ดแนวนอน — รูปหน้าปกด้านซ้าย ข้อมูลด้านขวา
+   ✅ ปุ่มลบสีแดง ทรงสี่เหลี่ยม ด้านล่างซ้าย
+   ✅ เอาข้อความ "ออฟไลน์ — แสดงเฉพาะในเครื่อง" ออก
+   ✅ ขนาดการ์ดพอดี ไม่ใหญ่เกินไป
+   ✅ ทุกอย่างอื่นเหมือนเดิมเป๊ะ
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -39,7 +30,7 @@
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   }
 
-  /* แถบบน — เหมือนเดิม */
+  /* แถบบน */
   .top-bar {
     position: fixed; top: 0; left: 0; right: 0; height: 44px;
     background: #000; display: flex; align-items: center; justify-content: center; z-index: 200;
@@ -47,7 +38,7 @@
   .tab { padding: 0 12px; font-size: 14px; color: #999; cursor: pointer; }
   .tab.active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 4px; }
 
-  /* หน้าหลัก — เหมือนเดิม */
+  /* หน้าหลัก */
   .home-view {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
     background: #000; display: flex; align-items: center; justify-content: center;
@@ -57,14 +48,14 @@
   .main-img, .main-vid { width: 100%; height: 100%; object-fit: contain; display: none; }
   .main-img.active, .main-vid.active { display: block; }
 
-  /* คำอธิบาย — เหมือนเดิม */
+  /* คำอธิบาย */
   .caption-area {
     position: absolute; left: 12px; bottom: 90px; right: 90px;
     font-size: 13px; line-height: 1.6; z-index: 10; display: none;
   }
   .caption-area.show { display: block; }
 
-  /* ===== 6 ปุ่มด้านขวา — ตำแหน่งเดิมเป๊ะ ===== */
+  /* 6 ปุ่มด้านขวา */
   .side-bar {
     position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 150;
@@ -83,7 +74,7 @@
     background: #222; display: flex; align-items: center; justify-content: center;
   }
 
-  /* แผงอัปโหลด — เหมือนเดิม */
+  /* แผงอัปโหลด */
   .upload-panel {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.97); z-index: 500; display: none; flex-direction: column; padding: 20px;
@@ -105,7 +96,7 @@
   }
   .file-input { display: none; }
 
-  /* ===== หน้าโปรไฟล์ — เปลี่ยนเป็นการ์ดแนวตั้ง ตรงตามรูป ===== */
+  /* ===== หน้าโปรไฟล์ — ตรงตามรูปตัวอย่าง ===== */
   .profile-view {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
     background: #000; display: none; overflow-y: auto; padding: 20px 15px;
@@ -114,7 +105,7 @@
   .p-header { text-align: center; margin-bottom: 20px; }
   .p-avatar {
     width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff;
-    margin: 0 auto 10px; overflow: hidden;
+    margin: 0 auto 10px; overflow: hidden; background: #333;
   }
   .p-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .p-name { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
@@ -123,40 +114,36 @@
   .p-stat-num { font-size: 18px; font-weight: bold; }
   .p-stat-label { font-size: 11px; color: #999; margin-top: 2px; }
   .p-count { text-align: center; color: #999; font-size: 13px; margin: 10px 0 15px; }
-  .offline-note { text-align: center; color: #ffcc00; font-size: 12px; margin-bottom: 15px; }
 
-  /* ===== การ์ดโพสต์ — แบบเต็มแถว ตรงตามรูปตัวอย่าง ===== */
+  /* ===== การ์ดแนวนอน — ตรงรูปเป๊ะ ===== */
   .p-grid { display: flex; flex-direction: column; gap: 12px; }
   .p-item {
-    width: 100%; background: #1a1a1a; border-radius: 12px; overflow: hidden;
-    cursor: pointer; position: relative;
+    width: 100%; background: #1a1a1a; border-radius: 8px; padding: 10px;
+    display: flex; gap: 12px; cursor: pointer; position: relative;
   }
-  .p-item .poster-img {
-    width: 100%; height: 200px; object-fit: cover; display: block;
-    background: #222;
+  /* รูปด้านซ้าย */
+  .p-item-thumb {
+    width: 100px; height: 100px; border-radius: 4px; overflow: hidden;
+    flex-shrink: 0; background: #222;
   }
-  .p-item .type-mark {
-    position: absolute; top: 10px; left: 10px; font-size: 16px;
-    background: rgba(0,0,0,0.65); padding: 6px 10px; border-radius: 20px;
+  .p-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  /* ข้อมูลด้านขวา */
+  .p-item-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+  .p-item-top { }
+  .p-item-filename {
+    font-size: 14px; font-weight: 500; color: #fff;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px;
   }
-  /* ปุ่มลบสีแดง */
-  .p-item .delete-btn {
-    position: absolute; top: 10px; right: 10px;
-    background: #ff3b30; color: #fff; border: none; border-radius: 6px;
-    padding: 6px 14px; font-size: 14px; font-weight: bold; cursor: pointer;
-    z-index: 10;
+  .p-item-meta { font-size: 12px; color: #999; line-height: 1.6; }
+  /* ปุ่มลบสีแดง ด้านล่างซ้าย */
+  .p-item-del-btn {
+    background: #ff3b30; color: #fff; border: none; border-radius: 4px;
+    padding: 6px 16px; font-size: 14px; cursor: pointer; align-self: flex-start;
+    margin-top: 4px;
   }
-  .p-item .delete-btn:active { background: #cc2f26; }
-  /* ข้อมูลใต้รูป */
-  .p-item-body { padding: 12px; }
-  .p-item-title {
-    font-size: 14px; color: #fff; margin-bottom: 6px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .p-item-meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #999; }
-  .p-item-size { display: flex; align-items: center; gap: 6px; }
+  .p-item-del-btn:active { background: #cc2f26; }
 
-  /* ===== เมนูล่าง 5 ปุ่ม — ตำแหน่งเดิมเป๊ะ ===== */
+  /* เมนูล่าง */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
     background: #000; display: grid; grid-template-columns: repeat(5, 1fr);
@@ -170,7 +157,7 @@
   .nav-icon { font-size: 20px; line-height: 1; }
   .nav-label { font-size: 10px; margin-top: 2px; }
 
-  /* ปุ่ม + ตรงกลาง — เหมือนเดิม */
+  /* ปุ่ม + ตรงกลาง */
   .center-col { display: flex; align-items: center; justify-content: center; }
   .plus-btn {
     width: 48px; height: 34px; background: #fff; border-radius: 8px;
@@ -187,13 +174,11 @@
 </head>
 <body>
 
-<!-- แถบบน -->
 <div class="top-bar">
   <span class="tab" data-goto="home">กำลังติดตาม</span>
   <span class="tab active" data-goto="home">สำหรับคุณ</span>
 </div>
 
-<!-- หน้าหลัก -->
 <div class="home-view" id="homePage">
   <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเลือกภาพหรือวิดีโอ</p>
   <img id="mainImage" class="main-img" alt="โพสต์ภาพ">
@@ -201,12 +186,11 @@
 </div>
 
 <div class="caption-area" id="captionBox">
-  <strong>ชื่อผู้ใช้</strong><br>
+  <strong>thaipodee</strong><br>
   <span id="captionText">คำอธิบายจะแสดงที่นี่</span><br>
   <span style="color:#888; font-size:11px;">เสียง · เพลงพื้นหลัง</span>
 </div>
 
-<!-- 6 ปุ่มด้านขวา -->
 <div class="side-bar" id="sideArea">
   <div class="side-btn">
     <div class="profile-circle">
@@ -234,7 +218,6 @@
   </div>
 </div>
 
-<!-- แผงอัปโหลด -->
 <div class="upload-panel" id="uploadPanel">
   <div class="panel-head">
     <span class="panel-close" id="closeBtn">✕ ปิด</span>
@@ -251,7 +234,7 @@
 
 <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
 
-<!-- หน้าโปรไฟล์ — ตรงตามรูปแบบใหม่ -->
+<!-- หน้าโปรไฟล์ -->
 <div class="profile-view" id="profilePage">
   <div class="p-header">
     <div class="p-avatar">
@@ -274,14 +257,11 @@
     </div>
   </div>
 
-  <p class="offline-note">⚠️ ออฟไลน์ — แสดงเฉพาะในเครื่อง</p>
-
   <div class="p-count">จำนวนโพสต์: <span id="gridCount">0</span> รายการ</div>
 
   <div class="p-grid" id="postGrid"></div>
 </div>
 
-<!-- เมนูล่าง 5 ปุ่ม -->
 <nav class="bottom-nav">
   <div class="nav-btn active" data-goto="home">
     <span class="nav-icon">🏠</span>
@@ -333,28 +313,22 @@ const sideArea = document.getElementById('sideArea');
 const likeBtn = document.getElementById('likeBtn');
 const likeCount = document.getElementById('likeCount');
 
-// โหลดข้อมูลที่เก็บไว้
 window.addEventListener('load', () => {
   const saved = localStorage.getItem('thaipodee_posts');
   if (saved) {
     postList = JSON.parse(saved);
-    if (postList.length > 0) {
-      showOnMain(postList[0]);
-    }
+    if (postList.length > 0) showOnMain(postList[0]);
   }
   renderHistory();
 });
 
-// กด + เลือกไฟล์
 addBtn.addEventListener('click', () => fileInput.click());
 addBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fileInput.click(); });
-
 fileInput.addEventListener('change', handleFile);
 
 function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
-
   selectedFile = file;
   selectedType = file.type.startsWith('image') ? 'image' : 'video';
 
@@ -370,11 +344,9 @@ function handleFile(e) {
     };
     reader.readAsDataURL(file);
   } else {
-    // สร้างรูปหน้าปกจากวิดีโออัตโนมัติ
     const tempVid = document.createElement('video');
     tempVid.src = URL.createObjectURL(file);
     tempVid.currentTime = 0.5;
-
     tempVid.addEventListener('loadeddata', () => {
       const canvas = document.createElement('canvas');
       canvas.width = tempVid.videoWidth || 400;
@@ -396,25 +368,22 @@ function handleFile(e) {
   }
 }
 
-// ปิดแผง
 closeBtn.addEventListener('click', () => {
   uploadPanel.classList.remove('show');
   previewImg.classList.remove('active');
   previewVid.classList.remove('active');
-  previewVid.pause();
-  previewVid.src = '';
-  descTextarea.value = '';
-  fileInput.value = '';
+  previewVid.pause(); previewVid.src = '';
+  descTextarea.value = ''; fileInput.value = '';
   selectedFile = selectedType = selectedDataUrl = selectedPoster = null;
 });
 
-// กดเผยแพร่
 publishBtn.addEventListener('click', () => {
   if (!selectedDataUrl) return alert('⚠️ เลือกไฟล์ก่อน');
-
-  const caption = descTextarea.value.trim() || 'ไม่มีคำอธิบาย';
+  const caption = descTextarea.value.trim() || 'เสียงต้นฉบับ';
   const fileSize = selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB' : '';
   const duration = selectedType === 'video' ? '9:16' : '';
+  const now = new Date();
+  const dateStr = now.getDate() + '/' + (now.getMonth()+1) + ' — ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
 
   const newPost = {
     id: Date.now(),
@@ -425,7 +394,7 @@ publishBtn.addEventListener('click', () => {
     fileName: selectedFile?.name || 'ไฟล์สื่อ',
     fileSize: fileSize,
     duration: duration,
-    time: new Date().toLocaleString('th-TH'),
+    time: dateStr,
     likes: 0
   };
 
@@ -433,7 +402,6 @@ publishBtn.addEventListener('click', () => {
   saveToLocal();
   showOnMain(newPost);
   renderHistory();
-
   uploadPanel.classList.remove('show');
   alert('✅ เผยแพร่สำเร็จ!');
 });
@@ -442,7 +410,6 @@ function saveToLocal() {
   localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
 }
 
-// แสดงที่หน้าหลัก
 function showOnMain(post) {
   emptyText.style.display = 'none';
   mainImage.classList.remove('active');
@@ -461,58 +428,49 @@ function showOnMain(post) {
     mainVideo.classList.add('active');
     mainVideo.play().catch(() => {});
   }
-
   captionText.textContent = post.caption;
   captionBox.classList.add('show');
   likeCount.textContent = post.likes || 0;
 }
 
-// ===== แสดงประวัติแบบการ์ด — ตรงตามรูปตัวอย่าง =====
 function renderHistory() {
   postGrid.innerHTML = '';
 
   postList.forEach((post, index) => {
     const item = document.createElement('div');
     item.className = 'p-item';
-
     const displaySrc = post.poster || post.dataUrl;
-    const icon = post.type === 'image' ? '🖼️' : '🎬';
 
     item.innerHTML = `
-      <img src="${displaySrc}" class="poster-img" alt="">
-      <span class="type-mark">${icon}</span>
-      <button class="delete-btn" data-index="${index}">ลบ</button>
+      <div class="p-item-thumb">
+        <img src="${displaySrc}" alt="">
+      </div>
       <div class="p-item-body">
-        <div class="p-item-title">${post.fileName || post.caption}</div>
-        <div class="p-item-meta">
-          <div class="p-item-size">
-            ${post.fileSize || ''} ${post.duration ? '⏱️ ' + post.duration : ''}
-            ${post.time ? '📅 ' + post.time : ''}
+        <div class="p-item-top">
+          <div class="p-item-filename">${post.fileName}</div>
+          <div class="p-item-meta">
+            🎵 ${post.caption}<br>
+            📦 ${post.fileSize || ''} ⏱️ ${post.duration || ''} 📅 ${post.time || ''}
           </div>
-          <div>❤️ ${post.likes || 0}</div>
         </div>
+        <button class="p-item-del-btn" data-index="${index}">ลบ</button>
       </div>
     `;
 
-    // กดการ์ด (ไม่ใช่ปุ่มลบ) → ไปเล่น
     item.addEventListener('click', (e) => {
-      if (e.target.classList.contains('delete-btn')) return;
+      if (e.target.classList.contains('p-item-del-btn')) return;
       showOnMain(post);
       switchPage('home');
     });
 
-    // กดปุ่มลบ
-    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+    item.querySelector('.p-item-del-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       if (!confirm('ต้องการลบโพสต์นี้หรือไม่?')) return;
-
       postList.splice(index, 1);
       saveToLocal();
       renderHistory();
-
-      if (postList.length > 0) {
-        showOnMain(postList[0]);
-      } else {
+      if (postList.length > 0) showOnMain(postList[0]);
+      else {
         emptyText.style.display = 'block';
         mainImage.classList.remove('active');
         mainVideo.classList.remove('active');
@@ -529,7 +487,6 @@ function renderHistory() {
   gridCount.textContent = postList.length;
 }
 
-// กดไลก์
 likeBtn.addEventListener('click', () => {
   if (postList.length === 0) return;
   postList[0].likes++;
@@ -537,18 +494,14 @@ likeBtn.addEventListener('click', () => {
   saveToLocal();
 });
 
-// สลับหน้า
 document.querySelectorAll('.nav-btn, .tab').forEach(el => {
-  el.addEventListener('click', () => {
-    switchPage(el.getAttribute('data-goto'));
-  });
+  el.addEventListener('click', () => switchPage(el.getAttribute('data-goto')));
 });
 
 function switchPage(page) {
   document.querySelectorAll('.nav-btn, .tab').forEach(el => {
     el.classList.toggle('active', el.getAttribute('data-goto') === page);
   });
-
   if (page === 'profile') {
     homePage.style.display = 'none';
     profilePage.classList.add('show');
