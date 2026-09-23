@@ -1,31 +1,24 @@
 <!-- ==============================================================
    ลิขสิทธิ์ © 2569 Thaipodee Product Engineering Co.,Ltd.
-   สงวนสิทธิ์ทุกประการ ห้ามนำไปเผยแพร่ คัดลอก หรือดัดแปลง
-   โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษร
-   --------------------------------------------------------------
-   ชื่อบริษัท: บริษัท ไทยโพดี โปรดักส์ เอ็นจิเนียริ่ง จำกัด
-   กรรมการผู้จัดการ: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   อีเมล: thaipodee@gmail.com
-   เบอร์ติดต่อ: 0960760475
-   Line ID: thaipodee-pro-eng
+   สงวนสิทธิ์ทุกประการ
    --------------------------------------------------------------
    โครงการ: Thaipodee Global Market
-   เวอร์ชัน: v41
-   พัฒนาจาก: v40
-   วันที่: 23 กันยายน 2569
+   เวอร์ชัน: v42
+   พัฒนาจาก: v41
+   วันที่: 23 กันยายน 2569 07:07 น.
    --------------------------------------------------------------
-   ปัญหา v40:
-   - ปุ่มโปรไฟล์ด้านขวาสุดไม่โชว์ กดไม่ได้
-   - บางส่วนของเมนูถูกซ่อน/แสดงไม่ครบ
+   ปัญหา v41:
+   - ปุ่มโปรไฟล์ด้านขวาสุด ไม่ขึ้น/หลุดจอ
+   - พื้นที่ไม่พอ แสดงไม่ครบทุกเครื่อง
 
    สาเหตุ:
-   - การจัดวางและพื้นที่แสดงผลไม่พอ ทำให้ปุ่มขวาสุดหลุดจอ
-   - คำสั่งเปลี่ยนหน้าขาดความชัดเจนบางจุด
+   - ขนาดช่องว่างและฟอนต์ใหญ่เกินไป
+   - ไม่บังคับให้ครบ 5 ปุ่มในความกว้างจอ
 
-   วิธีแก้ v41:
-   - ปรับขนาด ช่องว่าง ให้ 5 ปุ่มพอดีจอ — ไม่หาย ไม่หลุด
-   - ยืนยันคำสั่งกดทุกปุ่ม ทำงานชัดเจน
-   - รักษาทุกอย่างอื่นเหมือนเดิม
+   วิธีแก้ v42:
+   - บีบอัดช่องว่าง ให้ 5 ปุ่มพอดีจอทุกขนาด
+   - ลดขนาดไอคอน-ข้อความเล็กน้อย แต่ยังชัดเจน
+   - ยืนยัน: 5 ปุ่ม — หน้าหลัก | ร้านค้า | + | ข้อความ | โปรไฟล์
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -45,43 +38,61 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
 
-  .app-container { height: 100vh; display: flex; flex-direction: column; position: relative; }
-  .status-bar { padding: 8px 12px; font-size: 12px; display: flex; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); z-index: 100; }
+  .app-container { height: 100vh; display: flex; flex-direction: column; }
+  .status-bar { padding: 6px 10px; font-size: 11px; display: flex; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent); z-index: 100; }
   .status-online { color: #22c55e; }
   .status-offline { color: #eab308; }
 
-  .content-area { flex: 1; overflow-y: auto; padding-bottom: 70px; padding-top: 35px; }
-  .page { display: none; min-height: 100%; padding: 12px; }
+  .content-area { flex: 1; overflow-y: auto; padding-bottom: 65px; padding-top: 32px; }
+  .page { display: none; min-height: 100%; padding: 10px; }
   .page.active { display: block; }
 
   /* ===== หน้าหลัก ===== */
-  .feed-item { aspect-ratio: 9/16; background: #111; margin-bottom: 8px; border-radius: 8px; overflow: hidden; cursor: pointer; }
-  .feed-cover { width: 100%; height: 100%; object-fit: cover; }
+  .feed-item { background: #111; margin-bottom: 8px; border-radius: 8px; overflow: hidden; }
+  .feed-cover { width: 100%; height: 200px; background: linear-gradient(135deg, #1a1a2e, #16213e); display: flex; align-items: center; justify-content: center; color: #888; font-size: 14px; }
   .feed-caption { padding: 10px; font-size: 14px; }
   .empty-text { color: #666; text-align: center; margin-top: 100px; font-size: 14px; }
 
   /* ===== โปรไฟล์ ===== */
-  .profile-header { padding: 20px; text-align: center; border-bottom: 1px solid #2a2a2a; }
-  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: #111; margin: 0 auto 10px; overflow: hidden; }
+  .profile-header { padding: 16px; text-align: center; border-bottom: 1px solid #2a2a2a; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #111; margin: 0 auto 8px; overflow: hidden; }
   .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
-  .profile-username { font-size: 13px; color: #888; margin-bottom: 16px; }
-  .profile-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 16px; }
+  .profile-name { font-size: 16px; font-weight: bold; margin-bottom: 2px; }
+  .profile-username { font-size: 12px; color: #888; margin-bottom: 12px; }
+  .profile-stats { display: flex; justify-content: center; gap: 24px; margin-bottom: 12px; }
   .stat-item { text-align: center; }
-  .stat-num { font-size: 16px; font-weight: bold; }
-  .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
-  .profile-bio { font-size: 13px; color: #aaa; line-height: 1.6; padding: 0 10px 16px; text-align: center; border-bottom: 1px solid #2a2a2a; }
+  .stat-num { font-size: 15px; font-weight: bold; }
+  .stat-label { font-size: 10px; color: #888; margin-top: 1px; }
+  .profile-bio { font-size: 12px; color: #aaa; line-height: 1.5; padding: 0 8px 12px; text-align: center; border-bottom: 1px solid #2a2a2a; }
   .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 3px; }
-  .grid-item { aspect-ratio: 1/1; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer; }
-  .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+  .grid-item { aspect-ratio: 1/1; background: #222; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #666; font-size: 18px; }
 
-  /* ===== เมนูล่าง — ปรับให้พอดีจอ ไม่หาย ===== */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #2a2a2a; z-index: 999; padding: 0 4px; }
-  .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 4px 6px; flex: 1; text-align: center; }
-  .nav-icon { font-size: 22px; line-height: 1; }
-  .nav-label { font-size: 10px; color: #888; margin-top: 2px; white-space: nowrap; }
+  /* ===== เมนูล่าง — แก้ให้พอดีจอทุกเครื่อง! ===== */
+  .bottom-nav { 
+    position: fixed; bottom: 0; left: 0; right: 0; 
+    height: 58px; background: #000; 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-top: 1px solid #2a2a2a; z-index: 999; 
+    padding: 0 2px;
+  }
+  .nav-item { 
+    display: flex; flex-direction: column; align-items: center; 
+    cursor: pointer; padding: 4px 2px; 
+    width: 18%; /* แบ่ง 5 ส่วนพอดี */
+  }
+  .nav-icon { font-size: 20px; line-height: 1; }
+  .nav-label { font-size: 9px; color: #888; margin-top: 1px; white-space: nowrap; }
   .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #fff; font-weight: bold; }
-  .nav-fab { width: 46px; height: 46px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: -12px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  
+  /* ปุ่มตรงกลาง */
+  .nav-fab { 
+    width: 44px; height: 44px; border-radius: 50%; 
+    background: #ef4444; color: #fff; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 22px; margin-top: -10px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .nav-center { width: 18%; display: flex; justify-content: center; }
 </style>
 </head>
 <body>
@@ -117,27 +128,27 @@
       </div>
     </div>
 
-    <!-- 4. โปรไฟล์ — กดปุ่มขวาสุดจะมาที่นี่ -->
+    <!-- 4. โปรไฟล์ -->
     <div class="page" id="page-profile">
       <div class="profile-header">
         <div class="profile-avatar">
           <img src="https://raw.githubusercontent.com/thaipodee/thaipodee/main/icon-192.png" alt="Logo">
         </div>
-        <h1 class="profile-name">THAIPODEE PRODUCT ENGINEERING</h1>
+        <h1 class="profile-name">THAIPODEE</h1>
         <p class="profile-username">@thaipodee</p>
         <div class="profile-stats">
-          <div class="stat-item"><div class="stat-num" id="statFollowing">0</div><div class="stat-label">กำลังติดตาม</div></div>
+          <div class="stat-item"><div class="stat-num" id="statFollowing">0</div><div class="stat-label">ติดตาม</div></div>
           <div class="stat-item"><div class="stat-num" id="statFollowers">0</div><div class="stat-label">ผู้ติดตาม</div></div>
           <div class="stat-item"><div class="stat-num" id="statLikes">0</div><div class="stat-label">ถูกใจ</div></div>
         </div>
       </div>
-      <p class="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบ เขียนแบบ ปรับปรุง ซ่อมแซม สร้างระบบประกอบ ติดตั้งเครื่องจักรอุตสาหกรรม</p>
+      <p class="profile-bio">บริการที่ปรึกษา โครงการ ออกแบบ ติดตั้งเครื่องจักรอุตสาหกรรม</p>
       <div class="posts-grid" id="profileGrid"></div>
-      <p id="gridEmpty" class="empty-text">ยังไม่มีการแชร์วิดีโอ</p>
+      <p id="gridEmpty" class="empty-text">ยังไม่มีวิดีโอ</p>
     </div>
   </div>
 
-  <!-- ===== เมนูล่าง — 5 ปุ่ม พอดีจอ ไม่หาย! ===== -->
+  <!-- ===== เมนูล่าง — 5 ปุ่ม พอดีจอแน่นอน! ===== -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="home">
       <span class="nav-icon">🏠</span>
@@ -147,14 +158,14 @@
       <span class="nav-icon">🛒</span>
       <span class="nav-label">ร้านค้า</span>
     </div>
-    <div class="nav-item" id="navPublish">
+    <div class="nav-center" id="navPublish">
       <span class="nav-fab">+</span>
     </div>
     <div class="nav-item" data-page="messages">
       <span class="nav-icon">💬</span>
       <span class="nav-label">ข้อความ</span>
     </div>
-    <div class="nav-item" data-page="profile" id="navProfile">
+    <div class="nav-item" data-page="profile">
       <span class="nav-icon">👤</span>
       <span class="nav-label">โปรไฟล์</span>
     </div>
@@ -162,30 +173,26 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'thaipodee_posts_v41';
+const STORAGE_KEY = 'thaipodee_posts_v42';
 let localPosts = [];
 
-// === โหลดข้อมูล ===
 function loadData() {
   const saved = localStorage.getItem(STORAGE_KEY);
   localPosts = saved ? JSON.parse(saved) : [];
   renderAll();
 }
 
-// === บันทึก ===
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(localPosts));
   renderAll();
 }
 
-// === สถานะออนไลน์ ===
 function setStatus(text, isOnline) {
   const bar = document.getElementById('statusBar');
   document.getElementById('statusText').textContent = text;
   bar.className = `status-bar ${isOnline ? 'status-online' : 'status-offline'}`;
 }
 
-// === อัปเดตตัวเลข ===
 function updateCounts() {
   const valid = localPosts.filter(p => !p.deleted);
   document.getElementById('postCountDisplay').textContent = `โพสต์: ${valid.length}`;
@@ -193,59 +200,47 @@ function updateCounts() {
   document.getElementById('statLikes').textContent = valid.length * 5;
 }
 
-// === เปลี่ยนหน้า — ชัดเจนทุกปุ่ม ===
 function switchPage(pageName) {
-  // ซ่อนทุกหน้า
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  //แสดงหน้าที่เลือก
   document.getElementById(`page-${pageName}`).classList.add('active');
-  //ไฮไลท์เมนู
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.classList.toggle('active', item.dataset.page === pageName);
   });
 }
 
-// === เพิ่มโพสต์ใหม่ ===
 function addNewPost() {
   const newPost = {
     id: Date.now(),
     caption: 'วิดีโอใหม่',
-    cover: '',
     deleted: false,
     createdAt: new Date().toISOString()
   };
   localPosts.unshift(newPost);
   saveData();
-  alert('✅ เพิ่มเรียบร้อยแล้ว!');
+  alert('✅ เพิ่มเรียบร้อย!');
 }
 
-// === แสดงผลทั้งหมด ===
 function renderAll() {
   const valid = localPosts.filter(p => !p.deleted);
   
-  // หน้าหลัก
   const feedList = document.getElementById('feedList');
   feedList.innerHTML = valid.length 
     ? valid.map(p => `
         <div class="feed-item">
-          <div style="width:100%;height:200px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;color:#888;">วิดีโอ</div>
+          <div class="feed-cover">วิดีโอ</div>
           <p class="feed-caption">${p.caption}</p>
         </div>
       `).join('')
     : '';
   document.getElementById('homeEmpty').style.display = valid.length ? 'none' : 'block';
   
-  // โปรไฟล์ ตาราง
   const grid = document.getElementById('profileGrid');
-  grid.innerHTML = valid.length
-    ? valid.map(() => `<div class="grid-item"><div style="width:100%;height:100%;background:#2a2a2e;display:flex;align-items:center;justify-content:center;color:#666;">+</div></div>`).join('')
-    : '';
+  grid.innerHTML = valid.length ? valid.map(() => `<div class="grid-item">+</div>`).join('') : '';
   document.getElementById('gridEmpty').style.display = valid.length ? 'none' : 'block';
   
   updateCounts();
 }
 
-// === ตรวจสอบการเชื่อมต่อ ===
 async function checkConnect() {
   try {
     await fetch('https://thaipodee-global-market-v2026-new.onrender.com/', { mode: 'no-cors' });
@@ -255,20 +250,16 @@ async function checkConnect() {
   }
 }
 
-// === เริ่มทำงาน — ผูกทุกปุ่มชัดเจน ===
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
   checkConnect();
 
-  // ปุ่มเมนูทุกอัน
+  // ทุกปุ่มเมนู
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-    item.addEventListener('click', () => {
-      console.log('กดเมนู:', item.dataset.page);
-      switchPage(item.dataset.page);
-    });
+    item.addEventListener('click', () => switchPage(item.dataset.page));
   });
 
-  // ปุ่ม + กลาง
+  // ปุ่ม +
   document.getElementById('navPublish').addEventListener('click', addNewPost);
 });
 </script>
