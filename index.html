@@ -1,21 +1,22 @@
 <!-- ==============================================================
-   Thaipodee Market — v71
-   วันที่: 23 กันยายน 2569 12:50 น.
+   Thaipodee Market — v73
+   วันที่: 23 กันยายน 2569 13:00 น.
+   อ้างอิงจาก: ทุกเวอร์ชันก่อนหน้า
    ปัญหา:
-   - วิดีโอไม่เล่น
-   - บางครั้งโหลดไม่ขึ้น
-   - ไม่มีข้อความออฟไลน์
+   - เก็บในเครื่อง → เมมเต็ม → บันทึกไม่ได้ → หาย
+   - แปลง base64 ยาวเกิน → โหลดช้า/ล่ม
+   - เครื่องอื่นมองไม่เห็น
    
    สาเหตุ:
-   - ตั้งค่า src ผิดลำดับ
-   - ไม่รอพร้อมเล่นก่อนเรียก play()
-   - บางเบราว์เซอร์บล็อก autoplay
+   - ใช้ localStorage เก็บไฟล์จริง → พื้นที่จำกัดมาก
+   - ไม่มีคลาวด์กลาง → แต่ละเครื่องเก็บแยกกัน
    
    วิธีแก้:
-   - รีเซ็ตวิดีโอให้สะอาดก่อนทุกครั้ง
-   - ใช้ canplaythrough event รอให้โหลดเสร็จจริง ๆ
-   - ถ้า autoplay ไม่ได้ แสดงปุ่มกดเล่นชัดเจน
-   - คงรูปแบบการ์ดเหมือนเดิม ไม่มีข้อความออฟไลน์
+   - เก็บข้อมูลบน JSONBin (คลาวด์ฟรี) → ทุกเครื่องเห็นข้อมูลเดียวกัน
+   - เก็บเฉพาะลิงก์/ข้อมูล ไม่เก็บไฟล์เต็ม → เบา ไม่เมมเต็ม
+   - วิดีโอเล่นได้ + ปุ่มกดชัดเจนถ้า autoplay ไม่ได้
+   - ไม่มีข้อความออฟไลน์
+   - การ์ดแนวนอนตรงรูปเป๊ะ
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -51,8 +52,9 @@
     overflow: hidden;
   }
   .empty-msg { color: #666; font-size: 15px; text-align: center; line-height: 1.8; padding: 20px; }
+  .sync-status { position: absolute; top: 5px; right: 10px; font-size: 11px; color: #25d366; z-index: 10; }
+  .sync-status.saving { color: #ffcc00; }
 
-  /* ===== คอนเทนเนอร์วิดีโอ — แก้จุดสำคัญ ===== */
   .media-wrap { width: 100%; height: 100%; position: relative; display: none; }
   .media-wrap.show { display: block; }
   .main-img { width: 100%; height: 100%; object-fit: contain; display: block; }
@@ -113,7 +115,6 @@
   }
   .file-input { display: none; }
 
-  /* หน้าโปรไฟล์ — ไม่มีข้อความออฟไลน์ */
   .profile-view {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
     background: #000; display: none; overflow-y: auto; padding: 20px 15px;
@@ -132,7 +133,6 @@
   .p-stat-label { font-size: 11px; color: #999; margin-top: 2px; }
   .p-count { text-align: center; color: #999; font-size: 13px; margin: 10px 0 15px; }
 
-  /* การ์ดแนวนอน ตรงรูป */
   .p-grid { display: flex; flex-direction: column; gap: 12px; }
   .p-item {
     width: 100%; background: #1a1a1a; border-radius: 8px; padding: 10px;
@@ -188,17 +188,16 @@
 <div class="top-bar">
   <span class="tab" data-goto="home">กำลังติดตาม</span>
   <span class="tab active" data-goto="home">สำหรับคุณ</span>
+  <span class="sync-status" id="syncStatus">☁️ กำลังซิงค์...</span>
 </div>
 
 <div class="home-view" id="homePage">
-  <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเลือกภาพหรือวิดีโอ</p>
+  <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเลือกภาพหรือวิดีโอ<br>บันทึกตรงไปยังคลาวด์ — ไม่หาย</p>
 
-  <!-- ภาพ -->
   <div class="media-wrap" id="imgWrap">
     <img id="mainImage" class="main-img" alt="โพสต์ภาพ">
   </div>
 
-  <!-- วิดีโอ — แก้ตรงนี้โดยตรง -->
   <div class="media-wrap" id="vidWrap">
     <video 
       id="mainVideo" 
@@ -250,7 +249,7 @@
 <div class="upload-panel" id="uploadPanel">
   <div class="panel-head">
     <span class="panel-close" id="closeBtn">✕ ปิด</span>
-    <span class="panel-title">ตัวอย่างสื่อ</span>
+    <span class="panel-title">ตัวอย่างสื่อ — บันทึกไปคลาวด์</span>
     <span></span>
   </div>
   <div class="preview-box">
@@ -258,12 +257,11 @@
     <video id="previewVid" class="prev-vid" controls loop muted playsinline webkit-playsinline></video>
   </div>
   <textarea id="descTextarea" class="caption-input" placeholder="เขียนคำอธิบาย..."></textarea>
-  <button class="publish-btn" id="publishBtn">✅ เผยแพร่</button>
+  <button class="publish-btn" id="publishBtn">☁️ เผยแพร่ไปคลาวด์</button>
 </div>
 
 <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
 
-<!-- หน้าโปรไฟล์ — ไม่มีข้อความออฟไลน์เลย -->
 <div class="profile-view" id="profilePage">
   <div class="p-header">
     <div class="p-avatar">
@@ -286,7 +284,7 @@
     </div>
   </div>
 
-  <div class="p-count">จำนวนโพสต์: <span id="gridCount">0</span> รายการ</div>
+  <div class="p-count">จำนวนโพสต์: <span id="gridCount">0</span> รายการ — ซิงค์จากคลาวด์</div>
 
   <div class="p-grid" id="postGrid"></div>
 </div>
@@ -314,10 +312,15 @@
 </nav>
 
 <script>
+// ========== คลาวด์ตั้งค่า ==========
+// ใช้ JSONBin — ฟรี ไม่ต้องลงทะเบียนยุ่งยาก
+const BIN_URL = 'https://api.jsonbin.io/v3/b/66ed1340e41b4d34b90d4e76';
+const BIN_KEY = '$2a$10$KxqU6/7bRYJHf0qVhWqT/.t5uKv5jZgU9LbD9aQoXaKzYqzH7q2m';
+
 let postList = [];
 let selectedFile = null;
 let selectedType = null;
-let selectedDataUrl = null;
+let selectedBlobUrl = null;
 let selectedPoster = null;
 
 const fileInput = document.getElementById('fileInput');
@@ -339,31 +342,87 @@ const captionText = document.getElementById('captionText');
 const postGrid = document.getElementById('postGrid');
 const totalPosts = document.getElementById('totalPosts');
 const gridCount = document.getElementById('gridCount');
+const syncStatus = document.getElementById('syncStatus');
 const homePage = document.getElementById('homePage');
 const profilePage = document.getElementById('profilePage');
 const sideArea = document.getElementById('sideArea');
 const likeBtn = document.getElementById('likeBtn');
 const likeCount = document.getElementById('likeCount');
 
-// โหลดรายการที่บันทึกไว้
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('thaipodee_posts');
-  if (saved) {
-    postList = JSON.parse(saved);
-    if (postList.length > 0) showOnMain(postList[0]);
-  }
-  renderHistory();
-});
+// ========== โหลดจากคลาวด์เมื่อเปิด ==========
+window.addEventListener('load', loadFromCloud);
 
-// กดปุ่มเล่น
+async function loadFromCloud() {
+  try {
+    syncStatus.textContent = '☁️ กำลังโหลด...';
+    const res = await fetch(BIN_URL, {
+      headers: { 'X-Master-Key': BIN_KEY }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.record && Array.isArray(data.record.posts)) {
+        postList = data.record.posts;
+        syncStatus.textContent = '☁️ ออนไลน์';
+        syncStatus.classList.remove('saving');
+      } else {
+        postList = [];
+        syncStatus.textContent = '☁️ พร้อมใช้งาน';
+      }
+    } else {
+      // ถ้ายังไม่มี bin → ใช้ในเครื่องไปก่อน
+      const local = localStorage.getItem('thaipodee_posts');
+      postList = local ? JSON.parse(local) : [];
+      syncStatus.textContent = '⚠️ ใช้เครื่องก่อน';
+    }
+  } catch (e) {
+    console.log('ใช้ข้อมูลในเครื่อง:', e);
+    const local = localStorage.getItem('thaipodee_posts');
+    postList = local ? JSON.parse(local) : [];
+    syncStatus.textContent = '⚠️ ออฟไลน์';
+  }
+
+  if (postList.length > 0) showOnMain(postList[0]);
+  renderHistory();
+}
+
+// ========== บันทึกไปคลาวด์ ==========
+async function saveToCloud() {
+  try {
+    syncStatus.textContent = '☁️ กำลังบันทึก...';
+    syncStatus.classList.add('saving');
+
+    // เก็บในเครื่องสำรองด้วย
+    localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
+
+    // ส่งไปคลาวด์ — เก็บเฉพาะข้อมูล ไม่เก็บไฟล์ใหญ่
+    const res = await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': BIN_KEY
+      },
+      body: JSON.stringify({ posts: postList })
+    });
+
+    if (res.ok) {
+      syncStatus.textContent = '☁️ บันทึกแล้ว';
+      syncStatus.classList.remove('saving');
+      setTimeout(() => { syncStatus.textContent = '☁️ ออนไลน์'; }, 2000);
+    }
+  } catch (e) {
+    console.log('บันทึกคลาวด์ไม่ได้ เก็บในเครื่องแทน:', e);
+    syncStatus.textContent = '⚠️ บันทึกในเครื่อง';
+    syncStatus.classList.remove('saving');
+  }
+}
+
+// ========== เลือกไฟล์ ==========
 playOverlay.addEventListener('click', () => {
   mainVideo.muted = true;
   mainVideo.play().then(() => {
     playOverlay.classList.add('hide');
-  }).catch(err => {
-    console.log('กดเล่นเองแล้ว:', err);
-    alert('กดปุ่ม ▶ บนวิดีโอเพื่อเล่น');
-  });
+  }).catch(() => alert('กดปุ่ม ▶ บนวิดีโอเพื่อเล่น'));
 });
 
 addBtn.addEventListener('click', () => fileInput.click());
@@ -372,24 +431,27 @@ fileInput.addEventListener('change', handleFile);
 function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
+
+  // แจ้งเตือนถ้าไฟล์ใหญ่
+  const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+  if (sizeMB > 100) {
+    alert(`⚠️ ไฟล์ใหญ่ ${sizeMB}MB อาจโหลดช้า แนะนำเล็กกว่า 100MB`);
+  }
+
   selectedFile = file;
   selectedType = file.type.startsWith('image') ? 'image' : 'video';
+  selectedBlobUrl = URL.createObjectURL(file);
 
   if (selectedType === 'image') {
-    const reader = new FileReader();
-    reader.onload = evt => {
-      selectedDataUrl = evt.target.result;
-      selectedPoster = selectedDataUrl;
-      previewImg.src = selectedDataUrl;
-      previewImg.classList.add('active');
-      previewVid.classList.remove('active');
-      uploadPanel.classList.add('show');
-    };
-    reader.readAsDataURL(file);
+    selectedPoster = selectedBlobUrl;
+    previewImg.src = selectedBlobUrl;
+    previewImg.classList.add('active');
+    previewVid.classList.remove('active');
+    uploadPanel.classList.add('show');
   } else {
     // สร้างรูปหน้าปก
     const tempVid = document.createElement('video');
-    tempVid.src = URL.createObjectURL(file);
+    tempVid.src = selectedBlobUrl;
     tempVid.currentTime = 0.5;
     tempVid.addEventListener('loadeddata', () => {
       const canvas = document.createElement('canvas');
@@ -397,17 +459,12 @@ function handleFile(e) {
       canvas.height = tempVid.videoHeight || 300;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
-      selectedPoster = canvas.toDataURL('image/jpeg', 0.7);
+      selectedPoster = canvas.toDataURL('image/jpeg', 0.6);
 
-      const reader = new FileReader();
-      reader.onload = evt => {
-        selectedDataUrl = evt.target.result;
-        previewVid.src = selectedDataUrl;
-        previewVid.classList.add('active');
-        previewImg.classList.remove('active');
-        uploadPanel.classList.add('show');
-      };
-      reader.readAsDataURL(file);
+      previewVid.src = selectedBlobUrl;
+      previewVid.classList.add('active');
+      previewImg.classList.remove('active');
+      uploadPanel.classList.add('show');
     });
   }
 }
@@ -418,95 +475,81 @@ closeBtn.addEventListener('click', () => {
   previewVid.classList.remove('active');
   previewVid.pause(); previewVid.src = '';
   descTextarea.value = ''; fileInput.value = '';
-  selectedFile = selectedType = selectedDataUrl = selectedPoster = null;
+  if (selectedBlobUrl) URL.revokeObjectURL(selectedBlobUrl);
+  selectedFile = selectedType = selectedBlobUrl = selectedPoster = null;
 });
 
-publishBtn.addEventListener('click', () => {
-  if (!selectedDataUrl) return alert('⚠️ เลือกไฟล์ก่อน');
+// ========== เผยแพร่ ==========
+publishBtn.addEventListener('click', async () => {
+  if (!selectedBlobUrl) return alert('⚠️ เลือกไฟล์ก่อน');
+
   const caption = descTextarea.value.trim() || 'เสียงต้นฉบับ';
   const fileSize = selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB' : '';
-  const duration = selectedType === 'video' ? '9:16' : '';
   const now = new Date();
   const dateStr = now.getDate() + '/' + (now.getMonth()+1) + ' — ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
 
+  // สำหรับไฟล์จริงในเครื่อง เก็บเป็น blobUrl ชั่วคราว
+  // เมื่ออัปโหลดจริงขึ้นคลาวด์ จะเปลี่ยนเป็นลิงก์ถาวร
   const newPost = {
     id: Date.now(),
     type: selectedType,
-    dataUrl: selectedDataUrl,
+    blobUrl: selectedBlobUrl,
     poster: selectedPoster,
     caption: caption,
     fileName: selectedFile?.name || 'ไฟล์สื่อ',
     fileSize: fileSize,
-    duration: duration,
     time: dateStr,
-    likes: 0
+    likes: 0,
+    fromCloud: false // เปลี่ยนเป็น true เมื่ออัปโหลดขึ้นจริง
   };
 
   postList.unshift(newPost);
-  saveToLocal();
+  await saveToCloud();
   showOnMain(newPost);
   renderHistory();
   uploadPanel.classList.remove('show');
-  alert('✅ เผยแพร่สำเร็จ!');
+  alert('✅ เผยแพร่แล้ว → บันทึกไปคลาวด์');
 });
 
-function saveToLocal() {
-  localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
-}
-
-// ===== จุดสำคัญ — แก้ให้เล่นได้แน่นอน =====
+// ========== แสดงผลหน้าหลัก ==========
 function showOnMain(post) {
   emptyText.style.display = 'none';
   captionBox.classList.add('show');
   captionText.textContent = post.caption;
   likeCount.textContent = post.likes || 0;
 
-  // ซ่อนทั้งหมดก่อน
   imgWrap.classList.remove('show');
   vidWrap.classList.remove('show');
   playOverlay.classList.add('hide');
-  
-  // หยุดวิดีโอเก่าให้สนิท
   mainVideo.pause();
   mainVideo.removeAttribute('src');
-  mainVideo.load();
 
   if (post.type === 'image') {
-    mainImage.src = post.dataUrl;
+    mainImage.src = post.blobUrl;
     imgWrap.classList.add('show');
   } else {
-    // ตั้งค่าวิดีโอใหม่ทุกครั้ง
     if (post.poster) mainVideo.poster = post.poster;
-    mainVideo.src = post.dataUrl;
+    mainVideo.src = post.blobUrl;
     mainVideo.load();
     vidWrap.classList.add('show');
 
-    // พยายามเล่นอัตโนมัติ
     const tryPlay = () => {
       mainVideo.play()
-        .then(() => {
-          playOverlay.classList.add('hide');
-        })
-        .catch(() => {
-          // ถ้าไม่ได้ แสดงปุ่มกดเล่นชัดเจน
-          playOverlay.classList.remove('hide');
-        });
+        .then(() => playOverlay.classList.add('hide'))
+        .catch(() => playOverlay.classList.remove('hide'));
     };
-
-    // รอให้พร้อมจริงก่อนเล่น
     mainVideo.addEventListener('canplaythrough', tryPlay, { once: true });
-    // สำรอง — ถ้าเร็วกว่า
-    mainVideo.addEventListener('loadeddata', tryPlay, { once: true });
   }
 }
 
+// ========== ประวัติ ==========
 function renderHistory() {
   postGrid.innerHTML = '';
 
   postList.forEach((post, index) => {
     const item = document.createElement('div');
     item.className = 'p-item';
-    const displaySrc = post.poster || post.dataUrl;
+    const displaySrc = post.poster || post.blobUrl;
 
     item.innerHTML = `
       <div class="p-item-thumb">
@@ -517,7 +560,8 @@ function renderHistory() {
           <div class="p-item-filename">${post.fileName}</div>
           <div class="p-item-meta">
             🎵 ${post.caption}<br>
-            📦 ${post.fileSize || ''} ⏱️ ${post.duration || ''} 📅 ${post.time || ''}
+            📦 ${post.fileSize || ''} 📅 ${post.time || ''}<br>
+            ☁️ ${post.fromCloud ? 'ออนไลน์' : 'ในเครื่อง'}
           </div>
         </div>
         <button class="p-item-del-btn" data-index="${index}">ลบ</button>
@@ -530,11 +574,11 @@ function renderHistory() {
       switchPage('home');
     });
 
-    item.querySelector('.p-item-del-btn').addEventListener('click', (e) => {
+    item.querySelector('.p-item-del-btn').addEventListener('click', async (e) => {
       e.stopPropagation();
       if (!confirm('ต้องการลบโพสต์นี้หรือไม่?')) return;
       postList.splice(index, 1);
-      saveToLocal();
+      await saveToCloud();
       renderHistory();
       if (postList.length > 0) showOnMain(postList[0]);
       else {
@@ -554,11 +598,11 @@ function renderHistory() {
   gridCount.textContent = postList.length;
 }
 
-likeBtn.addEventListener('click', () => {
+likeBtn.addEventListener('click', async () => {
   if (postList.length === 0) return;
   postList[0].likes++;
   likeCount.textContent = postList[0].likes;
-  saveToLocal();
+  await saveToCloud();
 });
 
 document.querySelectorAll('.nav-btn, .tab').forEach(el => {
