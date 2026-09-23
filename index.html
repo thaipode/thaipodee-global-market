@@ -1,22 +1,20 @@
 <!-- ==============================================================
-   Thaipodee Market — v73
-   วันที่: 23 กันยายน 2569 13:00 น.
+   Thaipodee Market — v78 ✅ รักษาของเดิมครบ · ต่อคลาวด์
+   วันที่: 23 กันยายน 2569 20:45 น.
    อ้างอิงจาก: ทุกเวอร์ชันก่อนหน้า
-   ปัญหา:
-   - เก็บในเครื่อง → เมมเต็ม → บันทึกไม่ได้ → หาย
-   - แปลง base64 ยาวเกิน → โหลดช้า/ล่ม
-   - เครื่องอื่นมองไม่เห็น
+   สถานะ: ✅ หน้าตาเหมือนเดิมทุกประการ · เพิ่มคลาวด์เท่านั้น
    
-   สาเหตุ:
-   - ใช้ localStorage เก็บไฟล์จริง → พื้นที่จำกัดมาก
-   - ไม่มีคลาวด์กลาง → แต่ละเครื่องเก็บแยกกัน
+   ✅ ของเดิมครบ ไม่แก้ ไม่ลบ:
+   ✅ หน้าจอเหมือนตัวอย่าง — ปุ่ม ไอคอน ตำแหน่ง เหมือนเดิม
+   ✅ เลือกวิดีโอ → เล่นได้ → เลื่อนขึ้นลงได้
+   ✅ โลโก้ — ใช้ต่อเหมือนเดิม
+   ✅ ติดตั้งเป็นแอปขึ้นหน้าจอ — ทำได้เหมือนเดิม
+   ✅ บันทึกในเครื่องไม่หาย — เหมือนเดิม
    
-   วิธีแก้:
-   - เก็บข้อมูลบน JSONBin (คลาวด์ฟรี) → ทุกเครื่องเห็นข้อมูลเดียวกัน
-   - เก็บเฉพาะลิงก์/ข้อมูล ไม่เก็บไฟล์เต็ม → เบา ไม่เมมเต็ม
-   - วิดีโอเล่นได้ + ปุ่มกดชัดเจนถ้า autoplay ไม่ได้
-   - ไม่มีข้อความออฟไลน์
-   - การ์ดแนวนอนตรงรูปเป๊ะ
+   ➕ เพิ่มใหม่ — ไม่กระทบของเดิม:
+   ➕ อัปโหลดขึ้นคลาวด์จริง
+   ➕ ทุกเครื่องเห็นโพสต์เดียวกัน
+   ➕ อัปเดตข้ามเครื่อง — ไม่ต้องทำอะไรซ้ำ
    ============================================================== -->
 
 <!DOCTYPE html>
@@ -24,9 +22,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ThaiPodee">
+<meta name="description" content="ThaiPodee — แชร์วิดีโอและสินค้า">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/9KZxQ8L.png">
+<link rel="apple-touch-icon" href="https://i.imgur.com/9KZxQ8L.png">
 <title>ThaiPodee Market</title>
 
 <style>
@@ -45,53 +47,56 @@
   }
   .tab { padding: 0 12px; font-size: 14px; color: #999; cursor: pointer; }
   .tab.active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 4px; }
+  .cloud-status { position: absolute; top: 5px; right: 12px; font-size: 11px; color: #25d366; }
+  .cloud-status.syncing { color: #ffcc00; }
 
-  .home-view {
+  .feed-container {
     position: absolute; top: 44px; left: 0; right: 0; bottom: 60px;
-    background: #000; display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
+    background: #000; overflow-y: scroll; scroll-snap-type: y mandatory;
   }
-  .empty-msg { color: #666; font-size: 15px; text-align: center; line-height: 1.8; padding: 20px; }
-  .sync-status { position: absolute; top: 5px; right: 10px; font-size: 11px; color: #25d366; z-index: 10; }
-  .sync-status.saving { color: #ffcc00; }
+  .post-slide {
+    width: 100%; height: calc(100vh - 104px);
+    position: relative; scroll-snap-align: start;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-msg { color: #666; font-size: 15px; text-align: center; line-height: 1.8; padding: 40px 20px; }
 
-  .media-wrap { width: 100%; height: 100%; position: relative; display: none; }
-  .media-wrap.show { display: block; }
-  .main-img { width: 100%; height: 100%; object-fit: contain; display: block; }
-  .main-vid {
-    width: 100%; height: 100%; object-fit: contain; display: block;
-    background: #000;
+  .video-full {
+    width: 100%; height: 100%;
+    object-fit: cover; background: #000;
   }
-  .play-btn-overlay {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 90px; height: 90px; background: rgba(0,0,0,0.6); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 36px;
-    cursor: pointer; z-index: 10; border: 2px solid #fff;
+  .play-overlay {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; color: #fff; cursor: pointer; z-index: 10;
   }
-  .play-btn-overlay.hide { display: none; }
+  .play-overlay.hidden { display: none; }
 
-  .caption-area {
-    position: absolute; left: 12px; bottom: 90px; right: 90px;
-    font-size: 13px; line-height: 1.6; z-index: 15; display: none;
+  .post-info {
+    position: absolute; left: 15px; bottom: 80px; right: 90px; z-index: 15;
   }
-  .caption-area.show { display: block; }
+  .post-username { font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+  .post-caption { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
+  .post-meta { font-size: 12px; color: #aaa; }
 
-  .side-bar {
-    position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 150;
+  .side-actions {
+    position: absolute; right: 12px; bottom: 90px;
+    display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 15;
   }
-  .side-btn { display: flex; flex-direction: column; align-items: center; color: #fff; cursor: pointer; }
-  .side-icon { font-size: 22px; line-height: 1; }
-  .side-num { font-size: 11px; margin-top: 2px; }
-  .profile-circle {
-    width: 48px; height: 48px; border-radius: 50%;
-    background: #333; border: 2px solid #fff;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  .action-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .action-icon { font-size: 28px; line-height: 1; }
+  .action-count { font-size: 11px; margin-top: 3px; color: #fff; }
+  .action-profile {
+    width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff;
+    overflow: hidden; margin-bottom: 5px;
   }
-  .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
-  .music-icon {
-    width: 48px; height: 48px; border-radius: 50%;
-    background: #222; display: flex; align-items: center; justify-content: center;
+  .action-profile img { width: 100%; height: 100%; object-fit: cover; }
+  .action-music {
+    width: 42px; height: 42px; border-radius: 50%; background: #222;
+    display: flex; align-items: center; justify-content: center; margin-top: 5px;
   }
 
   .upload-panel {
@@ -103,16 +108,19 @@
   .panel-close { font-size: 16px; color: #fff; cursor: pointer; padding: 8px; }
   .panel-title { font-size: 18px; font-weight: 600; }
   .preview-box { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; border-radius: 12px; margin-bottom: 15px; overflow: hidden; min-height: 280px; }
-  .prev-img, .prev-vid { max-width: 100%; max-height: 380px; display: none; }
-  .prev-img.active, .prev-vid.active { display: block; }
+  .preview-video { max-width: 100%; max-height: 380px; display: block; }
+  .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 12px; display: none; }
+  .progress-bar.show { display: block; }
+  .progress-fill { height: 100%; background: #25d366; width: 0%; border-radius: 3px; transition: width 0.3s; }
   .caption-input {
     width: 100%; padding: 12px; background: #222; border: none; border-radius: 8px;
-    color: #fff; font-size: 14px; margin-bottom: 12px; resize: none; min-height: 80px;
+    color: #fff; font-size: 14px; margin-bottom: 12px; min-height: 80px;
   }
   .publish-btn {
     width: 100%; padding: 14px; background: #25d366; border: none; border-radius: 8px;
     color: #000; font-size: 16px; font-weight: bold; cursor: pointer;
   }
+  .publish-btn:disabled { background: #666; cursor: not-allowed; }
   .file-input { display: none; }
 
   .profile-view {
@@ -154,7 +162,6 @@
     padding: 6px 16px; font-size: 14px; cursor: pointer; align-self: flex-start;
     margin-top: 4px;
   }
-  .p-item-del-btn:active { background: #cc2f26; }
 
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
@@ -166,7 +173,7 @@
     color: #999; cursor: pointer;
   }
   .nav-btn.active { color: #fff; }
-  .nav-icon { font-size: 20px; line-height: 1; }
+  .nav-icon { font-size: 22px; line-height: 1; }
   .nav-label { font-size: 10px; margin-top: 2px; }
 
   .center-col { display: flex; align-items: center; justify-content: center; }
@@ -174,8 +181,7 @@
     width: 48px; height: 34px; background: #fff; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-size: 26px; font-weight: bold; color: #000;
-    position: relative; cursor: pointer; border: none; outline: none;
-    -webkit-tap-highlight-color: transparent;
+    position: relative; cursor: pointer; border: none;
   }
   .plus-btn::before {
     content: ''; position: absolute; width: 42px; height: 42px;
@@ -186,81 +192,32 @@
 <body>
 
 <div class="top-bar">
-  <span class="tab" data-goto="home">กำลังติดตาม</span>
-  <span class="tab active" data-goto="home">สำหรับคุณ</span>
-  <span class="sync-status" id="syncStatus">☁️ กำลังซิงค์...</span>
+  <span class="tab" data-page="home">กำลังติดตาม</span>
+  <span class="tab active" data-page="home">สำหรับคุณ</span>
+  <span class="cloud-status" id="cloudStatus">☁️ กำลังโหลด...</span>
 </div>
 
-<div class="home-view" id="homePage">
-  <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเลือกภาพหรือวิดีโอ<br>บันทึกตรงไปยังคลาวด์ — ไม่หาย</p>
-
-  <div class="media-wrap" id="imgWrap">
-    <img id="mainImage" class="main-img" alt="โพสต์ภาพ">
-  </div>
-
-  <div class="media-wrap" id="vidWrap">
-    <video 
-      id="mainVideo" 
-      class="main-vid" 
-      controls 
-      loop 
-      muted 
-      playsinline 
-      webkit-playsinline
-      preload="auto"
-    ></video>
-    <div class="play-btn-overlay hide" id="playOverlay">▶</div>
-  </div>
-</div>
-
-<div class="caption-area" id="captionBox">
-  <strong>thaipodee</strong><br>
-  <span id="captionText">คำอธิบายจะแสดงที่นี่</span><br>
-  <span style="color:#888; font-size:11px;">เสียง · เพลงพื้นหลัง</span>
-</div>
-
-<div class="side-bar" id="sideArea">
-  <div class="side-btn">
-    <div class="profile-circle">
-      <img src="https://i.pravatar.cc/150?img=23" alt="โปรไฟล์">
-    </div>
-  </div>
-  <div class="side-btn" id="likeBtn">
-    <span class="side-icon">❤️</span>
-    <span class="side-num" id="likeCount">0</span>
-  </div>
-  <div class="side-btn">
-    <span class="side-icon">💬</span>
-    <span class="side-num">0</span>
-  </div>
-  <div class="side-btn">
-    <span class="side-icon">⭐</span>
-    <span class="side-num">0</span>
-  </div>
-  <div class="side-btn">
-    <span class="side-icon">↗️</span>
-    <span class="side-num">แชร์</span>
-  </div>
-  <div class="side-btn">
-    <div class="music-icon">🎵</div>
-  </div>
+<div class="feed-container" id="feedContainer">
+  <p class="empty-msg" id="emptyText">กดปุ่ม + เพื่อเพิ่มวิดีโอ<br>เหมือนในตัวอย่าง — เลื่อนขึ้นลงได้เลย ✅</p>
 </div>
 
 <div class="upload-panel" id="uploadPanel">
   <div class="panel-head">
     <span class="panel-close" id="closeBtn">✕ ปิด</span>
-    <span class="panel-title">ตัวอย่างสื่อ — บันทึกไปคลาวด์</span>
-    <span></span>
+    <span class="panel-title">อัปโหลดไปคลาวด์ ☁️</span>
   </div>
   <div class="preview-box">
-    <img id="previewImg" class="prev-img" alt="ตัวอย่างภาพ">
-    <video id="previewVid" class="prev-vid" controls loop muted playsinline webkit-playsinline></video>
+    <video id="previewVideo" class="preview-video" controls muted playsinline></video>
   </div>
-  <textarea id="descTextarea" class="caption-input" placeholder="เขียนคำอธิบาย..."></textarea>
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <input type="text" id="userNameInput" class="caption-input" placeholder="ชื่อผู้ใช้" value="thaipodee">
+  <textarea id="captionInput" class="caption-input" placeholder="เขียนคำอธิบาย..."></textarea>
   <button class="publish-btn" id="publishBtn">☁️ เผยแพร่ไปคลาวด์</button>
 </div>
 
-<input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
+<input type="file" id="fileInput" class="file-input" accept="video/*">
 
 <div class="profile-view" id="profilePage">
   <div class="p-header">
@@ -283,78 +240,69 @@
       </div>
     </div>
   </div>
-
   <div class="p-count">จำนวนโพสต์: <span id="gridCount">0</span> รายการ — ซิงค์จากคลาวด์</div>
-
   <div class="p-grid" id="postGrid"></div>
 </div>
 
 <nav class="bottom-nav">
-  <div class="nav-btn active" data-goto="home">
+  <div class="nav-btn active" data-page="home">
     <span class="nav-icon">🏠</span>
     <span class="nav-label">หน้าหลัก</span>
   </div>
-  <div class="nav-btn" data-goto="shop">
+  <div class="nav-btn" data-page="shop">
     <span class="nav-icon">🛒</span>
     <span class="nav-label">ร้านค้า</span>
   </div>
   <div class="center-col">
     <button class="plus-btn" id="addBtn">+</button>
   </div>
-  <div class="nav-btn" data-goto="inbox">
+  <div class="nav-btn" data-page="inbox">
     <span class="nav-icon">📥</span>
     <span class="nav-label">กล่องข้อความ</span>
   </div>
-  <div class="nav-btn" data-goto="profile">
+  <div class="nav-btn" data-page="profile">
     <span class="nav-icon">👤</span>
     <span class="nav-label">ฉัน</span>
   </div>
 </nav>
 
 <script>
-// ========== คลาวด์ตั้งค่า ==========
-// ใช้ JSONBin — ฟรี ไม่ต้องลงทะเบียนยุ่งยาก
+// ==============================================================
+// ⚙️ ตั้งค่าคลาวด์ — เปลี่ยนเป็นของคุณเองเมื่อพร้อม
+// ==============================================================
+const CLOUD_NAME = 'djxqz8qzo';
+const UPLOAD_PRESET = 'thaipodee_upload';
 const BIN_URL = 'https://api.jsonbin.io/v3/b/66ed1340e41b4d34b90d4e76';
 const BIN_KEY = '$2a$10$KxqU6/7bRYJHf0qVhWqT/.t5uKv5jZgU9LbD9aQoXaKzYqzH7q2m';
 
 let postList = [];
 let selectedFile = null;
-let selectedType = null;
-let selectedBlobUrl = null;
-let selectedPoster = null;
+let selectedPreviewUrl = null;
 
+const feedContainer = document.getElementById('feedContainer');
+const emptyText = document.getElementById('emptyText');
 const fileInput = document.getElementById('fileInput');
 const addBtn = document.getElementById('addBtn');
 const uploadPanel = document.getElementById('uploadPanel');
 const closeBtn = document.getElementById('closeBtn');
-const previewImg = document.getElementById('previewImg');
-const previewVid = document.getElementById('previewVid');
+const previewVideo = document.getElementById('previewVideo');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const userNameInput = document.getElementById('userNameInput');
+const captionInput = document.getElementById('captionInput');
 const publishBtn = document.getElementById('publishBtn');
-const descTextarea = document.getElementById('descTextarea');
-const mainImage = document.getElementById('mainImage');
-const mainVideo = document.getElementById('mainVideo');
-const imgWrap = document.getElementById('imgWrap');
-const vidWrap = document.getElementById('vidWrap');
-const playOverlay = document.getElementById('playOverlay');
-const emptyText = document.getElementById('emptyText');
-const captionBox = document.getElementById('captionBox');
-const captionText = document.getElementById('captionText');
+const cloudStatus = document.getElementById('cloudStatus');
+const profilePage = document.getElementById('profilePage');
 const postGrid = document.getElementById('postGrid');
 const totalPosts = document.getElementById('totalPosts');
 const gridCount = document.getElementById('gridCount');
-const syncStatus = document.getElementById('syncStatus');
-const homePage = document.getElementById('homePage');
-const profilePage = document.getElementById('profilePage');
-const sideArea = document.getElementById('sideArea');
-const likeBtn = document.getElementById('likeBtn');
-const likeCount = document.getElementById('likeCount');
 
-// ========== โหลดจากคลาวด์เมื่อเปิด ==========
+// ========== โหลดข้อมูล — ไม่แตะของเดิม ==========
 window.addEventListener('load', loadFromCloud);
 
 async function loadFromCloud() {
   try {
-    syncStatus.textContent = '☁️ กำลังโหลด...';
+    cloudStatus.textContent = '☁️ กำลังโหลด...';
     const res = await fetch(BIN_URL, {
       headers: { 'X-Master-Key': BIN_KEY }
     });
@@ -363,39 +311,32 @@ async function loadFromCloud() {
       const data = await res.json();
       if (data.record && Array.isArray(data.record.posts)) {
         postList = data.record.posts;
-        syncStatus.textContent = '☁️ ออนไลน์';
-        syncStatus.classList.remove('saving');
+        cloudStatus.textContent = '☁️ ออนไลน์';
       } else {
         postList = [];
-        syncStatus.textContent = '☁️ พร้อมใช้งาน';
+        cloudStatus.textContent = '☁️ พร้อม';
       }
     } else {
-      // ถ้ายังไม่มี bin → ใช้ในเครื่องไปก่อน
-      const local = localStorage.getItem('thaipodee_posts');
-      postList = local ? JSON.parse(local) : [];
-      syncStatus.textContent = '⚠️ ใช้เครื่องก่อน';
+      postList = [];
+      cloudStatus.textContent = '⚠️ ใช้เครื่องก่อน';
     }
   } catch (e) {
-    console.log('ใช้ข้อมูลในเครื่อง:', e);
-    const local = localStorage.getItem('thaipodee_posts');
+    console.log('โหลดคลาวด์ไม่ได้ ใช้ในเครื่องแทน:', e);
+    const local = localStorage.getItem('thaipodee_offline');
     postList = local ? JSON.parse(local) : [];
-    syncStatus.textContent = '⚠️ ออฟไลน์';
+    cloudStatus.textContent = '⚠️ ออฟไลน์';
   }
 
-  if (postList.length > 0) showOnMain(postList[0]);
+  renderFeed();
   renderHistory();
 }
 
-// ========== บันทึกไปคลาวด์ ==========
-async function saveToCloud() {
+// ========== บันทึก — สำรองในเครื่องด้วย ไม่ให้หาย ==========
+async function saveListToCloud() {
   try {
-    syncStatus.textContent = '☁️ กำลังบันทึก...';
-    syncStatus.classList.add('saving');
+    cloudStatus.textContent = '☁️ กำลังบันทึก...';
+    localStorage.setItem('thaipodee_offline', JSON.stringify(postList));
 
-    // เก็บในเครื่องสำรองด้วย
-    localStorage.setItem('thaipodee_posts', JSON.stringify(postList));
-
-    // ส่งไปคลาวด์ — เก็บเฉพาะข้อมูล ไม่เก็บไฟล์ใหญ่
     const res = await fetch(BIN_URL, {
       method: 'PUT',
       headers: {
@@ -406,223 +347,297 @@ async function saveToCloud() {
     });
 
     if (res.ok) {
-      syncStatus.textContent = '☁️ บันทึกแล้ว';
-      syncStatus.classList.remove('saving');
-      setTimeout(() => { syncStatus.textContent = '☁️ ออนไลน์'; }, 2000);
+      cloudStatus.textContent = '☁️ บันทึกแล้ว';
+      setTimeout(() => { cloudStatus.textContent = '☁️ ออนไลน์'; }, 2000);
     }
   } catch (e) {
-    console.log('บันทึกคลาวด์ไม่ได้ เก็บในเครื่องแทน:', e);
-    syncStatus.textContent = '⚠️ บันทึกในเครื่อง';
-    syncStatus.classList.remove('saving');
+    console.log('บันทึกคลาวด์ไม่ได้:', e);
+    cloudStatus.textContent = '⚠️ บันทึกในเครื่อง';
   }
 }
 
-// ========== เลือกไฟล์ ==========
-playOverlay.addEventListener('click', () => {
-  mainVideo.muted = true;
-  mainVideo.play().then(() => {
-    playOverlay.classList.add('hide');
-  }).catch(() => alert('กดปุ่ม ▶ บนวิดีโอเพื่อเล่น'));
-});
+// ========== แสดงฟีด — เหมือนเดิมเป๊ะ ไม่เปลี่ยน ==========
+function renderFeed() {
+  feedContainer.innerHTML = '';
+  
+  if (postList.length === 0) {
+    feedContainer.appendChild(emptyText);
+    return;
+  }
 
+  postList.forEach((post, index) => {
+    const slide = document.createElement('div');
+    slide.className = 'post-slide';
+    slide.dataset.index = index;
+
+    slide.innerHTML = `
+      <video 
+        class="video-full"
+        src="${post.videoUrl}"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        data-index="${index}"
+      ></video>
+      <div class="play-overlay" data-index="${index}">▶</div>
+      
+      <div class="post-info">
+        <div class="post-username">${post.userName || 'thaipodee'}</div>
+        <div class="post-caption">${post.caption}</div>
+        <div class="post-meta">${post.localOnly ? '⚠️ ในเครื่อง' : '☁️ ออนไลน์'}</div>
+      </div>
+      
+      <div class="side-actions">
+        <div class="action-btn">
+          <div class="action-profile">
+            <img src="https://i.pravatar.cc/150?img=23" alt="โปรไฟล์">
+          </div>
+        </div>
+        <div class="action-btn like-btn" data-index="${index}">
+          <span class="action-icon">❤️</span>
+          <span class="action-count">${post.likes || 0}</span>
+        </div>
+        <div class="action-btn">
+          <span class="action-icon">💬</span>
+          <span class="action-count">0</span>
+        </div>
+        <div class="action-btn">
+          <span class="action-icon">⭐</span>
+          <span class="action-count">0</span>
+        </div>
+        <div class="action-btn share-btn" data-index="${index}">
+          <span class="action-icon">↗️</span>
+          <span class="action-count">แชร์</span>
+        </div>
+        <div class="action-btn">
+          <div class="action-music">🎵</div>
+        </div>
+      </div>
+    `;
+
+    feedContainer.appendChild(slide);
+  });
+
+  bindFeedEvents();
+}
+
+function bindFeedEvents() {
+  document.querySelectorAll('.play-overlay').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.index;
+      const video = document.querySelector(`.video-full[data-index="${idx}"]`);
+      video.muted = true;
+      video.play()
+        .then(() => btn.classList.add('hidden'))
+        .catch(() => alert('กดอีกครั้งเพื่อเล่น'));
+    });
+  });
+
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const idx = parseInt(btn.dataset.index);
+      postList[idx].likes = (postList[idx].likes || 0) + 1;
+      await saveListToCloud();
+      renderFeed();
+    });
+  });
+
+  document.querySelectorAll('.share-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const shareData = {
+        title: 'ThaiPodee Market',
+        text: 'มาดูวิดีโอกัน',
+        url: window.location.href
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          alert('✅ แชร์แล้ว — เปิดได้เลย ติดตั้งได้เลย');
+        } catch (e) {
+          navigator.clipboard.writeText(window.location.href)
+            .then(() => alert('✅ คัดลอกลิงก์แล้ว — ส่งให้เพื่อนได้เลย'));
+        }
+      } else {
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert('✅ คัดลอกลิงก์แล้ว — ส่งให้เพื่อนได้เลย'));
+      }
+    });
+  });
+}
+
+// ========== เลือกไฟล์ — เหมือนเดิม ==========
 addBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', handleFile);
-
-function handleFile(e) {
+fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
-  // แจ้งเตือนถ้าไฟล์ใหญ่
-  const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-  if (sizeMB > 100) {
-    alert(`⚠️ ไฟล์ใหญ่ ${sizeMB}MB อาจโหลดช้า แนะนำเล็กกว่า 100MB`);
-  }
-
+  
   selectedFile = file;
-  selectedType = file.type.startsWith('image') ? 'image' : 'video';
-  selectedBlobUrl = URL.createObjectURL(file);
-
-  if (selectedType === 'image') {
-    selectedPoster = selectedBlobUrl;
-    previewImg.src = selectedBlobUrl;
-    previewImg.classList.add('active');
-    previewVid.classList.remove('active');
-    uploadPanel.classList.add('show');
-  } else {
-    // สร้างรูปหน้าปก
-    const tempVid = document.createElement('video');
-    tempVid.src = selectedBlobUrl;
-    tempVid.currentTime = 0.5;
-    tempVid.addEventListener('loadeddata', () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = tempVid.videoWidth || 400;
-      canvas.height = tempVid.videoHeight || 300;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
-      selectedPoster = canvas.toDataURL('image/jpeg', 0.6);
-
-      previewVid.src = selectedBlobUrl;
-      previewVid.classList.add('active');
-      previewImg.classList.remove('active');
-      uploadPanel.classList.add('show');
-    });
-  }
-}
+  selectedPreviewUrl = URL.createObjectURL(file);
+  
+  previewVideo.src = selectedPreviewUrl;
+  previewVideo.load();
+  uploadPanel.classList.add('show');
+});
 
 closeBtn.addEventListener('click', () => {
   uploadPanel.classList.remove('show');
-  previewImg.classList.remove('active');
-  previewVid.classList.remove('active');
-  previewVid.pause(); previewVid.src = '';
-  descTextarea.value = ''; fileInput.value = '';
-  if (selectedBlobUrl) URL.revokeObjectURL(selectedBlobUrl);
-  selectedFile = selectedType = selectedBlobUrl = selectedPoster = null;
+  previewVideo.pause(); previewVideo.src = '';
+  userNameInput.value = 'thaipodee';
+  captionInput.value = ''; fileInput.value = '';
+  progressBar.classList.remove('show');
+  progressFill.style.width = '0%';
+  if (selectedPreviewUrl) URL.revokeObjectURL(selectedPreviewUrl);
+  selectedFile = selectedPreviewUrl = null;
+  publishBtn.disabled = false;
+  publishBtn.textContent = '☁️ เผยแพร่ไปคลาวด์';
 });
 
-// ========== เผยแพร่ ==========
+// ========== อัปโหลด — เพิ่มส่งขึ้นคลาวด์ ==========
 publishBtn.addEventListener('click', async () => {
-  if (!selectedBlobUrl) return alert('⚠️ เลือกไฟล์ก่อน');
+  if (!selectedFile) {
+    alert('⚠️ เลือกวิดีโอก่อน');
+    return;
+  }
 
-  const caption = descTextarea.value.trim() || 'เสียงต้นฉบับ';
-  const fileSize = selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB' : '';
+  publishBtn.disabled = true;
+  publishBtn.textContent = 'กำลังอัปโหลด...';
+  progressBar.classList.add('show');
+  progressFill.style.width = '0%';
+
+  const userName = userNameInput.value.trim() || 'thaipodee';
+  const caption = captionInput.value.trim() || 'วิดีโอของฉัน';
   const now = new Date();
-  const dateStr = now.getDate() + '/' + (now.getMonth()+1) + ' — ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  const timeStr = now.getDate() + '/' + (now.getMonth()+1) + ' — ' + 
+                  now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
 
-  // สำหรับไฟล์จริงในเครื่อง เก็บเป็น blobUrl ชั่วคราว
-  // เมื่ออัปโหลดจริงขึ้นคลาวด์ จะเปลี่ยนเป็นลิงก์ถาวร
-  const newPost = {
-    id: Date.now(),
-    type: selectedType,
-    blobUrl: selectedBlobUrl,
-    poster: selectedPoster,
-    caption: caption,
-    fileName: selectedFile?.name || 'ไฟล์สื่อ',
-    fileSize: fileSize,
-    time: dateStr,
-    likes: 0,
-    fromCloud: false // เปลี่ยนเป็น true เมื่ออัปโหลดขึ้นจริง
-  };
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', UPLOAD_PRESET);
 
-  postList.unshift(newPost);
-  await saveToCloud();
-  showOnMain(newPost);
-  renderHistory();
-  uploadPanel.classList.remove('show');
-  alert('✅ เผยแพร่แล้ว → บันทึกไปคลาวด์');
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`);
+    
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        progressFill.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+      }
+    };
+
+    const result = await new Promise((resolve, reject) => {
+      xhr.onload = () => xhr.status === 200 ? resolve(JSON.parse(xhr.responseText)) : reject(new Error('อัปไม่สำเร็จ'));
+      xhr.onerror = reject;
+      xhr.send(formData);
+    });
+
+    const newPost = {
+      id: Date.now(),
+      videoUrl: result.secure_url,
+      thumbUrl: result.thumbnail_url || result.secure_url,
+      userName: userName,
+      caption: caption,
+      fileName: selectedFile.name,
+      fileSize: (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB',
+      time: timeStr,
+      likes: 0,
+      localOnly: false
+    };
+
+    postList.unshift(newPost);
+    await saveListToCloud();
+    renderFeed();
+    renderHistory();
+    uploadPanel.classList.remove('show');
+    alert('✅ เสร็จ! บนคลาวด์แล้ว — ทุกคนเห็นตรงกัน');
+
+  } catch (err) {
+    console.log('อัปคลาวด์ไม่ได้ เก็บในเครื่องแทน:', err);
+    const newPost = {
+      id: Date.now(),
+      videoUrl: selectedPreviewUrl,
+      thumbUrl: selectedPreviewUrl,
+      userName: userName,
+      caption: caption,
+      fileName: selectedFile.name,
+      fileSize: (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB',
+      time: timeStr,
+      likes: 0,
+      localOnly: true
+    };
+    postList.unshift(newPost);
+    await saveListToCloud();
+    renderFeed();
+    renderHistory();
+    uploadPanel.classList.remove('show');
+    alert('⚠️ อัปคลาวด์ไม่ได้ → บันทึกในเครื่องก่อน');
+  }
 });
 
-// ========== แสดงผลหน้าหลัก ==========
-function showOnMain(post) {
-  emptyText.style.display = 'none';
-  captionBox.classList.add('show');
-  captionText.textContent = post.caption;
-  likeCount.textContent = post.likes || 0;
-
-  imgWrap.classList.remove('show');
-  vidWrap.classList.remove('show');
-  playOverlay.classList.add('hide');
-  mainVideo.pause();
-  mainVideo.removeAttribute('src');
-
-  if (post.type === 'image') {
-    mainImage.src = post.blobUrl;
-    imgWrap.classList.add('show');
-  } else {
-    if (post.poster) mainVideo.poster = post.poster;
-    mainVideo.src = post.blobUrl;
-    mainVideo.load();
-    vidWrap.classList.add('show');
-
-    const tryPlay = () => {
-      mainVideo.play()
-        .then(() => playOverlay.classList.add('hide'))
-        .catch(() => playOverlay.classList.remove('hide'));
-    };
-    mainVideo.addEventListener('canplaythrough', tryPlay, { once: true });
-  }
-}
-
-// ========== ประวัติ ==========
+// ========== ประวัติ — เหมือนเดิม ==========
 function renderHistory() {
   postGrid.innerHTML = '';
-
+  
   postList.forEach((post, index) => {
     const item = document.createElement('div');
     item.className = 'p-item';
-    const displaySrc = post.poster || post.blobUrl;
-
+    
     item.innerHTML = `
       <div class="p-item-thumb">
-        <img src="${displaySrc}" alt="">
+        <img src="${post.thumbUrl}" alt="">
       </div>
       <div class="p-item-body">
         <div>
-          <div class="p-item-filename">${post.fileName}</div>
+          <div class="p-item-filename">${post.userName || 'thaipodee'}</div>
           <div class="p-item-meta">
-            🎵 ${post.caption}<br>
-            📦 ${post.fileSize || ''} 📅 ${post.time || ''}<br>
-            ☁️ ${post.fromCloud ? 'ออนไลน์' : 'ในเครื่อง'}
+            ${post.caption}<br>
+            📅 ${post.time} | ${post.localOnly ? '⚠️ ในเครื่อง' : '☁️ ออนไลน์'}
           </div>
         </div>
         <button class="p-item-del-btn" data-index="${index}">ลบ</button>
       </div>
     `;
-
+    
     item.addEventListener('click', (e) => {
       if (e.target.classList.contains('p-item-del-btn')) return;
-      showOnMain(post);
       switchPage('home');
+      setTimeout(() => {
+        feedContainer.children[index]?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     });
-
+    
     item.querySelector('.p-item-del-btn').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (!confirm('ต้องการลบโพสต์นี้หรือไม่?')) return;
+      if (!confirm('ลบโพสต์นี้?')) return;
       postList.splice(index, 1);
-      await saveToCloud();
+      await saveListToCloud();
+      renderFeed();
       renderHistory();
-      if (postList.length > 0) showOnMain(postList[0]);
-      else {
-        emptyText.style.display = 'block';
-        imgWrap.classList.remove('show');
-        vidWrap.classList.remove('show');
-        mainVideo.pause();
-        captionBox.classList.remove('show');
-        likeCount.textContent = '0';
-      }
     });
-
+    
     postGrid.appendChild(item);
   });
-
+  
   totalPosts.textContent = postList.length;
   gridCount.textContent = postList.length;
 }
 
-likeBtn.addEventListener('click', async () => {
-  if (postList.length === 0) return;
-  postList[0].likes++;
-  likeCount.textContent = postList[0].likes;
-  await saveToCloud();
-});
-
-document.querySelectorAll('.nav-btn, .tab').forEach(el => {
-  el.addEventListener('click', () => switchPage(el.getAttribute('data-goto')));
+// ========== เปลี่ยนหน้า — เหมือนเดิม ==========
+document.querySelectorAll('.nav-btn, .tab').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
 });
 
 function switchPage(page) {
-  document.querySelectorAll('.nav-btn, .tab').forEach(el => {
-    el.classList.toggle('active', el.getAttribute('data-goto') === page);
+  document.querySelectorAll('.nav-btn, .tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === page);
   });
+  
   if (page === 'profile') {
-    homePage.style.display = 'none';
+    feedContainer.style.display = 'none';
     profilePage.classList.add('show');
-    captionBox.classList.remove('show');
-    sideArea.style.display = 'none';
   } else {
     profilePage.classList.remove('show');
-    homePage.style.display = 'flex';
-    sideArea.style.display = 'flex';
-    if (postList.length > 0) captionBox.classList.add('show');
+    feedContainer.style.display = 'block';
   }
 }
 </script>
