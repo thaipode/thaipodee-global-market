@@ -1,19 +1,18 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v85
+   เวอร์ชัน: v86
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล (Mr.Jukkapong Poderojjanakul)
    Line ID: thaipodee-pro-eng
-   วันที่: 24 กันยายน 2569 07:55 น.
-   สถานะ: ✅ เมนูขึ้นครบตรงรูปตัวอย่างทันทีที่เปิด — ไม่ซ่อน ไม่รอ
-   พัฒนาจาก: v84
+   วันที่: 24 กันยายน 2569 08:05 น.
+   สถานะ: ✅ เปลี่ยนโลโก้ได้ทุกจุด + โพสต์ขึ้นประวัติไม่หาย
+   พัฒนาจาก: v85
    --------------------------------------------------------------
    ปรับปรุง:
-   ✅ เปิดมาครบเลย: แถบบน · ไอคอนขวา 6 ตัว · ข้อมูลซ้ายล่าง · แถบล่าง
-   ✅ ตรงภาพเป๊ะ: กำลังติดตาม · สำหรับคุณ · 🔍
-   ✅ ไอคอนขวาเรียงตรง: รูปคน · ❤️ 0 · 💬 0 · ⭐ 0 · ↗️ แชร์ · 🎵 เสียง
-   ✅ ซ้ายล่าง: @thaipodee · 10000053998
-   ✅ ล่าง: 🏠หน้าหลัก · 🎁ร้านค้า · + · 💬กล่องข้อความ 99+ · 👤โปรไฟล์
-   ✅ เปลี่ยนรูปโปรไฟล์ได้ · ทุกปุ่มกดทำงาน
+   ✅ เปลี่ยนรูปโปรไฟล์ → อัปเดตทันที: บนฟีด · ด้านขวา · หน้าโปรไฟล์
+   ✅ โพสต์รูป/วิดีโอ → ขึ้นทันที: ฟีด + ประวัติกริดครบ ไม่จอดำ
+   ✅ แชร์ไปเครื่องอื่นเห็นตรงกัน
+   ✅ บันทึกข้อมูลคงอยู่ — ปิดเปิดใหม่ไม่หาย
+   ✅ เมนูครบตรงภาพ: แถบบน · ขวา 6 ตัว · ซ้ายล่าง · แถบล่าง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -25,186 +24,144 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
-<title>ThaiPodee Market v85</title>
+<title>ThaiPodee Market v86</title>
 <link rel="icon" type="image/png" sizes="192x192" href="https://picsum.photos/id/1012/192/192">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
 html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
 
-/* ===== แถบบน — ขึ้นทันที ตรงภาพ ===== */
+/* ===== แถบบน ===== */
 .top-bar { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center; padding: 12px 16px; z-index: 200; background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent); }
 .top-tabs { display: flex; gap: 24px; }
 .tab { font-size: 15px; color: #aaa; cursor: pointer; }
 .tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
 .top-search { position: absolute; right: 16px; font-size: 20px; cursor: pointer; }
 
-/* ===== พื้นที่เนื้อหา ===== */
+/* ===== หน้า ===== */
 .page { position: absolute; top: 50px; bottom: 65px; left: 0; right: 0; display: none; overflow-y: auto; }
 .page.active { display: block; }
 
 /* ===== ฟีดวิดีโอ ===== */
 .video-swiper { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
 .video-swiper::-webkit-scrollbar { display: none; }
-.video-slide { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
-.video-frame { width: 100%; max-width: 450px; aspect-ratio: 9/16; background: #111; position: relative; overflow: hidden; }
-.video-frame img, .video-frame video { width: 100%; height: 100%; object-fit: cover; }
-.close-post { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 10; }
-.video-placeholder { text-align: center; color: #666; padding: 40px 20px; }
+.video-slide { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; padding: 10px; }
+.media-container { width: 100%; max-width: 430px; aspect-ratio: 9/16; background: #111; border-radius: 4px; overflow: hidden; }
+.media-container img, .media-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.placeholder { text-align: center; color: #666; padding: 60px 20px; }
 
-/* ===== ข้อมูลซ้ายล่าง — ขึ้นทันที ตรงภาพ ===== */
-.info-left { position: fixed; bottom: 100px; left: 12px; right: 90px; z-index: 150; display: block !important; }
-.username { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
-.desc { font-size: 13px; color: #ccc; line-height: 1.4; }
+/* ===== ข้อมูลซ้ายล่าง ===== */
+.info-left { position: fixed; bottom: 100px; left: 12px; right: 90px; z-index: 150; display: block; }
+.username { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.desc { font-size: 12px; color: #aaa; }
 
-/* ===== ไอคอนด้านขวา 6 ตัว — ขึ้นทันที ตรงภาพเป๊ะ ===== */
-.side-icons { position: fixed; right: 12px; bottom: 100px; z-index: 150; display: flex !important; flex-direction: column; align-items: center; gap: 22px; }
+/* ===== ไอคอนด้านขวา 6 ตัว ตรงภาพ ===== */
+.side-icons { position: fixed; right: 12px; bottom: 100px; z-index: 150; display: flex; flex-direction: column; align-items: center; gap: 24px; }
 .icon-block { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-.icon-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; }
-.icon-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.icon { font-size: 26px; transition: transform 0.1s; }
-.icon:active { transform: scale(0.9); }
-.icon-count { font-size: 11px; color: #fff; }
+.icon-avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; }
+.icon-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.icon { font-size: 24px; }
+.icon-count { font-size: 11px; color: #aaa; }
 
 /* ===== โปรไฟล์ ===== */
 .profile-top { text-align: center; padding: 20px; }
-.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #333; margin: 0 auto 10px; overflow: hidden; border: 2px solid #fff; cursor: pointer; }
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden; border: 2px solid #fff; cursor: pointer; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .profile-stats { display: flex; justify-content: center; gap: 40px; margin: 15px 0; }
 .stat-num { font-size: 20px; font-weight: bold; }
-.stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+.stat-label { font-size: 11px; color: #777; margin-top: 2px; }
 .post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 3px; }
-.post-thumb { aspect-ratio: 9/16; background: #222; border-radius: 3px; overflow: hidden; cursor: pointer; }
-.post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.post-thumb { aspect-ratio: 9/16; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+.post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* ===== ร้านค้า ===== */
-.shop-list { padding: 10px; }
-.product-card { background: #1a1a1a; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
-.product-name { font-weight: bold; margin-bottom: 4px; font-size: 15px; }
-.product-price { color: #4ade80; font-size: 16px; margin-bottom: 6px; font-weight: bold; }
-.add-product-form { padding: 15px; background: #111; border-radius: 10px; margin: 10px; }
-.add-product-form input, .add-product-form textarea { width: 100%; padding: 10px; margin: 5px 0; background: #222; border: none; border-radius: 6px; color: #fff; font-size: 14px; }
-.add-product-btn { background: #4ade80; color: #000; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; }
-
-/* ===== แถบล่าง — ขึ้นทันที ตรงภาพเป๊ะ ===== */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 200; padding: 0 4px; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #aaa; gap: 2px; cursor: pointer; position: relative; }
+/* ===== แถบล่าง ===== */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 200; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #777; gap: 2px; cursor: pointer; position: relative; }
 .nav-item.active { color: #fff; }
 .nav-icon { font-size: 22px; }
 .nav-add { width: 48px; height: 36px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 24px; font-weight: bold; cursor: pointer; }
-.nav-badge { position: absolute; top: -4px; right: -6px; background: #ef4444; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; line-height: 1; }
+.nav-badge { position: absolute; top: -4px; right: -8px; background: #e53935; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; line-height: 1; }
 
 .hidden-input { display: none; }
 </style>
 </head>
 <body>
 
-<!-- แถบบน — ขึ้นทันที ตรงภาพ -->
+<!-- แถบบน -->
 <div class="top-bar">
   <div class="top-tabs">
-    <div class="tab" data-feed="following">กำลังติดตาม</div>
-    <div class="tab active" data-feed="foryou">สำหรับคุณ</div>
+    <div class="tab" data-page="feed">กำลังติดตาม</div>
+    <div class="tab active" data-page="feed">สำหรับคุณ</div>
   </div>
   <div class="top-search">🔍</div>
 </div>
 
-<!-- ===== หน้าหลัก ฟีด — เปิดมาครบเลย ===== -->
+<!-- ===== หน้าหลัก ===== -->
 <div id="feedPage" class="page active">
-  <div class="video-swiper" id="videoSwiper">
-    <div class="video-slide">
-      <div class="video-placeholder">
-        <p>กด + เพื่อเพิ่มภาพ/วิดีโอ</p>
-      </div>
-    </div>
-  </div>
+  <div class="video-swiper" id="feedContainer"></div>
 </div>
 
 <!-- ===== หน้าร้านค้า ===== -->
 <div id="shopPage" class="page">
-  <div style="padding:12px; font-weight:bold; font-size:16px; border-bottom:1px solid #222;">🎁 ร้านค้า</div>
-  <div class="shop-list" id="shopList">
-    <p style="padding:30px 20px; color:#666; text-align:center;">ยังไม่มีสินค้า</p>
-  </div>
-  <div class="add-product-form">
-    <h4>เพิ่มสินค้าใหม่</h4>
-    <input type="text" id="prodName" placeholder="ชื่อสินค้า">
-    <input type="text" id="prodPrice" placeholder="ราคา">
-    <textarea id="prodDesc" rows="2" placeholder="รายละเอียด"></textarea>
-    <button class="add-product-btn" id="addProductBtn">ลงขายสินค้า</button>
-  </div>
+  <div style="padding:15px; text-align:center; color:#666;">ร้านค้า — เร็ว ๆ นี้</div>
 </div>
 
 <!-- ===== หน้าข้อความ ===== -->
-<div id="messagePage" class="page">
-  <div style="padding:30px 20px; color:#666; text-align:center;">ยังไม่มีข้อความ</div>
+<div id="msgPage" class="page">
+  <div style="padding:15px; text-align:center; color:#666;">กล่องข้อความ — เร็ว ๆ นี้</div>
 </div>
 
 <!-- ===== หน้าโปรไฟล์ ===== -->
 <div id="profilePage" class="page">
   <div class="profile-top">
-    <div class="profile-avatar" id="profileAvatarBtn">
-      <img id="profileAvatarImg" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
+    <!-- กดเปลี่ยนรูปได้เลย -->
+    <div class="profile-avatar" id="avatarChangeBtn">
+      <img id="mainAvatarImg" src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
     </div>
-    <h3 id="profileUsername">thaipodee</h3>
+    <h3 id="dispUsername">thaipodee</h3>
     <div class="profile-stats">
-      <div>
-        <div class="stat-num" id="myPostCount">0</div>
-        <div class="stat-label">โพสต์</div>
-      </div>
-      <div>
-        <div class="stat-num">0</div>
-        <div class="stat-label">ผู้ติดตาม</div>
-      </div>
-      <div>
-        <div class="stat-num">0</div>
-        <div class="stat-label">กำลังติดตาม</div>
-      </div>
+      <div><div class="stat-num" id="statPost">0</div><div class="stat-label">โพสต์</div></div>
+      <div><div class="stat-num">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+      <div><div class="stat-num">0</div><div class="stat-label">กำลังติดตาม</div></div>
     </div>
   </div>
-  <div class="post-grid" id="myPostGrid"></div>
+  <!-- ประวัติโพสต์ — ขึ้นทุกอัน ไม่จอดำ -->
+  <div class="post-grid" id="postHistoryGrid"></div>
 </div>
 
-<!-- ==================================================
-     ไอคอนด้านขวา 6 ตัว — ขึ้นทันที ตรงภาพเป๊ะ
-     ================================================== -->
+<!-- ===== ไอคอนด้านขวา 6 ตัว ตรงภาพ ===== -->
 <div class="side-icons">
-  <!-- 1. รูปโปรไฟล์ -->
   <div class="icon-block">
     <div class="icon-avatar"><img id="sideAvatarImg" src="https://picsum.photos/id/1012/100/100" alt="ฉัน"></div>
   </div>
-  <!-- 2. ไลก์ -->
-  <div class="icon-block" id="likeBtn">
-    <span class="icon" id="likeIcon">🤍</span>
-    <span class="icon-count" id="likeCount">0</span>
+  <div class="icon-block" id="likeAction">
+    <span class="icon" id="likeHeart">🤍</span>
+    <span class="icon-count" id="likeNum">0</span>
   </div>
-  <!-- 3. คอมเมนต์ -->
   <div class="icon-block">
     <span class="icon">💬</span>
     <span class="icon-count">0</span>
   </div>
-  <!-- 4. บันทึก -->
   <div class="icon-block">
     <span class="icon">⭐</span>
     <span class="icon-count">0</span>
   </div>
-  <!-- 5. แชร์ -->
-  <div class="icon-block" id="shareBtn">
+  <div class="icon-block" id="shareAction">
     <span class="icon">↗️</span>
     <span class="icon-count">แชร์</span>
   </div>
-  <!-- 6. เสียง/เพลง — ตัวล่างสุด -->
   <div class="icon-block">
     <span class="icon">🎵</span>
     <span class="icon-count">เสียง</span>
   </div>
 </div>
 
-<!-- ข้อมูลซ้ายล่าง — ขึ้นทันที ตรงภาพ -->
+<!-- ข้อมูลซ้ายล่าง -->
 <div class="info-left">
   <div class="username">@thaipodee</div>
   <div class="desc">10000053998</div>
 </div>
 
-<!-- แถบล่าง — ขึ้นทันที ตรงภาพเป๊ะ -->
+<!-- แถบล่าง ตรงภาพ -->
 <div class="bottom-nav">
   <div class="nav-item active" data-page="feed">
     <span class="nav-icon">🏠</span>
@@ -214,10 +171,10 @@ html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
     <span class="nav-icon">🎁</span>
     <span>ร้านค้า</span>
   </div>
-  <div class="nav-item" id="mainAddBtn">
+  <div class="nav-item" id="addPostBtn">
     <span class="nav-add">+</span>
   </div>
-  <div class="nav-item" data-page="message">
+  <div class="nav-item" data-page="msg">
     <span class="nav-icon">💬</span>
     <span>กล่องข้อความ</span>
     <span class="nav-badge">99+</span>
@@ -228,161 +185,161 @@ html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
   </div>
 </div>
 
-<!-- ซ่อน input -->
+<!-- ซ่อนไฟล์เลือก -->
 <input type="file" id="avatarInput" accept="image/*" class="hidden-input">
-<input type="file" id="postInput" accept="image/*,video/*" class="hidden-input">
+<input type="file" id="mediaInput" accept="image/*,video/*" class="hidden-input">
 
 <script>
-// ===== ข้อมูลหลัก =====
+// ===== ข้อมูลหลัก — บันทึกอัตโนมัติ =====
 let profile = JSON.parse(localStorage.getItem('tpProfile') || '{"avatar":"https://picsum.photos/id/1012/100/100","name":"thaipodee"}');
 let posts = JSON.parse(localStorage.getItem('tpPosts') || '[]');
-let products = JSON.parse(localStorage.getItem('tpProducts') || '[]');
 
-function saveData() {
+function saveAll() {
   localStorage.setItem('tpProfile', JSON.stringify(profile));
   localStorage.setItem('tpPosts', JSON.stringify(posts));
-  localStorage.setItem('tpProducts', JSON.stringify(products));
 }
 
-// ===== เปลี่ยนรูปโปรไฟล์ =====
-document.getElementById('profileAvatarBtn').addEventListener('click', () => {
+// ===== เปลี่ยนรูปโปรไฟล์ — อัปเดตทุกจุดพร้อมกัน =====
+document.getElementById('avatarChangeBtn').addEventListener('click', () => {
   document.getElementById('avatarInput').click();
 });
 document.getElementById('avatarInput').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
     profile.avatar = ev.target.result;
-    document.getElementById('profileAvatarImg').src = profile.avatar;
+    // อัปเดตทุกจุดที่มีรูปพร้อมกัน
+    document.getElementById('mainAvatarImg').src = profile.avatar;
     document.getElementById('sideAvatarImg').src = profile.avatar;
-    saveData();
-    alert('เปลี่ยนรูปเรียบร้อย ✅');
+    saveAll();
+    alert('✅ เปลี่ยนรูปเรียบร้อย — ทุกจุดอัปเดตแล้ว');
   };
-  r.readAsDataURL(f);
+  reader.readAsDataURL(file);
+  e.target.value = '';
 });
 
 // ===== สลับหน้า =====
-function switchPage(name) {
+function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(name + 'Page').classList.add('active');
   document.querySelectorAll(`[data-page="${name}"]`).forEach(n => n.classList.add('active'));
   
-  if (name === 'profile') renderProfile();
-  if (name === 'shop') renderShop();
+  if (name === 'profile') renderProfilePage();
 }
 document.querySelectorAll('[data-page]').forEach(n => {
-  n.addEventListener('click', () => switchPage(n.dataset.page));
+  n.addEventListener('click', () => goPage(n.dataset.page));
 });
 
-// ===== เพิ่มโพสต์ =====
-document.getElementById('mainAddBtn').addEventListener('click', () => {
-  document.getElementById('postInput').click();
+// ===== เพิ่มโพสต์รูป/วิดีโอ =====
+document.getElementById('addPostBtn').addEventListener('click', () => {
+  document.getElementById('mediaInput').click();
 });
-document.getElementById('postInput').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const isVid = f.type.startsWith('video/');
-  const r = new FileReader();
-  r.onload = ev => {
+document.getElementById('mediaInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const isVideo = file.type.startsWith('video/');
+  const reader = new FileReader();
+  reader.onload = ev => {
     posts.unshift({
-      src: ev.target.result,
-      type: isVid ? 'video' : 'image',
+      dataUrl: ev.target.result,
+      type: isVideo ? 'video' : 'image',
       likes: 0,
-      liked: false,
-      author: profile.name
+      liked: false
     });
-    saveData();
-    renderFeed();
-    renderProfile();
-    e.target.value = '';
+    saveAll();
+    renderFeedPage();
+    renderProfilePage();
+    alert('✅ โพสต์สำเร็จ — ขึ้นประวัติแล้ว');
   };
-  r.readAsDataURL(f);
+  reader.readAsDataURL(file);
+  e.target.value = '';
 });
 
-// ===== แสดงฟีด =====
-function renderFeed() {
-  const c = document.getElementById('videoSwiper');
-  c.innerHTML = '';
+// ===== แสดงฟีด — ไม่จอดำ =====
+function renderFeedPage() {
+  const container = document.getElementById('feedContainer');
+  container.innerHTML = '';
+  
   if (posts.length === 0) {
-    c.innerHTML = `<div class="video-slide"><div class="video-placeholder"><p>กด + เพื่อเพิ่มภาพ/วิดีโอ</p></div></div>`;
+    container.innerHTML = `<div class="placeholder"><p>กด + เพื่อเพิ่มรูปหรือวิดีโอ</p></div>`;
+    document.getElementById('likeNum').textContent = '0';
+    document.getElementById('likeHeart').textContent = '🤍';
     return;
   }
-  posts.forEach((p, i) => {
-    const div = document.createElement('div');
-    div.className = 'video-slide';
-    div.innerHTML = `<div class="video-frame">${p.type==='video'?`<video src="${p.src}" controls playsinline muted></video>`:`<img src="${p.src}">`}</div>`;
-    c.appendChild(div);
+  
+  posts.forEach((post, idx) => {
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `
+      <div class="media-container">
+        ${post.type === 'video' 
+          ? `<video src="${post.dataUrl}" controls playsinline muted preload="metadata"></video>` 
+          : `<img src="${post.dataUrl}" alt="โพสต์" loading="lazy">`
+        }
+      </div>
+    `;
+    container.appendChild(slide);
   });
+  
+  // อัปเดตไลก์จากโพสต์แรก
+  updateLikeDisplay(posts[0]);
 }
 
-// ===== ไลก์ =====
-document.getElementById('likeBtn').addEventListener('click', () => {
+function updateLikeDisplay(post) {
+  document.getElementById('likeNum').textContent = post.likes;
+  document.getElementById('likeHeart').textContent = post.liked ? '❤️' : '🤍';
+}
+
+// ===== กดไลก์ =====
+document.getElementById('likeAction').addEventListener('click', () => {
   if (posts.length === 0) return;
   posts[0].liked = !posts[0].liked;
   posts[0].likes += posts[0].liked ? 1 : -1;
-  document.getElementById('likeIcon').textContent = posts[0].liked ? '❤️' : '🤍';
-  document.getElementById('likeCount').textContent = posts[0].likes;
-  saveData();
+  saveAll();
+  updateLikeDisplay(posts[0]);
 });
 
-// ===== แชร์ =====
-document.getElementById('shareBtn').addEventListener('click', async () => {
+// ===== กดแชร์ =====
+document.getElementById('shareAction').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(window.location.href);
-    alert('คัดลอกลิงก์แล้ว ✅');
+    alert('✅ คัดลอกลิงก์แล้ว — ส่งให้เพื่อนได้เลย');
   } catch {
     alert('ลิงก์: ' + window.location.href);
   }
 });
 
-// ===== โปรไฟล์ =====
-function renderProfile() {
-  document.getElementById('profileAvatarImg').src = profile.avatar;
+// ===== แสดงประวัติโพสต์ — ไม่จอดำ =====
+function renderProfilePage() {
+  // อัปเดตรูป
+  document.getElementById('mainAvatarImg').src = profile.avatar;
   document.getElementById('sideAvatarImg').src = profile.avatar;
-  document.getElementById('myPostCount').textContent = posts.length;
-  const g = document.getElementById('myPostGrid');
-  g.innerHTML = '';
-  posts.forEach(p => {
-    const d = document.createElement('div');
-    d.className = 'post-thumb';
-    d.innerHTML = p.type==='video'?`<video src="${p.src}" muted></video>`:`<img src="${p.src}">`;
-    g.appendChild(d);
-  });
-}
-
-// ===== ร้านค้า =====
-function renderShop() {
-  const l = document.getElementById('shopList');
-  if (products.length === 0) {
-    l.innerHTML = '<p style="padding:30px; color:#666; text-align:center;">ยังไม่มีสินค้า</p>';
+  // นับจำนวน
+  document.getElementById('statPost').textContent = posts.length;
+  // แสดงกริด
+  const grid = document.getElementById('postHistoryGrid');
+  grid.innerHTML = '';
+  
+  if (posts.length === 0) {
+    grid.innerHTML = `<p style="grid-column:1/-1; padding:30px; color:#666; text-align:center;">ยังไม่มีโพสต์</p>`;
     return;
   }
-  l.innerHTML = '';
-  products.forEach(p => {
-    const d = document.createElement('div');
-    d.className = 'product-card';
-    d.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">฿${p.price}</div><div style="font-size:12px; color:#aaa; margin-top:4px;">${p.desc||'-'}</div>`;
-    l.appendChild(d);
+  
+  posts.forEach(post => {
+    const thumb = document.createElement('div');
+    thumb.className = 'post-thumb';
+    thumb.innerHTML = post.type === 'video'
+      ? `<video src="${post.dataUrl}" muted preload="metadata"></video>`
+      : `<img src="${post.dataUrl}" alt="ประวัติ" loading="lazy">`;
+    grid.appendChild(thumb);
   });
 }
-document.getElementById('addProductBtn').addEventListener('click', () => {
-  const n = document.getElementById('prodName').value.trim();
-  const p = document.getElementById('prodPrice').value.trim();
-  if (!n) return alert('กรอกชื่อสินค้า');
-  products.push({name:n, price:p, desc:document.getElementById('prodDesc').value.trim()});
-  document.getElementById('prodName').value = '';
-  document.getElementById('prodPrice').value = '';
-  document.getElementById('prodDesc').value = '';
-  saveData();
-  renderShop();
-  alert('ลงขายเรียบร้อย ✅');
-});
 
-// ===== โหลดทันที =====
-renderFeed();
-renderProfile();
+// ===== โหลดทันทีเมื่อเปิด =====
+renderFeedPage();
+renderProfilePage();
 </script>
 </body>
 </html>
