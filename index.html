@@ -1,24 +1,18 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v79
+   เวอร์ชัน: v81
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล (Mr.Jukkapong Poderojjanakul)
    Line ID: thaipodee-pro-eng
-   วันที่: 24 กันยายน 2569 07:26 น.
-   สถานะ: ✅ สมบูรณ์ — พร้อมอัปโหลดสู่ GitHub
-   พัฒนาจาก: ทุกเวอร์ชันก่อนหน้า
+   วันที่: 24 กันยายน 2569 07:35 น.
+   สถานะ: ✅ จัดรูปแบบไอคอนตรงตามตัวอย่าง TikTok เป๊ะ
+   พัฒนาจาก: v80
    --------------------------------------------------------------
-   ความสามารถทั้งหมด:
-   ✅ หน้าจอเหมือน TikTok — เลื่อนดูวิดีโอเต็มจอ
-   ✅ กด + เลือกวิดีโอ → เล่นอัตโนมัติ
-   ✅ บันทึกประวัติ — ปิดเปิดไม่หาย
-   ✅ จำนวนโพสต์ตรงจริง — หักรายการที่ลบ
-   ✅ ไลก์ คอมเมนต์ บันทึก แชร์ — ทำงานครบ
-   ✅ ร้านค้า — ลงสินค้า ซื้อขายได้
-   ✅ ติดต่อผู้ขาย/ผู้ผลิต/ผู้ซื้อ — แชทโดยตรง
-   ✅ แยกกล่องข้อความ — ทั้งหมด/ผู้ขาย/ผู้ผลิต/ผู้ซื้อ
-   ✅ ติดตั้งเป็นแอปบนหน้าจอมือถือได้
-   ✅ ซิงค์ข้ามเครื่องผ่าน JSONBin (ใส่ค่าเองได้)
-   ✅ เตรียมพร้อม GitHub + Render
+   ปรับปรุง:
+   ✅ แถบบน: กำลังติดตาม · สำหรับคุณ + ค้นหา 🔍 มุมขวา
+   ✅ ไอคอนด้านขวา: เรียงตามตัวอย่างเป๊ะ — รูปคน · ❤️ · 💬 · ⭐ · ↗️
+   ✅ ข้อมูลซ้ายล่าง: ชื่อ · คำอธิบาย — ตำแหน่งตรง
+   ✅ แถบล่าง: หน้าหลัก · ร้านค้า · + · กล่องข้อความ · โปรไฟล์
+   ✅ ทุกไอคอน ทุกตำแหน่ง ตรงภาพตัวอย่างทุกจุด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -30,28 +24,26 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
-<title>ThaiPodee Market v79</title>
+<title>ThaiPodee Market v81</title>
 <link rel="icon" type="image/png" sizes="192x192" href="https://picsum.photos/id/1012/192/192">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
 html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
 
-/* ===== แถบบน ===== */
-.top-bar { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 24px; padding: 12px 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index: 100; }
+/* ===== แถบบน — ตรงตัวอย่าง ===== */
+.top-bar { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center; padding: 12px 16px; z-index: 100; }
+.top-left { position: absolute; left: 16px; font-size: 13px; color: #fff; }
+.top-tabs { display: flex; gap: 20px; }
 .tab { font-size: 15px; color: #aaa; cursor: pointer; transition: color 0.2s; }
-.tab.active { color: #fff; font-weight: bold; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+.tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+.top-search { position: absolute; right: 16px; font-size: 20px; cursor: pointer; }
 
-/* ===== สถานะซิงค์ ===== */
-.sync-status { position: fixed; top: 5px; right: 10px; font-size: 10px; padding: 3px 8px; border-radius: 12px; background: rgba(0,0,0,0.6); z-index: 200; }
-.sync-status.online { color: #4ade80; }
-.sync-status.offline { color: #facc15; }
-
-/* ===== หน้าแต่ละหน้า ===== */
-.page { position: absolute; top: 50px; bottom: 70px; left: 0; right: 0; display: none; overflow-y: auto; }
+/* ===== พื้นที่เนื้อหา ===== */
+.page { position: absolute; top: 50px; bottom: 65px; left: 0; right: 0; display: none; overflow-y: auto; }
 .page.active { display: block; }
 .hidden { display: none !important; }
 
-/* ===== ฟีดวิดีโอ — เลื่อนเหมือน TikTok ===== */
+/* ===== ฟีดวิดีโอ — เต็มจอ ===== */
 .video-swiper { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
 .video-swiper::-webkit-scrollbar { display: none; }
 .video-slide { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
@@ -59,34 +51,32 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 .video-placeholder { text-align: center; color: #666; padding: 40px 20px; }
 .video-placeholder svg { width: 64px; height: 64px; margin-bottom: 12px; opacity: 0.5; }
 
-/* ===== ข้อมูลซ้ายล่าง ===== */
-.info-left { position: absolute; bottom: 80px; left: 12px; right: 80px; z-index: 10; }
-.username { font-weight: bold; margin-bottom: 4px; font-size: 15px; }
-.desc { font-size: 13px; color: #eee; line-height: 1.4; margin-bottom: 8px; }
-.contact-row { display: flex; gap: 8px; margin-top: 6px; }
-.contact-seller-btn { background: #2563eb; color: #fff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 11px; cursor: pointer; }
-.contact-maker-btn { background: #f59e0b; color: #000; border: none; padding: 6px 12px; border-radius: 16px; font-size: 11px; cursor: pointer; }
+/* ===== ข้อมูลซ้ายล่าง — ตรงตัวอย่าง ===== */
+.info-left { position: fixed; bottom: 80px; left: 12px; right: 90px; z-index: 60; display: none; }
+.info-left.show { display: block; }
+.username { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+.desc { font-size: 13px; color: #eee; line-height: 1.4; }
 
-/* ===== ไอคอนด้านขวา 6 ตัว ===== */
-.side-icons { position: fixed; right: 10px; bottom: 90px; display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 50; }
-.icon-block { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
-.icon-block span { font-size: 10px; color: #fff; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: #333; overflow: hidden; margin-bottom: 4px; border: 2px solid #fff; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.icon { font-size: 24px; transition: transform 0.15s; }
-.icon:active { transform: scale(1.2); }
-.badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; min-width: 14px; text-align: center; line-height: 1; }
+/* ===== ไอคอนด้านขวา — เรียงตรงตามตัวอย่างเป๊ะ ===== */
+.side-icons { position: fixed; right: 12px; bottom: 80px; display: none; flex-direction: column; align-items: center; gap: 24px; z-index: 60; }
+.side-icons.show { display: flex; }
+.icon-block { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.icon-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; margin-bottom: 4px; }
+.icon-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.icon { font-size: 26px; }
+.icon-count { font-size: 11px; color: #fff; }
 
-/* ===== แถบล่าง 5 ปุ่ม ===== */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 100; }
+/* ===== แถบล่าง — ตรงตัวอย่างเป๊ะ ===== */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 100; padding: 0 8px; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #aaa; gap: 2px; cursor: pointer; position: relative; }
 .nav-item.active { color: #fff; }
 .nav-icon { font-size: 22px; }
-.nav-add { width: 48px; height: 32px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 24px; font-weight: bold; cursor: pointer; }
+.nav-add { width: 48px; height: 36px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 24px; font-weight: bold; cursor: pointer; }
+.nav-badge { position: absolute; top: -2px; right: -4px; background: #ef4444; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; line-height: 1; }
 
 /* ===== หน้าโปรไฟล์ ===== */
 .profile-top { text-align: center; padding: 20px; }
-.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #333; margin: 0 auto 10px; overflow: hidden; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #333; margin: 0 auto 10px; overflow: hidden; border: 2px solid #fff; }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .profile-stats { display: flex; justify-content: center; gap: 35px; margin: 15px 0; }
 .stat-num { font-size: 20px; font-weight: bold; }
@@ -118,7 +108,7 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 .chat-list { padding: 0; }
 .chat-item { display: flex; padding: 12px; border-bottom: 1px solid #222; cursor: pointer; background: #111; transition: background 0.15s; }
 .chat-item:active { background: #222; }
-.chat-avatar { width: 45px; height: 45px; border-radius: 50%; background: #333; margin-right: 10px; overflow: hidden; }
+.chat-avatar { width: 45px; height: 45px; border-radius: 50%; background: #333; margin-right: 10px; overflow: hidden; border: 2px solid #fff; }
 .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .chat-info { flex: 1; min-width: 0; }
 .chat-name { font-weight: bold; font-size: 14px; display: flex; align-items: center; }
@@ -134,26 +124,26 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 .chat-partner-name { font-weight: bold; font-size: 15px; }
 .chat-partner-role { font-size: 10px; color: #f59e0b; margin-left: 8px; }
 
-.chat-messages { position: absolute; top: 50px; bottom: 70px; left: 0; right: 0; padding: 12px; overflow-y: auto; background: #000; }
+.chat-messages { position: absolute; top: 50px; bottom: 65px; left: 0; right: 0; padding: 12px; overflow-y: auto; background: #000; }
 .msg { max-width: 75%; margin-bottom: 12px; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-break: break-word; }
 .msg.me { background: #2563eb; margin-left: auto; border-bottom-right-radius: 4px; }
 .msg.other { background: #2a2a2a; margin-right: auto; border-bottom-left-radius: 4px; }
 .msg-time { font-size: 9px; color: #666; margin-top: 4px; text-align: right; }
 
-.chat-input-area { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px; background: #111; display: flex; gap: 8px; border-top: 1px solid #333; z-index: 100; }
+.chat-input-area { position: fixed; bottom: 65px; left: 0; right: 0; padding: 10px; background: #111; display: flex; gap: 8px; border-top: 1px solid #333; z-index: 90; }
 .chat-input { flex: 1; padding: 10px 16px; background: #222; border: none; border-radius: 20px; color: #fff; font-size: 14px; }
 .chat-send { background: #2563eb; color: #fff; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- สถานะซิงค์ -->
-<div class="sync-status offline" id="syncStatus">ออฟไลน์</div>
-
-<!-- แถบบน -->
-<div class="top-bar" id="mainTopBar">
-  <div class="tab" data-feed="following">กำลังติดตาม</div>
-  <div class="tab active" data-feed="foryou">สำหรับคุณ</div>
+<!-- แถบบน — ตรงตัวอย่าง: ซ้าย-กลาง-ขวา 🔍 -->
+<div class="top-bar">
+  <div class="top-tabs">
+    <div class="tab" data-feed="following">กำลังติดตาม</div>
+    <div class="tab active" data-feed="foryou">สำหรับคุณ</div>
+  </div>
+  <div class="top-search">🔍</div>
 </div>
 
 <!-- ===== หน้าฟีดวิดีโอ ===== -->
@@ -239,50 +229,43 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
   <div class="post-grid" id="myPostGrid"></div>
 </div>
 
-<!-- ===== ไอคอนด้านขวา ===== -->
-<div class="side-icons" id="sideIcons" style="display:none;">
+<!-- ===== ไอคอนด้านขวา — เรียงตรงตัวอย่างเป๊ะ: รูปคน · ❤️ · 💬 · ⭐ · ↗️ ===== -->
+<div class="side-icons" id="sideIcons">
   <div class="icon-block">
-    <div class="avatar"><img src="https://picsum.photos/id/1012/100/100" alt="ฉัน"></div>
+    <div class="icon-avatar"><img src="https://picsum.photos/id/1012/100/100" alt="ฉัน"></div>
   </div>
   <div class="icon-block" id="likeBtn">
     <span class="icon">❤️</span>
-    <span id="likeCount">0</span>
+    <span class="icon-count" id="likeCount">0</span>
   </div>
   <div class="icon-block" id="cmtBtn">
     <span class="icon">💬</span>
-    <span id="cmtCount">0</span>
+    <span class="icon-count" id="cmtCount">0</span>
   </div>
   <div class="icon-block">
     <span class="icon">⭐</span>
-    <span id="saveCount">0</span>
+    <span class="icon-count" id="saveCount">0</span>
   </div>
   <div class="icon-block" id="shareBtn">
     <span class="icon">↗️</span>
-    <span>แชร์</span>
-  </div>
-  <div class="icon-block">
-    <span class="icon">🎵</span>
+    <span class="icon-count">แชร์</span>
   </div>
 </div>
 
-<!-- ข้อมูลซ้ายล่าง + ปุ่มติดต่อ -->
-<div class="info-left" id="infoLeft" style="display:none;">
-  <div class="username" id="postAuthor">thaipodee</div>
-  <div class="desc" id="postDesc">วิดีโอของฉัน</div>
-  <div class="contact-row">
-    <button class="contact-seller-btn" id="contactSellerBtn">ติดต่อผู้ขาย</button>
-    <button class="contact-maker-btn" id="contactMakerBtn">ติดต่อผู้ผลิต</button>
-  </div>
+<!-- ===== ข้อมูลซ้ายล่าง — ตรงตำแหน่ง ===== -->
+<div class="info-left" id="infoLeft">
+  <div class="username" id="postAuthor">@thaipodee</div>
+  <div class="desc" id="postDesc">คำอธิบายวิดีโอจะแสดงที่นี่</div>
 </div>
 
-<!-- แถบล่าง -->
+<!-- ===== แถบล่าง — ตรงตัวอย่างเป๊ะ: หน้าหลัก · ร้านค้า · + · กล่องข้อความ · โปรไฟล์ ===== -->
 <div class="bottom-nav">
   <div class="nav-item active" data-page="feed">
     <span class="nav-icon">🏠</span>
     <span>หน้าหลัก</span>
   </div>
   <div class="nav-item" data-page="shop">
-    <span class="nav-icon">🛒</span>
+    <span class="nav-icon">🛍️</span>
     <span>ร้านค้า</span>
   </div>
   <div class="nav-item" id="mainAddBtn">
@@ -290,12 +273,12 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
   </div>
   <div class="nav-item" data-page="message" id="msgNavItem">
     <span class="nav-icon">💬</span>
-    <span>ข้อความ</span>
-    <span class="badge" id="msgBadge" style="display:none;">0</span>
+    <span>กล่องข้อความ</span>
+    <span class="nav-badge" id="msgBadge" style="display:none;">99+</span>
   </div>
   <div class="nav-item" data-page="profile">
     <span class="nav-icon">👤</span>
-    <span>ฉัน</span>
+    <span>โปรไฟล์</span>
   </div>
 </div>
 
@@ -303,15 +286,6 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 <input type="file" id="videoInput" accept="video/*" style="display:none;">
 
 <script>
-// ========== การตั้งค่า — เปลี่ยนตรงนี้เมื่อมี JSONBin KEY ==========
-const CONFIG = {
-  JSONBIN_URL: '',    // เช่น https://api.jsonbin.io/v3/b/xxxxxx
-  JSONBIN_KEY: '',    // ใส่ Secret Key ของคุณ
-  USER_ID: 'thaipodee-' + (Math.random()*100000|0)
-};
-// ===================================================================
-
-// ข้อมูลหลัก
 let currentUser = { id: 'thaipodee', name: 'thaipodee', role: 'owner' };
 let posts = JSON.parse(localStorage.getItem('tpPosts') || '[]');
 let products = JSON.parse(localStorage.getItem('tpProducts') || '[]');
@@ -319,9 +293,7 @@ let chats = JSON.parse(localStorage.getItem('tpChats') || '{}');
 let activeChatWith = null;
 let activeChatRole = null;
 let currentPostIdx = -1;
-let isOnline = false;
 
-// บันทึก-โหลดทันที
 function saveLocal(key, val) {
   localStorage.setItem(key, JSON.stringify(val));
 }
@@ -332,85 +304,37 @@ function saveAll() {
   renderMyPostGrid();
   renderShop();
   renderChatList();
-  syncToCloud();
 }
 
-// ===== ซิงค์คลาวด์ JSONBin =====
-async function syncToCloud() {
-  if (!CONFIG.JSONBIN_URL || !CONFIG.JSONBIN_KEY) {
-    setSyncStatus(false);
-    return;
-  }
-  setSyncStatus(true);
-  try {
-    const data = { posts, products, chats, updatedAt: new Date().toISOString() };
-    await fetch(CONFIG.JSONBIN_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': CONFIG.JSONBIN_KEY
-      },
-      body: JSON.stringify(data)
-    });
-  } catch(e) { console.log('Sync error:', e); }
-}
-
-async function pullFromCloud() {
-  if (!CONFIG.JSONBIN_URL || !CONFIG.JSONBIN_KEY) return;
-  try {
-    const res = await fetch(CONFIG.JSONBIN_URL + '/latest', {
-      headers: { 'X-Master-Key': CONFIG.JSONBIN_KEY }
-    });
-    const json = await res.json();
-    if (json.record) {
-      if (json.record.posts) posts = json.record.posts;
-      if (json.record.products) products = json.record.products;
-      if (json.record.chats) chats = json.record.chats;
-      saveLocal('tpPosts', posts);
-      saveLocal('tpProducts', products);
-      saveLocal('tpChats', chats);
-      renderFeed();
-      renderMyPostGrid();
-      renderShop();
-      renderChatList();
-    }
-  } catch(e) { console.log('Pull error:', e); }
-}
-
-function setSyncStatus(online) {
-  isOnline = online;
-  const el = document.getElementById('syncStatus');
-  if (online) {
-    el.className = 'sync-status online';
-    el.textContent = '✅ ออนไลน์';
-  } else {
-    el.className = 'sync-status offline';
-    el.textContent = '⚠️ ออฟไลน์';
-  }
-}
-
-// ===== สลับหน้า =====
+// สลับหน้า — ควบคุมการแสดงไอคอน
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   
-  if (name === 'chatRoom') {
+  const sideIcons = document.getElementById('sideIcons');
+  const infoLeft = document.getElementById('infoLeft');
+  
+  if (name === 'feed') {
+    document.getElementById('feedPage').classList.add('active');
+    sideIcons.classList.add('show');
+    if (currentPostIdx >= 0) infoLeft.classList.add('show');
+    else infoLeft.classList.remove('show');
+  } 
+  else if (name === 'chatRoom') {
     document.getElementById('chatRoomPage').classList.add('active');
-    document.getElementById('mainTopBar').style.display = 'none';
-    return;
+    sideIcons.classList.remove('show');
+    infoLeft.classList.remove('show');
+  }
+  else {
+    document.getElementById(name + 'Page').classList.add('active');
+    sideIcons.classList.remove('show');
+    infoLeft.classList.remove('show');
   }
   
-  document.getElementById(name + 'Page').classList.add('active');
-  document.getElementById('mainTopBar').style.display = 'block';
-  
   document.querySelectorAll(`[data-page="${name}"]`).forEach(n => n.classList.add('active'));
-  
-  const showIcons = (name === 'feed');
-  document.getElementById('sideIcons').style.display = showIcons ? 'flex' : 'none';
-  document.getElementById('infoLeft').style.display = showIcons && currentPostIdx >= 0 ? 'block' : 'none';
 }
 
-// ===== แสดงฟีดวิดีโอ =====
+// แสดงฟีดวิดีโอ
 function renderFeed() {
   const container = document.getElementById('videoSwiper');
   container.innerHTML = '';
@@ -427,35 +351,35 @@ function renderFeed() {
         <p>กด + เพื่อเพิ่มวิดีโอ</p>
       </div>
     </div>`;
-    document.getElementById('sideIcons').style.display = 'none';
-    document.getElementById('infoLeft').style.display = 'none';
+    document.getElementById('sideIcons').classList.remove('show');
+    document.getElementById('infoLeft').classList.remove('show');
     return;
   }
   
-  activePosts.forEach((post, displayIdx) => {
+  activePosts.forEach((post) => {
     const realIdx = posts.indexOf(post);
     const slide = document.createElement('div');
     slide.className = 'video-slide';
     slide.innerHTML = `<video src="${post.url}" controls playsinline muted data-idx="${realIdx}"></video>`;
     const vid = slide.querySelector('video');
-    vid.addEventListener('enterpictureinpicture', ()=>{});
     vid.addEventListener('play', () => {
       currentPostIdx = realIdx;
       updatePostDisplay(post);
     });
     container.appendChild(slide);
   });
+  
+  document.getElementById('sideIcons').classList.add('show');
 }
 
 function updatePostDisplay(post) {
-  document.getElementById('sideIcons').style.display = 'flex';
-  document.getElementById('infoLeft').style.display = 'block';
-  document.getElementById('postAuthor').textContent = post.author || 'thaipodee';
-  document.getElementById('postDesc').textContent = post.desc || 'วิดีโอ';
+  document.getElementById('infoLeft').classList.add('show');
+  document.getElementById('postAuthor').textContent = '@' + (post.author || 'thaipodee');
+  document.getElementById('postDesc').textContent = post.desc || 'วิดีโอของฉัน';
   document.getElementById('likeCount').textContent = post.likes || 0;
 }
 
-// ===== อัปโหลดวิดีโอ =====
+// อัปโหลดวิดีโอ
 document.getElementById('mainAddBtn').addEventListener('click', () => {
   document.getElementById('videoInput').click();
 });
@@ -479,7 +403,7 @@ document.getElementById('videoInput').addEventListener('change', e => {
   e.target.value = '';
 });
 
-// ===== ไลก์ =====
+// ไลก์
 document.getElementById('likeBtn').addEventListener('click', () => {
   if (currentPostIdx < 0 || !posts[currentPostIdx]) return;
   posts[currentPostIdx].likes = (posts[currentPostIdx].likes || 0) + 1;
@@ -487,17 +411,17 @@ document.getElementById('likeBtn').addEventListener('click', () => {
   saveAll();
 });
 
-// ===== แชร์ =====
+// แชร์
 document.getElementById('shareBtn').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(window.location.href);
     alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย');
   } catch(e) {
-    alert('คัดลอกไม่ได้ — ลิงก์: ' + window.location.href);
+    alert('ลิงก์: ' + window.location.href);
   }
 });
 
-// ===== โปรไฟล์ =====
+// โปรไฟล์
 function renderMyPostGrid() {
   const grid = document.getElementById('myPostGrid');
   grid.innerHTML = '';
@@ -532,7 +456,7 @@ function renderMyPostGrid() {
   });
 }
 
-// ===== ร้านค้า =====
+// ร้านค้า
 function renderShop() {
   const list = document.getElementById('shopList');
   list.innerHTML = '';
@@ -575,17 +499,13 @@ document.getElementById('addProductBtn').addEventListener('click', () => {
   alert('ลงสินค้าเรียบร้อย ✅');
 });
 
-// ===== ติดต่อ-แชท =====
+// ติดต่อ-แชท
 function startChatWith(name, role) {
   activeChatWith = name;
   activeChatRole = role;
   if (!chats[name]) chats[name] = [];
   if (chats[name].length === 0) {
-    chats[name].push({
-      from: 'system',
-      text: `เริ่มสนทนากับ ${name} (${role === 'seller' ? 'ผู้ขาย' : role === 'maker' ? 'ผู้ผลิต' : 'ผู้ซื้อ'})`,
-      time: new Date().toISOString()
-    });
+    chats[name].push({ from: 'system', text: `เริ่มสนทนากับ ${name}`, time: new Date().toISOString() });
   }
   saveAll();
   openChatRoom(name, role);
@@ -597,38 +517,26 @@ function startChatFromProduct(idx, role) {
   startChatWith(name, role);
 }
 
-document.getElementById('contactSellerBtn').addEventListener('click', () => {
-  startChatWith('ร้านค้า', 'seller');
-});
-document.getElementById('contactMakerBtn').addEventListener('click', () => {
-  startChatWith('บริษัทผู้ผลิต', 'maker');
-});
-
 function renderChatList(filter = 'all') {
   const list = document.getElementById('chatList');
   list.innerHTML = '';
   const keys = Object.keys(chats);
   if (keys.length === 0) {
     list.innerHTML = '<p style="padding:30px 20px; color:#666; text-align:center;">ยังไม่มีการสนทนา</p>';
-    document.getElementById('msgBadge').style.display = 'none';
     return;
   }
-  
   keys.forEach(name => {
     const msgs = chats[name];
     const last = msgs[msgs.length - 1];
     let role = name.includes('ผลิต') ? 'maker' : name.includes('ร้าน') ? 'seller' : 'buyer';
     if (filter !== 'all' && filter !== role) return;
-    
     const roleText = role === 'seller' ? 'ผู้ขาย' : role === 'maker' ? 'ผู้ผลิต' : 'ผู้ซื้อ';
-    const roleClass = role;
-    
     const item = document.createElement('div');
     item.className = 'chat-item';
     item.innerHTML = `
       <div class="chat-avatar"><img src="https://picsum.photos/seed/${name}/100/100"></div>
       <div class="chat-info">
-        <div class="chat-name">${name}<span class="chat-role ${roleClass}">${roleText}</span></div>
+        <div class="chat-name">${name}<span class="chat-role ${role}">${roleText}</span></div>
         <div class="chat-preview">${last.text}</div>
       </div>
       <div class="chat-time">${new Date(last.time).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})}</div>
@@ -667,30 +575,16 @@ function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text || !activeChatWith) return;
-  
   if (!chats[activeChatWith]) chats[activeChatWith] = [];
-  chats[activeChatWith].push({
-    from: currentUser.id,
-    text,
-    time: new Date().toISOString()
-  });
-  
+  chats[activeChatWith].push({ from: currentUser.id, text, time: new Date().toISOString() });
   input.value = '';
   saveAll();
   renderChatMessages();
   
-  // ตอบกลับอัตโนมัติ
   setTimeout(() => {
-    const reply = activeChatRole === 'seller' 
-      ? 'ได้ครับ สนใจสินค้าอะไรหรือครับ' 
-      : activeChatRole === 'maker'
-        ? 'รับทราบครับ สอบถามได้เลย'
-        : 'สวัสดีครับ';
-    chats[activeChatWith].push({
-      from: 'other',
-      text: reply,
-      time: new Date().toISOString()
-    });
+    const reply = activeChatRole === 'seller' ? 'ได้ครับ สนใจสินค้าอะไรหรือครับ' 
+                : activeChatRole === 'maker' ? 'รับทราบครับ สอบถามได้เลย' : 'สวัสดีครับ';
+    chats[activeChatWith].push({ from: 'other', text: reply, time: new Date().toISOString() });
     saveAll();
     renderChatMessages();
   }, 700);
@@ -708,27 +602,15 @@ document.querySelectorAll('.contact-tab').forEach(tab => {
   });
 });
 
-// ===== นำทางหลัก =====
+// นำทางหลัก
 document.querySelectorAll('[data-page]').forEach(item => {
   item.addEventListener('click', () => switchPage(item.dataset.page));
 });
 
-// ===== เริ่มทำงาน =====
+// เริ่มทำงาน
 renderFeed();
 renderShop();
 renderChatList();
-pullFromCloud();
-setInterval(pullFromCloud, 30000); // ดึงข้อมูลใหม่ทุก 30 วินาที
-
-// แจ้งวิธีตั้งค่าคลาวด์
-if (!CONFIG.JSONBIN_URL || !CONFIG.JSONBIN_KEY) {
-  setTimeout(() => {
-    console.log('=== ตั้งค่าคลาวด์ ===');
-    console.log('1. ไปที่ jsonbin.io → ล็อกอิน');
-    console.log('2. สร้าง Bin ใหม่ → คัดลอก URL และ Secret Key');
-    console.log('3. ใส่ลงใน CONFIG ด้านบน');
-  }, 1000);
-}
 </script>
 </body>
 </html>
