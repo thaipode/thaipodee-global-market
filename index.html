@@ -1,18 +1,22 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v82
+   เวอร์ชัน: v83
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล (Mr.Jukkapong Poderojjanakul)
    Line ID: thaipodee-pro-eng
-   วันที่: 24 กันยายน 2569 07:35 น.
-   สถานะ: ✅ บังคับแสดงทุกเมนู — ไม่ซ่อน ไม่หาย ตรงตัวอย่าง
-   พัฒนาจาก: v81
+   วันที่: 24 กันยายน 2569 07:38 น.
+   สถานะ: ✅ ไอคอนขวา 6 ตัวครบ — ตัวล่างสุดเป็นโน้ตดนตรี 🎵
+   พัฒนาจาก: v82
    --------------------------------------------------------------
    ปรับปรุง:
-   ✅ แถบบน: แสดงตลอด — กำลังติดตาม · สำหรับคุณ · 🔍
-   ✅ ไอคอนขวา: แสดงตลอด — รูปคน · ❤️ · 💬 · ⭐ · ↗️
-   ✅ ข้อมูลซ้ายล่าง: แสดงตลอด — @ชื่อ · คำอธิบาย
-   ✅ แถบล่าง: แสดงตลอด — 5 ปุ่มครบ ไม่หาย
-   ✅ ลบเงื่อนไขซ่อนทั้งหมด — ทุกอย่างโชว์เสมอ
+   ✅ ไอคอนด้านขวา เรียงจากบนลงล่าง 6 ตัวตรงตัวอย่าง:
+      1. รูปโปรไฟล์
+      2. ❤️ ไลก์
+      3. 💬 คอมเมนต์
+      4. ⭐ บันทึก
+      5. ↗️ แชร์
+      6. 🎵 โน้ตดนตรี (จานเสียง/เพลง) ← ตัวล่างสุด
+   ✅ แถบบน + แถบล่าง ครบเหมือนเดิม ไม่หาย
+   ✅ ข้อมูลซ้ายล่าง — แสดงตลอด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -24,20 +28,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="description" content="ThaiPodee Market — แอปแชร์วิดีโอและสินค้า">
-<title>ThaiPodee Market v82</title>
+<title>ThaiPodee Market v83</title>
 <link rel="icon" type="image/png" sizes="192x192" href="https://picsum.photos/id/1012/192/192">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
 html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
 
-/* ===== แถบบน — แสดงตลอด ===== */
+/* ===== แถบบน ===== */
 .top-bar { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center; padding: 12px 16px; z-index: 200; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
 .top-tabs { display: flex; gap: 24px; }
 .tab { font-size: 15px; color: #aaa; cursor: pointer; }
 .tab.active { color: #fff; font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 2px; }
 .top-search { position: absolute; right: 16px; font-size: 20px; cursor: pointer; }
 
-/* ===== พื้นที่วิดีโอ ===== */
+/* ===== พื้นที่เนื้อหา ===== */
 .page { position: absolute; top: 50px; bottom: 65px; left: 0; right: 0; display: none; overflow-y: auto; }
 .page.active { display: block; }
 .hidden { display: none !important; }
@@ -49,20 +53,21 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 .video-placeholder { text-align: center; color: #666; padding: 40px 20px; }
 .video-placeholder svg { width: 64px; height: 64px; margin-bottom: 12px; opacity: 0.5; }
 
-/* ===== ข้อมูลซ้ายล่าง — แสดงตลอด ===== */
-.info-left { position: fixed; bottom: 85px; left: 12px; right: 90px; z-index: 150; display: block !important; }
+/* ===== ข้อมูลซ้ายล่าง ===== */
+.info-left { position: fixed; bottom: 85px; left: 12px; right: 90px; z-index: 150; display: block; }
 .username { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
 .desc { font-size: 13px; color: #eee; line-height: 1.4; }
 
-/* ===== ไอคอนด้านขวา — แสดงตลอด เรียงตรงตัวอย่าง ===== */
-.side-icons { position: fixed; right: 12px; bottom: 85px; display: flex !important; flex-direction: column; align-items: center; gap: 24px; z-index: 150; }
+/* ===== ไอคอนด้านขวา — 6 ตัวครบ ตัวล่างสุดคือโน้ตดนตรี ===== */
+.side-icons { position: fixed; right: 12px; bottom: 85px; display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 150; }
 .icon-block { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
 .icon-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; overflow: hidden; margin-bottom: 4px; }
 .icon-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .icon { font-size: 26px; }
 .icon-count { font-size: 11px; color: #fff; }
+.icon-music { font-size: 28px; }
 
-/* ===== แถบล่าง — แสดงตลอด 5 ปุ่มครบ ===== */
+/* ===== แถบล่าง — 5 ปุ่มครบ ===== */
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 200; padding: 0 4px; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #aaa; gap: 2px; cursor: pointer; position: relative; }
 .nav-item.active { color: #fff; }
@@ -130,7 +135,7 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 </head>
 <body>
 
-<!-- แถบบน — แสดงตลอด -->
+<!-- แถบบน -->
 <div class="top-bar">
   <div class="top-tabs">
     <div class="tab" data-feed="following">กำลังติดตาม</div>
@@ -222,36 +227,48 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
   <div class="post-grid" id="myPostGrid"></div>
 </div>
 
-<!-- ===== ไอคอนด้านขวา — แสดงตลอด เรียงตรงตัวอย่าง ===== -->
+<!-- ==================================================
+     ไอคอนด้านขวา — 6 ตัว เรียงตรงล่างสุดคือโน้ตดนตรี 🎵
+     ================================================== -->
 <div class="side-icons" id="sideIcons">
+  <!-- 1. รูปโปรไฟล์ -->
   <div class="icon-block">
     <div class="icon-avatar"><img src="https://picsum.photos/id/1012/100/100" alt="ฉัน"></div>
   </div>
+  <!-- 2. ไลก์ -->
   <div class="icon-block" id="likeBtn">
     <span class="icon">❤️</span>
     <span class="icon-count" id="likeCount">0</span>
   </div>
+  <!-- 3. คอมเมนต์ -->
   <div class="icon-block" id="cmtBtn">
     <span class="icon">💬</span>
     <span class="icon-count" id="cmtCount">0</span>
   </div>
+  <!-- 4. บันทึก/คอลเลกชัน -->
   <div class="icon-block">
     <span class="icon">⭐</span>
     <span class="icon-count" id="saveCount">0</span>
   </div>
+  <!-- 5. แชร์ -->
   <div class="icon-block" id="shareBtn">
     <span class="icon">↗️</span>
     <span class="icon-count">แชร์</span>
   </div>
+  <!-- 6. โน้ตดนตรี — ตัวล่างสุด จานเสียง/เพลง -->
+  <div class="icon-block">
+    <span class="icon icon-music">🎵</span>
+    <span class="icon-count">เสียง</span>
+  </div>
 </div>
 
-<!-- ===== ข้อมูลซ้ายล่าง — แสดงตลอด ===== -->
+<!-- ===== ข้อมูลซ้ายล่าง ===== -->
 <div class="info-left" id="infoLeft">
   <div class="username" id="postAuthor">@thaipodee</div>
   <div class="desc" id="postDesc">ยินดีต้อนรับสู่ ThaiPodee — แชร์วิดีโอและสินค้า</div>
 </div>
 
-<!-- ===== แถบล่าง — แสดงตลอด 5 ปุ่มครบ ===== -->
+<!-- ===== แถบล่าง — 5 ปุ่มครบ ===== -->
 <div class="bottom-nav">
   <div class="nav-item active" data-page="feed">
     <span class="nav-icon">🏠</span>
@@ -259,4 +276,332 @@ video { width: 100%; height: 100%; object-fit: contain; background: #000; }
   </div>
   <div class="nav-item" data-page="shop">
     <span class="nav-icon">🛍️</span>
-    <span>
+    <span>ร้านค้า</span>
+  </div>
+  <div class="nav-item" id="mainAddBtn">
+    <span class="nav-add">+</span>
+  </div>
+  <div class="nav-item" data-page="message">
+    <span class="nav-icon">💬</span>
+    <span>กล่องข้อความ</span>
+    <span class="nav-badge">99+</span>
+  </div>
+  <div class="nav-item" data-page="profile">
+    <span class="nav-icon">👤</span>
+    <span>โปรไฟล์</span>
+  </div>
+</div>
+
+<!-- ซ่อน input เลือกไฟล์ -->
+<input type="file" id="videoInput" accept="video/*" style="display:none;">
+
+<script>
+let currentUser = { id: 'thaipodee', name: 'thaipodee', role: 'owner' };
+let posts = JSON.parse(localStorage.getItem('tpPosts') || '[]');
+let products = JSON.parse(localStorage.getItem('tpProducts') || '[]');
+let chats = JSON.parse(localStorage.getItem('tpChats') || '{}');
+let activeChatWith = null;
+let activeChatRole = null;
+let currentPostIdx = -1;
+
+function saveLocal(key, val) {
+  localStorage.setItem(key, JSON.stringify(val));
+}
+function saveAll() {
+  saveLocal('tpPosts', posts);
+  saveLocal('tpProducts', products);
+  saveLocal('tpChats', chats);
+  renderMyPostGrid();
+  renderShop();
+  renderChatList();
+}
+
+// สลับหน้า — ไม่ซ่อนเมนู
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  if (name === 'chatRoom') {
+    document.getElementById('chatRoomPage').classList.add('active');
+  } else {
+    document.getElementById(name + 'Page').classList.add('active');
+  }
+  
+  document.querySelectorAll(`[data-page="${name}"]`).forEach(n => n.classList.add('active'));
+}
+
+// แสดงฟีดวิดีโอ
+function renderFeed() {
+  const container = document.getElementById('videoSwiper');
+  container.innerHTML = '';
+  const activePosts = posts.filter(p => !p.deleted);
+  
+  if (activePosts.length === 0) {
+    container.innerHTML = `<div class="video-slide">
+      <div class="video-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <p>กด + เพื่อเพิ่มวิดีโอ</p>
+      </div>
+    </div>`;
+    return;
+  }
+  
+  activePosts.forEach((post) => {
+    const realIdx = posts.indexOf(post);
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `<video src="${post.url}" controls playsinline muted data-idx="${realIdx}"></video>`;
+    const vid = slide.querySelector('video');
+    vid.addEventListener('play', () => {
+      currentPostIdx = realIdx;
+      updatePostDisplay(post);
+    });
+    container.appendChild(slide);
+  });
+}
+
+function updatePostDisplay(post) {
+  document.getElementById('postAuthor').textContent = '@' + (post.author || 'thaipodee');
+  document.getElementById('postDesc').textContent = post.desc || 'วิดีโอของฉัน';
+  document.getElementById('likeCount').textContent = post.likes || 0;
+}
+
+// อัปโหลดวิดีโอ
+document.getElementById('mainAddBtn').addEventListener('click', () => {
+  document.getElementById('videoInput').click();
+});
+document.getElementById('videoInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  posts.unshift({
+    url,
+    name: f.name,
+    desc: f.name.replace(/\.[^/.]+$/, ''),
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    deleted: false,
+    author: currentUser.name,
+    time: new Date().toISOString()
+  });
+  saveAll();
+  renderFeed();
+  e.target.value = '';
+});
+
+// ไลก์
+document.getElementById('likeBtn').addEventListener('click', () => {
+  if (currentPostIdx < 0 || !posts[currentPostIdx]) return;
+  posts[currentPostIdx].likes = (posts[currentPostIdx].likes || 0) + 1;
+  document.getElementById('likeCount').textContent = posts[currentPostIdx].likes;
+  saveAll();
+});
+
+// แชร์
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย');
+  } catch(e) {
+    alert('ลิงก์: ' + window.location.href);
+  }
+});
+
+// โปรไฟล์
+function renderMyPostGrid() {
+  const grid = document.getElementById('myPostGrid');
+  grid.innerHTML = '';
+  const active = posts.filter(p => !p.deleted);
+  document.getElementById('myPostCount').textContent = active.length;
+  
+  active.forEach(post => {
+    const idx = posts.indexOf(post);
+    const div = document.createElement('div');
+    div.className = 'post-thumb';
+    div.innerHTML = `
+      <video src="${post.url}" muted></video>
+      <button class="post-del" data-idx="${idx}">×</button>
+    `;
+    div.addEventListener('click', () => {
+      currentPostIdx = idx;
+      switchPage('feed');
+      setTimeout(renderFeed, 50);
+    });
+    grid.appendChild(div);
+  });
+  
+  grid.querySelectorAll('.post-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (confirm('ลบรายการนี้หรือไม่?')) {
+        posts[btn.dataset.idx].deleted = true;
+        saveAll();
+        renderFeed();
+      }
+    });
+  });
+}
+
+// ร้านค้า
+function renderShop() {
+  const list = document.getElementById('shopList');
+  list.innerHTML = '';
+  if (products.length === 0) {
+    list.innerHTML = '<p style="padding:30px 20px; color:#666; text-align:center;">ยังไม่มีสินค้า — ลงขายได้เลย</p>';
+    return;
+  }
+  products.forEach((p, idx) => {
+    const div = document.createElement('div');
+    div.className = 'product-card';
+    div.innerHTML = `
+      <div class="product-name">${p.name}</div>
+      <div class="product-price">฿${p.price}</div>
+      <div class="product-desc">${p.desc || '-'}</div>
+      <div class="product-actions">
+        <button class="product-btn" onclick="startChatFromProduct(${idx}, 'seller')">ติดต่อผู้ขาย</button>
+        <button class="product-btn contact-maker-product" onclick="startChatFromProduct(${idx}, 'maker')">ติดต่อผู้ผลิต</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('addProductBtn').addEventListener('click', () => {
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const desc = document.getElementById('prodDesc').value.trim();
+  if (!name) return alert('กรอกชื่อสินค้า');
+  products.push({ 
+    name, price, desc, 
+    seller: 'ร้านค้า', 
+    maker: 'โรงงานผู้ผลิต', 
+    time: new Date().toISOString() 
+  });
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodDesc').value = '';
+  saveAll();
+  renderShop();
+  alert('ลงสินค้าเรียบร้อย ✅');
+});
+
+// แชท
+function startChatWith(name, role) {
+  activeChatWith = name;
+  activeChatRole = role;
+  if (!chats[name]) chats[name] = [];
+  if (chats[name].length === 0) {
+    chats[name].push({ from: 'system', text: `เริ่มสนทนากับ ${name}`, time: new Date().toISOString() });
+  }
+  saveAll();
+  openChatRoom(name, role);
+}
+
+function startChatFromProduct(idx, role) {
+  const p = products[idx];
+  const name = role === 'seller' ? (p.seller || 'ร้านค้า') : (p.maker || 'ผู้ผลิต');
+  startChatWith(name, role);
+}
+
+function renderChatList(filter = 'all') {
+  const list = document.getElementById('chatList');
+  list.innerHTML = '';
+  const keys = Object.keys(chats);
+  if (keys.length === 0) {
+    list.innerHTML = '<p style="padding:30px 20px; color:#666; text-align:center;">ยังไม่มีการสนทนา</p>';
+    return;
+  }
+  keys.forEach(name => {
+    const msgs = chats[name];
+    const last = msgs[msgs.length - 1];
+    let role = name.includes('ผลิต') ? 'maker' : name.includes('ร้าน') ? 'seller' : 'buyer';
+    if (filter !== 'all' && filter !== role) return;
+    const roleText = role === 'seller' ? 'ผู้ขาย' : role === 'maker' ? 'ผู้ผลิต' : 'ผู้ซื้อ';
+    const item = document.createElement('div');
+    item.className = 'chat-item';
+    item.innerHTML = `
+      <div class="chat-avatar"><img src="https://picsum.photos/seed/${name}/100/100"></div>
+      <div class="chat-info">
+        <div class="chat-name">${name}<span class="chat-role ${role}">${roleText}</span></div>
+        <div class="chat-preview">${last.text}</div>
+      </div>
+      <div class="chat-time">${new Date(last.time).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})}</div>
+    `;
+    item.addEventListener('click', () => openChatRoom(name, role));
+    list.appendChild(item);
+  });
+}
+
+function openChatRoom(name, role) {
+  activeChatWith = name;
+  activeChatRole = role;
+  document.getElementById('partnerName').textContent = name;
+  document.getElementById('partnerRole').textContent = role === 'seller' ? 'ผู้ขาย' : role === 'maker' ? 'ผู้ผลิต' : 'ผู้ซื้อ';
+  renderChatMessages();
+  switchPage('chatRoom');
+}
+
+function renderChatMessages() {
+  const box = document.getElementById('chatMessages');
+  box.innerHTML = '';
+  if (!chats[activeChatWith]) return;
+  chats[activeChatWith].forEach(m => {
+    const div = document.createElement('div');
+    div.className = `msg ${m.from === currentUser.id ? 'me' : 'other'}`;
+    div.innerHTML = `
+      <div>${m.text}</div>
+      <div class="msg-time">${new Date(m.time).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})}</div>
+    `;
+    box.appendChild(div);
+  });
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || !activeChatWith) return;
+  if (!chats[activeChatWith]) chats[activeChatWith] = [];
+  chats[activeChatWith].push({ from: currentUser.id, text, time: new Date().toISOString() });
+  input.value = '';
+  saveAll();
+  renderChatMessages();
+  
+  setTimeout(() => {
+    const reply = activeChatRole === 'seller' ? 'ได้ครับ สนใจสินค้าอะไรหรือครับ' 
+                : activeChatRole === 'maker' ? 'รับทราบครับ สอบถามได้เลย' : 'สวัสดีครับ';
+    chats[activeChatWith].push({ from: 'other', text: reply, time: new Date().toISOString() });
+    saveAll();
+    renderChatMessages();
+  }, 700);
+}
+
+document.getElementById('sendMsgBtn').addEventListener('click', sendMessage);
+document.getElementById('chatInput').addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
+document.getElementById('backToMsg').addEventListener('click', () => switchPage('message'));
+
+document.querySelectorAll('.contact-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.contact-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderChatList(tab.dataset.filter);
+  });
+});
+
+// นำทางหลัก
+document.querySelectorAll('[data-page]').forEach(item => {
+  item.addEventListener('click', () => switchPage(item.dataset.page));
+});
+
+// เริ่มทำงาน
+renderFeed();
+renderShop();
+renderChatList();
+</script>
+</body>
+</html>
