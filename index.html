@@ -1,18 +1,12 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
    เวอร์ชัน: v1008
-   วันที่: 24 กันยายน 2569 15:45 น.
-   พัฒนาจาก: v1008 — แก้ให้ไอคอนด้านขวาครบ 6 ตัวพอดี
+   วันที่: 24 กันยายน 2569 15:57 น.
+   พัฒนาจาก: v1008 — เอารูปกล้อง+ข้อความออก / ด้านขวา 6 ตัวครบ
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    --------------------------------------------------------------
-   ✅ ด้านขวา 6 ตัว ครบ เรียงตรง:
-      1. 👤+ โปรไฟล์+เพิ่ม
-      2. 🤍 ถูกใจ
-      3. 💬 คอมเมนต์
-      4. 🔖 บันทึก ← เพิ่ม
-      5. ↗️ แชร์
-      6. 🎵 เพลง ← เพิ่ม
-   ✅ ไอคอนกล้องตรงกลางชิดขอบขวา
+   ✅ เอารูปกล้องและข้อความแนะนำออกแล้ว — พื้นดำเปล่า
+   ✅ ด้านขวา 6 ตัว ครบ: 👤+ / 🤍 / 💬 / 🔖 / ↗️ / 🎵
    ✅ แถบล่าง 5 ตัว ครบ ไม่มี 99+ คงที่
    ============================================================== -->
 <!DOCTYPE html>
@@ -47,7 +41,7 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 .top-tab.active { color: #fff; border-bottom: 2px solid #fff; font-weight: 500; }
 .top-search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; color: #fff; }
 
-/* ===== พื้นที่ฟีด — ไอคอนกล้องตรงกลางชิดขวา ===== */
+/* ===== พื้นที่ฟีด — ไม่มีกล้อง ไม่มีข้อความ ===== */
 .feed {
   height: 100vh; overflow-y: auto;
   scroll-snap-type: y mandatory; padding-top: 50px;
@@ -56,21 +50,13 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
   height: 100vh; scroll-snap-align: start;
   position: relative; background: #000;
 }
-.feed-placeholder {
-  position: absolute; top: 50%; right: 78px;
-  transform: translateY(-50%);
-  display: flex; flex-direction: column;
-  align-items: center; gap: 12px;
-  color: #777; text-align: center;
-}
-.feed-placeholder-icon { font-size: 48px; opacity: 0.5; }
-.feed-placeholder-text { font-size: 14px; }
+.feed-placeholder { display: none !important; }
 .feed-video {
   width: 100%; height: 100%; object-fit: cover;
   position: absolute; top: 0; left: 0; display: none;
 }
 
-/* ===== มุมล่างซ้าย ===== */
+/* ===== มุมล่างซ้าย — แสดงเมื่อมีวิดีโอ ===== */
 .bottom-left {
   position: absolute; left: 16px; right: 100px; bottom: 80px;
   z-index: 10; display: none;
@@ -90,7 +76,7 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
   font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px;
 }
 
-/* ===== ด้านขวา — 6 ตัว ครบ พอดี ===== */
+/* ===== ด้านขวา — 6 ตัว ครบ ===== */
 .side-bar {
   position: absolute; right: 12px; top: 50%;
   transform: translateY(-50%);
@@ -175,16 +161,13 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
   <div class="feed">
     <div class="feed-item">
-      <!-- ข้อความแนะนำ -->
-      <div class="feed-placeholder" id="placeholder">
-        <div class="feed-placeholder-icon">📷</div>
-        <div class="feed-placeholder-text">กดปุ่ม + ด้านล่างเพื่อเพิ่มวิดีโอ</div>
-      </div>
+      <!-- ไม่มีกล้อง ไม่มีข้อความ -- พื้นดำเปล่า -->
+      <div class="feed-placeholder" id="placeholder"></div>
 
       <!-- วิดีโอ -->
       <video class="feed-video" id="videoPlayer" controls playsinline loop muted autoplay></video>
 
-      <!-- ข้อมูลด้านล่างซ้าย -->
+      <!-- ข้อมูลด้านล่างซ้าย -- แสดงตอนมีวิดีโอ -->
       <div class="bottom-left" id="postInfo">
         <div class="bl-username">
           <span>@thaipodee</span>
@@ -195,9 +178,9 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
         <div class="bl-search-bar">🔍 ค้นหาเนื้อหาที่เกี่ยวข้อง</div>
       </div>
 
-      <!-- ด้านขวา — 6 ตัว ครบตรงลำดับ ✅ -->
+      <!-- ด้านขวา -- 6 ตัว ครบ -->
       <div class="side-bar" id="sideButtons">
-        <!-- 1. โปรไฟล์ + เพิ่ม -->
+        <!-- 1. โปรไฟล์+ -->
         <div class="s-avatar-wrap" onclick="goPage('page-profile')">
           <div class="s-avatar">👤</div>
           <div class="s-add-btn">+</div>
@@ -212,17 +195,17 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
           <span class="s-icon">💬</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 4. บันทึก ✅ -->
+        <!-- 4. บันทึก -->
         <div class="s-btn">
           <span class="s-icon">🔖</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 5. แชร์ ✅ -->
+        <!-- 5. แชร์ -->
         <div class="s-btn">
           <span class="s-icon">↗️</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 6. เพลง ✅ -->
+        <!-- 6. เพลง -->
         <div class="s-music">🎵</div>
       </div>
     </div>
@@ -318,7 +301,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// แจ้งเตือน — ไม่ตั้งค่าคงที่
+// แจ้งเตือน
 let unreadCount = 0;
 function updateBadge() {
   const badge = document.getElementById('msgBadge');
