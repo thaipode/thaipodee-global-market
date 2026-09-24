@@ -1,5 +1,5 @@
 <!-- ==============================================================
-   เวอร์ชัน: v94 — เปลี่ยนรูปโปรไฟล์ + ชื่อผู้ใช้ได้แน่นอน
+   เวอร์ชัน: v99 — เพิ่มแถบสีเทาด้านบนสุด ไอคอนครบ / เปลี่ยนรูป+ชื่อได้
    วันที่: 24 ก.ย. 2569
    ============================================================== -->
 <!DOCTYPE html>
@@ -7,106 +7,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ThaiPodee v94</title>
+<title>ThaiPodee v99</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif;}
 html,body{height:100%;background:#fff;}
 
-.top-bar{height:50px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;border-bottom:1px solid #eee;}
-.top-title{font-size:17px;font-weight:600;}
+/* แถบสีเทาด้านบนสุด — ตามรูป */
+.top-grey-bar{position:sticky;top:0;background:#e9e9e9;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;z-index:100;}
+.grey-left{display:flex;align-items:center;gap:14px;}
+.grey-icon{font-size:20px;cursor:pointer;}
+.grey-center{font-size:15px;color:#666;}
+.grey-right{display:flex;align-items:center;gap:14px;}
 
-.profile{padding:16px;text-align:center;}
-.avatar{width:90px;height:90px;border-radius:50%;margin:0 auto 10px;overflow:hidden;cursor:pointer;border:2px solid #ddd;}
+/* โลโก้ + ปุ่ม + สีฟ้า */
+.avatar-wrap{position:relative;display:inline-block;margin:16px 0 12px;}
+.avatar{width:90px;height:90px;border-radius:50%;overflow:hidden;border:2px solid #ddd;}
 .avatar img{width:100%;height:100%;object-fit:cover;}
-.p-name{font-size:16px;font-weight:700;color:#d00;margin-bottom:4px;}
-.p-user{font-size:13px;color:#666;margin-bottom:8px;}
-.p-bio{font-size:13px;color:#333;margin-bottom:12px;}
+.avatar-plus{position:absolute;bottom:0;right:0;width:24px;height:24px;background:#0095f6;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;border:2px solid #fff;z-index:10;}
 
-.stats{display:flex;justify-content:center;gap:32px;margin-bottom:12px;}
+.name-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;}
+.p-name{font-size:18px;font-weight:700;color:#000;}
+.edit-pen{font-size:16px;color:#0095f6;cursor:pointer;}
+.p-badge{background:#ed4956;color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;}
+
+.p-user{font-size:14px;color:#666;margin-bottom:10px;}
+.p-bio{font-size:14px;line-height:1.6;margin-bottom:16px;padding:0 15px;}
+
+.stats{display:flex;justify-content:center;gap:40px;margin-bottom:16px;}
+.stat{text-align:center;}
 .stat-num{font-size:18px;font-weight:700;}
-.stat-label{font-size:11px;color:#666;}
+.stat-label{font-size:12px;color:#666;margin-top:2px;}
 
-.btns{display:flex;justify-content:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.btn-red{background:#d00;color:#fff;border:none;padding:8px 24px;border-radius:6px;cursor:pointer;}
-.btn-grey{background:#eee;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;}
-.btn-edit{background:#fff9c4;border:1px solid #fdd835;padding:8px 16px;border-radius:6px;cursor:pointer;}
+.action-btns{display:flex;flex-direction:column;gap:8px;align-items:center;margin-bottom:20px;}
+.btn{padding:8px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:transparent;color:#000;}
+.btn-email{color:#d00;}
+.btn-order{color:#d00;}
 
-.tabs{display:flex;justify-content:center;border-bottom:1px solid #eee;margin-bottom:4px;}
-.tab{padding:10px 16px;font-size:13px;color:#666;cursor:pointer;}
-.tab.active{border-bottom:2px solid #000;color:#000;font-weight:bold;}
+.tabs{display:flex;justify-content:space-around;border-top:1px solid #eee;margin-bottom:2px;}
+.tab{padding:12px 0;font-size:20px;color:#888;cursor:pointer;}
+.tab.active{color:#000;border-top:2px solid #000;}
 
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;min-height:200px;}
-.thumb{aspect-ratio:9/16;background:#f5f5f5;overflow:hidden;cursor:pointer;position:relative;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;}
+.thumb{aspect-ratio:4/5;background:#f0f0f0;overflow:hidden;cursor:pointer;position:relative;}
 .thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block;}
-.play-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,0.7);pointer-events:none;}
-.empty{display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;border:1px dashed #ddd;}
+.play-count{position:absolute;bottom:6px;left:6px;color:#fff;font-size:13px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6);display:flex;align-items:center;gap:4px;}
+.empty{aspect-ratio:4/5;background:#f8f8f8;display:flex;align-items:center;justify-content:center;color:#aaa;border:1px dashed #ddd;font-size:12px;}
 
 .player{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;}
 .player.active{display:flex;}
-.p-top{padding:12px 16px;display:flex;align-items:center;background:rgba(0,0,0,0.7);}
+.p-top{padding:12px 16px;display:flex;align-items:center;background:rgba(0,0,0,.7);}
 .back{color:#fff;font-size:22px;cursor:pointer;margin-right:12px;}
 .p-body{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
 .p-media{max-width:100%;max-height:85vh;}
 
-.bottom{position:fixed;bottom:0;left:0;right:0;height:65px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #eee;background:#fff;}
-.b-item{display:flex;flex-direction:column;align-items:center;font-size:10px;color:#666;gap:2px;cursor:pointer;}
+.bottom{position:fixed;bottom:0;left:0;right:0;height:60px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #eee;background:#fff;z-index:100;}
+.b-item{display:flex;flex-direction:column;align-items:center;font-size:10px;color:#888;gap:2px;cursor:pointer;}
 .b-item.active{color:#000;}
-.b-add{width:48px;height:36px;background:#000;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
+.b-icon{font-size:22px;}
+.b-badge{background:red;color:#fff;font-size:9px;padding:1px 4px;border-radius:10px;position:absolute;}
 
 .hidden{display:none !important;}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <span></span><span class="top-title">thaipodee</span><span>⋮</span>
+<!-- แถบสีเทาด้านบนสุด — ตามรูปเป๊ะ -->
+<div class="top-grey-bar">
+  <div class="grey-left">
+    <span class="grey-icon" onclick="history.back()">←</span>
+    <span class="grey-icon">+</span>
+    <span class="grey-icon" style="background:#ddd;border-radius:50%;padding:2px 6px;">P</span>
+  </div>
+  <div class="grey-center">ว่าไง</div>
+  <div class="grey-right">
+    <span class="grey-icon">👤</span>
+    <span class="grey-icon">↗</span>
+    <span class="grey-icon">☰</span>
+  </div>
 </div>
 
-<div class="profile">
-  <!-- รูปโลโก้โปรไฟล์ — กดเปลี่ยนได้เลย -->
-  <div class="avatar" id="avatarBtn">
-    <img id="avatarImg" src="https://picsum.photos/id/1012/100/100" alt="โลโก้โปรไฟล์">
+<!-- เนื้อหาโปรไฟล์ -->
+<div style="text-align:center;padding:0 10px 20px;">
+  <!-- โลโก้ + ปุ่ม + สีฟ้า -->
+  <div class="avatar-wrap">
+    <div class="avatar" id="avatarBtn">
+      <img id="avatarImg" src="https://picsum.photos/id/1012/100/100" alt="โลโก้">
+    </div>
+    <div class="avatar-plus" id="avatarPlusBtn">+</div>
   </div>
-  <div class="p-name" id="dispName">THAIPODEE PRODUCT ENGINEERING</div>
-  <!-- ชื่อผู้ใช้ — เปลี่ยนได้เลย -->
+
+  <!-- ชื่อ + ดินสอ -->
+  <div class="name-row">
+    <h1 class="p-name" id="dispName">THAIPODEE PRODUCT ENGINEERING</h1>
+    <span class="p-badge">9+</span>
+    <span class="edit-pen" id="nameEditBtn">✏️</span>
+  </div>
+
   <div class="p-user" id="dispUser">@thaipodee-official</div>
-  <div class="p-bio" id="dispBio">รับจ้างผลิตชิ้นงานกลึง มิลลิ่ง เชื่อม ประกอบชุดงาน</div>
+  <div class="p-bio" id="dispBio">ใส่คำอธิบายของคุณตรงนี้</div>
 
+  <!-- สถิติ -->
   <div class="stats">
-    <div><div class="stat-num" id="statPost">0</div><div class="stat-label">โพสต์</div></div>
-    <div><div class="stat-num" id="statFollowers">1,238</div><div class="stat-label">ผู้ติดตาม</div></div>
-    <div><div class="stat-num" id="statFollowing">2,748</div><div class="stat-label">กำลังติดตาม</div></div>
+    <div class="stat"><div class="stat-num" id="statFollowing">0</div><div class="stat-label">กำลังติดตาม</div></div>
+    <div class="stat"><div class="stat-num" id="statFollowers">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+    <div class="stat"><div class="stat-num" id="statLikes">0</div><div class="stat-label">ถูกใจ</div></div>
   </div>
 
-  <div class="btns">
-    <button class="btn-red">กดติดตาม</button>
-    <button class="btn-grey" id="shareBtn">แชร์โปรไฟล์</button>
-    <button class="btn-edit" id="editBtn">✏️ แก้ไข</button>
+  <!-- ปุ่ม -->
+  <div class="action-btns">
+    <button class="btn btn-email" id="emailBtn">✉️ อีเมล</button>
+    <button class="btn btn-order" id="orderBtn">🛒 คำสั่งซื้อของคุณ</button>
   </div>
 
+  <!-- แท็บ -->
   <div class="tabs">
-    <div class="tab active">โพสต์</div>
-    <div class="tab">วิดีโอ</div>
-    <div class="tab">ถูกใจ</div>
+    <div class="tab active">☰</div>
+    <div class="tab">🔒</div>
+    <div class="tab">↕</div>
+    <div class="tab">❤️</div>
   </div>
 </div>
 
+<!-- กริดโพสต์ -->
 <div class="grid" id="postGrid"></div>
 
+<!-- หน้าเล่น -->
 <div class="player" id="playerPage">
   <div class="p-top"><span class="back" id="backBtn">←</span></div>
   <div class="p-body">
     <video id="playVid" controls playsinline class="p-media" style="display:none;"></video>
-    <img id="playImg" class="p-media" style="display:none;" alt="รูป">
+    <img id="playImg" class="p-media" style="display:none;">
   </div>
 </div>
 
+<!-- แถบล่าง -->
 <div class="bottom">
-  <div class="b-item"><span>🏠</span><span>หน้าหลัก</span></div>
-  <div class="b-item"><span>🔍</span><span>ค้นหา</span></div>
-  <div class="b-item" id="addBtn"><span class="b-add">+</span></div>
-  <div class="b-item"><span>💬</span><span>ข้อความ</span></div>
-  <div class="b-item active"><span>👤</span><span>โปรไฟล์</span></div>
+  <div class="b-item"><span class="b-icon">🏠</span><span>หน้าหลัก</span></div>
+  <div class="b-item"><span class="b-icon">🛒</span><span>ร้านค้า</span></div>
+  <div class="b-item active"><span class="b-icon">➕</span><span>สร้าง</span></div>
+  <div class="b-item" style="position:relative;">
+    <span class="b-icon">💬</span>
+    <span class="b-badge">99+</span>
+    <span>กล่องข้อความ</span>
+  </div>
+  <div class="b-item"><span class="b-icon">👤</span><span>โปรไฟล์</span></div>
 </div>
 
 <input type="file" id="avatarInput" accept="image/*" class="hidden">
@@ -117,21 +161,23 @@ let profile = {
   avatar: localStorage.getItem('tp_avatar') || 'https://picsum.photos/id/1012/100/100',
   name: localStorage.getItem('tp_name') || 'THAIPODEE PRODUCT ENGINEERING',
   username: localStorage.getItem('tp_username') || '@thaipodee-official',
-  bio: localStorage.getItem('tp_bio') || 'รับจ้างผลิตชิ้นงานกลึง มิลลิ่ง เชื่อม ประกอบชุดงาน',
-  followers: localStorage.getItem('tp_followers') || '1,238',
-  following: localStorage.getItem('tp_following') || '2,748'
+  bio: localStorage.getItem('tp_bio') || 'ใส่คำอธิบายของคุณตรงนี้',
+  following: localStorage.getItem('tp_following') || '0',
+  followers: localStorage.getItem('tp_followers') || '0',
+  likes: localStorage.getItem('tp_likes') || '0'
 };
 
-let posts = JSON.parse(local.getItem('tp_posts') || '[]');
+let posts = JSON.parse(localStorage.getItem('tp_posts_list') || '[]');
 
 function saveAll() {
   localStorage.setItem('tp_avatar', profile.avatar);
   localStorage.setItem('tp_name', profile.name);
   localStorage.setItem('tp_username', profile.username);
   localStorage.setItem('tp_bio', profile.bio);
-  localStorage.setItem('tp_followers', profile.followers);
   localStorage.setItem('tp_following', profile.following);
-  localStorage.setItem('tp_posts', JSON.stringify(posts));
+  localStorage.setItem('tp_followers', profile.followers);
+  localStorage.setItem('tp_likes', profile.likes);
+  localStorage.setItem('tp_posts_list', JSON.stringify(posts));
 }
 
 function renderAll() {
@@ -139,31 +185,36 @@ function renderAll() {
   document.getElementById('dispName').textContent = profile.name;
   document.getElementById('dispUser').textContent = profile.username;
   document.getElementById('dispBio').textContent = profile.bio;
-  document.getElementById('statPost').textContent = posts.length;
-  document.getElementById('statFollowers').textContent = profile.followers;
   document.getElementById('statFollowing').textContent = profile.following;
+  document.getElementById('statFollowers').textContent = profile.followers;
+  document.getElementById('statLikes').textContent = profile.likes;
 
   const grid = document.getElementById('postGrid');
   grid.innerHTML = '';
+
   if (posts.length === 0) {
-    for (let i = 0; i < 3; i++) {
-      const slot = document.createElement('div');
-      slot.className = 'thumb empty';
-      slot.textContent = 'กด + เพิ่ม';
-      grid.appendChild(slot);
+    for (let i = 0; i < 8; i++) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'กด + เพิ่ม';
+      grid.appendChild(e);
     }
     return;
   }
+
   posts.forEach((p, i) => {
-    const thumb = document.createElement('div');
-    thumb.className = 'thumb';
+    const d = document.createElement('div');
+    d.className = 'thumb';
     if (p.type === 'video') {
-      thumb.innerHTML = `<video src="${p.data}" muted preload="metadata"></video><span class="play-badge">▶</span>`;
+      d.innerHTML = `
+        <video src="${p.src}" muted preload="metadata"></video>
+        <span class="play-count"><span>▶</span>${p.views || 0}</span>
+      `;
     } else {
-      thumb.innerHTML = `<img src="${p.data}" alt="ปก">`;
+      d.innerHTML = `<img src="${p.src}">`;
     }
-    thumb.onclick = () => openPost(i);
-    grid.appendChild(thumb);
+    d.onclick = () => openPost(i);
+    grid.appendChild(d);
   });
 }
 
@@ -173,11 +224,11 @@ function openPost(i) {
   document.getElementById('playImg').style.display = 'none';
   document.getElementById('playVid').pause();
   if (p.type === 'video') {
-    document.getElementById('playVid').src = p.data;
+    document.getElementById('playVid').src = p.src;
     document.getElementById('playVid').style.display = 'block';
     document.getElementById('playVid').play().catch(()=>{});
   } else {
-    document.getElementById('playImg').src = p.data;
+    document.getElementById('playImg').src = p.src;
     document.getElementById('playImg').style.display = 'block';
   }
   document.getElementById('playerPage').classList.add('active');
@@ -189,26 +240,24 @@ document.getElementById('backBtn').onclick = () => {
   document.getElementById('playVid').src = '';
 };
 
-// === เปลี่ยนรูปโลโก้โปรไฟล์ ===
-document.getElementById('avatarBtn').onclick = () => {
+// เปลี่ยนรูปโลโก้ — ปุ่ม + สีฟ้า
+document.getElementById('avatarPlusBtn').onclick = () => {
   document.getElementById('avatarInput').click();
 };
 document.getElementById('avatarInput').onchange = e => {
-  const f = e.target.files[0];
-  if (!f) return;
+  const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = ev => {
     profile.avatar = ev.target.result;
-    saveAll();
-    renderAll();
-    alert('✅ เปลี่ยนรูปโลโก้เรียบร้อย');
+    saveAll(); renderAll();
+    alert('✅ เปลี่ยนโลโก้เรียบร้อย');
   };
   r.readAsDataURL(f);
 };
 
-// === เปลี่ยนชื่อผู้ใช้ ===
-document.getElementById('editBtn').onclick = () => {
-  const n = prompt('ชื่อแสดง:', profile.name);
+// เปลี่ยนชื่อ — ปุ่มดินสอ
+document.getElementById('nameEditBtn').onclick = () => {
+  const n = prompt('ชื่อโปรไฟล์:', profile.name);
   if (n && n.trim()) profile.name = n.trim();
 
   const u = prompt('ชื่อผู้ใช้:', profile.username);
@@ -216,40 +265,37 @@ document.getElementById('editBtn').onclick = () => {
     profile.username = u.trim().startsWith('@') ? u.trim() : '@' + u.trim();
   }
 
-  const b = prompt('คำอธิบาย:', profile.bio);
+  const b = prompt('คำอธิบายโปรไฟล์:', profile.bio);
   if (b && b.trim()) profile.bio = b.trim();
 
-  const fl = prompt('ผู้ติดตาม:', profile.followers);
-  if (fl && fl.trim()) profile.followers = fl.trim();
-
-  const fg = prompt('กำลังติดตาม:', profile.following);
-  if (fg && fg.trim()) profile.following = fg.trim();
-
-  saveAll();
-  renderAll();
-  alert('✅ อัปเดตเรียบร้อยแล้ว');
+  saveAll(); renderAll();
+  alert('✅ อัปเดตเรียบร้อย');
 };
 
-// === เพิ่มโพสต์ ===
-document.getElementById('addBtn').onclick = () => {
+// แชร์
+const doShare = () => {
+  navigator.clipboard.writeText(location.href).then(()=>alert('✅ คัดลอกลิงก์แล้ว'));
+};
+document.querySelector('.grey-right .grey-icon:nth-child(2)').onclick = doShare;
+
+// เพิ่มโพสต์ — ปุ่ม + ด้านล่าง
+document.querySelector('.b-item.active').onclick = () => {
   document.getElementById('mediaInput').click();
 };
 document.getElementById('mediaInput').onchange = e => {
-  const f = e.target.files[0];
-  if (!f) return;
+  const f = e.target.files[0]; if (!f) return;
   const isVid = f.type.startsWith('video/');
   const r = new FileReader();
   r.onload = ev => {
-    posts.unshift({data: ev.target.result, type: isVid ? 'video' : 'image'});
-    saveAll();
-    renderAll();
-    alert('✅ เพิ่มเรียบร้อย');
+    posts.unshift({
+      src: ev.target.result,
+      type: isVid ? 'video' : 'image',
+      views: Math.floor(Math.random() * 150) + 30
+    });
+    saveAll(); renderAll();
+    alert('✅ เพิ่มโพสต์เรียบร้อย');
   };
   r.readAsDataURL(f);
-};
-
-document.getElementById('shareBtn').onclick = () => {
-  navigator.clipboard.writeText(location.href).then(()=>alert('✅ คัดลอกลิงก์แล้ว'));
 };
 
 renderAll();
