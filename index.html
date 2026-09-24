@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1025 — กดโปรไฟล์ดูรายการวิดีโอที่บันทึก
-   25 กันยายน 2569 06:15 น.
-   อ้างอิงจาก: v1024
+   ThaiPodee v1026 — เปลี่ยนรูป+ชื่อโปรไฟล์ได้
+   25 กันยายน 2569 06:22 น.
+   อ้างอิงจาก: v1025
    --------------------------------------------------------------
-   ✅ กดปุ่มโปรไฟล์ → เปิดหน้าประวัติ
-   ✅ แสดงรายการวิดีโอที่อัปโหลดทั้งหมด
-   ✅ กดที่รายการ → เล่นวิดีโอนั้น
-   ✅ ส่วนอื่นเหมือน v1024 ทุกประการ ไม่แก้
+   ✅ เปลี่ยนรูปโปรไฟล์จากภาพในเครื่องได้
+   ✅ เปลี่ยนชื่อโปรไฟล์ได้ บันทึกคงอยู่
+   ✅ แสดงที่ปุ่มมุมขวาและในหน้าโปรไฟล์
+   ✅ ส่วนอื่นเหมือน v1025 ทุกประการ ไม่แก้
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -21,7 +21,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
 
-/* ===== หน้าหลัก ===== */
+/* ===== หน้า ===== */
 .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; flex-direction: column; }
 .page.active { display: flex; }
 .main-page { z-index: 1; }
@@ -33,8 +33,26 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
   display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
 }
 
-/* ===== รายการวิดีโอในโปรไฟล์ ===== */
-.profile-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+/* ===== ส่วนโปรไฟล์ในหน้าโปรไฟล์ ===== */
+.profile-header { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+.profile-avatar-large {
+  width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff;
+  margin: 0 auto 12px; overflow: hidden; cursor: pointer; background: #333;
+  display: flex; align-items: center; justify-content: center; font-size: 40px;
+}
+.profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+.profile-name { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+.edit-name-input {
+  background: #222; border: 1px solid #444; color: #fff; padding: 8px 12px; border-radius: 8px;
+  font-size: 16px; text-align: center; width: 220px; margin-bottom: 10px; display: none;
+}
+.save-name-btn, .change-avatar-btn {
+  background: #ff2442; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; margin: 4px;
+}
+.hidden-input { display: none; }
+
+/* ===== รายการวิดีโอ ===== */
+.profile-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
 .video-list { display: flex; flex-direction: column; gap: 12px; }
 .video-item {
   display: flex; align-items: center; gap: 12px; padding: 12px; background: #1a1a1a; border-radius: 10px; cursor: pointer;
@@ -47,7 +65,7 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
 .video-item-date { font-size: 11px; color: #888; }
 .empty-text { text-align: center; color: #666; padding: 40px 20px; }
 
-/* ===== พื้นที่วิดีโอ — เหมือนเดิม ===== */
+/* ===== พื้นที่วิดีโอ ===== */
 .video-area {
   position: relative; flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #000;
 }
@@ -63,17 +81,10 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
 }
 .upload-input { display: none; }
 
-/* ===== ไอคอนด้านขวา 6 ตัว — เหมือนเดิม ===== */
+/* ===== ไอคอนด้านขวา ===== */
 .right-bar {
-  position: fixed;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  align-items: center;
-  z-index: 5;
+  position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 28px; align-items: center; z-index: 5;
 }
 .side-btn {
   border: none; background: transparent; color: #fff; cursor: pointer;
@@ -81,24 +92,20 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
 }
 .side-icon { font-size: 26px; line-height: 1; }
 .side-num { font-size: 11px; color: #fff; min-height: 14px; }
-.avatar-wrap { position: relative; width: 44px; height: 44px; }
+.avatar-wrap { position: relative; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; background: #333; }
+.avatar-wrap img { width: 100%; height: 100%; object-fit: cover; display: none; }
 .avatar-circle {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #333; display: flex; align-items: center; justify-content: center;
-  font-size: 22px; border: 2px solid #fff;
+  width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px;
 }
 .plus-red {
-  position: absolute; bottom: -3px; right: -3px;
-  width: 18px; height: 18px; border-radius: 50%;
+  position: absolute; bottom: -3px; right: -3px; width: 18px; height: 18px; border-radius: 50%;
   background: #ff2442; color: #fff; font-size: 13px; font-weight: bold;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid #000; line-height: 1;
+  display: flex; align-items: center; justify-content: center; border: 2px solid #000; line-height: 1;
 }
 
-/* ===== แถบล่าง 5 ปุ่ม — เหมือนเดิม ===== */
+/* ===== แถบล่าง ===== */
 .bottom-nav {
-  position: fixed;
-  bottom: 0; left: 0; right: 0; height: 60px;
+  position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
   background: #000; display: flex; justify-content: space-around; align-items: center;
   border-top: 1px solid #222; z-index: 5;
 }
@@ -132,8 +139,9 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
 
   <div class="right-bar">
     <button class="side-btn" id="btnAvatar">
-      <div class="avatar-wrap">
-        <div class="avatar-circle">👤</div>
+      <div class="avatar-wrap" id="avatarWrap">
+        <div class="avatar-circle" id="avatarCircle">👤</div>
+        <img id="avatarImg" alt="avatar">
         <div class="plus-red">+</div>
       </div>
     </button>
@@ -159,10 +167,26 @@ body { background: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
   </div>
 </div>
 
-<!-- ===== หน้าโปรไฟล์ ประวัติวิดีโอ ===== -->
+<!-- ===== หน้าโปรไฟล์ ===== -->
 <div class="page profile-page" id="profilePage">
   <button class="back-btn" id="backBtn">◀ กลับ</button>
-  <h2 class="profile-title">วิดีโอที่บันทึกไว้</h2>
+  
+  <div class="profile-header">
+    <div class="profile-avatar-large" id="profileAvatarLarge">
+      <span id="largeAvatarText">👤</span>
+      <img id="largeAvatarImg" alt="รูปโปรไฟล์">
+    </div>
+    <h2 class="profile-name" id="profileNameDisplay">ผู้ใช้ ThaiPodee</h2>
+    <input type="text" class="edit-name-input" id="editNameInput" placeholder="พิมพ์ชื่อของคุณ">
+    <div>
+      <button class="change-avatar-btn" id="changeAvatarBtn">📷 เปลี่ยนรูป</button>
+      <button class="change-avatar-btn" id="editNameBtn" style="background:#222;">✏️ เปลี่ยนชื่อ</button>
+      <button class="save-name-btn" id="saveNameBtn" style="display:none;">✅ บันทึกชื่อ</button>
+    </div>
+    <input type="file" class="hidden-input" id="avatarInput" accept="image/*">
+  </div>
+
+  <h3 class="profile-title">วิดีโอที่บันทึกไว้</h3>
   <div class="video-list" id="videoList">
     <p class="empty-text" id="emptyText">ยังไม่มีวิดีโอที่บันทึก</p>
   </div>
@@ -204,9 +228,70 @@ const videoPlayer = document.getElementById('videoPlayer');
 const uploadInput = document.getElementById('uploadInput');
 const uploadBtn = document.getElementById('uploadBtn');
 const videoList = document.getElementById('videoList');
-const emptyText = document.getElementById('emptyText');
 
-// ===== แสดงรายการวิดีโอในโปรไฟล์ =====
+// ===== โปรไฟล์ =====
+const avatarImg = document.getElementById('avatarImg');
+const avatarCircle = document.getElementById('avatarCircle');
+const largeAvatarImg = document.getElementById('largeAvatarImg');
+const largeAvatarText = document.getElementById('largeAvatarText');
+const profileNameDisplay = document.getElementById('profileNameDisplay');
+const editNameInput = document.getElementById('editNameInput');
+const editNameBtn = document.getElementById('editNameBtn');
+const saveNameBtn = document.getElementById('saveNameBtn');
+const avatarInput = document.getElementById('avatarInput');
+
+// โหลดข้อมูลที่บันทึกไว้
+function loadProfile() {
+  const savedName = localStorage.getItem('thaipodeeName');
+  const savedAvatar = localStorage.getItem('thaipodeeAvatar');
+  
+  if (savedName) profileNameDisplay.textContent = savedName;
+  if (savedAvatar) {
+    avatarImg.src = savedAvatar; avatarImg.style.display = 'block';
+    avatarCircle.style.display = 'none';
+    largeAvatarImg.src = savedAvatar; largeAvatarImg.style.display = 'block';
+    largeAvatarText.style.display = 'none';
+  }
+}
+
+// เปลี่ยนรูป
+document.getElementById('changeAvatarBtn').addEventListener('click', () => avatarInput.click());
+avatarInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    localStorage.setItem('thaipodeeAvatar', dataUrl);
+    avatarImg.src = dataUrl; avatarImg.style.display = 'block';
+    avatarCircle.style.display = 'none';
+    largeAvatarImg.src = dataUrl; largeAvatarImg.style.display = 'block';
+    largeAvatarText.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// เปลี่ยนชื่อ
+editNameBtn.addEventListener('click', () => {
+  const currentName = profileNameDisplay.textContent;
+  editNameInput.value = currentName;
+  editNameInput.style.display = 'block';
+  saveNameBtn.style.display = 'inline-block';
+  editNameBtn.style.display = 'none';
+  profileNameDisplay.style.display = 'none';
+  editNameInput.focus();
+});
+saveNameBtn.addEventListener('click', () => {
+  const newName = editNameInput.value.trim() || 'ผู้ใช้ ThaiPodee';
+  localStorage.setItem('thaipodeeName', newName);
+  profileNameDisplay.textContent = newName;
+  editNameInput.style.display = 'none';
+  saveNameBtn.style.display = 'none';
+  editNameBtn.style.display = 'inline-block';
+  profileNameDisplay.style.display = 'block';
+});
+
+// ===== รายการวิดีโอ =====
 function renderVideoList() {
   videoList.innerHTML = '';
   if (savedVideos.length === 0) {
@@ -227,8 +312,6 @@ function renderVideoList() {
     videoList.appendChild(item);
   });
 }
-
-// ===== เล่นวิดีโอที่กดจากรายการ =====
 function playSelectedVideo(index) {
   const vid = savedVideos[index];
   if (!vid) return;
@@ -236,34 +319,30 @@ function playSelectedVideo(index) {
   videoArea.classList.add('has-video');
   showPage('main');
 }
-
-// ===== เปลี่ยนหน้า =====
 function showPage(page) {
   mainPage.classList.toggle('active', page === 'main');
   profilePage.classList.toggle('active', page === 'profile');
 }
-
-// ===== โหลดรายการเมื่อเข้า =====
 document.getElementById('navProfile').addEventListener('click', () => {
   renderVideoList();
   showPage('profile');
   setActiveNav('navProfile');
 });
-
 document.getElementById('backBtn').addEventListener('click', () => {
   showPage('main');
   setActiveNav('navHome');
 });
 
-// ===== โหลดวิดีโอล่าสุด =====
+// ===== โหลดครั้งแรก =====
 window.addEventListener('load', () => {
+  loadProfile();
   if (savedVideos.length > 0) {
     videoPlayer.src = savedVideos[savedVideos.length - 1].url;
     videoArea.classList.add('has-video');
   }
 });
 
-// ===== เลือกไฟล์ใหม่ =====
+// ===== อัปโหลดวิดีโอ =====
 uploadBtn.addEventListener('click', () => uploadInput.click());
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -271,17 +350,13 @@ uploadInput.addEventListener('change', (e) => {
   const url = URL.createObjectURL(file);
   const now = new Date();
   const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
-  
-  // เพิ่มลงรายการ
   savedVideos.push({ url, date: dateStr, name: file.name });
   localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
-  
-  // แสดงทันที
   videoPlayer.src = url;
   videoArea.classList.add('has-video');
 });
 
-// ===== กดเล่น/หยุด =====
+// ===== เล่น/หยุด =====
 videoArea.addEventListener('click', (e) => {
   if (e.target === uploadBtn || e.target === uploadInput) return;
   if (!videoPlayer.src) return;
@@ -289,7 +364,7 @@ videoArea.addEventListener('click', (e) => {
   else { videoPlayer.pause(); isPlaying = false; videoArea.classList.remove('playing'); }
 });
 
-// ===== ปุ่มขวา =====
+// ===== ปุ่มอื่น ๆ =====
 document.getElementById('btnLike').onclick = () => {
   liked = !liked; likeCount += liked ? 1 : -1;
   document.getElementById('likeNum').textContent = likeCount;
@@ -299,7 +374,6 @@ document.getElementById('btnComment').onclick = () => { commentCount++; document
 document.getElementById('btnSave').onclick = () => { saveCount++; document.getElementById('saveNum').textContent = saveCount; };
 document.getElementById('btnShare').onclick = () => { shareCount++; document.getElementById('shareNum').textContent = shareCount; };
 document.getElementById('btnMusic').onclick = () => alert('เปลี่ยนเพลงประกอบ');
-document.getElementById('btnAvatar').onclick = () => alert('เปลี่ยนรูปโปรไฟล์');
 
 // ===== แถบล่าง =====
 function setActiveNav(id) {
