@@ -1,12 +1,13 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
    เวอร์ชัน: v1008
-   วันที่: 24 กันยายน 2569 15:57 น.
-   พัฒนาจาก: v1008 — เอารูปกล้อง+ข้อความออก / ด้านขวา 6 ตัวครบ
+   วันที่: 24 กันยายน 2569 17:20 น.
+   พัฒนาจาก: v1008 — แก้วิดีโอล้นจอ ให้พอดีจอ ไม่ตัดภาพ
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    --------------------------------------------------------------
-   ✅ เอารูปกล้องและข้อความแนะนำออกแล้ว — พื้นดำเปล่า
+   ✅ แก้แล้ว: วิดีโอพอดีจอมือถือ/แท็บเล็ต ไม่ล้น ไม่ตัดส่วนหาย
    ✅ ด้านขวา 6 ตัว ครบ: 👤+ / 🤍 / 💬 / 🔖 / ↗️ / 🎵
+   ✅ ไม่มีกล้อง+ข้อความ — พื้นดำเปล่า
    ✅ แถบล่าง 5 ตัว ครบ ไม่มี 99+ คงที่
    ============================================================== -->
 <!DOCTYPE html>
@@ -21,9 +22,12 @@
 <title>ThaiPodee v1008</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
+html, body {
+  height: 100%; overflow: hidden; background: #000; color: #fff;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+}
 
-.page { display: none; width: 100%; min-height: 100vh; }
+.page { display: none; width: 100%; height: 100%; }
 .page.active { display: block; }
 
 /* ===== แถบบน ===== */
@@ -41,24 +45,35 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 .top-tab.active { color: #fff; border-bottom: 2px solid #fff; font-weight: 500; }
 .top-search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; color: #fff; }
 
-/* ===== พื้นที่ฟีด — ไม่มีกล้อง ไม่มีข้อความ ===== */
+/* ===== พื้นที่ฟีด — ขอบเขตชัดเจน ===== */
 .feed {
-  height: 100vh; overflow-y: auto;
-  scroll-snap-type: y mandatory; padding-top: 50px;
+  position: absolute; top: 50px; bottom: 60px; left: 0; right: 0;
+  overflow: hidden;
 }
 .feed-item {
-  height: 100vh; scroll-snap-align: start;
-  position: relative; background: #000;
+  position: relative; width: 100%; height: 100%;
+  background: #000;
+  overflow: hidden;
 }
 .feed-placeholder { display: none !important; }
+
+/* ===== วิดีโอ — พอดีจอ ไม่ล้น ไม่ตัด ✅ ===== */
 .feed-video {
-  width: 100%; height: 100%; object-fit: cover;
-  position: absolute; top: 0; left: 0; display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* แสดงทั้งภาพ พอดีพื้นที่ ไม่ตัดขอบ */
+  display: none;
+  background: #000;
 }
 
-/* ===== มุมล่างซ้าย — แสดงเมื่อมีวิดีโอ ===== */
+/* ===== มุมล่างซ้าย ===== */
 .bottom-left {
-  position: absolute; left: 16px; right: 100px; bottom: 80px;
+  position: absolute; left: 16px; right: 90px; bottom: 16px;
   z-index: 10; display: none;
 }
 .bl-username {
@@ -81,7 +96,7 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
   position: absolute; right: 12px; top: 50%;
   transform: translateY(-50%);
   display: flex; flex-direction: column;
-  align-items: center; gap: 22px;
+  align-items: center; gap: 24px;
   z-index: 10;
 }
 .s-avatar-wrap { position: relative; cursor: pointer; }
@@ -161,13 +176,13 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
   <div class="feed">
     <div class="feed-item">
-      <!-- ไม่มีกล้อง ไม่มีข้อความ -- พื้นดำเปล่า -->
+      <!-- พื้นดำเปล่า ไม่มีกล้อง ไม่มีข้อความ -->
       <div class="feed-placeholder" id="placeholder"></div>
 
-      <!-- วิดีโอ -->
+      <!-- วิดีโอ — พอดีจอ ไม่ตัดขอบ ✅ -->
       <video class="feed-video" id="videoPlayer" controls playsinline loop muted autoplay></video>
 
-      <!-- ข้อมูลด้านล่างซ้าย -- แสดงตอนมีวิดีโอ -->
+      <!-- ข้อมูลด้านล่างซ้าย -->
       <div class="bottom-left" id="postInfo">
         <div class="bl-username">
           <span>@thaipodee</span>
@@ -178,57 +193,47 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
         <div class="bl-search-bar">🔍 ค้นหาเนื้อหาที่เกี่ยวข้อง</div>
       </div>
 
-      <!-- ด้านขวา -- 6 ตัว ครบ -->
+      <!-- ด้านขวา 6 ตัว ครบ -->
       <div class="side-bar" id="sideButtons">
-        <!-- 1. โปรไฟล์+ -->
         <div class="s-avatar-wrap" onclick="goPage('page-profile')">
           <div class="s-avatar">👤</div>
           <div class="s-add-btn">+</div>
         </div>
-        <!-- 2. ถูกใจ -->
         <div class="s-btn" id="likeBtn">
           <span class="s-icon">🤍</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 3. คอมเมนต์ -->
         <div class="s-btn">
           <span class="s-icon">💬</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 4. บันทึก -->
         <div class="s-btn">
           <span class="s-icon">🔖</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 5. แชร์ -->
         <div class="s-btn">
           <span class="s-icon">↗️</span>
           <span class="s-num">0</span>
         </div>
-        <!-- 6. เพลง -->
         <div class="s-music">🎵</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- หน้าร้านค้า -->
+<!-- หน้าอื่น -->
 <div class="page" id="page-shop">
   <div class="page-inner">
     <h2>ร้านค้า</h2>
     <p>สินค้าจะแสดงที่นี่</p>
   </div>
 </div>
-
-<!-- หน้าข้อความ -->
 <div class="page" id="page-inbox">
   <div class="page-inner">
     <h2>กล่องข้อความ</h2>
     <p>ยังไม่มีข้อความ</p>
   </div>
 </div>
-
-<!-- หน้าโปรไฟล์ -->
 <div class="page" id="page-profile">
   <div class="page-inner">
     <h2>โปรไฟล์</h2>
@@ -261,37 +266,26 @@ html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 <input type="file" id="fileInput" accept="video/*" class="hidden">
 
 <script>
-// เปลี่ยนหน้า
 function goPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll(`[data-page="${pageId}"]`).forEach(n => n.classList.add('active'));
 }
+document.querySelectorAll('.nav-item').forEach(i => i.onclick = () => goPage(i.dataset.page));
 
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => goPage(item.dataset.page));
-});
-
-// อัปโหลดวิดีโอ
-document.getElementById('uploadBtn').addEventListener('click', () => {
-  document.getElementById('fileInput').click();
-});
-
-document.getElementById('fileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  
-  const url = URL.createObjectURL(file);
-  const video = document.getElementById('videoPlayer');
-  video.src = url;
-  
+document.getElementById('uploadBtn').onclick = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const v = document.getElementById('videoPlayer');
+  v.src = url;
   document.getElementById('placeholder').style.display = 'none';
-  video.style.display = 'block';
+  v.style.display = 'block';
   document.getElementById('postInfo').style.display = 'block';
-});
+};
 
-// ปุ่มถูกใจ
 let liked = false;
 document.addEventListener('click', e => {
   if (e.target.closest('#likeBtn') && !liked) {
@@ -301,19 +295,18 @@ document.addEventListener('click', e => {
   }
 });
 
-// แจ้งเตือน
 let unreadCount = 0;
 function updateBadge() {
-  const badge = document.getElementById('msgBadge');
-  badge.style.display = unreadCount > 0 ? 'block' : 'none';
-  if (unreadCount > 0) badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+  const b = document.getElementById('msgBadge');
+  b.style.display = unreadCount > 0 ? 'block' : 'none';
+  if (unreadCount > 0) b.textContent = unreadCount > 99 ? '99+' : unreadCount;
 }
 updateBadge();
 </script>
 
 <!-- ==============================================================
-   v1008 — เพิ่มเติมต่อจากบรรทัดนี้ลงไปเท่านั้น
-   ไม่ย้อนขึ้นไปแก้ข้างบน
+   v1008 — ปรับวิดีโอใช้ object-fit:contain → แสดงทั้งภาพ พอดีจอ
+   ไม่ตัดขอบ ไม่ล้น ทั้งมือถือและแท็บเล็ต
    ============================================================== -->
 </body>
 </html>
