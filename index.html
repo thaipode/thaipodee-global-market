@@ -1,312 +1,55 @@
-<!-- ==============================================================
-   โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v1008
-   วันที่: 24 กันยายน 2569 17:20 น.
-   พัฒนาจาก: v1008 — แก้วิดีโอล้นจอ ให้พอดีจอ ไม่ตัดภาพ
-   ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   --------------------------------------------------------------
-   ✅ แก้แล้ว: วิดีโอพอดีจอมือถือ/แท็บเล็ต ไม่ล้น ไม่ตัดส่วนหาย
-   ✅ ด้านขวา 6 ตัว ครบ: 👤+ / 🤍 / 💬 / 🔖 / ↗️ / 🎵
-   ✅ ไม่มีกล้อง+ข้อความ — พื้นดำเปล่า
-   ✅ แถบล่าง 5 ตัว ครบ ไม่มี 99+ คงที่
-   ============================================================== -->
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<title>ThaiPodee v1008</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-html, body {
-  height: 100%; overflow: hidden; background: #000; color: #fff;
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-}
-
-.page { display: none; width: 100%; height: 100%; }
-.page.active { display: block; }
-
-/* ===== แถบบน ===== */
-.top-bar {
-  position: fixed; top: 0; left: 0; right: 0;
-  padding: 12px 16px;
-  display: flex; justify-content: center; align-items: center;
-  gap: 24px; z-index: 100;
-  background: rgba(0,0,0,0.9);
-}
-.top-tab {
-  font-size: 15px; color: #999;
-  cursor: pointer; padding-bottom: 4px;
-}
-.top-tab.active { color: #fff; border-bottom: 2px solid #fff; font-weight: 500; }
-.top-search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; color: #fff; }
-
-/* ===== พื้นที่ฟีด — ขอบเขตชัดเจน ===== */
+/* ===== พื้นที่ฟีด — ลดพื้นที่บน-ล่าง ===== */
 .feed {
-  position: absolute; top: 50px; bottom: 60px; left: 0; right: 0;
+  position: absolute;
+  top: 70px;
+  bottom: 80px;
+  left: 0;
+  right: 0;
   overflow: hidden;
 }
+
 .feed-item {
-  position: relative; width: 100%; height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
   background: #000;
   overflow: hidden;
 }
-.feed-placeholder { display: none !important; }
 
-/* ===== วิดีโอ — พอดีจอ ไม่ล้น ไม่ตัด ✅ ===== */
+/* ===== วิดีโอ — อยู่ตรงกลาง ขยายด้านข้างเต็มจอ ===== */
 .feed-video {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
+  width: 100%;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* แสดงทั้งภาพ พอดีพื้นที่ ไม่ตัดขอบ */
+  object-fit: cover;
   display: none;
   background: #000;
 }
 
-/* ===== มุมล่างซ้าย ===== */
+/* ===== มุมล่างซ้าย — ปรับระยะห่าง ===== */
 .bottom-left {
-  position: absolute; left: 16px; right: 90px; bottom: 16px;
-  z-index: 10; display: none;
-}
-.bl-username {
-  display: flex; align-items: center; gap: 6px;
-  font-weight: 600; font-size: 14px; margin-bottom: 6px;
-}
-.bl-tag {
-  background: #333; border-radius: 10px;
-  padding: 2px 8px; font-size: 11px; margin-left: 8px;
-}
-.bl-desc { font-size: 13px; line-height: 1.5; margin-bottom: 6px; }
-.bl-hashtag { font-size: 12px; color: #88c8ff; margin-bottom: 8px; }
-.bl-search-bar {
-  background: #222; border-radius: 4px; padding: 6px 10px;
-  font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px;
+  position: absolute;
+  left: 16px;
+  right: 90px;
+  bottom: 16px;
+  z-index: 10;
+  display: none;
 }
 
-/* ===== ด้านขวา — 6 ตัว ครบ ===== */
+/* ===== ด้านขวา — ปรับตำแหน่ง ===== */
 .side-bar {
-  position: absolute; right: 12px; top: 50%;
+  position: absolute;
+  right: 12px;
+  top: 50%;
   transform: translateY(-50%);
-  display: flex; flex-direction: column;
-  align-items: center; gap: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
   z-index: 10;
 }
-.s-avatar-wrap { position: relative; cursor: pointer; }
-.s-avatar {
-  width: 48px; height: 48px; border-radius: 50%;
-  overflow: hidden; border: 2px solid #fff; background: #333;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-}
-.s-add-btn {
-  position: absolute; bottom: -6px; left: 50%;
-  transform: translateX(-50%);
-  width: 20px; height: 20px; background: #f02b2b;
-  border-radius: 50%; display: flex;
-  align-items: center; justify-content: center;
-  font-size: 14px; font-weight: bold; color: #fff;
-}
-.s-btn {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 2px; cursor: pointer;
-}
-.s-icon { font-size: 28px; }
-.s-num { font-size: 11px; color: #fff; }
-.s-music {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: #222; display: flex;
-  align-items: center; justify-content: center;
-  font-size: 24px;
-}
-
-/* ===== หน้าอื่น ===== */
-.page-inner { padding: 80px 16px 80px; text-align: center; }
-.page-inner h2 { font-size: 20px; margin-bottom: 12px; }
-.page-inner p { color: #888; }
-
-/* ===== แถบล่าง ===== */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: 60px; display: flex;
-  justify-content: space-around; align-items: center;
-  background: #000; border-top: 1px solid #222; z-index: 100;
-}
-.nav-item {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 2px; cursor: pointer;
-  position: relative;
-}
-.nav-icon { font-size: 22px; }
-.nav-label { font-size: 10px; color: #888; }
-.nav-item.active .nav-label { color: #fff; }
-.nav-center {
-  width: 44px; height: 32px; background: #fff;
-  border-radius: 6px; display: flex;
-  align-items: center; justify-content: center;
-  color: #000; font-size: 22px; font-weight: bold;
-  cursor: pointer;
-}
-.nav-badge {
-  position: absolute; top: -2px; right: -6px;
-  background: #f02b2b; color: #fff;
-  font-size: 9px; padding: 1px 5px;
-  border-radius: 10px; display: none;
-}
-
-.hidden { display: none !important; }
-</style>
-</head>
-<body>
-
-<!-- หน้าแรก -->
-<div class="page active" id="page-home">
-  <div class="top-bar">
-    <span class="top-tab">กำลังติดตาม</span>
-    <span class="top-tab active">สำหรับคุณ</span>
-    <span class="top-search">🔍</span>
-  </div>
-
-  <div class="feed">
-    <div class="feed-item">
-      <!-- พื้นดำเปล่า ไม่มีกล้อง ไม่มีข้อความ -->
-      <div class="feed-placeholder" id="placeholder"></div>
-
-      <!-- วิดีโอ — พอดีจอ ไม่ตัดขอบ ✅ -->
-      <video class="feed-video" id="videoPlayer" controls playsinline loop muted autoplay></video>
-
-      <!-- ข้อมูลด้านล่างซ้าย -->
-      <div class="bottom-left" id="postInfo">
-        <div class="bl-username">
-          <span>@thaipodee</span>
-          <span class="bl-tag">ติดตาม</span>
-        </div>
-        <div class="bl-desc">ThaiPodee — แชร์วิดีโอและสินค้า</div>
-        <div class="bl-hashtag">#ThaiPodee #แชร์วิดีโอ #สินค้าไทย</div>
-        <div class="bl-search-bar">🔍 ค้นหาเนื้อหาที่เกี่ยวข้อง</div>
-      </div>
-
-      <!-- ด้านขวา 6 ตัว ครบ -->
-      <div class="side-bar" id="sideButtons">
-        <div class="s-avatar-wrap" onclick="goPage('page-profile')">
-          <div class="s-avatar">👤</div>
-          <div class="s-add-btn">+</div>
-        </div>
-        <div class="s-btn" id="likeBtn">
-          <span class="s-icon">🤍</span>
-          <span class="s-num">0</span>
-        </div>
-        <div class="s-btn">
-          <span class="s-icon">💬</span>
-          <span class="s-num">0</span>
-        </div>
-        <div class="s-btn">
-          <span class="s-icon">🔖</span>
-          <span class="s-num">0</span>
-        </div>
-        <div class="s-btn">
-          <span class="s-icon">↗️</span>
-          <span class="s-num">0</span>
-        </div>
-        <div class="s-music">🎵</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- หน้าอื่น -->
-<div class="page" id="page-shop">
-  <div class="page-inner">
-    <h2>ร้านค้า</h2>
-    <p>สินค้าจะแสดงที่นี่</p>
-  </div>
-</div>
-<div class="page" id="page-inbox">
-  <div class="page-inner">
-    <h2>กล่องข้อความ</h2>
-    <p>ยังไม่มีข้อความ</p>
-  </div>
-</div>
-<div class="page" id="page-profile">
-  <div class="page-inner">
-    <h2>โปรไฟล์</h2>
-    <p>ข้อมูลของคุณจะแสดงที่นี่</p>
-  </div>
-</div>
-
-<!-- แถบล่าง -->
-<div class="bottom-nav">
-  <div class="nav-item active" data-page="page-home">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">หน้าหลัก</span>
-  </div>
-  <div class="nav-item" data-page="page-shop">
-    <span class="nav-icon">🛍️</span>
-    <span class="nav-label">ร้านค้า</span>
-  </div>
-  <div class="nav-center" id="uploadBtn">+</div>
-  <div class="nav-item" data-page="page-inbox">
-    <span class="nav-icon">💬</span>
-    <span class="nav-label">ข้อความ</span>
-    <span class="nav-badge" id="msgBadge"></span>
-  </div>
-  <div class="nav-item" data-page="page-profile">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">โปรไฟล์</span>
-  </div>
-</div>
-
-<input type="file" id="fileInput" accept="video/*" class="hidden">
-
-<script>
-function goPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll(`[data-page="${pageId}"]`).forEach(n => n.classList.add('active'));
-}
-document.querySelectorAll('.nav-item').forEach(i => i.onclick = () => goPage(i.dataset.page));
-
-document.getElementById('uploadBtn').onclick = () => document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange = e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const url = URL.createObjectURL(f);
-  const v = document.getElementById('videoPlayer');
-  v.src = url;
-  document.getElementById('placeholder').style.display = 'none';
-  v.style.display = 'block';
-  document.getElementById('postInfo').style.display = 'block';
-};
-
-let liked = false;
-document.addEventListener('click', e => {
-  if (e.target.closest('#likeBtn') && !liked) {
-    liked = true;
-    document.querySelector('#likeBtn .s-icon').textContent = '❤️';
-    document.querySelector('#likeBtn .s-num').textContent = '1';
-  }
-});
-
-let unreadCount = 0;
-function updateBadge() {
-  const b = document.getElementById('msgBadge');
-  b.style.display = unreadCount > 0 ? 'block' : 'none';
-  if (unreadCount > 0) b.textContent = unreadCount > 99 ? '99+' : unreadCount;
-}
-updateBadge();
-</script>
-
-<!-- ==============================================================
-   v1008 — ปรับวิดีโอใช้ object-fit:contain → แสดงทั้งภาพ พอดีจอ
-   ไม่ตัดขอบ ไม่ล้น ทั้งมือถือและแท็บเล็ต
-   ============================================================== -->
-</body>
-</html>
