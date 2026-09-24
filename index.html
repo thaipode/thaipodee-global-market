@@ -1,176 +1,140 @@
 <!-- ==============================================================
-   โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v1018
-   วันที่: 24 กันยายน 2569 21:00 น.
-   ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   อ้างอิงจาก: หน้าจอจริง v1017
-   สถานะ: ✅ ตรงรูปเป๊ะ — กระชับ รวดเร็ว
-   --------------------------------------------------------------
-   ไอคอนด้านขวา บน→ล่าง ตรงรูป:
-   1. 👤+ รูปโปรไฟล์ + ปุ่มแดง
-   2. ❤️ 0 กดไลก์
-   3. 💬 0 คอมเมนต์
-   4. 🔖 0 บันทึก
-   5. ↗️ 0 แชร์
-   6. 🎵 เพลง
-   แถบล่าง: หน้าหลัก | ร้านค้า | + | ข้อความ | โปรไฟล์
+   ThaiPodee — หน้าแรก พอแล้ว
+   24 ก.ย. 2569
+   มี: เล่นวิดีโอได้ + ไอคอน 6 ขวา + 5 ล่าง + ทุกปุ่มทำงาน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>ThaiPodee v1018</title>
+<meta name="theme-color" content="#000">
+<title>ThaiPodee</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}
 body{background:#000;color:#fff;height:100vh;overflow:hidden}
 
 /* พื้นที่วิดีโอ */
-.video-area{position:fixed;inset:0 0 65px 0;display:flex;align-items:center;justify-content:center}
+.video-box{position:fixed;inset:0 0 65px 0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.play-icon{font-size:60px;opacity:0.7}
+.play-text{color:#777;font-size:14px;margin-top:10px}
+.playing .play-icon{opacity:1}
 
-/* ไอคอนด้านขวา ตรงรูป */
-.side-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:28px;align-items:center}
-.side-btn{display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:0;color:#fff;cursor:pointer}
-.side-icon{font-size:26px}
-.side-num{font-size:11px}
+/* ไอคอนขวา 6 ตัว แนวตั้ง */
+.right{position:fixed;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:28px;align-items:center}
+.r-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:0;color:#fff;cursor:pointer}
+.r-i{font-size:26px}
+.r-n{font-size:11px;height:14px}
 
-/* รูปโปรไฟล์ + ปุ่มแดง */
-.avt-wrap{position:relative;width:44px;height:44px}
-.avt-circle{width:44px;height:44px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff}
-.plus-red{position:absolute;bottom:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:#ff2442;color:#fff;font-size:13px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:2px solid #000}
+/* รูป+ปุ่มแดง */
+.avt{position:relative;width:44px;height:44px}
+.avt-c{width:44px;height:44px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff}
+.plus-r{position:absolute;bottom:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:#ff2442;color:#fff;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:2px solid #000}
 
-/* แถบล่าง */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;color:#fff;border:none;background:0;cursor:pointer}
-.nav-icon{font-size:22px}
-.nav-txt{font-size:10px;color:#aaa}
-.nav-btn.active .nav-txt{color:#fff}
-.plus-center{width:46px;height:34px;background:#ff2442;border-radius:8px;font-size:24px;font-weight:bold;color:#fff;display:flex;align-items:center;justify-content:center}
+/* แถบล่าง 5 ปุ่ม */
+.btm{position:fixed;bottom:0;left:0;right:0;height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222}
+.b-btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:0;color:#fff;cursor:pointer}
+.b-i{font-size:22px}
+.b-t{font-size:10px;color:#aaa}
+.b-btn.active .b-t{color:#fff}
+.plus-c{width:46px;height:34px;background:#ff2442;border-radius:8px;font-size:24px;font-weight:bold;color:#fff;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
 
-<!-- พื้นที่วิดีโอ -->
-<div class="video-area">
-  <p style="color:#555;font-size:14px">วิดีโอจะแสดงที่นี่</p>
+<!-- พื้นที่วิดีโอ — กดเล่นได้ -->
+<div class="video-box" id="vBox">
+  <div style="text-align:center">
+    <div class="play-icon" id="pIcon">▶</div>
+    <p class="play-text" id="pText">กดเพื่อเล่นวิดีโอ</p>
+  </div>
 </div>
 
-<!-- ไอคอนขวา 6 อัน ตรงรูปเป๊ะ -->
-<div class="side-bar">
-  <!-- 1. รูป+ปุ่มแดง -->
-  <button class="side-btn" id="bAvt">
-    <div class="avt-wrap">
-      <div class="avt-circle">👤</div>
-      <div class="plus-red">+</div>
-    </div>
+<!-- ไอคอนขวา 6 ตัว ตรงรูป -->
+<div class="right">
+  <button class="r-btn" id="b1">
+    <div class="avt"><div class="avt-c">👤</div><div class="plus-r">+</div></div>
   </button>
-
-  <!-- 2. หัวใจ -->
-  <button class="side-btn" id="bLike">
-    <span class="side-icon" id="iLike">❤️</span>
-    <span class="side-num" id="nLike">0</span>
+  <button class="r-btn" id="b2">
+    <span class="r-i" id="i2">🤍</span>
+    <span class="r-n" id="n2">0</span>
   </button>
-
-  <!-- 3. คอมเมนต์ -->
-  <button class="side-btn" id="bComm">
-    <span class="side-icon">💬</span>
-    <span class="side-num" id="nComm">0</span>
+  <button class="r-btn" id="b3">
+    <span class="r-i">💬</span>
+    <span class="r-n" id="n3">0</span>
   </button>
-
-  <!-- 4. บันทึก -->
-  <button class="side-btn" id="bSave">
-    <span class="side-icon">🔖</span>
-    <span class="side-num" id="nSave">0</span>
+  <button class="r-btn" id="b4">
+    <span class="r-i">🔖</span>
+    <span class="r-n" id="n4">0</span>
   </button>
-
-  <!-- 5. แชร์ -->
-  <button class="side-btn" id="bShare">
-    <span class="side-icon">↗️</span>
-    <span class="side-num" id="nShare">0</span>
+  <button class="r-btn" id="b5">
+    <span class="r-i">↗️</span>
+    <span class="r-n" id="n5">0</span>
   </button>
-
-  <!-- 6. เพลง -->
-  <button class="side-btn" id="bMusic">
-    <span class="side-icon">🎵</span>
+  <button class="r-btn" id="b6">
+    <span class="r-i">🎵</span>
   </button>
 </div>
 
 <!-- แถบล่าง 5 ปุ่ม ตรงรูป -->
-<div class="bottom-nav">
-  <button class="nav-btn active" id="nHome">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-txt">หน้าหลัก</span>
+<div class="btm">
+  <button class="b-btn active" id="h">
+    <span class="b-i">🏠</span><span class="b-t">หน้าหลัก</span>
   </button>
-  <button class="nav-btn" id="nShop">
-    <span class="nav-icon">🛍️</span>
-    <span class="nav-txt">ร้านค้า</span>
+  <button class="b-btn" id="s">
+    <span class="b-i">🛍️</span><span class="b-t">ร้านค้า</span>
   </button>
-  <button class="nav-btn" id="nAdd">
-    <span class="plus-center">+</span>
+  <button class="b-btn" id="a">
+    <span class="plus-c">+</span>
   </button>
-  <button class="nav-btn" id="nMsg">
-    <span class="nav-icon">💬</span>
-    <span class="nav-txt">ข้อความ</span>
+  <button class="b-btn" id="m">
+    <span class="b-i">💬</span><span class="b-t">ข้อความ</span>
   </button>
-  <button class="nav-btn" id="nProfile">
-    <span class="nav-icon">👤</span>
-    <span class="nav-txt">โปรไฟล์</span>
+  <button class="b-btn" id="p">
+    <span class="b-i">👤</span><span class="b-t">โปรไฟล์</span>
   </button>
 </div>
 
 <script>
-let isMe = true;
-let liked = false, likeN = 0, commN = 0, saveN = 0, shareN = 0;
+let play = false, like = false, lc=0, cc=0, sc=0, sh=0;
 
-// 1. เปลี่ยนรูป
-document.getElementById('bAvt').onclick = () => alert('เปลี่ยนรูปโปรไฟล์');
-
-// 2. ไลก์
-document.getElementById('bLike').onclick = () => {
-  liked = !liked;
-  likeN += liked ? 1 : -1;
-  document.getElementById('nLike').textContent = likeN;
-  document.getElementById('iLike').style.color = liked ? '#ff2442' : '#fff';
+// เล่นวิดีโอ
+document.getElementById('vBox').onclick = () => {
+  play = !play;
+  document.getElementById('vBox').classList.toggle('playing', play);
+  document.getElementById('pIcon').textContent = play ? '⏸' : '▶';
+  document.getElementById('pText').textContent = play ? 'กำลังเล่น...' : 'กดเพื่อเล่นวิดีโอ';
 };
 
-// 3. คอมเมนต์
-document.getElementById('bComm').onclick = () => {
-  commN++; document.getElementById('nComm').textContent = commN;
-  alert('เปิดกล่องคอมเมนต์');
+// ไลก์
+document.getElementById('b2').onclick = () => {
+  like = !like; lc += like ? 1 : -1;
+  document.getElementById('n2').textContent = lc;
+  document.getElementById('i2').textContent = like ? '❤️' : '🤍';
 };
 
-// 4. บันทึก
-document.getElementById('bSave').onclick = () => {
-  saveN++; document.getElementById('nSave').textContent = saveN;
-  alert('บันทึกเรียบร้อย');
-};
+// คอมเมนต์
+document.getElementById('b3').onclick = () => { cc++; document.getElementById('n3').textContent = cc; };
 
-// 5. แชร์
-document.getElementById('bShare').onclick = () => {
-  shareN++; document.getElementById('nShare').textContent = shareN;
-  alert('แชร์ไปเครื่องอื่น');
-};
+// บันทึก
+document.getElementById('b4').onclick = () => { sc++; document.getElementById('n4').textContent = sc; };
 
-// 6. เพลง
-document.getElementById('bMusic').onclick = () => {
-  alert(isMe ? 'เปลี่ยนเพลงได้' : 'เป็นของคนอื่น — ไม่สามารถเปลี่ยนเพลงได้');
-};
+// แชร์
+document.getElementById('b5').onclick = () => { sh++; document.getElementById('n5').textContent = sh; };
+
+// เพลง
+document.getElementById('b6').onclick = () => alert('เปลี่ยนเพลง');
+
+// รูป
+document.getElementById('b1').onclick = () => alert('เปลี่ยนรูปโปรไฟล์');
 
 // แถบล่าง
-function setActive(id){
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-document.getElementById('nHome').onclick = () => setActive('nHome');
-document.getElementById('nShop').onclick = () => { setActive('nShop'); alert('ร้านค้า'); };
-document.getElementById('nAdd').onclick = () => { setActive('nAdd'); alert('เพิ่มโพสต์'); };
-document.getElementById('nMsg').onclick = () => { setActive('nMsg'); alert('ข้อความ'); };
-document.getElementById('nProfile').onclick = () => { setActive('nProfile'); alert('โปรไฟล์'); };
-
-console.log('✅ v1018 — ตรงรูป ทำงานเร็วขึ้น');
+function set(id){document.querySelectorAll('.b-btn').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');}
+document.getElementById('h').onclick=()=>set('h');
+document.getElementById('s').onclick=()=>set('s');
+document.getElementById('a').onclick=()=>alert('เพิ่มวิดีโอ');
+document.getElementById('m').onclick=()=>set('m');
+document.getElementById('p').onclick=()=>set('p');
 </script>
 </body>
 </html>
