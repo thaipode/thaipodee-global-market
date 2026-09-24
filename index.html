@@ -1,16 +1,15 @@
 <!-- ==============================================================
    โครงการ: ThaiPodee Global Market
-   เวอร์ชัน: v1002 — ตรงตามรูปเป๊ะ ทุกไอคอนครบ
+   เวอร์ชัน: v1008
+   วันที่: 24 กันยายน 2569 15:39 น.
+   พัฒนาจาก: v1008 (แก้ให้เมนูด้านขวาโชว์ทันที)
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   วันที่: 24 กันยายน 2569
-   พัฒนาจาก: v1001 — ปรับให้ตรงตามรูปเป๊ะ
    --------------------------------------------------------------
-   ✅ แถบบน: กำลังติดตาม / สำหรับคุณ / 🔍
-   ✅ ด้านขวา: รูป+ปุ่ม+ / ❤️ / 💬 / 🔖 / ↗️ — ครบตามลำดับ
-   ✅ มุมล่างซ้าย: ชื่อแอคเคาน์ + คำอธิบาย + แฮชแท็ก
+   ✅ แก้แล้ว: เมนูด้านขวา 6 ตัว โชว์ทันทีตอนเปิดหน้า ไม่ต้องรออัปโหลด
+   ✅ ด้านขวา: รูป+ / ❤️ / 💬 / 🔖 / ↗️ / 🎵
    ✅ แถบล่าง: หน้าหลัก / ร้านค้า / + / ข้อความ / โปรไฟล์
-   ✅ ไม่มี 99+ คงที่ — แสดงเมื่อมีจริง
-   ✅ ไม่มี "บุรีรัมย์" — ลบออกหมดแล้ว
+   ✅ ไม่มี 99+ คงที่
+   ✅ กด + อัปโหลด → แสดงข้อมูลเพิ่มเติม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -21,215 +20,293 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<title>ThaiPodee v1002</title>
+<title>ThaiPodee v1008</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
 .page { display: none; width: 100%; min-height: 100vh; }
 .page.active { display: block; }
 
-/* ===== แถบบน — ตรงรูป ===== */
-.top-bar { position: fixed; top: 0; left: 0; right: 0; padding: 12px 16px; display: flex; justify-content: center; align-items: center; gap: 24px; z-index: 100; background: rgba(0,0,0,0.7); }
-.top-tab { font-size: 15px; color: #999; cursor: pointer; padding-bottom: 4px; }
-.top-tab.active { color: #fff; border-bottom: 2px solid #fff; }
-.top-search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; }
+/* ===== แถบบน ===== */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 12px 16px;
+  display: flex; justify-content: center; align-items: center;
+  gap: 24px; z-index: 100;
+  background: rgba(0,0,0,0.9);
+}
+.top-tab {
+  font-size: 15px; color: #999;
+  cursor: pointer; padding-bottom: 4px;
+}
+.top-tab.active { color: #fff; border-bottom: 2px solid #fff; font-weight: 500; }
+.top-search { position: absolute; right: 16px; font-size: 22px; cursor: pointer; color: #fff; }
 
-/* ===== พื้นที่วิดีโอ ===== */
-.feed { height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; padding-top: 50px; }
-.feed-item { height: 100vh; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
-.feed-placeholder { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #666; text-align: center; }
+/* ===== พื้นที่ฟีด ===== */
+.feed {
+  height: 100vh; overflow-y: auto;
+  scroll-snap-type: y mandatory; padding-top: 50px;
+}
+.feed-item {
+  height: 100vh; scroll-snap-align: start;
+  position: relative; display: flex;
+  align-items: center; justify-content: center;
+  background: #000;
+}
+.feed-placeholder {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  color: #777; text-align: center;
+}
 .feed-placeholder-icon { font-size: 48px; opacity: 0.5; }
 .feed-placeholder-text { font-size: 14px; }
-.feed-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; }
+.feed-video {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; top: 0; left: 0; display: none;
+}
 
-/* ===== มุมล่างซ้าย — ชื่อ+คำอธิบาย ตรงรูป ===== */
-.bottom-left { position: absolute; left: 16px; right: 100px; bottom: 80px; z-index: 10; display: none; }
-.bl-username { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-.bl-tag { background: #333; border-radius: 10px; padding: 2px 6px; font-size: 11px; }
+/* ===== มุมล่างซ้าย — แสดงเมื่อมีวิดีโอ ===== */
+.bottom-left {
+  position: absolute; left: 16px; right: 100px; bottom: 80px;
+  z-index: 10; display: none;
+}
+.bl-username {
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 600; font-size: 14px; margin-bottom: 6px;
+}
+.bl-tag {
+  background: #333; border-radius: 10px;
+  padding: 2px 8px; font-size: 11px; margin-left: 8px;
+}
 .bl-desc { font-size: 13px; line-height: 1.5; margin-bottom: 6px; }
-.bl-hashtag { font-size: 12px; color: #ddd; }
-.bl-search-bar { margin-top: 8px; background: #222; border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px; }
+.bl-hashtag { font-size: 12px; color: #88c8ff; margin-bottom: 8px; }
+.bl-search-bar {
+  background: #222; border-radius: 4px; padding: 6px 10px;
+  font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px;
+}
 
-/* ===== ด้านขวาแนวตั้ง — ครบทุกตัว ตรงลำดับ ===== */
-.side-bar { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; align-items: center; gap: 22px; z-index: 10; display: none; }
+/* ===== ด้านขวา — 6 ตัว โชว์ทันที ✅ ===== */
+.side-bar {
+  position: absolute; right: 12px; bottom: 90px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 22px;
+  z-index: 10;
+  /* ไม่ซ่อน — โชว์เลย */
+}
 .s-avatar-wrap { position: relative; cursor: pointer; }
-.s-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid #fff; background: #333; }
-.s-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.s-add-btn { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: #f00; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
-.s-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.s-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  overflow: hidden; border: 2px solid #fff; background: #333;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+.s-add-btn {
+  position: absolute; bottom: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 20px; background: #f02b2b;
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 14px; font-weight: bold; color: #fff;
+}
+.s-btn {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px; cursor: pointer;
+}
 .s-icon { font-size: 28px; }
 .s-num { font-size: 11px; color: #fff; }
+.s-music {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #222; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 24px;
+}
 
-/* ===== หน้าอื่น ๆ — คงไว้ ไม่ลบ ===== */
-#page-shop { background: #fff; color: #000; display: flex; align-items: center; justify-content: center; }
-#page-inbox { background: #fff; color: #000; display: flex; align-items: center; justify-content: center; }
-#page-profile { background: #fff; color: #000; overflow-y: auto; }
-.page-center { text-align: center; }
+/* ===== หน้าอื่น ===== */
+.page-inner { padding: 80px 16px 80px; text-align: center; }
+.page-inner h2 { font-size: 20px; margin-bottom: 12px; }
+.page-inner p { color: #888; }
 
-/* ===== แถบล่างแนวนอน — ตรงรูป ไม่มี 99+ คงที่ ===== */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; display: flex; justify-content: space-around; align-items: center; background: #000; border-top: 1px solid #222; z-index: 100; }
-.bottom-nav.light { background: #fff; border-top-color: #eee; }
-.b-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative; }
-.b-nav-icon { font-size: 22px; }
-.b-nav-text { font-size: 10px; color: #888; }
-.b-nav-item.active .b-nav-text { color: #fff; }
-.bottom-nav.light .b-nav-text { color: #888; }
-.bottom-nav.light .b-nav-item.active .b-nav-text { color: #000; }
-.b-center-btn { width: 44px; height: 32px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 22px; font-weight: bold; cursor: pointer; }
-.b-badge { background: red; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 10px; position: absolute; top: -2px; right: -6px; display: none; }
+/* ===== แถบล่าง ===== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 60px; display: flex;
+  justify-content: space-around; align-items: center;
+  background: #000; border-top: 1px solid #222; z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px; cursor: pointer;
+  position: relative;
+}
+.nav-icon { font-size: 22px; }
+.nav-label { font-size: 10px; color: #888; }
+.nav-item.active .nav-label { color: #fff; }
+.nav-center {
+  width: 44px; height: 32px; background: #fff;
+  border-radius: 6px; display: flex;
+  align-items: center; justify-content: center;
+  color: #000; font-size: 22px; font-weight: bold;
+  cursor: pointer;
+}
+.nav-badge {
+  position: absolute; top: -2px; right: -6px;
+  background: #f02b2b; color: #fff;
+  font-size: 9px; padding: 1px 5px;
+  border-radius: 10px; display: none;
+}
 
 .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- ===== หน้าแรก — ตรงรูปเป๊ะ ===== -->
+<!-- หน้าแรก -->
 <div class="page active" id="page-home">
   <div class="top-bar">
-    <span class="top-tab active">กำลังติดตาม</span>
-    <span class="top-tab">สำหรับคุณ</span>
+    <span class="top-tab">กำลังติดตาม</span>
+    <span class="top-tab active">สำหรับคุณ</span>
     <span class="top-search">🔍</span>
   </div>
 
-  <div class="feed" id="feedList">
+  <div class="feed">
     <div class="feed-item">
-      <div class="feed-placeholder" id="phMain">
-        <div class="feed-placeholder-icon">🎬</div>
+      <!-- ข้อความแนะนำ -->
+      <div class="feed-placeholder" id="placeholder">
+        <div class="feed-placeholder-icon">📷</div>
         <div class="feed-placeholder-text">กดปุ่ม + ด้านล่างเพื่อเพิ่มวิดีโอ</div>
       </div>
-      
-      <video class="feed-video" id="vidMain" controls playsinline loop muted autoplay></video>
-      
-      <!-- มุมล่างซ้าย — ตรงรูป -->
-      <div class="bottom-left" id="blInfo">
+
+      <!-- วิดีโอ -->
+      <video class="feed-video" id="videoPlayer" controls playsinline loop muted autoplay></video>
+
+      <!-- ข้อมูลด้านล่างซ้าย — แสดงตอนมีวิดีโอ -->
+      <div class="bottom-left" id="postInfo">
         <div class="bl-username">
           <span>@thaipodee</span>
           <span class="bl-tag">ติดตาม</span>
         </div>
         <div class="bl-desc">ThaiPodee — แชร์วิดีโอและสินค้า</div>
         <div class="bl-hashtag">#ThaiPodee #แชร์วิดีโอ #สินค้าไทย</div>
-        <div class="bl-search-bar">🔍 ค้นหา</div>
+        <div class="bl-search-bar">🔍 ค้นหาเนื้อหาที่เกี่ยวข้อง</div>
       </div>
-      
-      <!-- ด้านขวา — ครบทุกตัว ตรงลำดับ -->
-      <div class="side-bar" id="sideBtns">
+
+      <!-- ด้านขวา 6 ตัว — โชว์ทันที ✅ -->
+      <div class="side-bar" id="sideButtons">
+        <!-- 1. โปรไฟล์ + เพิ่ม -->
         <div class="s-avatar-wrap" onclick="goPage('page-profile')">
-          <div class="s-avatar">
-            <img src="https://picsum.photos/id/1012/100/100" alt="โปรไฟล์">
-          </div>
+          <div class="s-avatar">👤</div>
           <div class="s-add-btn">+</div>
         </div>
+        <!-- 2. ถูกใจ -->
         <div class="s-btn" id="likeBtn">
           <span class="s-icon">🤍</span>
           <span class="s-num">0</span>
         </div>
+        <!-- 3. คอมเมนต์ -->
         <div class="s-btn">
           <span class="s-icon">💬</span>
           <span class="s-num">0</span>
         </div>
+        <!-- 4. บันทึก -->
         <div class="s-btn">
           <span class="s-icon">🔖</span>
           <span class="s-num">0</span>
         </div>
+        <!-- 5. แชร์ -->
         <div class="s-btn">
           <span class="s-icon">↗️</span>
           <span class="s-num">0</span>
         </div>
+        <!-- 6. เพลง -->
+        <div class="s-music">🎵</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== ร้านค้า ===== -->
+<!-- หน้าร้านค้า -->
 <div class="page" id="page-shop">
-  <div class="page-center">
+  <div class="page-inner">
     <h2>ร้านค้า</h2>
     <p>สินค้าจะแสดงที่นี่</p>
   </div>
 </div>
 
-<!-- ===== ข้อความ ===== -->
+<!-- หน้าข้อความ -->
 <div class="page" id="page-inbox">
-  <div class="page-center">
+  <div class="page-inner">
     <h2>กล่องข้อความ</h2>
     <p>ยังไม่มีข้อความ</p>
   </div>
 </div>
 
-<!-- ===== โปรไฟล์ ===== -->
+<!-- หน้าโปรไฟล์ -->
 <div class="page" id="page-profile">
-  <div class="page-center" style="padding-top:60px;">
+  <div class="page-inner">
     <h2>โปรไฟล์</h2>
     <p>ข้อมูลของคุณจะแสดงที่นี่</p>
   </div>
 </div>
 
-<!-- ===== แถบล่าง — ตรงรูป ไม่มี 99+ คงที่ ===== -->
-<div class="bottom-nav" id="bottomNav">
-  <div class="b-nav-item active" data-goto="page-home">
-    <span class="b-nav-icon">🏠</span>
-    <span class="b-nav-text">หน้าหลัก</span>
+<!-- แถบล่าง -->
+<div class="bottom-nav">
+  <div class="nav-item active" data-page="page-home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">หน้าหลัก</span>
   </div>
-  <div class="b-nav-item" data-goto="page-shop">
-    <span class="b-nav-icon">🛍️</span>
-    <span class="b-nav-text">ร้านค้า</span>
+  <div class="nav-item" data-page="page-shop">
+    <span class="nav-icon">🛍️</span>
+    <span class="nav-label">ร้านค้า</span>
   </div>
-  <div class="b-nav-item" id="uploadCenter">
-    <span class="b-center-btn">+</span>
+  <div class="nav-center" id="uploadBtn">+</div>
+  <div class="nav-item" data-page="page-inbox">
+    <span class="nav-icon">💬</span>
+    <span class="nav-label">ข้อความ</span>
+    <span class="nav-badge" id="msgBadge"></span>
   </div>
-  <div class="b-nav-item" data-goto="page-inbox">
-    <span class="b-nav-icon">💬</span>
-    <span class="b-nav-text">ข้อความ</span>
-    <span class="b-badge" id="msgBadge"></span>
-  </div>
-  <div class="b-nav-item" data-goto="page-profile">
-    <span class="b-nav-icon">👤</span>
-    <span class="b-nav-text">โปรไฟล์</span>
+  <div class="nav-item" data-page="page-profile">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">โปรไฟล์</span>
   </div>
 </div>
 
-<input type="file" id="videoInput" accept="video/*" class="hidden">
+<input type="file" id="fileInput" accept="video/*" class="hidden">
 
 <script>
-let messageCount = 0; // ยังไม่มี = ไม่โชว์อะไร
-
+// เปลี่ยนหน้า
 function goPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-  
-  document.querySelectorAll('.b-nav-item').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll(`[data-goto="${pageId}"]`).forEach(b => b.classList.add('active'));
-  
-  const nav = document.getElementById('bottomNav');
-  nav.classList.toggle('light', pageId === 'page-profile' || pageId === 'page-shop' || pageId === 'page-inbox');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll(`[data-page="${pageId}"]`).forEach(n => n.classList.add('active'));
 }
 
-document.querySelectorAll('[data-goto]').forEach(i => i.addEventListener('click', () => goPage(i.dataset.goto)));
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => goPage(item.dataset.page));
+});
 
-// กด + อัปโหลด
-document.getElementById('uploadCenter').onclick = () => document.getElementById('videoInput').click();
+// อัปโหลดวิดีโอ
+document.getElementById('uploadBtn').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
 
-document.getElementById('videoInput').onchange = e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    // ซ่อนข้อความแนะนำ
-    document.getElementById('phMain').style.display = 'none';
-    //แสดงวิดีโอ
-    const v = document.getElementById('vidMain');
-    v.src = ev.target.result;
-    v.style.display = 'block';
-    //แสดงส่วนประกอบอื่น ๆ ตรงรูป
-    document.getElementById('blInfo').style.display = 'block';
-    document.getElementById('sideBtns').style.display = 'flex';
-    alert('✅ อัปโหลดเรียบร้อย!');
-  };
-  r.readAsDataURL(f);
-};
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const url = URL.createObjectURL(file);
+  const video = document.getElementById('videoPlayer');
+  video.src = url;
+  
+  // ซ่อนข้อความแนะนำ แสดงวิดีโอและข้อมูลเพิ่ม
+  document.getElementById('placeholder').style.display = 'none';
+  video.style.display = 'block';
+  document.getElementById('postInfo').style.display = 'block';
+  // ด้านขวาโชว์อยู่แล้ว ไม่ต้องทำอะไร
+});
 
-// กดไลก์
+// ปุ่มถูกใจ
 let liked = false;
 document.addEventListener('click', e => {
   if (e.target.closest('#likeBtn') && !liked) {
@@ -239,17 +316,19 @@ document.addEventListener('click', e => {
   }
 });
 
-// ป้ายแจ้งเตือน — แสดงเมื่อมีข้อความจริง
+// แจ้งเตือน — ไม่ตั้งค่าคงที่
+let unreadCount = 0;
 function updateBadge() {
-  const b = document.getElementById('msgBadge');
-  if (messageCount > 0) {
-    b.textContent = messageCount > 99 ? '99+' : messageCount;
-    b.style.display = 'block';
-  } else {
-    b.style.display = 'none';
-  }
+  const badge = document.getElementById('msgBadge');
+  badge.style.display = unreadCount > 0 ? 'block' : 'none';
+  if (unreadCount > 0) badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
 }
 updateBadge();
 </script>
+
+<!-- ==============================================================
+   v1008 — เพิ่มเติมต่อจากบรรทัดนี้ลงไปเท่านั้น
+   ไม่ย้อนขึ้นไปแก้ข้างบน
+   ============================================================== -->
 </body>
 </html>
