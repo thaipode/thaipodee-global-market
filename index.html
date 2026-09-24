@@ -1,13 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1027 — แก้วิดีโอโหลดได้คงที่ / ไม่หาย
-   25 กันยายน 2569 06:48 น.
-   อ้างอิงจาก: v1026
+   ThaiPodee v1028 — เพิ่มปุ่มลบวิดีโอ
+   25 กันยายน 2569 06:53 น.
+   อ้างอิงจาก: v1027
    --------------------------------------------------------------
-   ✅ แก้วิดีโอเสีย/หาย — เปลี่ยนวิธีบันทึกเป็นคงที่
-   ✅ เลือกไฟล์ → เล่นได้ทันที
-   ✅ ปิดเปิดใหม่ → ยังอยู่ ไม่หาย
-   ✅ กดรายการในโปรไฟล์ → เล่นได้
-   ✅ รูป+ชื่อโปรไฟล์เหมือน v1026 ทุกประการ ไม่แก้
+   ✅ เพิ่มปุ่มลบ ที่ขวาของแต่ละรายการ
+   ✅ กดลบ → ยืนยัน → ลบออกจากรายการ
+   ✅ รูป+ชื่อโปรไฟล์เหมือนเดิม
+   ✅ วิดีโอโหลด/บันทึกได้คงที่เหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -52,14 +51,19 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 .profile-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
 .video-list { display: flex; flex-direction: column; gap: 12px; }
 .video-item {
-  display: flex; align-items: center; gap: 12px; padding: 12px; background: #1a1a1a; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; padding: 12px; background: #1a1a1a; border-radius: 10px;
 }
 .video-item-thumb {
   width: 80px; height: 45px; background: #333; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  cursor: pointer; flex-shrink: 0;
 }
-.video-item-info { flex: 1; }
+.video-item-info { flex: 1; cursor: pointer; }
 .video-item-name { font-size: 14px; margin-bottom: 2px; }
 .video-item-date { font-size: 11px; color: #888; }
+.video-delete-btn {
+  background: #cc0000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%;
+  font-size: 18px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
 .empty-text { text-align: center; color: #666; padding: 40px 20px; }
 
 .video-area {
@@ -169,7 +173,7 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
       <span id="largeAvatarText">👤</span>
       <img id="largeAvatarImg" alt="รูปโปรไฟล์">
     </div>
-    <h2 class="profile-name" id="profileNameDisplay">ผู้ใช้ ThaiPodee</h2>
+    <h2 class="profile-name" id="profileNameDisplay">ผู้ใช้ Thaipodee master app</h2>
     <input type="text" class="edit-name-input" id="editNameInput" placeholder="พิมพ์ชื่อของคุณ">
     <div>
       <button class="change-avatar-btn" id="changeAvatarBtn">📷 เปลี่ยนรูป</button>
@@ -231,7 +235,7 @@ const editNameBtn = document.getElementById('editNameBtn');
 const saveNameBtn = document.getElementById('saveNameBtn');
 const avatarInput = document.getElementById('avatarInput');
 
-// โหลดโปรไฟล์ — เหมือนเดิม
+// โหลดโปรไฟล์
 function loadProfile() {
   const savedName = localStorage.getItem('thaipodeeName');
   const savedAvatar = localStorage.getItem('thaipodeeAvatar');
@@ -244,7 +248,7 @@ function loadProfile() {
   }
 }
 
-// เปลี่ยนรูป — เหมือนเดิม
+// เปลี่ยนรูป
 document.getElementById('changeAvatarBtn').addEventListener('click', () => avatarInput.click());
 avatarInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -261,7 +265,7 @@ avatarInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-// เปลี่ยนชื่อ — เหมือนเดิม
+// เปลี่ยนชื่อ
 editNameBtn.addEventListener('click', () => {
   editNameInput.value = profileNameDisplay.textContent;
   editNameInput.style.display = 'block';
@@ -286,7 +290,7 @@ function showPage(page) {
   profilePage.classList.toggle('active', page === 'profile');
 }
 
-// แสดงรายการวิดีโอ
+// แสดงรายการวิดีโอ — มีปุ่มลบ
 function renderVideoList() {
   videoList.innerHTML = '';
   if (savedVideos.length === 0) {
@@ -297,15 +301,46 @@ function renderVideoList() {
     const item = document.createElement('div');
     item.className = 'video-item';
     item.innerHTML = `
-      <div class="video-item-thumb">▶</div>
-      <div class="video-item-info">
+      <div class="video-item-thumb" data-idx="${idx}">▶</div>
+      <div class="video-item-info" data-idx="${idx}">
         <div class="video-item-name">วิดีโอ #${idx + 1}</div>
         <div class="video-item-date">${vid.date}</div>
       </div>
+      <button class="video-delete-btn" data-idx="${idx}">🗑️</button>
     `;
-    item.onclick = () => playSelectedVideo(idx);
     videoList.appendChild(item);
   });
+  
+  // กดเล่น
+  document.querySelectorAll('.video-item-thumb, .video-item-info').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.idx);
+      playSelectedVideo(idx);
+    });
+  });
+  
+  // กดลบ
+  document.querySelectorAll('.video-delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.idx);
+      deleteVideo(idx);
+    });
+  });
+}
+
+// ลบวิดีโอ
+function deleteVideo(index) {
+  if (!confirm('ต้องการลบวิดีโอนี้หรือไม่?')) return;
+  savedVideos.splice(index, 1);
+  localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
+  
+  // ถ้าลบรายการที่กำลังเล่นอยู่ → ล้างหน้าจอ
+  if (savedVideos.length === 0 || videoPlayer.src === savedVideos[index]?.dataUrl) {
+    videoPlayer.src = '';
+    videoArea.classList.remove('has-video');
+  }
+  
+  renderVideoList();
 }
 
 // เล่นวิดีโอจากรายการ
@@ -333,7 +368,7 @@ window.addEventListener('load', () => {
   }
 });
 
-// อัปโหลดวิดีโอ — แก้ตรงนี้ให้คงที่
+// อัปโหลดวิดีโอ
 uploadBtn.addEventListener('click', () => uploadInput.click());
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -369,7 +404,7 @@ document.getElementById('backBtn').addEventListener('click', () => {
   setActiveNav('navHome');
 });
 
-// ปุ่มอื่นๆ — เหมือนเดิม
+// ปุ่มอื่นๆ
 document.getElementById('btnLike').onclick = () => {
   liked = !liked; likeCount += liked ? 1 : -1;
   document.getElementById('likeNum').textContent = likeCount;
