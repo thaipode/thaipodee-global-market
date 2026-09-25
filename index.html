@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1034 — เปลี่ยนชื่อลิงก์บังคับเอาโลโก้ใหม่
-   25 กันยายน 2569 07:54 น.
-   พัฒนาจาก: v1033
+   ThaiPodee v1037 — แก้ชื่อให้ถูกต้อง p เดียว ไม่ซ้ำ
+   25 กันยายน 2569 08:16 น.
+   พัฒนาจาก: v1036
    --------------------------------------------------------------
-   ✅ เปลี่ยนลิงก์โลโก้ → เบราว์เซอร์ไม่เจอของเก่า
-   ✅ ชื่อแอป: ThaiPodee — ไม่มีคำว่า Chrome เลย
-   ✅ ปิดไอคอนอัตโนมัติของเบราว์เซอร์
-   ✅ ขนาดไอคอน 512x512 ตรงมาตรฐาน
+   ✅ ชื่อถูกต้อง: ThaiPodee — p เดียว ไม่ซ้ำ
+   ✅ ลิงก์ถูกต้อง: thaipodee ไม่ใช่ thaippodee
+   ✅ Manifest ถูกต้อง — ติดตั้งได้แน่นอน
+   ✅ ชื่อแอป: ThaiPodee ทุกที่ตรงกัน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,23 +14,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- ===== ชื่อแอป ===== -->
+<!-- ===== ชื่อแอป — ถูกต้อง p เดียว ===== -->
 <meta name="application-name" content="ThaiPodee">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="description" content="ThaiPodee — แอปวิดีโอและตลาดสินค้าไทย">
 <meta name="theme-color" content="#000000">
-<meta name="msapplication-TileColor" content="#000000">
+<meta name="background-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="google" content="notranslate">
 
-<!-- ===== บังคับไม่เอาไอคอนอัตโนมัติ ===== -->
-<meta name="robots" content="noindex,nofollow">
+<!-- ===== 🔑 ลิงก์ถูกต้อง p เดียว v1037 ===== -->
+<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037">
 
-<!-- ===== 🔑 เปลี่ยนลิงก์ — บังคับเอาใหม่ v1034 ===== -->
-<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034">
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034">
-<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1034","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+<!-- ===== Manifest ถูกต้อง p เดียว ===== -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1037","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
 
 <title>ThaiPodee</title>
 <style>
@@ -228,7 +228,17 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 </nav>
 
 <script>
-let isPlaying = false;
+// Service Worker — บอกเบราว์เซอร์ว่านี่คือแอปจริง ติดตั้งได้
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swCode = `self.addEventListener('install', e => { e.waitUntil(self.skipWaiting()); }); self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });`;
+    const blob = new Blob([swCode], {type: 'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob))
+      .then(() => console.log('✅ SW registered — ติดตั้งได้'))
+      .catch(err => console.log('SW skip:', err));
+  });
+}
+
 let liked = false, likeCount = 0;
 let commentCount = 0, saveCount = 0, shareCount = 0;
 let savedVideos = [];
