@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1032 — ใช้โลโก้จริงจาก GitHub ตรงเป๊ะ
-   25 กันยายน 2569 07:30 น.
-   พัฒนาจาก: v1031
+   ThaiPodee v1034 — เปลี่ยนชื่อลิงก์บังคับเอาโลโก้ใหม่
+   25 กันยายน 2569 07:54 น.
+   พัฒนาจาก: v1033
    --------------------------------------------------------------
-   ✅ ไอคอนแอป = ไฟล์ thaippodee_logo_icon.png จาก GitHub โดยตรง
-   ✅ ชื่อแอป: ThaiPodee — ไม่มี Chrome/Google
-   ✅ บังคับไม่เอาไอคอนเก่า v=1032
-   ✅ ทุกฟังก์ชันเหมือนเดิม
+   ✅ เปลี่ยนลิงก์โลโก้ → เบราว์เซอร์ไม่เจอของเก่า
+   ✅ ชื่อแอป: ThaiPodee — ไม่มีคำว่า Chrome เลย
+   ✅ ปิดไอคอนอัตโนมัติของเบราว์เซอร์
+   ✅ ขนาดไอคอน 512x512 ตรงมาตรฐาน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -22,13 +22,15 @@
 <meta name="msapplication-TileColor" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 
-<!-- ===== ไอคอนจาก GitHub ตรงเป๊ะ ===== -->
-<link rel="icon" type="image/png" sizes="any" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?v=1032">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?v=1032">
+<!-- ===== บังคับไม่เอาไอคอนอัตโนมัติ ===== -->
+<meta name="robots" content="noindex,nofollow">
 
-<!-- ===== Manifest บังคับใช้โลโก้จริง ===== -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1032","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?v=1032","sizes":"512x512","type":"image/png"}]}'>
+<!-- ===== 🔑 เปลี่ยนลิงก์ — บังคับเอาใหม่ v1034 ===== -->
+<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034">
+<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1034","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaippodee/thaippodee-global-market/main/thaippodee_logo_icon.png?ver=1034","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
 
 <title>ThaiPodee</title>
 <style>
@@ -249,7 +251,6 @@ const editNameBtn = document.getElementById('editNameBtn');
 const saveNameBtn = document.getElementById('saveNameBtn');
 const avatarInput = document.getElementById('avatarInput');
 
-// โหลดโปรไฟล์
 function loadProfile() {
   const savedName = localStorage.getItem('thaipodeeName');
   const savedAvatar = localStorage.getItem('thaipodeeAvatar');
@@ -262,7 +263,6 @@ function loadProfile() {
   }
 }
 
-// เปลี่ยนรูป
 document.getElementById('changeAvatarBtn').addEventListener('click', () => avatarInput.click());
 avatarInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -279,7 +279,6 @@ avatarInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-// เปลี่ยนชื่อ
 editNameBtn.addEventListener('click', () => {
   editNameInput.value = profileNameDisplay.textContent;
   editNameInput.style.display = 'block';
@@ -298,13 +297,11 @@ saveNameBtn.addEventListener('click', () => {
   profileNameDisplay.style.display = 'block';
 });
 
-// เปลี่ยนหน้า
 function showPage(page) {
   mainPage.classList.toggle('active', page === 'main');
   profilePage.classList.toggle('active', page === 'profile');
 }
 
-// แสดงรายการวิดีโอ — มีปุ่มลบ
 function renderVideoList() {
   videoList.innerHTML = '';
   if (savedVideos.length === 0) {
@@ -325,7 +322,6 @@ function renderVideoList() {
     videoList.appendChild(item);
   });
   
-  // กดเล่น
   document.querySelectorAll('.video-item-thumb, .video-item-info').forEach(el => {
     el.addEventListener('click', (e) => {
       const idx = parseInt(e.currentTarget.dataset.idx);
@@ -333,7 +329,6 @@ function renderVideoList() {
     });
   });
   
-  // กดลบ
   document.querySelectorAll('.video-delete-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const idx = parseInt(e.currentTarget.dataset.idx);
@@ -342,7 +337,6 @@ function renderVideoList() {
   });
 }
 
-// ลบวิดีโอ
 function deleteVideo(index) {
   if (!confirm('ต้องการลบวิดีโอนี้หรือไม่?')) return;
   savedVideos.splice(index, 1);
@@ -359,7 +353,6 @@ function deleteVideo(index) {
   renderVideoList();
 }
 
-// เล่นวิดีโอจากรายการ
 function playSelectedVideo(index) {
   const vid = savedVideos[index];
   if (!vid || !vid.dataUrl) return;
@@ -368,7 +361,6 @@ function playSelectedVideo(index) {
   showPage('main');
 }
 
-// โหลดครั้งแรก
 window.addEventListener('load', () => {
   loadProfile();
   const stored = localStorage.getItem('thaipodeeVideoList');
@@ -384,7 +376,6 @@ window.addEventListener('load', () => {
   }
 });
 
-// อัปโหลดวิดีโอ
 uploadBtn.addEventListener('click', () => uploadInput.click());
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -396,11 +387,7 @@ uploadInput.addEventListener('change', (e) => {
     const now = new Date();
     const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
     
-    savedVideos.push({ 
-      dataUrl, 
-      date: dateStr, 
-      name: file.name 
-    });
+    savedVideos.push({ dataUrl, date: dateStr, name: file.name });
     localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
     
     videoPlayer.src = dataUrl;
@@ -410,7 +397,6 @@ uploadInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-// ปุ่มโปรไฟล์
 document.getElementById('navProfile').addEventListener('click', () => {
   renderVideoList();
   showPage('profile');
@@ -421,7 +407,6 @@ document.getElementById('backBtn').addEventListener('click', () => {
   setActiveNav('navHome');
 });
 
-// ปุ่มอื่นๆ
 document.getElementById('btnLike').onclick = () => {
   liked = !liked; likeCount += liked ? 1 : -1;
   document.getElementById('likeNum').textContent = likeCount;
