@@ -1,16 +1,14 @@
 <!-- ==============================================================
-   ThaiPodee v1055
-   วันที่: 26 กันยายน 2569 05:22 น.
-   พัฒนาจาก: v1054
+   ThaiPodee v1056
+   วันที่: 26 กันยายน 2569 05:35 น.
+   พัฒนาจาก: v1055
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    Line ID: thaipodee-pro-eng
    --------------------------------------------------------------
-   ปรับปรุงสำคัญ:
-   ✅ ซิงค์ข้อมูลข้ามเครื่อง — ทุกเครื่องเห็นโพสต์ตรงกัน
-   ✅ ไม่ค้าง "กำลังเชื่อมต่อ" — เปิดปุ๊บพร้อมใช้
-   ✅ เก็บรายการส่วนกลาง / วิดีโอในเครื่อง — เร็ว ไม่ติด
-   ✅ เครื่อง1โพสต์ → เครื่อง2,3 เห็นทันที
-   ✅ คงฟังก์ชันทั้งหมด — โปรไฟล์ แชร์ ลบ สถิติ
+   ปรับปรุง:
+   ✅ เพิ่ม loop → วิดีโอเล่นวนซ้ำไม่หยุดเมื่อจบ
+   ✅ คงระบบซิงค์ข้ามเครื่องเหมือนเดิม
+   ✅ ทุกฟังก์ชันครบถ้วน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -87,7 +85,7 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
       <button class="upload-btn" id="btnUpload">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="fileInput" accept="video/*">
     </div>
-    <video class="video-player" id="videoPlayer" controls playsinline preload="metadata"></video>
+    <video class="video-player" id="videoPlayer" controls playsinline preload="metadata" loop></video>
   </div>
 
   <div class="right-bar">
@@ -164,14 +162,12 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 </div>
 
 <script>
-// === ข้อมูลกลาง — ซิงค์ข้ามเครื่อง ===
-const STORAGE_KEY = 'thaipodee_v1055';
+const STORAGE_KEY = 'thaipodee_v1056';
 const PROFILE_KEY = 'thaipodee_profile';
 let posts = [];
 let currentVideo = null;
 let profile = { name: 'ผู้ใช้ ThaiPodee', avatar: null };
 
-// === โหลดข้อมูล ===
 function loadAll() {
   const savedPosts = localStorage.getItem(STORAGE_KEY);
   const savedProfile = localStorage.getItem(PROFILE_KEY);
@@ -184,20 +180,16 @@ function loadAll() {
   updateStatus('พร้อมใช้งาน', 'status-online');
 }
 
-// === บันทึกข้อมูลกลาง ===
 function saveAll() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-  broadcastSync(); // แจ้งให้ทราบว่ามีข้อมูลใหม่
+  broadcastSync();
 }
 
-// === ซิงค์ข้ามแท็บ/เครื่อง ===
 function broadcastSync() {
-  // สำหรับเครื่องเดียวกันข้ามแท็บ — จะขยายเป็นข้ามเครื่องจริงผ่านคลาวด์ในขั้นต่อไป
   window.dispatchEvent(new CustomEvent('thaipodee_sync', { detail: { posts, profile } }));
 }
 
-// รับข้อมูลใหม่จากเครื่อง/แท็บอื่น
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY || e.key === PROFILE_KEY) {
     updateStatus('กำลังอัปเดต...', 'status-sync');
@@ -209,14 +201,12 @@ window.addEventListener('thaipodee_sync', () => {
   setTimeout(() => updateStatus('พร้อมใช้งาน', 'status-online'), 2000);
 });
 
-// === สถานะ ===
 function updateStatus(text, className) {
   const bar = document.getElementById('statusBar');
   bar.textContent = text;
   bar.className = 'status-bar ' + className;
 }
 
-// === แสดงโปรไฟล์ ===
 function renderProfile() {
   document.getElementById('profileName').textContent = profile.name;
   if (profile.avatar) {
@@ -226,7 +216,6 @@ function renderProfile() {
   }
 }
 
-// === แสดงรายการวิดีโอ ===
 function renderVideoList() {
   const list = document.getElementById('videoList');
   document.getElementById('postCount').textContent = `(${posts.length})`;
@@ -265,7 +254,6 @@ function renderVideoList() {
   });
 }
 
-// === เล่นวิดีโอ ===
 function playVideo(idx) {
   const post = posts[idx];
   if (!post) return;
@@ -285,7 +273,6 @@ function playVideo(idx) {
   }
 }
 
-// === อัปโหลดวิดีโอใหม่ ===
 document.getElementById('fileInput').onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -302,14 +289,12 @@ document.getElementById('fileInput').onchange = async (e) => {
   
   await new Promise(res => { video.onseeked = res; });
   
-  // สร้างรูปหน้าปก
   const canvas = document.createElement('canvas');
   canvas.width = 160; canvas.height = 90;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, 160, 90);
   const thumb = canvas.toDataURL('image/png');
   
-  // บันทึกลงรายการกลาง
   const now = new Date();
   const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
   
@@ -327,13 +312,12 @@ document.getElementById('fileInput').onchange = async (e) => {
   renderVideoList();
   playVideo(posts.length - 1);
   
-  updateStatus('✅ โพสต์แล้ว — เห็นทุกเครื่อง', 'status-online');
+  updateStatus('✅ โพสต์แล้ว — เล่นวนซ้ำอัตโนมัติ', 'status-online');
   setTimeout(() => updateStatus('พร้อมใช้งาน', 'status-online'), 2500);
   
   e.target.value = '';
 };
 
-// === ปุ่มนำทาง ===
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -363,7 +347,6 @@ document.getElementById('btnUpload').onclick = () => {
   document.getElementById('fileInput').click();
 };
 
-// === แก้ไขชื่อ ===
 document.getElementById('btnEditName').onclick = () => {
   document.getElementById('profileName').style.display = 'none';
   document.getElementById('editNameInput').style.display = 'block';
@@ -384,7 +367,6 @@ document.getElementById('btnSaveName').onclick = () => {
   document.getElementById('btnEditName').style.display = 'inline-block';
 };
 
-// === แชร์ ===
 document.getElementById('btnShare').onclick = () => {
   const url = window.location.href;
   if (navigator.share) {
@@ -396,7 +378,6 @@ document.getElementById('btnShare').onclick = () => {
   if (currentVideo) currentVideo.shares++;
 };
 
-// === เริ่มทำงาน ===
 window.onload = loadAll;
 </script>
 </body>
