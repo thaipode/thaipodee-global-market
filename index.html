@@ -1,12 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1050 — ไม่ต้องใช้ Token ✅ พร้อมใช้งานทันที
-   25 กันยายน 2569 18:07 น.
+   ThaiPodee v1051 — มี Token แล้ว ✅
+   25 กันยายน 2569 19:20 น.
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    --------------------------------------------------------------
-   ✅ ไม่ต้องใส่รหัสอะไรเลย
-   ✅ ทุกเครื่องเห็นรายการตรงกัน
-   ✅ กดเล่นได้ในเครื่องที่อัปโหลด
-   ✅ ก๊อปวางทับ → บันทึก → เสร็จ
+   ✅ ใส่ Token แล้ว — อัปโหลดวิดีโอขึ้น GitHub อัตโนมัติ
+   ✅ ทุกเครื่องเห็นวิดีโอตรงกันทันที
+   ✅ ไม่ต้องแชร์ลิงก์ — เหมือนติ๊กต็อก
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -29,7 +28,6 @@
 
 <link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo.png">
 <link rel="apple-touch-icon" sizes="180x180" href="thaipodee_logo.png">
-<link rel="manifest" href="manifest.json">
 
 <title>ThaiPodee</title>
 <style>
@@ -236,12 +234,19 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 </nav>
 
 <script>
+// ==============================================
+// ✅ ตั้งค่า — ใส่ Token แล้ว
+// ==============================================
+const CONFIG = {
+  username: 'thaipodee',
+  repo: 'thaipodee-global-market',
+  token: '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',
+  branch: 'main'
+};
+
 const STORAGE_KEY = 'thaipodeeVideos';
 const NAME_KEY = 'thaipodeeUserName';
 const AVATAR_KEY = 'thaipodeeUserAvatar';
-
-const CLOUD_URL = 'https://api.jsonbin.io/v3/b/66ed1fadad19ca34f8e7d3a7';
-const CLOUD_KEY = '$2a$10$V8qfH0rM3bD8G9eF7hJ6kL5mN4bP3cQ2dR1eS0fT9gU8hI7jK6';
 
 let savedVideos = [];
 let lastSyncHash = '';
@@ -252,14 +257,7 @@ const postCountSpan = document.getElementById('postCountSpan');
 const videoPlayer = document.getElementById('videoPlayer');
 const videoArea = document.getElementById('videoArea');
 
-function loadLocalData() {
-  try {
-    const local = localStorage.getItem(STORAGE_KEY);
-    if (local) savedVideos = JSON.parse(local);
-  } catch { savedVideos = []; }
-  renderVideoList();
-}
-
+// --- โหลดข้อมูล ---
 function loadProfile() {
   const n = localStorage.getItem(NAME_KEY);
   const a = localStorage.getItem(AVATAR_KEY);
@@ -274,27 +272,67 @@ function loadProfile() {
   }
 }
 
+async function uploadToGitHub(file, fileName) {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = async e => {
+      const content = btoa(e.target.result);
+      const path = `videos/${Date.now()}_${fileName}`;
+      const res = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${CONFIG.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Upload video: ${fileName}`,
+          content: content,
+          branch: CONFIG.branch
+        })
+      });
+      const data = await res.json();
+      if (data.content) {
+        resolve(data.content.download_url);
+      } else {
+        reject(new Error(data.message || 'Upload failed'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsBinaryString(file);
+  });
+}
+
 async function syncFromCloud() {
   if (isSyncing) return;
   isSyncing = true;
   
   try {
-    const res = await fetch(CLOUD_URL + '/latest', {
-      headers: { 'X-Master-Key': CLOUD_KEY }
+    const res = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json?ref=${CONFIG.branch}`, {
+      headers: { 'Authorization': `token ${CONFIG.token}` }
     });
+    
+    if (res.status === 404) {
+      cloudStatus.textContent = '⚠️ ยังไม่มีข้อมูล';
+      cloudStatus.className = 'cloud-status offline';
+      isSyncing = false;
+      return;
+    }
+    
     const data = await res.json();
-    if (data.record && data.record.videos) {
-      const h = JSON.stringify(data.record.videos);
+    if (data.content) {
+      const decoded = JSON.parse(atob(data.content));
+      const h = JSON.stringify(decoded);
       if (h !== lastSyncHash) {
-        savedVideos = data.record.videos;
+        savedVideos = decoded;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
         lastSyncHash = h;
         renderVideoList();
       }
+      cloudStatus.textContent = '✅ ออนไลน์';
+      cloudStatus.className = 'cloud-status online';
     }
-    cloudStatus.textContent = '✓ ออนไลน์';
-    cloudStatus.className = 'cloud-status online';
-  } catch {
+  } catch (err) {
+    console.error(err);
     cloudStatus.textContent = '⚠️ ออฟไลน์';
     cloudStatus.className = 'cloud-status offline';
   }
@@ -303,17 +341,34 @@ async function syncFromCloud() {
 
 async function saveToCloud() {
   try {
-    await fetch(CLOUD_URL, {
+    const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json?ref=${CONFIG.branch}`, {
+      headers: { 'Authorization': `token ${CONFIG.token}` }
+    });
+    
+    const body = {
+      message: `Update: ${new Date().toLocaleString('th-TH')}`,
+      content: btoa(JSON.stringify(savedVideos, null, 2)),
+      branch: CONFIG.branch
+    };
+    
+    if (fileRes.ok) {
+      const fileData = await fileRes.json();
+      body.sha = fileData.sha;
+    }
+    
+    await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': CLOUD_KEY
+        'Authorization': `token ${CONFIG.token}`,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ videos: savedVideos })
+      body: JSON.stringify(body)
     });
+    
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
     lastSyncHash = JSON.stringify(savedVideos);
-  } catch {
+  } catch (err) {
+    console.error(err);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
   }
 }
@@ -350,10 +405,10 @@ function renderVideoList() {
   });
   
   document.querySelectorAll('.video-delete-btn').forEach(b => {
-    b.onclick = (e) => {
-      if (confirm('ลบ?')) {
+    b.onclick = async (e) => {
+      if (confirm('ลบวิดีโอนี้?')) {
         savedVideos.splice(parseInt(e.target.dataset.idx), 1);
-        saveToCloud();
+        await saveToCloud();
         renderVideoList();
       }
     };
@@ -367,13 +422,13 @@ function playVideo(idx) {
   videoPlayer.removeAttribute('src');
   videoArea.classList.remove('has-video');
   
-  if (vid.localUrl) {
-    videoPlayer.src = vid.localUrl;
+  if (vid.url) {
+    videoPlayer.src = vid.url;
     videoArea.classList.add('has-video');
     showPage('main');
     videoPlayer.play().catch(() => {});
   } else {
-    alert(`📺 ${vid.name}\n📅 ${vid.date}\n👤 โดย: ${vid.by}\n\n(อัปโหลดในเครื่องนี้เพื่อเล่น)`);
+    alert(`📺 ${vid.name}\n📅 ${vid.date}\n👤 โดย: ${vid.by}`);
     showPage('main');
   }
 }
@@ -385,30 +440,56 @@ document.getElementById('uploadInput').onchange = async (e) => {
   const now = new Date();
   const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
   const myName = localStorage.getItem(NAME_KEY) || 'ผู้ใช้';
-  const localUrl = URL.createObjectURL(file);
   
-  const tempVid = document.createElement('video');
-  tempVid.src = localUrl;
-  tempVid.preload = 'metadata';
-  tempVid.onloadeddata = () => { tempVid.currentTime = 1; };
-  tempVid.onseeked = () => {
-    const c = document.createElement('canvas');
-    c.width = 160; c.height = 90;
-    const ctx = c.getContext('2d');
-    ctx.drawImage(tempVid, 0, 0, 160, 90);
+  try {
+    cloudStatus.textContent = 'กำลังอัปโหลด...';
+    cloudStatus.className = 'cloud-status offline';
     
+    const videoUrl = await uploadToGitHub(file, file.name);
+    
+    const tempVid = document.createElement('video');
+    tempVid.src = videoUrl;
+    tempVid.preload = 'metadata';
+    
+    tempVid.onloadeddata = () => {
+      tempVid.currentTime = 1;
+    };
+    
+    tempVid.onseeked = async () => {
+      const c = document.createElement('canvas');
+      c.width = 160; c.height = 90;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(tempVid, 0, 0, 160, 90);
+      
+      savedVideos.push({
+        name: file.name,
+        date: dateStr,
+        by: myName,
+        url: videoUrl,
+        thumb: c.toDataURL('image/png')
+      });
+      
+      await saveToCloud();
+      renderVideoList();
+      playVideo(savedVideos.length - 1);
+      cloudStatus.textContent = '✅ อัปโหลดสำเร็จ';
+      cloudStatus.className = 'cloud-status online';
+    };
+    
+  } catch (err) {
+    alert('เกิดข้อผิดพลาด: ' + err.message);
+    const localUrl = URL.createObjectURL(file);
     savedVideos.push({
       name: file.name,
       date: dateStr,
       by: myName,
-      localUrl: localUrl,
-      thumb: c.toDataURL('image/png')
+      url: localUrl,
+      thumb: null
     });
-    
     saveToCloud();
     renderVideoList();
     playVideo(savedVideos.length - 1);
-  };
+  }
   
   e.target.value = '';
 };
@@ -420,7 +501,7 @@ document.getElementById('editNameBtn').onclick = () => {
   document.getElementById('editNameBtn').style.display = 'none';
   document.getElementById('profileNameDisplay').style.display = 'none';
 };
-document.getElementById('saveNameBtn').onclick = () => {
+document.getElementById('saveNameBtn').onclick = async () => {
   const name = document.getElementById('editNameInput').value.trim() || 'ผู้ใช้ ThaiPodee';
   localStorage.setItem(NAME_KEY, name);
   document.getElementById('profileNameDisplay').textContent = name;
@@ -466,11 +547,20 @@ document.getElementById('navMsg').onclick = () => setNav('navMsg');
 document.getElementById('navProfile').onclick = () => { showPage('profile'); setNav('navProfile'); };
 document.getElementById('backBtn').onclick = () => { showPage('main'); setNav('navHome'); };
 
+document.getElementById('btnShare').onclick = () => {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'ThaiPodee', url: url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('คัดลอกลิงก์แล้ว ✅');
+  }
+};
+
 window.onload = () => {
-  loadLocalData();
   loadProfile();
   syncFromCloud();
-  setInterval(syncFromCloud, 8000);
+  setInterval(syncFromCloud, 10000);
 };
 </script>
 
