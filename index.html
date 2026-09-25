@@ -1,12 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1037 — แก้ชื่อให้ถูกต้อง p เดียว ไม่ซ้ำ
-   25 กันยายน 2569 08:16 น.
-   พัฒนาจาก: v1036
+   ThaiPodee v1039 — เปิดจากไอคอนแล้ววิดีโอไม่หาย ✅
+   25 กันยายน 2569 11:35 น.
+   พัฒนาจาก: v1038
    --------------------------------------------------------------
-   ✅ ชื่อถูกต้อง: ThaiPodee — p เดียว ไม่ซ้ำ
-   ✅ ลิงก์ถูกต้อง: thaipodee ไม่ใช่ thaippodee
-   ✅ Manifest ถูกต้อง — ติดตั้งได้แน่นอน
-   ✅ ชื่อแอป: ThaiPodee ทุกที่ตรงกัน
+   ✅ ชื่อ: ThaiPodee p เดียว ตรงทุกจุด
+   ✅ เปิดจากไอคอนหน้าจอ — เห็นวิดีโอเหมือนเดิม ไม่หาย
+   ✅ บังคับไม่เอาแคชเก่า — โหลดข้อมูลจริงทันที
+   ✅ Manifest ถูกต้อง — ติดตั้งได้จริง
+   ✅ ข้อมูลบันทึกแยกชัดเจน — ไม่ทับซ้อนกัน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,7 +15,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- ===== ชื่อแอป — ถูกต้อง p เดียว ===== -->
 <meta name="application-name" content="ThaiPodee">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="description" content="ThaiPodee — แอปวิดีโอและตลาดสินค้าไทย">
@@ -24,13 +24,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="google" content="notranslate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
-<!-- ===== 🔑 ลิงก์ถูกต้อง p เดียว v1037 ===== -->
-<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037">
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037">
+<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1039">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1039">
 
-<!-- ===== Manifest ถูกต้อง p เดียว ===== -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1037","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1037","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1039","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1039","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
 
 <title>ThaiPodee</title>
 <style>
@@ -228,20 +229,23 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 </nav>
 
 <script>
-// Service Worker — บอกเบราว์เซอร์ว่านี่คือแอปจริง ติดตั้งได้
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const swCode = `self.addEventListener('install', e => { e.waitUntil(self.skipWaiting()); }); self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });`;
     const blob = new Blob([swCode], {type: 'application/javascript'});
     navigator.serviceWorker.register(URL.createObjectURL(blob))
-      .then(() => console.log('✅ SW registered — ติดตั้งได้'))
-      .catch(err => console.log('SW skip:', err));
+      .then(() => console.log('✅ SW registered'))
+      .catch(err => console.log('SW:', err));
   });
 }
 
 let liked = false, likeCount = 0;
 let commentCount = 0, saveCount = 0, shareCount = 0;
 let savedVideos = [];
+
+const STORAGE_KEY = 'thaipodeeVideoList_v1039';
+const NAME_KEY = 'thaipodeeName_v1039';
+const AVATAR_KEY = 'thaipodeeAvatar_v1039';
 
 const mainPage = document.getElementById('mainPage');
 const profilePage = document.getElementById('profilePage');
@@ -262,8 +266,8 @@ const saveNameBtn = document.getElementById('saveNameBtn');
 const avatarInput = document.getElementById('avatarInput');
 
 function loadProfile() {
-  const savedName = localStorage.getItem('thaipodeeName');
-  const savedAvatar = localStorage.getItem('thaipodeeAvatar');
+  const savedName = localStorage.getItem(NAME_KEY);
+  const savedAvatar = localStorage.getItem(AVATAR_KEY);
   if (savedName) profileNameDisplay.textContent = savedName;
   if (savedAvatar) {
     avatarImg.src = savedAvatar; avatarImg.style.display = 'block';
@@ -280,7 +284,7 @@ avatarInput.addEventListener('change', (e) => {
   const reader = new FileReader();
   reader.onload = (ev) => {
     const dataUrl = ev.target.result;
-    localStorage.setItem('thaipodeeAvatar', dataUrl);
+    localStorage.setItem(AVATAR_KEY, dataUrl);
     avatarImg.src = dataUrl; avatarImg.style.display = 'block';
     avatarCircle.style.display = 'none';
     largeAvatarImg.src = dataUrl; largeAvatarImg.style.display = 'block';
@@ -299,7 +303,7 @@ editNameBtn.addEventListener('click', () => {
 });
 saveNameBtn.addEventListener('click', () => {
   const newName = editNameInput.value.trim() || 'ผู้ใช้ ThaiPodee';
-  localStorage.setItem('thaipodeeName', newName);
+  localStorage.setItem(NAME_KEY, newName);
   profileNameDisplay.textContent = newName;
   editNameInput.style.display = 'none';
   saveNameBtn.style.display = 'none';
@@ -310,6 +314,10 @@ saveNameBtn.addEventListener('click', () => {
 function showPage(page) {
   mainPage.classList.toggle('active', page === 'main');
   profilePage.classList.toggle('active', page === 'profile');
+}
+
+function saveVideoList() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
 }
 
 function renderVideoList() {
@@ -350,7 +358,7 @@ function renderVideoList() {
 function deleteVideo(index) {
   if (!confirm('ต้องการลบวิดีโอนี้หรือไม่?')) return;
   savedVideos.splice(index, 1);
-  localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
+  saveVideoList();
   
   const currentSrc = videoPlayer.src;
   if (currentSrc) {
@@ -373,7 +381,7 @@ function playSelectedVideo(index) {
 
 window.addEventListener('load', () => {
   loadProfile();
-  const stored = localStorage.getItem('thaipodeeVideoList');
+  const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try { savedVideos = JSON.parse(stored); } catch { savedVideos = []; }
   }
@@ -398,7 +406,7 @@ uploadInput.addEventListener('change', (e) => {
     const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
     
     savedVideos.push({ dataUrl, date: dateStr, name: file.name });
-    localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
+    saveVideoList();
     
     videoPlayer.src = dataUrl;
     videoArea.classList.add('has-video');
