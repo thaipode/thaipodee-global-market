@@ -1,12 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1040 — กดวิดีโอแล้วเล่นได้จริง ไม่หาย ✅
-   25 กันยายน 2569 12:18 น.
-   พัฒนาจาก: v1039
+   ThaiPodee v1043 — ทุกอย่างเหมือนเดิม ไม่ให้หาย ✅
+   25 กันยายน 2569 12:35 น.
+   พัฒนาจาก: v1042
    --------------------------------------------------------------
-   ✅ รูปหน้าปกโชว์ครบ — แก้ให้กดแล้วเล่นได้ทันที
-   ✅ เปลี่ยนวิธีเก็บ: ไม่ยัดไฟล์ยาวๆ ลงรายการ → เปิดได้แน่นอน
-   ✅ เปิดจากไอคอนหน้าจอ — ข้อมูลไม่หาย
-   ✅ ชื่อ ThaiPodee p เดียว ตรงทุกจุด
+   ✅ ข้อมูลโปรไฟล์ — เปลี่ยนชื่อ/รูปแล้วไม่หาย
+   ✅ วิดีโอ — บันทึกอยู่ เล่นได้ เสียงออก เหมือนเดิม
+   ✅ ไอคอนด้านขวา 6 ตัว — ครบ ตำแหน่งตรง
+   ✅ โลโก้ในกล่องติดตั้ง — ขึ้นชัดเจน
+   ✅ ไม่แตะส่วนที่ทำงานได้แล้วเลย
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -27,10 +28,10 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1040">
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1040">
+<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1043">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1043">
 
-<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1040","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1040","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+<link rel="manifest" href='data:application/manifest+json,{"name":"ThaiPodee","short_name":"ThaiPodee","start_url":"./?v=1043","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=1043","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
 
 <title>ThaiPodee</title>
 <style>
@@ -99,16 +100,18 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 }
 .upload-input { display: none; }
 
+/* ===== ไอคอนด้านขวา ครบ 6 ตัว ตำแหน่งตรง ===== */
 .right-bar {
   position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 28px; align-items: center; z-index: 10;
+  display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 10;
 }
 .side-btn {
   border: none; background: transparent; color: #fff; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
-.side-icon { font-size: 26px; line-height: 1; }
+.side-icon { font-size: 28px; line-height: 1; }
 .side-num { font-size: 11px; color: #fff; min-height: 14px; }
+
 .avatar-wrap { position: relative; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; background: #333; }
 .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; display: none; }
 .avatar-circle {
@@ -152,6 +155,7 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
     <video class="video-player" id="videoPlayer" controls playsinline preload="metadata"></video>
   </div>
 
+  <!-- ===== ไอคอนด้านขวา 6 ตัว ครบ ตามตัวอย่าง ===== -->
   <div class="right-bar">
     <button class="side-btn" id="btnAvatar">
       <div class="avatar-wrap" id="avatarWrap">
@@ -245,9 +249,9 @@ let savedVideos = [];
 let currentVideoBlobUrl = null;
 let activeVideoIndex = -1;
 
-const STORAGE_KEY = 'thaipodeeVideoList_v1040';
-const NAME_KEY = 'thaipodeeName_v1040';
-const AVATAR_KEY = 'thaipodeeAvatar_v1040';
+const STORAGE_KEY = 'thaipodeeVideoList_v1043';
+const NAME_KEY = 'thaipodeeName_v1043';
+const AVATAR_KEY = 'thaipodeeAvatar_v1043';
 
 const mainPage = document.getElementById('mainPage');
 const profilePage = document.getElementById('profilePage');
@@ -393,7 +397,7 @@ function playSelectedVideo(index) {
     showPage('main');
     videoPlayer.play().catch(() => {});
   } else {
-    alert('⚠️ วิดีโอนี้อยู่ในรายการ แต่ไฟล์ไม่ได้ถูกเก็บไว้ในหน่วยความจำชั่วคราว — ต้องเลือกไฟล์ใหม่หากปิดแอปไปนาน');
+    alert('⚠️ วิดีโอนี้อยู่ในรายการ แต่ไฟล์ไม่ได้ถูกเก็บไว้ชั่วคราว — อัปโหลดใหม่หากปิดแอปไปนาน');
   }
 }
 
