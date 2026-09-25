@@ -1,13 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1047 — เล่นวิดีโอได้ + ซิงค์ข้ามเครื่อง ✅
-   25 กันยายน 2569 15:15 น.
+   ThaiPodee v1050 — ไม่ต้องใช้ Token ✅ พร้อมใช้งานทันที
+   25 กันยายน 2569 18:07 น.
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   พัฒนาจาก: v1046 — รักษาทุกอย่างไว้ครบ
    --------------------------------------------------------------
-   ✅ เครื่องมาสเตอร์เล่นวิดีโอได้
-   ✅ กดที่รายการ → เปิดวิดีโอจริง
-   ✅ ซิงค์ชื่อ/รายการข้ามเครื่องได้
-   ✅ ติดตั้ง/ไอคอน/ชื่อ/รูป — เหมือนเดิมไม่เปลี่ยน
+   ✅ ไม่ต้องใส่รหัสอะไรเลย
+   ✅ ทุกเครื่องเห็นรายการตรงกัน
+   ✅ กดเล่นได้ในเครื่องที่อัปโหลด
+   ✅ ก๊อปวางทับ → บันทึก → เสร็จ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -28,8 +27,8 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="thaipodee_logo_icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo.png">
+<link rel="apple-touch-icon" sizes="180x180" href="thaipodee_logo.png">
 <link rel="manifest" href="manifest.json">
 
 <title>ThaiPodee</title>
@@ -153,7 +152,7 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
   <div class="video-area" id="videoArea">
     <div class="play-box" id="playBox">
       <div class="play-icon">▶</div>
-      <p class="play-text" id="playText">กดปุ่มล่างเพื่อเลือกวิดีโอ</p>
+      <p class="play-text" id="playText">กดปุ่ม + ด้านล่างเพื่ออัปโหลดวิดีโอ</p>
       <button class="upload-btn" id="uploadBtn">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="uploadInput" accept="video/*">
     </div>
@@ -210,14 +209,14 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 
   <h3 class="profile-title">วิดีโอทั้งหมด <span id="postCountSpan">(0)</span></h3>
   <div class="video-list" id="videoList">
-    <p class="empty-text" id="emptyText">ยังไม่มีวิดีโอ</p>
+    <p class="empty-text">ยังไม่มีวิดีโอ — เป็นคนแรกที่โพสต์!</p>
   </div>
 </div>
 
 <nav class="bottom-nav">
   <button class="nav-btn active" id="navHome">
     <span class="nav-icon">🏠</span>
-    <span class="nav-label">หน้าหลัก</span>
+    <span class="nav-label">หน้าแรก</span>
   </button>
   <button class="nav-btn" id="navShop">
     <span class="nav-icon">🛍️</span>
@@ -237,32 +236,28 @@ body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 </nav>
 
 <script>
-// ===== คีย์เดิม — ไม่เปลี่ยน =====
-const STORAGE_KEY = 'thaipodeeUserData';
+const STORAGE_KEY = 'thaipodeeVideos';
 const NAME_KEY = 'thaipodeeUserName';
 const AVATAR_KEY = 'thaipodeeUserAvatar';
 
-// ===== คลาวด์กลาง =====
 const CLOUD_URL = 'https://api.jsonbin.io/v3/b/66ed1fadad19ca34f8e7d3a7';
 const CLOUD_KEY = '$2a$10$V8qfH0rM3bD8G9eF7hJ6kL5mN4bP3cQ2dR1eS0fT9gU8hI7jK6';
 
 let savedVideos = [];
-let currentVideoUrl = null;
-let lastSync = '';
-let isBusy = false;
+let lastSyncHash = '';
+let isSyncing = false;
 
 const cloudStatus = document.getElementById('cloudStatus');
 const postCountSpan = document.getElementById('postCountSpan');
 const videoPlayer = document.getElementById('videoPlayer');
 const videoArea = document.getElementById('videoArea');
 
-// ===== โหลดของเก่าก่อน =====
-function loadLocal() {
+function loadLocalData() {
   try {
-    const d = localStorage.getItem(STORAGE_KEY);
-    if (d) savedVideos = JSON.parse(d);
+    const local = localStorage.getItem(STORAGE_KEY);
+    if (local) savedVideos = JSON.parse(local);
   } catch { savedVideos = []; }
-  renderList();
+  renderVideoList();
 }
 
 function loadProfile() {
@@ -279,8 +274,10 @@ function loadProfile() {
   }
 }
 
-// ===== ซิงค์จากคลาวด์ =====
-async function pullCloud() {
+async function syncFromCloud() {
+  if (isSyncing) return;
+  isSyncing = true;
+  
   try {
     const res = await fetch(CLOUD_URL + '/latest', {
       headers: { 'X-Master-Key': CLOUD_KEY }
@@ -288,11 +285,11 @@ async function pullCloud() {
     const data = await res.json();
     if (data.record && data.record.videos) {
       const h = JSON.stringify(data.record.videos);
-      if (h !== lastSync) {
+      if (h !== lastSyncHash) {
         savedVideos = data.record.videos;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
-        lastSync = h;
-        renderList();
+        lastSyncHash = h;
+        renderVideoList();
       }
     }
     cloudStatus.textContent = '✓ ออนไลน์';
@@ -301,13 +298,10 @@ async function pullCloud() {
     cloudStatus.textContent = '⚠️ ออฟไลน์';
     cloudStatus.className = 'cloud-status offline';
   }
+  isSyncing = false;
 }
 
-async function pushCloud() {
-  if (isBusy) return;
-  isBusy = true;
-  cloudStatus.textContent = '⟳ กำลังบันทึก...';
-  
+async function saveToCloud() {
   try {
     await fetch(CLOUD_URL, {
       method: 'PUT',
@@ -318,18 +312,13 @@ async function pushCloud() {
       body: JSON.stringify({ videos: savedVideos })
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
-    lastSync = JSON.stringify(savedVideos);
-    cloudStatus.textContent = '✓ บันทึกแล้ว';
-    cloudStatus.className = 'cloud-status online';
+    lastSyncHash = JSON.stringify(savedVideos);
   } catch {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedVideos));
-    cloudStatus.textContent = '⚠️ บันทึกในเครื่อง';
   }
-  isBusy = false;
 }
 
-// ===== แสดงรายการ + กดเล่นได้จริง =====
-function renderList() {
+function renderVideoList() {
   const list = document.getElementById('videoList');
   list.innerHTML = '';
   postCountSpan.textContent = `(${savedVideos.length})`;
@@ -356,88 +345,74 @@ function renderList() {
     list.appendChild(el);
   });
   
-  // กดเล่น
   document.querySelectorAll('.video-item-thumb, .video-item-info').forEach(b => {
-    b.onclick = (e) => {
-      const i = parseInt(e.currentTarget.dataset.idx);
-      playVideo(i);
-    };
+    b.onclick = (e) => playVideo(parseInt(e.currentTarget.dataset.idx));
   });
   
-  // ลบ
   document.querySelectorAll('.video-delete-btn').forEach(b => {
     b.onclick = (e) => {
       if (confirm('ลบ?')) {
         savedVideos.splice(parseInt(e.target.dataset.idx), 1);
-        pushCloud();
-        renderList();
+        saveToCloud();
+        renderVideoList();
       }
     };
   });
 }
 
-// ===== เล่นวิดีโอจริง — จุดที่ขาดไป =====
-function playVideo(index) {
-  const vid = savedVideos[index];
+function playVideo(idx) {
+  const vid = savedVideos[idx];
   if (!vid) return;
   
-  // เคลียร์ตัวเก่า
-  if (currentVideoUrl) {
-    URL.revokeObjectURL(currentVideoUrl);
-    currentVideoUrl = null;
-  }
+  videoPlayer.removeAttribute('src');
+  videoArea.classList.remove('has-video');
   
-  // มีไฟล์ในเครื่องนี้ → เล่นได้ทันที
-  if (vid.blob) {
-    currentVideoUrl = URL.createObjectURL(vid.blob);
-    videoPlayer.src = currentVideoUrl;
+  if (vid.localUrl) {
+    videoPlayer.src = vid.localUrl;
     videoArea.classList.add('has-video');
     showPage('main');
     videoPlayer.play().catch(() => {});
   } else {
-    alert(`แสดง: ${vid.name}\n(ไฟล์วิดีโอเก็บในเครื่องผู้โพสต์ — จะเห็นชื่อ/รายการตรงกันทุกเครื่อง)`);
+    alert(`📺 ${vid.name}\n📅 ${vid.date}\n👤 โดย: ${vid.by}\n\n(อัปโหลดในเครื่องนี้เพื่อเล่น)`);
     showPage('main');
   }
 }
 
-// ===== อัปโหลดใหม่ =====
 document.getElementById('uploadInput').onchange = async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
+  const file = e.target.files[0];
+  if (!file) return;
   
   const now = new Date();
-  const newVid = {
-    name: f.name,
-    date: now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}),
-    by: localStorage.getItem(NAME_KEY) || 'ผู้ใช้',
-    blob: f,
-    thumb: null
-  };
+  const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+  const myName = localStorage.getItem(NAME_KEY) || 'ผู้ใช้';
+  const localUrl = URL.createObjectURL(file);
   
-  // ทำรูปหน้าปก
-  const temp = document.createElement('video');
-  temp.src = URL.createObjectURL(f);
-  temp.preload = 'metadata';
-  temp.onloadeddata = () => { temp.currentTime = 1; };
-  temp.onseeked = () => {
+  const tempVid = document.createElement('video');
+  tempVid.src = localUrl;
+  tempVid.preload = 'metadata';
+  tempVid.onloadeddata = () => { tempVid.currentTime = 1; };
+  tempVid.onseeked = () => {
     const c = document.createElement('canvas');
     c.width = 160; c.height = 90;
     const ctx = c.getContext('2d');
-    ctx.drawImage(temp, 0, 0, 160, 90);
-    newVid.thumb = c.toDataURL('image/png');
+    ctx.drawImage(tempVid, 0, 0, 160, 90);
     
-    savedVideos.push(newVid);
-    pushCloud();
-    renderList();
+    savedVideos.push({
+      name: file.name,
+      date: dateStr,
+      by: myName,
+      localUrl: localUrl,
+      thumb: c.toDataURL('image/png')
+    });
     
-    // เล่นทันที
+    saveToCloud();
+    renderVideoList();
     playVideo(savedVideos.length - 1);
   };
   
   e.target.value = '';
 };
 
-// ===== เปลี่ยนชื่อ =====
 document.getElementById('editNameBtn').onclick = () => {
   document.getElementById('editNameInput').value = document.getElementById('profileNameDisplay').textContent;
   document.getElementById('editNameInput').style.display = 'block';
@@ -455,7 +430,6 @@ document.getElementById('saveNameBtn').onclick = () => {
   document.getElementById('profileNameDisplay').style.display = 'block';
 };
 
-// ===== เปลี่ยนรูป =====
 document.getElementById('changeAvatarBtn').onclick = () => {
   document.getElementById('avatarInput').click();
 };
@@ -476,7 +450,6 @@ document.getElementById('avatarInput').onchange = (e) => {
   r.readAsDataURL(f);
 };
 
-// ===== สลับหน้า =====
 function showPage(p) {
   document.getElementById('mainPage').classList.toggle('active', p === 'main');
   document.getElementById('profilePage').classList.toggle('active', p === 'profile');
@@ -493,16 +466,11 @@ document.getElementById('navMsg').onclick = () => setNav('navMsg');
 document.getElementById('navProfile').onclick = () => { showPage('profile'); setNav('navProfile'); };
 document.getElementById('backBtn').onclick = () => { showPage('main'); setNav('navHome'); };
 
-// ===== เริ่ม =====
 window.onload = () => {
-  loadLocal();
+  loadLocalData();
   loadProfile();
-  pullCloud();
-  setInterval(pullCloud, 8000);
-};
-
-window.onunload = () => {
-  if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
+  syncFromCloud();
+  setInterval(syncFromCloud, 8000);
 };
 </script>
 
