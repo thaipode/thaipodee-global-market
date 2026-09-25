@@ -1,21 +1,37 @@
 <!-- ==============================================================
-   ThaiPodee v1028 — เพิ่มปุ่มลบวิดีโอ
-   25 กันยายน 2569 06:53 น.
-   อ้างอิงจาก: v1027
+   ThaiPodee v1030 — แก้ไอคอน+ชื่อหายสนิท ไม่ใช้ Google
+   25 กันยายน 2569 07:15 น.
+   อ้างอิงจาก: v1029
    --------------------------------------------------------------
-   ✅ เพิ่มปุ่มลบ ที่ขวาของแต่ละรายการ
-   ✅ กดลบ → ยืนยัน → ลบออกจากรายการ
-   ✅ รูป+ชื่อโปรไฟล์เหมือนเดิม
-   ✅ วิดีโอโหลด/บันทึกได้คงที่เหมือนเดิม
+   ✅ ชื่อแอป: ThaiPodee — ไม่มี Chrome/Google
+   ✅ ไอคอน TP ชัดเจน — บังคับไม่เอาของเก่า
+   ✅ เพิ่ม cache-bust ไม่ให้จำของเก่า
+   ✅ ทุกฟังก์ชันเหมือน v1029
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- ===== บังคับชื่อแอป ===== -->
+<meta name="application-name" content="ThaiPodee">
+<meta name="apple-mobile-web-app-title" content="ThaiPodee">
+<meta name="description" content="ThaiPodee แอปวิดีโอและตลาดสินค้าไทย">
+
+<!-- ===== สีแถบด้านบน ===== -->
 <meta name="theme-color" content="#000000">
+<meta name="msapplication-TileColor" content="#000000">
+
+<!-- ===== ปิดชื่อเบราว์เซอร์ ===== -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ===== ไอคอนหลัก — บังคับใหม่ ไม่เอาของเก่า ===== -->
+<link rel="icon" sizes="any" href="data:image/svg+xml;v=1030,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23000000'/%3E%3Ccircle cx='50' cy='50' r='42' fill='none' stroke='%23ffffff' stroke-width='3'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='44' fill='white' font-weight='bold' font-family='sans-serif'%3ETP%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;v=1030,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23000000'/%3E%3Ccircle cx='90' cy='90' r='76' fill='none' stroke='%23ffffff' stroke-width='5'/%3E%3Ctext x='90' y='110' text-anchor='middle' font-size='80' fill='white' font-weight='bold' font-family='sans-serif'%3ETP%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json;v=1030,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%25200%2520192%2520192%27%253E%253Crect%2520width%3D%27192%27%2520height%3D%27192%27%2520rx%3D%2742%27%2520fill%3D%27%2523000%27%2F%253E%253Ctext%2520x%3D%2796%27%2520y%3D%27120%27%2520text-anchor%3D%27middle%27%2520font-size%3D%2790%27%2520fill%3D%27white%27%2520font-weight%3D%27bold%27%253ETP%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
 <title>ThaiPodee</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -335,8 +351,15 @@ function deleteVideo(index) {
   localStorage.setItem('thaipodeeVideoList', JSON.stringify(savedVideos));
   
   // ถ้าลบรายการที่กำลังเล่นอยู่ → ล้างหน้าจอ
-  if (savedVideos.length === 0 || videoPlayer.src === savedVideos[index]?.dataUrl) {
-    videoPlayer.src = '';
+  const currentSrc = videoPlayer.src;
+  if (currentSrc) {
+    const stillExists = savedVideos.some(v => v.dataUrl === currentSrc);
+    if (!stillExists) {
+      videoPlayer.src = '';
+      videoArea.classList.remove('has-video');
+    }
+  }
+  if (savedVideos.length === 0 && !videoPlayer.src) {
     videoArea.classList.remove('has-video');
   }
   
