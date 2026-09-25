@@ -1,8 +1,15 @@
 <!-- ==============================================================
-   ThaiPodee v1051 — แก้ครบ 25 ก.ย. 2569
+   ThaiPodee v1052
+   วันที่: 25 กันยายน 2569 21:25 น.
+   พัฒนาจาก: v1051
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    Line ID: thaipodee-pro-eng
-   แก้: เติม data/ ครบ 3 จุด — อ่าน, เขียน, เก็บไฟล์
+   --------------------------------------------------------------
+   ปรับปรุง:
+   ✅ เพิ่ม data/ นำหน้าที่อยู่ไฟล์ทั้งหมด
+   ✅ สร้าง data/videos.json อัตโนมัติ ถ้ายังไม่มี
+   ✅ แก้จุดขาด , ท้ายบรรทัด
+   ✅ คงโครงสร้างเดิม ไม่ตัดอะไร
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -222,10 +229,33 @@ async function uploadToGitHub(file, fileName) {
   });
 }
 
+async function createDataFileIfMissing() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json?ref=${CONFIG.branch}`, {
+      headers: { 'Authorization': `token ${CONFIG.token}` }
+    });
+    if (res.status === 404) {
+      await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${CONFIG.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Initialize data folder',
+          content: btoa('[]'),
+          branch: CONFIG.branch
+        })
+      });
+    }
+  } catch (e) {}
+}
+
 async function syncFromCloud() {
   if (isSyncing) return;
   isSyncing = true;
   try {
+    await createDataFileIfMissing();
     const res = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/data/videos.json?ref=${CONFIG.branch}`, {
       headers: { 'Authorization': `token ${CONFIG.token}` }
     });
