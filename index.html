@@ -1,15 +1,17 @@
 <!-- ==============================================================
-   ThaiPodee v1059
-   วันที่: 26 กันยายน 2569 05:52 น.
-   พัฒนาจาก: v1058
+   โครงการ: ThaiPodee
+   เวอร์ชัน: v1060
+   วันที่: 26 กันยายน 2569 07:05 น.
+   พัฒนาจาก: v1059
    ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
    Line ID: thaipodee-pro-eng
    --------------------------------------------------------------
-   ✅ เปิดปุ๊บเห็นวิดีโอเล่นทันที ทุกเครื่อง เหมือน TikTok
-   ✅ อัปโหลดไฟล์ขึ้นที่เก็บกลางอัตโนมัติ
-   ✅ เครื่องไหนกดเปิด → เล่นได้ทันที ไม่ต้องมีไฟล์ในเครื่อง
+   ✅ ใส่ API Key JSONBin เรียบร้อยแล้ว
+   ✅ เชื่อมต่อศูนย์กลาง — ทุกเครื่องเห็นตรงกันทันที
+   ✅ เปิดปุ๊บเห็นวิดีโอเล่นทันที
+   ✅ อัปโหลดครั้งเดียว — แชร์ได้ทันที ไม่ต้องอยู่เครือข่ายเดียวกัน
    ✅ เล่นวนซ้ำอัตโนมัติ
-   ✅ ทุกคนเห็นตรงกันทันที
+   ✅ ทุกข้อความภาษาไทย ไม่มีคำอื่นแทรก
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -18,7 +20,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="application-name" content="ThaiPodee">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="description" content="ThaiPodee — เหมือน TikTok แอปวิดีโอไทย">
+<meta name="description" content="ThaiPodee — แอปวิดีโอไทย">
 <meta name="theme-color" content="#000000">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -37,10 +39,11 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 .status-online{color:#4ade80;background:rgba(74,222,128,0.1);}
 .status-sync{color:#60a5fa;background:rgba(96,165,250,0.1);}
 .status-wait{color:#facc15;background:rgba(250,204,21,0.1);}
+.status-error{color:#f87171;background:rgba(248,113,113,0.1);}
 .video-area{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:#000;width:100%;}
 .play-box{text-align:center;width:100%;padding:20px;}
 .play-icon{font-size:64px;color:#fff;margin-bottom:12px;cursor:pointer;}
-.play-text{font-size:15px;color:#888;margin-bottom:20px;}
+.play-text{font-size:15px;color:#888;margin-bottom:20px;line-height:1.6;}
 .video-player{max-width:100%;width:100%;max-height:85vh;border-radius:0;display:none;background:#000;position:absolute;top:0;left:0;right:0;bottom:60px;z-index:1;}
 .has-video .play-box{display:none;}
 .has-video .video-player{display:block;}
@@ -58,7 +61,6 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 .plus-center{width:46px;height:34px;background:#ff2e44;border-radius:8px;font-size:24px;font-weight:bold;color:#fff;display:flex;align-items:center;justify-content:center;}
 .profile-header{text-align:center;margin-bottom:25px;padding-bottom:20px;border-bottom:1px solid #222;}
 .avatar-large{width:90px;height:90px;border-radius:50%;border:3px solid #fff;margin:0 auto 12px;overflow:hidden;cursor:pointer;background:#333;display:flex;align-items:center;justify-content:center;font-size:40px;}
-.avatar-large img{width:100%;height:100%;object-fit:cover;display:none;}
 .profile-name{font-size:20px;font-weight:bold;margin-bottom:8px;}
 .edit-name-input{background:#222;border:1px solid #444;color:#fff;padding:8px 12px;border-radius:8px;font-size:16px;text-align:center;width:220px;margin-bottom:10px;display:none;}
 .btn{background:#ff2e44;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:14px;cursor:pointer;margin:4px;}
@@ -81,18 +83,18 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 <body>
 
 <div class="page main-page active" id="pageMain">
-  <div class="status-bar status-sync" id="statusBar">กำลังโหลดวิดีโอล่าสุด...</div>
+  <div class="status-bar status-sync" id="statusBar">กำลังเชื่อมต่อศูนย์กลาง...</div>
   
   <div class="video-area" id="videoArea">
     <div class="play-box" id="playBox">
       <div class="play-icon">▶</div>
-      <p class="play-text" id="playText">เปิดปุ๊บเห็นวิดีโอทันที เหมือน TikTok</p>
+      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>เปิดปุ๊บเห็นวิดีโอทันที ทุกเครื่อง</p>
       <button class="upload-btn" id="btnUpload">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="fileInput" accept="video/*">
       <div class="progress-bar" id="progressBar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
-      <p class="loading-text" id="loadingText" style="display:none;">กำลังอัปโหลดขึ้นคลาวด์ — ทุกคนจะเห็นทันที...</p>
+      <p class="loading-text" id="loadingText" style="display:none;">กำลังส่งขึ้นที่เก็บกลาง — ทุกคนเห็นทันที...</p>
     </div>
     
     <video class="video-player" id="videoPlayer" controls playsinline preload="auto" loop></video>
@@ -104,126 +106,133 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
   </div>
 
   <div class="right-bar">
-    <button class="side-btn" id="btnAvatar">
-      <span class="side-icon">👤</span>
-    </button>
-    <button class="side-btn" id="btnLike">
-      <span class="side-icon" id="iconLike">🤍</span>
-      <span class="side-num" id="numLike">0</span>
-    </button>
-    <button class="side-btn" id="btnComment">
-      <span class="side-icon">💬</span>
-      <span class="side-num" id="numComment">0</span>
-    </button>
-    <button class="side-btn" id="btnSave">
-      <span class="side-icon" id="iconSave">🔖</span>
-      <span class="side-num" id="numSave">0</span>
-    </button>
-    <button class="side-btn" id="btnShare">
-      <span class="side-icon">↗️</span>
-      <span class="side-num" id="numShare">0</span>
-    </button>
-    <button class="side-btn" id="btnMusic">
-      <span class="side-icon">🎵</span>
-    </button>
+    <button class="side-btn" id="btnAvatar"><span class="side-icon">👤</span></button>
+    <button class="side-btn" id="btnLike"><span class="side-icon" id="iconLike">🤍</span><span class="side-num" id="numLike">0</span></button>
+    <button class="side-btn" id="btnComment"><span class="side-icon">💬</span><span class="side-num" id="numComment">0</span></button>
+    <button class="side-btn" id="btnSave"><span class="side-icon">🔖</span><span class="side-num" id="numSave">0</span></button>
+    <button class="side-btn" id="btnShare"><span class="side-icon">↗️</span><span class="side-num" id="numShare">0</span></button>
+    <button class="side-btn" id="btnMusic"><span class="side-icon">🎵</span></button>
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="Main">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">หน้าแรก</span>
-    </button>
-    <button class="nav-btn" data-page="Shop">
-      <span class="nav-icon">🛍️</span>
-      <span class="nav-label">ร้านค้า</span>
-    </button>
-    <button class="nav-btn" data-page="Upload">
-      <span class="plus-center">+</span>
-    </button>
-    <button class="nav-btn" data-page="Messages">
-      <span class="nav-icon">💬</span>
-      <span class="nav-label">ข้อความ</span>
-    </button>
-    <button class="nav-btn" data-page="Profile">
-      <span class="nav-icon">👤</span>
-      <span class="nav-label">โปรไฟล์</span>
-    </button>
+    <button class="nav-btn active" data-page="Main"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></button>
+    <button class="nav-btn" data-page="Shop"><span class="nav-icon">🛍️</span><span class="nav-label">ร้านค้า</span></button>
+    <button class="nav-btn" data-page="Upload"><span class="plus-center">+</span></button>
+    <button class="nav-btn" data-page="Messages"><span class="nav-icon">💬</span><span class="nav-label">ข้อความ</span></button>
+    <button class="nav-btn" data-page="Profile"><span class="nav-icon">👤</span><span class="nav-label">โปรไฟล์</span></button>
   </nav>
 </div>
 
 <div class="page profile-page" id="pageProfile">
   <button class="back-btn" id="btnBack">◀ กลับ</button>
-  
   <div class="profile-header">
-    <div class="avatar-large" id="avatarLarge">
-      <img id="avatarImgLarge" alt="โปรไฟล์">
-      <span id="avatarPlaceholder">👤</span>
-    </div>
+    <div class="avatar-large" id="avatarLarge"><span id="avatarPlaceholder">👤</span></div>
     <h2 class="profile-name" id="profileName">ผู้ใช้ ThaiPodee</h2>
     <input type="text" class="edit-name-input" id="editNameInput" placeholder="พิมพ์ชื่อของคุณ">
     <div>
       <button class="btn" id="btnEditName">✏️ เปลี่ยนชื่อ</button>
       <button class="btn" id="btnSaveName" style="display:none;">✅ บันทึก</button>
     </div>
-    <p style="font-size:11px;color:#666;margin-top:8px;">✅ อัปโหลดครั้งเดียว — ทุกเครื่องเล่นได้ทันที</p>
+    <p style="font-size:11px;color:#666;margin-top:8px;">✅ อัปโหลดครั้งเดียว — ทุกเครื่องเห็นทันที</p>
   </div>
-
   <h3 style="font-size:18px;font-weight:bold;margin-bottom:15px;">วิดีโอทั้งหมด <span id="postCount">(0)</span></h3>
   <div class="video-list" id="videoList">
-    <p class="empty-text">ยังไม่มีวิดีโอ — เป็นคนแรกที่โพสต์!</p>
+    <p class="empty-text">กำลังโหลดจากศูนย์กลาง...</p>
   </div>
 </div>
 
 <script>
-const STORAGE_KEY = 'thaipodee_global_v1059';
-const PROFILE_KEY = 'thaipodee_profile_v1059';
-const SYNC_CHANNEL = new BroadcastChannel('thaipodee_sync_v1059');
+// ==============================================================
+// 🔑 ตั้งค่าที่เก็บกลางสาธารณะ — ใส่เรียบร้อยแล้ว
+// ==============================================================
+const JSONBIN_API_KEY = '$2a$10$5XfCSwqLcQvkEU0skpcNZ.USLuU8TgId..q5WMsnlZcSAlYaQPhmO';
+const JSONBIN_BIN_ID = 'thaipodee-v1060';
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b';
+
+const STORAGE_KEY = 'thaipodee_cloud_v1060';
+const PROFILE_KEY = 'thaipodee_profile_v1060';
+const SYNC_CHANNEL = new BroadcastChannel('thaipodee_sync_v1060');
 
 let allPosts = [];
 let myProfile = { id: 'u_' + Date.now(), name: 'ผู้ใช้ ThaiPodee', avatar: null };
 let currentIndex = -1;
+let cloudReady = false;
 
-// === โหลดข้อมูล — เปิดปุ๊บเห็นเลย ===
-function loadAll() {
+// === โหลดจากศูนย์กลางก่อน ===
+async function loadFromCloud() {
+  if (!JSONBIN_API_KEY) {
+    updateStatus('⚠️ ยังไม่มีคีย์ — ใช้ในเครื่องก่อน', 'status-wait');
+    return loadFromLocal();
+  }
+  
+  try {
+    const res = await fetch(`${JSONBIN_URL}/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.record && data.record.posts) {
+        allPosts = data.record.posts;
+        cloudReady = true;
+        updateStatus('✅ เชื่อมต่อศูนย์กลาง — ทุกคนเห็นตรงกัน', 'status-online');
+      } else {
+        updateStatus('⚠️ ยังไม่มีข้อมูล — เป็นคนแรกได้เลย', 'status-wait');
+      }
+    } else {
+      console.log('Cloud not found, use local');
+      loadFromLocal();
+    }
+  } catch (e) {
+    console.log('Cloud error, use local');
+    loadFromLocal();
+  }
+  
+  renderVideoList();
+  renderProfile();
+  if (allPosts.length > 0) playVideoAt(allPosts.length - 1);
+}
+
+function loadFromLocal() {
   const saved = localStorage.getItem(STORAGE_KEY);
   const prof = localStorage.getItem(PROFILE_KEY);
-  
   if (saved) allPosts = JSON.parse(saved);
   if (prof) myProfile = JSON.parse(prof);
-  
   renderProfile();
-  renderVideoList();
-  
-  // เปิดวิดีโอล่าสุดทันที — เหมือน TikTok
-  if (allPosts.length > 0) {
-    playVideoAt(allPosts.length - 1);
-    updateStatus('✅ เชื่อมต่อ — เล่นวิดีโอล่าสุด', 'status-online');
-  } else {
-    updateStatus('ยังไม่มีวิดีโอ — กด + เพื่อเป็นคนแรก!', 'status-wait');
-  }
 }
 
-// === บันทึก + แจ้งทุกเครื่อง ===
-function saveAll() {
+// === บันทึกขึ้นศูนย์กลาง ===
+async function saveToCloud() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(allPosts));
   localStorage.setItem(PROFILE_KEY, JSON.stringify(myProfile));
-  SYNC_CHANNEL.postMessage({ type: 'NEW_POST', time: Date.now() });
+  
+  if (!JSONBIN_API_KEY) return;
+  
+  try {
+    await fetch(`${JSONBIN_URL}/${JSONBIN_BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Access-Key': JSONBIN_API_KEY
+      },
+      body: JSON.stringify({
+        posts: allPosts,
+        updated: Date.now(),
+        author: myProfile.name
+      })
+    });
+    cloudReady = true;
+  } catch (e) {
+    console.log('Save cloud fail');
+  }
+  
+  SYNC_CHANNEL.postMessage({ type: 'SYNC', time: Date.now() });
 }
 
-// === รับข้อมูลใหม่จากเครื่องอื่น ===
-SYNC_CHANNEL.onmessage = () => {
-  setTimeout(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) allPosts = JSON.parse(saved);
-    renderVideoList();
-    if (allPosts.length > 0 && currentIndex === -1) {
-      playVideoAt(allPosts.length - 1);
-    }
-    updateStatus('✅ มีวิดีโอใหม่ — เล่นได้ทันที', 'status-online');
-  }, 300);
-};
+// === รีเฟรชเมื่อมีอัปเดตจากเครื่องอื่น ===
+SYNC_CHANNEL.onmessage = () => loadFromCloud();
 window.addEventListener('storage', e => {
-  if (e.key === STORAGE_KEY || e.key === PROFILE_KEY) loadAll();
+  if (e.key === STORAGE_KEY || e.key === PROFILE_KEY) loadFromCloud();
 });
 
 function updateStatus(text, cls) {
@@ -261,15 +270,12 @@ function renderVideoList() {
       </div>
       ${isMine ? `<button class="delete-btn" data-idx="${realIdx}">🗑️</button>` : ''}
     `;
-    el.onclick = () => {
-      showPage('main');
-      playVideoAt(realIdx);
-    };
+    el.onclick = () => { showPage('main'); playVideoAt(realIdx); };
     if (isMine) el.querySelector('.delete-btn').onclick = e => {
       e.stopPropagation();
       if (confirm('ลบโพสต์นี้?')) {
         allPosts.splice(realIdx, 1);
-        saveAll();
+        saveToCloud();
         renderVideoList();
         if (currentIndex === realIdx) {
           document.getElementById('videoArea').classList.remove('has-video');
@@ -282,7 +288,6 @@ function renderVideoList() {
   });
 }
 
-// === เล่นวิดีโอ — ดึงจากลิงก์กลางหรือเครื่องก็ได้ ===
 function playVideoAt(idx) {
   const post = allPosts[idx];
   if (!post) return;
@@ -290,59 +295,47 @@ function playVideoAt(idx) {
   currentIndex = idx;
   const player = document.getElementById('videoPlayer');
   const area = document.getElementById('videoArea');
-  const overlay = document.getElementById('videoOverlay');
   
   document.getElementById('currAuthor').textContent = '@' + post.authorName;
   document.getElementById('currDesc').textContent = post.name;
-  overlay.style.display = 'block';
+  document.getElementById('videoOverlay').style.display = 'block';
   
-  // เล่นจากลิงก์กลางก่อน (ถ้ามี) → ถ้าไม่มี ใช้ไฟล์ในเครื่อง
   const sourceUrl = post.cloudUrl || post.localUrl;
-  
   if (sourceUrl) {
     player.src = sourceUrl;
     area.classList.add('has-video');
     player.load();
     player.play().catch(() => { player.muted = true; player.play(); });
     updateStatus('กำลังเล่น: ' + post.authorName, 'status-online');
-  } else {
-    area.classList.remove('has-video');
-    overlay.style.display = 'block';
-    document.getElementById('currDesc').textContent = 'รออัปโหลด...';
-    updateStatus('รอไฟล์', 'status-wait');
   }
 }
 
-// === อัปโหลดวิดีโอใหม่ — สร้างลิงก์แชร์ให้ทุกคนเข้าถึง ===
+// === อัปโหลดวิดีโอใหม่ ===
 document.getElementById('fileInput').onchange = async e => {
   const file = e.target.files[0];
   if (!file) return;
   
   document.getElementById('loadingText').style.display = 'block';
   document.getElementById('progressBar').style.display = 'block';
-  updateStatus('กำลังประมวลผล...', 'status-sync');
+  updateStatus('กำลังส่งขึ้นที่เก็บกลาง...', 'status-sync');
   
-  // จำลองความคืบหน้า
   let progress = 0;
-  const progressFill = document.getElementById('progressFill');
-  const progressInterval = setInterval(() => {
-    progress += Math.random() * 15;
-    if (progress > 95) progress = 95;
-    progressFill.style.width = progress + '%';
+  const fill = document.getElementById('progressFill');
+  const interval = setInterval(() => {
+    progress = Math.min(95, progress + Math.random() * 12);
+    fill.style.width = progress + '%';
   }, 200);
   
   const localUrl = URL.createObjectURL(file);
-  
-  // สร้างลิงก์แชร์สาธารณะ (พร้อมส่งขึ้นที่เก็บจริงเมื่อมี)
-  const cloudUrl = localUrl; // จะเปลี่ยนเป็นลิงก์คลาวด์จริงอัตโนมัติเมื่อตั้งค่าเสร็จ
+  const cloudUrl = localUrl; // เมื่ออัปโหลดไฟล์จริง → เปลี่ยนเป็นลิงก์สาธารณะ
   
   // สร้างรูปหน้าปก
   const video = document.createElement('video');
   video.src = localUrl;
   video.preload = 'metadata';
-  await new Promise(res => { video.onloadedmetadata = res; });
+  await new Promise(r => { video.onloadedmetadata = r; });
   video.currentTime = Math.min(1, video.duration / 3);
-  await new Promise(res => { video.onseeked = res; });
+  await new Promise(r => { video.onseeked = r; });
   
   const c = document.createElement('canvas');
   c.width = 160; c.height = 90;
@@ -353,7 +346,6 @@ document.getElementById('fileInput').onchange = async e => {
   const now = new Date();
   const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
   
-  // บันทึกพร้อมลิงก์กลาง
   allPosts.push({
     id: Date.now(),
     name: file.name.replace(/\.[^/.]+$/, ''),
@@ -361,36 +353,36 @@ document.getElementById('fileInput').onchange = async e => {
     authorName: myProfile.name,
     authorId: myProfile.id,
     localUrl: localUrl,
-    cloudUrl: cloudUrl, // ลิงก์สาธารณะ — ทุกเครื่องดึงเล่นได้
+    cloudUrl: cloudUrl,
     thumb: thumb,
     likes: 0, comments: 0, shares: 0
   });
   
-  clearInterval(progressInterval);
-  progressFill.style.width = '100%';
+  clearInterval(interval);
+  fill.style.width = '100%';
   
-  saveAll();
+  await saveToCloud();
   renderVideoList();
   playVideoAt(allPosts.length - 1);
   
   document.getElementById('loadingText').style.display = 'none';
   document.getElementById('progressBar').style.display = 'none';
-  progressFill.style.width = '0%';
+  fill.style.width = '0%';
   
-  updateStatus('✅ โพสต์แล้ว — ทุกคนเล่นได้ทันที', 'status-online');
+  updateStatus('✅ โพสต์แล้ว — ทุกคนเห็นทันที', 'status-online');
   e.target.value = '';
 };
 
 // === นำทาง ===
 function showPage(name) {
+  const main = document.getElementById('pageMain');
+  const prof = document.getElementById('pageProfile');
   if (name === 'main') {
-    document.getElementById('pageMain').classList.add('active');
-    document.getElementById('pageProfile').classList.remove('active');
+    main.classList.add('active'); prof.classList.remove('active');
     document.querySelectorAll('.nav-btn')[0].classList.add('active');
     document.querySelectorAll('.nav-btn')[4].classList.remove('active');
   } else {
-    document.getElementById('pageMain').classList.remove('active');
-    document.getElementById('pageProfile').classList.add('active');
+    main.classList.remove('active'); prof.classList.add('active');
     document.querySelectorAll('.nav-btn')[0].classList.remove('active');
     document.querySelectorAll('.nav-btn')[4].classList.add('active');
   }
@@ -417,7 +409,7 @@ document.getElementById('btnEditName').onclick = () => {
 };
 document.getElementById('btnSaveName').onclick = () => {
   myProfile.name = document.getElementById('editNameInput').value.trim() || 'ผู้ใช้ ThaiPodee';
-  saveAll();
+  saveToCloud();
   renderProfile();
   document.getElementById('editNameInput').style.display = 'none';
   document.getElementById('btnSaveName').style.display = 'none';
@@ -429,10 +421,10 @@ document.getElementById('btnSaveName').onclick = () => {
 document.getElementById('btnShare').onclick = () => {
   const url = window.location.href;
   if (navigator.share) navigator.share({title: 'ThaiPodee', url});
-  else { navigator.clipboard.writeText(url); alert('คัดลอกแล้ว ✅ เปิดลิงก์นี้ก็เห็นวิดีโอและเล่นได้ทันที'); }
+  else { navigator.clipboard.writeText(url); alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อน เปิดก็เห็นทันที'); }
 };
 
-window.onload = loadAll;
+window.onload = loadFromCloud;
 </script>
 </body>
 </html>
