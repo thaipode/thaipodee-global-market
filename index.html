@@ -1,10 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1071 — แก้จอว่าง / ทุกส่วนครบ ไม่ขาดหาย
-   26 กันยายน 2569 19:38 น.
+   ThaiPodee v1072 — แก้แถบล่างหาย+จอว่าง / ทุกส่วนครบ
+   26 กันยายน 2569 19:46 น.
    --------------------------------------------------------------
-   ✅ ด้านขวา 6 ตัวตรง: 👤 ❤️ 💬 🔖 ↗️ 🎵
-   ✅ ด้านล่าง 5 ตัวครบ: 🏠 🛒 ➕ 💬 👤
-   ✅ พื้นที่วิดีโอแสดงปกติ ไม่หาย
+   ✅ ด้านขวา 6 ตัว: 👤 ❤️ 💬 🔖 ↗️ 🎵
+   ✅ พื้นที่วิดีโอตรงกลาง แสดงชัดเจน
+   ✅ แถบล่าง 5 ตัว: 🏠 🛒 ➕ 💬 👤 ครบ ไม่หาย
    ✅ เชื่อม Firebase / อัปโหลด-ดู-ลบ-เปลี่ยนโปรไฟล์
    ============================================================== -->
 <!DOCTYPE html>
@@ -15,22 +15,24 @@
 <title>ThaiPodee</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
-body{background:#000;color:#fff;height:100vh;overflow:hidden;}
+html,body{width:100%;height:100%;background:#000;color:#fff;overflow:hidden;}
+
+/* หน้าแรก */
 .page{display:none;width:100%;height:100vh;position:absolute;top:0;left:0;}
 .page.active{display:block;}
 
-/* พื้นที่วิดีโอ — แน่นอนว่าแสดง */
+/* พื้นที่วิดีโอตรงกลาง */
 .video-area{width:100%;height:calc(100vh - 100px);display:flex;align-items:center;justify-content:center;position:relative;background:#000;overflow:hidden;}
 video{max-width:100%;max-height:100%;object-fit:contain;display:none;}
 
-/* ด้านขวา 6 ตัว เรียงบน-ล่าง ตรงลำดับ */
+/* เมนูด้านขวา 6 ตัว */
 .side-menu{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;align-items:center;z-index:20;}
 .side-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:0.2s;}
 .side-btn:hover{background:rgba(255,255,255,0.3);}
 .side-btn.liked{color:#ff4757;}
 .side-btn span{font-size:11px;margin-top:2px;display:block;text-align:center;}
 
-/* แถบล่าง 5 ตัว — ไม่หายแน่นอน */
+/* แถบล่าง 5 ตัว — แน่นอนว่ามี */
 .bottom-nav{position:absolute;bottom:0;left:0;width:100%;height:100px;background:#000;display:flex;align-items:center;justify-content:space-around;padding:0 10px;border-top:1px solid #222;z-index:30;}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:12px;}
 .nav-btn .icon{font-size:24px;}
@@ -65,13 +67,13 @@ input[type="file"]{display:none;}
 </head>
 <body>
 
-<!-- หน้าแรก — แสดงแน่นอน ไม่หาย -->
+<!-- หน้าแรก — ทุกส่วนครบ -->
 <div id="page-home" class="page active">
   <div class="video-area">
     <video id="mainVideo" loop playsinline preload="metadata"></video>
   </div>
 
-  <!-- ด้านขวา 6 ตัว เรียงตรงลำดับ -->
+  <!-- ด้านขวา 6 ตัว -->
   <div class="side-menu">
     <div class="side-btn" id="btnProf">👤</div>
     <div class="side-btn" id="btnLike">❤️<span id="likeCount">0</span></div>
