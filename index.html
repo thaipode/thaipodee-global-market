@@ -1,10 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1066 — เลิกใช้ JSONBin ใช้ GitHub โดยตรง
-   26 กันยายน 2569 08:10 น.
-   ✅ ตั้งค่าถูกต้อง: thaipodee / thaipodee-global-market / main
-   ✅ รีเฟรชอัตโนมัติทุก 5 วินาที — เห็นกันทันที
-   ✅ ไม่ต้องสมัคร — เปิดลิงก์เดียวกันก็เห็นกัน
-   ✅ ไอคอน/หน้าจอ/เสียง ตรงรูปเป๊ะ ไม่แก้
+   ThaiPodee v1067
+   26 กันยายน 2569 08:25 น.
+   ✅ แก้ทางไฟล์ → ชี้ไปที่ data/videos.json ที่มีอยู่แล้ว
+   ✅ อ่านข้อมูลเก่าที่มีอยู่ได้ทันที
+   ✅ ทุกอย่างเหมือน v1066 เพียงแค่แก้ทางเข้าไฟล์
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -81,7 +80,7 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
   
   <div class="video-area" id="videoArea">
     <div class="play-box" id="playBox">
-      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>ดูได้เลย — ติดตั้งแล้วกด + โพสต์ได้ทันที<br>ทุกคนเห็นร่วมกันผ่าน GitHub</p>
+      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>ดูได้เลย — ติดตั้งแล้วกด + โพสต์ได้ทันที<br>อ่านข้อมูลจาก data/videos.json</p>
       <button class="upload-btn" id="btnUpload">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="fileInput" accept="video/*">
       <div class="progress-bar" id="progressBar">
@@ -126,7 +125,7 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
       <button class="btn" id="btnEditName">✏️ เปลี่ยนชื่อ</button>
       <button class="btn" id="btnSaveName" style="display:none;">✅ บันทึก</button>
     </div>
-    <p style="font-size:11px;color:#666;margin-top:8px;">ไม่ต้องสมัคร — ใช้ GitHub เป็นที่เก็บกลาง</p>
+    <p style="font-size:11px;color:#666;margin-top:8px;">อ่านจาก data/videos.json</p>
   </div>
   <h3 style="font-size:18px;font-weight:bold;margin-bottom:15px;">วิดีโอทั้งหมด <span id="postCount">(0)</span></h3>
   <div class="video-list" id="videoList">
@@ -136,15 +135,15 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 
 <script>
 // ==============================================================
-// 🔑 v1066 — ตั้งค่าถูกต้องแล้ว: thaipodee
+// 🔑 v1067 — ชี้ไปที่ data/videos.json ที่มีอยู่แล้ว
 // ==============================================================
 const GITHUB_USER = 'thaipodee';
 const GITHUB_REPO = 'thaipodee-global-market';
 const GITHUB_BRANCH = 'main';
-const GITHUB_TOKEN = ''; // ใส่ Personal Access Token ถ้าต้องการบันทึกขึ้น GitHub
+const GITHUB_TOKEN = ''; // ใส่ Personal Access Token ถ้าต้องการบันทึก
 
-const DATA_FILE = 'thaipodee-shared-data.json';
-const PROFILE_KEY = 'thaipodee_profile_v1066';
+const DATA_FILE = 'data/videos.json'; // ✅ แก้ตรงนี้ให้ตรงกับที่มีอยู่จริง
+const PROFILE_KEY = 'thaipodee_profile_v1067';
 
 let allPosts = [];
 let myProfile = { id: 'u_' + Date.now(), name: 'ผู้ใช้ ThaiPodee', avatar: null };
@@ -185,7 +184,7 @@ async function loadFromGitHub() {
     allPosts = freshPosts;
     lastSyncHash = freshHash;
     
-    updateStatus('✅ เชื่อมต่อสำเร็จ — เห็นทุกคน', 'status-ok');
+    updateStatus(`✅ เชื่อมต่อสำเร็จ — เจอ ${allPosts.length} รายการ`, 'status-ok');
     renderVideoList();
     renderProfile();
     if (allPosts.length > 0 && currentIndex === -1) playVideoAt(allPosts.length - 1);
@@ -193,7 +192,7 @@ async function loadFromGitHub() {
   } catch (e) {
     console.log('โหลดจาก GitHub', e);
     if (e.message.includes('404') || e.message.includes('ไม่พบไฟล์')) {
-      updateStatus('🟡 ยังไม่มีโพสต์ — เป็นคนแรกเลย!', 'status-syncing');
+      updateStatus('⚠️ ยังไม่มีไฟล์ data/videos.json — สร้างก่อน', 'status-err');
       allPosts = [];
       renderVideoList();
     } else {
