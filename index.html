@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee — ไอคอนครบ 6+5 / เชื่อม Firebase / พร้อมอัปโหลด GitHub
-   26 กันยายน 2569 19:15 น.
+   ThaiPodee v1070 — ไอคอนครบ 6+5 / เชื่อม Firebase / กฎเปิดตลอด
+   26 กันยายน 2569 19:32 น.
    --------------------------------------------------------------
    ✅ ด้านขวา 6 ตัว: 👤 ❤️ 💬 🔖 ↗️ 🎵
    ✅ ด้านล่าง 5 ตัว: 🏠 🛒 ➕ 💬 👤
-   ✅ เชื่อม thaipodee-shop Firebase
-   ✅ อัปโหลด-ดูวิดีโอ-เปลี่ยนชื่อ-รูปโปรไฟล์
-   ✅ หน้าตาเหมือนเดิม ไม่หายอะไร
+   ✅ เชื่อม thaipodee-shop
+   ✅ อัปโหลด-ดู-เปลี่ยนชื่อ-รูป-ลบ
+   ✅ ไม่มีของเก่าปน ไม่มีส่วนที่รู้ว่าพัง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,28 +17,19 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
 body{background:#000;color:#fff;height:100vh;overflow:hidden;}
-
 .page{display:none;width:100%;height:100vh;position:absolute;top:0;left:0;}
 .page.active{display:block;}
-
-/* ---------- พื้นที่วิดีโอ ---------- */
 .video-area{width:100%;height:calc(100vh - 100px);display:flex;align-items:center;justify-content:center;position:relative;background:#000;overflow:hidden;}
 video{max-width:100%;max-height:100%;object-fit:contain;display:none;}
-
-/* ---------- ด้านขวา 6 ตัว — ตรงตำแหน่ง ---------- */
 .side-menu{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;align-items:center;z-index:20;}
 .side-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:0.2s;}
 .side-btn:hover{background:rgba(255,255,255,0.3);}
 .side-btn.liked{color:#ff4757;}
 .side-btn span{font-size:11px;margin-top:2px;display:block;text-align:center;}
-
-/* ---------- แถบล่าง 5 ตัว — ตรงตำแหน่ง ---------- */
 .bottom-nav{position:absolute;bottom:0;left:0;width:100%;height:100px;background:#000;display:flex;align-items:center;justify-content:space-around;padding:0 10px;border-top:1px solid #222;z-index:30;}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:12px;}
 .nav-btn .icon{font-size:24px;}
 .nav-btn.main{width:60px;height:60px;border-radius:50%;background:red;display:flex;align-items:center;justify-content:center;font-size:30px;}
-
-/* ---------- หน้าโปรไฟล์ ---------- */
 .profile-page{padding:20px;text-align:center;}
 .profile-avatar{width:100px;height:100px;border-radius:50%;background:#333;margin:0 auto;position:relative;overflow:hidden;}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;}
@@ -52,13 +43,10 @@ video{max-width:100%;max-height:100%;object-fit:contain;display:none;}
 .video-item{aspect-ratio:9/16;background:#222;border-radius:6px;overflow:hidden;position:relative;cursor:pointer;}
 .video-item video{width:100%;height:100%;object-fit:cover;display:block;}
 .video-item .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-
-/* ---------- กล่องอัปโหลด ---------- */
 .upload-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
 .upload-modal.active{display:flex;}
 .upload-btn{background:red;border:none;color:#fff;padding:14px 28px;border-radius:8px;font-size:18px;cursor:pointer;margin:10px;}
 .upload-status{margin-top:15px;color:#aaa;max-width:300px;text-align:center;}
-
 input[type="file"]{display:none;}
 </style>
 
@@ -68,13 +56,10 @@ input[type="file"]{display:none;}
 </head>
 <body>
 
-<!-- หน้าแรก -->
 <div id="page-home" class="page active">
   <div class="video-area">
     <video id="mainVideo" loop playsinline preload="metadata"></video>
   </div>
-
-  <!-- ด้านขวา 6 ตัว เรียงบน-ล่าง -->
   <div class="side-menu">
     <div class="side-btn" id="btnProf">👤</div>
     <div class="side-btn" id="btnLike">❤️<span id="likeCount">0</span></div>
@@ -83,8 +68,6 @@ input[type="file"]{display:none;}
     <div class="side-btn" id="btnShare">↗️</div>
     <div class="side-btn" id="btnSound">🎵</div>
   </div>
-
-  <!-- แถบล่าง 5 ตัว เรียงซ้าย-ขวา -->
   <div class="bottom-nav">
     <div class="nav-btn" data-page="home"><span class="icon">🏠</span>หน้าแรก</div>
     <div class="nav-btn" data-page="shop"><span class="icon">🛒</span>ร้าน</div>
@@ -94,7 +77,6 @@ input[type="file"]{display:none;}
   </div>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
 <div id="page-profile" class="page profile-page">
   <div class="profile-avatar">
     <img id="avatarImg" src="" alt="">
@@ -112,7 +94,6 @@ input[type="file"]{display:none;}
   <div class="videos-grid" id="myVideosGrid"></div>
 </div>
 
-<!-- กล่องอัปโหลด -->
 <div class="upload-modal" id="uploadModal">
   <h3>เลือกวิดีโอ</h3>
   <button class="upload-btn" id="selVideoBtn">เลือกไฟล์วิดีโอ</button>
@@ -184,10 +165,7 @@ function renderMyVideos(){
   myVids.forEach(v => {
     const div = document.createElement('div');
     div.className = 'video-item';
-    div.innerHTML = `
-      <video src="${v.videoUrl}" muted preload="metadata"></video>
-      <button class="del-btn" data-id="${v.id}">×</button>
-    `;
+    div.innerHTML = `<video src="${v.videoUrl}" muted preload="metadata"></video><button class="del-btn" data-id="${v.id}">×</button>`;
     div.querySelector('video').addEventListener('click', () => {
       showVideo(allVideos.indexOf(v));
       switchPage('home');
@@ -195,7 +173,7 @@ function renderMyVideos(){
     grid.appendChild(div);
   });
   document.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async e => {
       e.stopPropagation();
       if(confirm('ลบวิดีโอนี้?')){
         await db.collection('videos').doc(btn.dataset.id).delete();
@@ -205,6 +183,11 @@ function renderMyVideos(){
       }
     });
   });
+}
+
+function switchPage(name){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
 }
 
 document.getElementById('uploadTrigger').addEventListener('click', () => uploadModal.classList.add('active'));
@@ -263,17 +246,10 @@ document.getElementById('btnLike').addEventListener('click', async () => {
   document.getElementById('btnLike').classList.add('liked');
 });
 
-function switchPage(name){
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`page-${name}`).classList.add('active');
-}
-document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchPage(btn.dataset.page);
-    if(btn.dataset.page === 'profile') renderMyVideos();
-  });
-});
 document.getElementById('btnProf').addEventListener('click', () => switchPage('profile'));
+document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
 
 mainVideo.addEventListener('ended', () => {
   if(allVideos.length > 1){
