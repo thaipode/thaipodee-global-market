@@ -13,12 +13,12 @@ html,body{width:100%;height:100%;background:#000;color:#fff;overflow:hidden;font
 /* หน้าหลัก */
 .app-container{width:100%;height:100%;position:relative}
 .video-feed{width:100%;height:100vh;position:relative}
-.video-card{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.video-card{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a1a2e,#16213e)}
 
-/* วิดีโอ */
-video{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
+/* พื้นหลังแทนวิดีโอ */
+.bg-placeholder{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#888;font-size:16px;text-align:center;padding:20px}
 
-/* ข้อมูลวิดีโอ */
+/* ข้อมูล */
 .video-info{position:absolute;bottom:110px;left:16px;right:90px;z-index:10}
 .user-name{font-weight:bold;font-size:15px;margin-bottom:6px}
 .video-desc{font-size:13px;color:#eee;line-height:1.4;margin-bottom:8px}
@@ -29,41 +29,36 @@ video{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
 .action-btn{display:flex;flex-direction:column;align-items:center;color:#fff;text-decoration:none;font-size:11px;gap:4px}
 .action-icon{font-size:24px;line-height:1}
 .avatar{width:44px;height:44px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;margin-bottom:4px;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
 .music-disc{width:44px;height:44px;border-radius:50%;background:linear-gradient(45deg,#f60,#c00);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* แถบเมนูล่าง */
+/* เมนูล่าง */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
 .nav-item{display:flex;flex-direction:column;align-items:center;color:#fff;text-decoration:none;font-size:10px;gap:3px}
 .nav-icon{font-size:22px;line-height:1}
 .nav-center{width:44px;height:30px;background:linear-gradient(180deg,#fff,#ddd);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:16px}
-
-/* ซ่อนข้อความรอโหลด */
-.loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#aaa;font-size:14px;z-index:5}
 </style>
 </head>
 <body>
-<!-- ThaiPodee ver.1 — อัปโหลดขึ้น GitHub/Render ได้เลย -->
+<!-- ThaiPodee ver.1 — ไม่ต้องรอวิดีโอ -->
 
 <div class="app-container">
   <div class="video-feed">
     <div class="video-card">
       
-      <!-- วิดีโอ: เปลี่ยนชื่อไฟล์ตามที่อัปโหลดจริง -->
-      <video id="mainVideo" muted loop playsinline preload="auto">
-        <source src="vid1.mp4" type="video/mp4">
-        <source src="https://firebasestorage.googleapis.com/v0/b/thai-podee.appspot.com/o/sample.mp4?alt=media" type="video/mp4">
-        ไม่รองรับวิดีโอ
-      </video>
-
-      <div class="loading" id="loadingMsg">กำลังโหลด...</div>
+      <!-- พื้นหลัง แทนวิดีโอ -->
+      <div class="bg-placeholder">
+        <div>
+          📱 ThaiPodee<br>
+          <span style="font-size:12px;color:#666;margin-top:8px;display:block;">อัปโหลดวิดีโอทีหลังได้เลย</span>
+        </div>
+      </div>
       
       <!-- ข้อมูล -->
       <div class="video-info">
         <div class="user-name">@ThaiPodee_Official</div>
-        <div class="video-desc">ยินดีต้อนรับสู่ ThaiPodee! 🎉<br>วิดีโอทดลอง — แทนที่ด้วยวิดีโอของคุณเองได้เลย</div>
-        <div class="music-line">🎵 เสียงเพลงตัวอย่าง — ThaiPodee</div>
+        <div class="video-desc">ยินดีต้อนรับสู่ ThaiPodee! 🎉</div>
+        <div class="music-line">🎵 เพลงตัวอย่าง — ThaiPodee</div>
       </div>
 
       <!-- ปุ่มด้านขวา -->
@@ -113,23 +108,6 @@ video{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
     <span>โปรไฟล์</span>
   </a>
 </nav>
-
-<script>
-const video = document.getElementById('mainVideo');
-const loading = document.getElementById('loadingMsg');
-
-// เปิดผ่านลิงก์เว็บ → แตะครั้งเดียวเล่นได้เลย
-document.addEventListener('click', function startPlay() {
-  video.play()
-    .then(() => { loading.style.display = 'none'; })
-    .catch(err => { loading.textContent = 'แตะหน้าจอเพื่อเล่น'; });
-}, { once: true });
-
-// โหลดเสร็จซ่อนข้อความ
-video.addEventListener('canplay', () => {
-  loading.style.display = 'none';
-});
-</script>
 
 </body>
 </html>
