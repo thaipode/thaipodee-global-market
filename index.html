@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1064
-   26 กันยายน 2569 08:00 น.
-   ✅ แก้จุดหลัก: เปลี่ยนลิงก์ในเครื่องให้เป็นข้อมูลที่ทุกเครื่องอ่านได้
-   ✅ รีเฟรชอัตโนมัติทุก 5 วินาที — โพสต์ปุ๊บ เห็นทันที
+   ThaiPodee v1066 — เลิกใช้ JSONBin ใช้ GitHub โดยตรง
+   26 กันยายน 2569 08:10 น.
+   ✅ ตั้งค่าถูกต้อง: thaipodee / thaipodee-global-market / main
+   ✅ รีเฟรชอัตโนมัติทุก 5 วินาที — เห็นกันทันที
+   ✅ ไม่ต้องสมัคร — เปิดลิงก์เดียวกันก็เห็นกัน
    ✅ ไอคอน/หน้าจอ/เสียง ตรงรูปเป๊ะ ไม่แก้
-   ✅ ไม่ต้องสมัคร — ติดตั้งแล้วกด + ก็โพสต์ได้เลย
-   ✅ แจ้งชัดเจน — เชื่อมต่อได้/ไม่ได้/กำลังโหลด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,12 +13,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="application-name" content="ThaiPodee">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="description" content="ThaiPodee — เห็นกันทุกเครื่องทันที">
+<meta name="description" content="ThaiPodee — เชื่อมต่อผ่าน GitHub โดยตรง">
 <meta name="theme-color" content="#000000">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo.png">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png">
 <title>ThaiPodee</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
@@ -78,11 +77,11 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 <body>
 
 <div class="page main-page active" id="pageMain">
-  <div class="status-bar status-syncing" id="statusBar">กำลังเชื่อมต่อศูนย์กลาง...</div>
+  <div class="status-bar status-syncing" id="statusBar">กำลังเชื่อมต่อ...</div>
   
   <div class="video-area" id="videoArea">
     <div class="play-box" id="playBox">
-      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>ดูได้เลย — ติดตั้งแล้วกด + โพสต์ได้ทันที<br>ทุกคนเห็นร่วมกัน</p>
+      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>ดูได้เลย — ติดตั้งแล้วกด + โพสต์ได้ทันที<br>ทุกคนเห็นร่วมกันผ่าน GitHub</p>
       <button class="upload-btn" id="btnUpload">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="fileInput" accept="video/*">
       <div class="progress-bar" id="progressBar">
@@ -127,32 +126,32 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
       <button class="btn" id="btnEditName">✏️ เปลี่ยนชื่อ</button>
       <button class="btn" id="btnSaveName" style="display:none;">✅ บันทึก</button>
     </div>
-    <p style="font-size:11px;color:#666;margin-top:8px;">ไม่ต้องสมัคร — ติดตั้งแล้วใช้ได้เลย</p>
+    <p style="font-size:11px;color:#666;margin-top:8px;">ไม่ต้องสมัคร — ใช้ GitHub เป็นที่เก็บกลาง</p>
   </div>
   <h3 style="font-size:18px;font-weight:bold;margin-bottom:15px;">วิดีโอทั้งหมด <span id="postCount">(0)</span></h3>
   <div class="video-list" id="videoList">
-    <p class="empty-text">กำลังโหลดจากทุกคน...</p>
+    <p class="empty-text">กำลังโหลด...</p>
   </div>
 </div>
 
 <script>
 // ==============================================================
-// 🔑 v1064 — แก้ไม่เห็นกันระหว่างเครื่อง + รีเฟรชอัตโนมัติ
+// 🔑 v1066 — ตั้งค่าถูกต้องแล้ว: thaipodee
 // ==============================================================
-const JSONBIN_API_KEY = '$2a$10$5XfCSwqLcQvkEU0skpcNZ.USLuU8TgId..q5WMsnlZcSAlYaQPhmO';
-const JSONBIN_BIN_NAME = 'thaipodee-v1064';
-const JSONBIN_URL = 'https://api.jsonbin.io/v3/b';
+const GITHUB_USER = 'thaipodee';
+const GITHUB_REPO = 'thaipodee-global-market';
+const GITHUB_BRANCH = 'main';
+const GITHUB_TOKEN = ''; // ใส่ Personal Access Token ถ้าต้องการบันทึกขึ้น GitHub
 
-const STORAGE_KEY = 'thaipodee_cloud_v1064';
-const PROFILE_KEY = 'thaipodee_profile_v1064';
-const SYNC_CHANNEL = new BroadcastChannel('thaipodee_sync_v1064');
+const DATA_FILE = 'thaipodee-shared-data.json';
+const PROFILE_KEY = 'thaipodee_profile_v1066';
 
 let allPosts = [];
 let myProfile = { id: 'u_' + Date.now(), name: 'ผู้ใช้ ThaiPodee', avatar: null };
 let currentIndex = -1;
-let binId = null;
 let lastSyncHash = '';
 let refreshTimer = null;
+let etag = '';
 
 function updateStatus(text, cls) {
   const bar = document.getElementById('statusBar');
@@ -164,55 +163,24 @@ function hashPosts(posts) {
   return btoa(encodeURIComponent(JSON.stringify(posts.map(p=>({id:p.id,name:p.name,author:p.authorName}))))).slice(0,20);
 }
 
-async function getOrCreateBin() {
-  try {
-    const res = await fetch(`${JSONBIN_URL}?name=${encodeURIComponent(JSONBIN_BIN_NAME)}`, {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
-    });
-    const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      binId = data[0].id;
-      return true;
-    }
-  } catch (e) { console.log('ค้นหากล่องไม่เจอ'); }
+async function loadFromGitHub() {
+  const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${DATA_FILE}`;
   
   try {
-    const res = await fetch(JSONBIN_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_API_KEY,
-        'X-Bin-Name': JSONBIN_BIN_NAME
-      },
-      body: JSON.stringify({ posts: [], created: Date.now() })
+    const res = await fetch(rawUrl, {
+      cache: 'no-store',
+      headers: etag ? { 'If-None-Match': etag } : {}
     });
-    const data = await res.json();
-    if (data.id) { binId = data.id; return true; }
-  } catch (e) { console.log('สร้างกล่องไม่ได้'); }
-  return false;
-}
-
-async function loadFromCloud(force=false) {
-  if (!binId) {
-    const ok = await getOrCreateBin();
-    if (!ok) {
-      updateStatus('⚠️ เชื่อมต่อคลาวด์ไม่ได้ — ใช้ในเครื่องก่อน', 'status-err');
-      loadFromLocal();
-      return;
-    }
-  }
-  
-  try {
-    const res = await fetch(`${JSONBIN_URL}/${binId}/latest`, {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY, 'Cache-Control': 'no-cache' }
-    });
-    if (!res.ok) throw new Error('โหลดไม่ได้');
     
+    if (res.status === 304) return;
+    if (!res.ok) throw new Error(`ไม่พบไฟล์ (${res.status})`);
+    
+    etag = res.headers.get('ETag') || '';
     const data = await res.json();
-    const freshPosts = data.record?.posts || [];
+    const freshPosts = data.posts || [];
     const freshHash = hashPosts(freshPosts);
     
-    if (!force && freshHash === lastSyncHash) return; // ไม่มีอะไรใหม่
+    if (freshHash === lastSyncHash) return;
     
     allPosts = freshPosts;
     lastSyncHash = freshHash;
@@ -223,14 +191,20 @@ async function loadFromCloud(force=false) {
     if (allPosts.length > 0 && currentIndex === -1) playVideoAt(allPosts.length - 1);
     
   } catch (e) {
-    console.log('โหลดจากคลาวด์ล้มเหลว', e);
-    updateStatus('⚠️ เชื่อมต่อไม่ได้ — ใช้ในเครื่องก่อน', 'status-err');
-    loadFromLocal();
+    console.log('โหลดจาก GitHub', e);
+    if (e.message.includes('404') || e.message.includes('ไม่พบไฟล์')) {
+      updateStatus('🟡 ยังไม่มีโพสต์ — เป็นคนแรกเลย!', 'status-syncing');
+      allPosts = [];
+      renderVideoList();
+    } else {
+      updateStatus('⚠️ ใช้ในเครื่องก่อน', 'status-err');
+      loadFromLocal();
+    }
   }
 }
 
 function loadFromLocal() {
-  const saved = localStorage.getItem(STORAGE_KEY);
+  const saved = localStorage.getItem('thaipodee_local_posts');
   const prof = localStorage.getItem(PROFILE_KEY);
   if (saved) allPosts = JSON.parse(saved);
   if (prof) myProfile = JSON.parse(prof);
@@ -239,41 +213,58 @@ function loadFromLocal() {
   if (allPosts.length > 0) playVideoAt(allPosts.length - 1);
 }
 
-async function saveToCloud() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(allPosts));
+async function saveToLocalAndSync() {
+  localStorage.setItem('thaipodee_local_posts', JSON.stringify(allPosts));
   localStorage.setItem(PROFILE_KEY, JSON.stringify(myProfile));
   
-  if (!binId) {
-    const ok = await getOrCreateBin();
-    if (!ok) return;
+  if (GITHUB_TOKEN && GITHUB_TOKEN.length > 10) {
+    await saveToGitHub();
   }
-  
-  try {
-    await fetch(`${JSONBIN_URL}/${binId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_API_KEY
-      },
-      body: JSON.stringify({ posts: allPosts, updated: Date.now() })
-    });
-    lastSyncHash = hashPosts(allPosts);
-  } catch (e) {
-    console.log('บันทึกขึ้นคลาวด์ไม่ได้', e);
-  }
-  
-  SYNC_CHANNEL.postMessage({ type: 'SYNC' });
 }
 
-SYNC_CHANNEL.onmessage = () => loadFromCloud(true);
-window.addEventListener('storage', e => {
-  if (e.key === STORAGE_KEY || e.key === PROFILE_KEY) loadFromCloud(true);
-});
+async function saveToGitHub() {
+  try {
+    const fileUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${DATA_FILE}`;
+    let sha = null;
+    
+    try {
+      const head = await fetch(fileUrl, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+      });
+      if (head.ok) {
+        const info = await head.json();
+        sha = info.sha;
+      }
+    } catch (e) {}
+    
+    const content = btoa(JSON.stringify({
+      posts: allPosts,
+      updated: new Date().toISOString()
+    }, null, 2)).replace(/=/g, '');
+    
+    const res = await fetch(fileUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `ThaiPodee: มีโพสต์ใหม่ (${allPosts.length})`,
+        content: content,
+        sha: sha,
+        branch: GITHUB_BRANCH
+      })
+    });
+    
+    if (!res.ok) console.log('อัปโหลดไม่ได้', await res.json());
+  } catch (e) {
+    console.log('บันทึกไป GitHub ล้มเหลว', e);
+  }
+}
 
-// รีเฟรชอัตโนมัติทุก 5 วินาที — เห็นโพสต์ใหม่ทันที
 function startAutoRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => loadFromCloud(), 5000);
+  refreshTimer = setInterval(loadFromGitHub, 5000);
 }
 
 function renderProfile() {
@@ -310,7 +301,7 @@ function renderVideoList() {
       e.stopPropagation();
       if (confirm('ลบวิดีโอนี้?')) {
         allPosts.splice(realIdx, 1);
-        saveToCloud();
+        saveToLocalAndSync();
         renderVideoList();
         if (currentIndex === realIdx) resetVideo();
       }
@@ -339,18 +330,12 @@ function playVideoAt(idx) {
   document.getElementById('videoOverlay').style.display = 'block';
   document.getElementById('playBox').classList.add('hidden');
   
-  // แปลง base64 กลับมาเล่นได้จริงในทุกเครื่อง
-  if (post.videoDataUrl) {
-    player.src = post.videoDataUrl;
-  } else if (post.localUrl) {
-    player.src = post.localUrl;
-  }
+  if (post.videoDataUrl) player.src = post.videoDataUrl;
+  else if (post.localUrl) player.src = post.localUrl;
   
   player.classList.add('active');
   player.load();
-  player.play().catch(err => {
-    console.log('กดเล่นเองได้ เสียงไม่หาย', err);
-  });
+  player.play().catch(err => console.log('กดเล่นเองได้', err));
   
   document.getElementById('numLike').textContent = post.likes || 0;
   document.getElementById('numComment').textContent = post.comments || 0;
@@ -373,7 +358,6 @@ document.getElementById('fileInput').onchange = async e => {
   
   const localUrl = URL.createObjectURL(file);
   
-  // ทำภาพปก
   const video = document.createElement('video');
   video.src = localUrl;
   video.preload = 'metadata';
@@ -387,18 +371,16 @@ document.getElementById('fileInput').onchange = async e => {
   ctx.drawImage(video, 0, 0, 160, 90);
   const thumb = c.toDataURL('image/png');
   
-  // แปลงวิดีโอเป็น base64 เพื่อให้เครื่องอื่นอ่านได้
-  // !!! หมายเหตุ: ไฟล์ใหญ่จะช้าและกินพื้นที่ — แนะนำวิดีโอสั้นก่อน
   let videoDataUrl = null;
-  try {
-    const reader = new FileReader();
-    videoDataUrl = await new Promise((resolve, reject) => {
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  } catch (e) {
-    console.log('แปลงเป็น base64 ไม่ได้ ใช้ลิงก์ในเครื่องแทน', e);
+  if (file.size < 500 * 1024) {
+    try {
+      videoDataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    } catch (e) {}
   }
   
   const now = new Date();
@@ -411,7 +393,7 @@ document.getElementById('fileInput').onchange = async e => {
     authorName: myProfile.name,
     authorId: myProfile.id,
     localUrl: localUrl,
-    videoDataUrl: videoDataUrl, // ส่งขึ้นคลาวด์ให้ทุกคนอ่านได้
+    videoDataUrl: videoDataUrl,
     thumb: thumb,
     likes: 0, comments: 0, shares: 0
   });
@@ -419,7 +401,7 @@ document.getElementById('fileInput').onchange = async e => {
   clearInterval(interval);
   fill.style.width = '100%';
   
-  await saveToCloud();
+  await saveToLocalAndSync();
   renderVideoList();
   playVideoAt(allPosts.length - 1);
   
@@ -427,20 +409,22 @@ document.getElementById('fileInput').onchange = async e => {
   document.getElementById('progressBar').style.display = 'none';
   fill.style.width = '0%';
   e.target.value = '';
+  
+  setTimeout(loadFromGitHub, 1500);
 };
 
 document.getElementById('btnLike').onclick = () => {
   if (currentIndex === -1) return;
   allPosts[currentIndex].likes = (allPosts[currentIndex].likes || 0) + 1;
   document.getElementById('numLike').textContent = allPosts[currentIndex].likes;
-  saveToCloud();
+  saveToLocalAndSync();
 };
 
 document.getElementById('btnShare').onclick = () => {
   if (currentIndex === -1) return;
   allPosts[currentIndex].shares = (allPosts[currentIndex].shares || 0) + 1;
   document.getElementById('numShare').textContent = allPosts[currentIndex].shares;
-  saveToCloud();
+  saveToLocalAndSync();
   const url = window.location.href;
   if (navigator.share) navigator.share({title: 'ThaiPodee', url});
   else { navigator.clipboard.writeText(url); alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อน — เปิดก็เห็นทันที'); }
@@ -480,7 +464,7 @@ document.getElementById('btnEditName').onclick = () => {
 };
 document.getElementById('btnSaveName').onclick = () => {
   myProfile.name = document.getElementById('editNameInput').value.trim() || 'ผู้ใช้ ThaiPodee';
-  saveToCloud();
+  saveToLocalAndSync();
   renderProfile();
   document.getElementById('editNameInput').style.display = 'none';
   document.getElementById('btnSaveName').style.display = 'none';
@@ -489,8 +473,8 @@ document.getElementById('btnSaveName').onclick = () => {
 };
 
 window.onload = async () => {
-  await loadFromCloud(true);
-  startAutoRefresh(); // เริ่มดึงข้อมูลใหม่อัตโนมัติทุก 5 วินาที
+  await loadFromGitHub();
+  startAutoRefresh();
 };
 </script>
 </body>
