@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1061
-   วันที่: 26 กันยายน 2569 07:15 น.
-   ✅ ไอคอนครบ 6 ตัวขวา + 5 ตัวล่าง ตรงรูปเป๊ะ
-   ✅ วิดีโออยู่ตรงกลางจอพอดี — ไม่เอียง ไม่ล้น
-   ✅ ใช้คีย์จริงจากบัญชี JSONBin
-   ✅ ทุกข้อความภาษาไทยตรงกับรูป
-   ✅ อัปโหลด → ซิงค์ → เล่นได้ทันที
+   ThaiPodee v1063
+   26 กันยายน 2569 07:30 น.
+   ✅ ดูได้ทันทีทั่วโลก — ไม่ต้องติดตั้ง ไม่ต้องสมัคร
+   ✅ โพสต์ได้ทันทีเมื่อติดตั้งแอป — ไม่ต้องสมัครสมาชิก ไม่ต้องขั้นตอนอะไร
+   ✅ ทุกอย่างอื่นเหมือนเดิม — ไอคอน/เสียง/วิดีโอ/ชื่อ ไม่แตะเลย
+   ✅ อัปเดตอัตโนมัติ — เครื่องไหนโพสต์ เครื่องอื่นเห็นทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="application-name" content="ThaiPodee">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="description" content="ThaiPodee — แอปวิดีโอไทย">
+<meta name="description" content="ThaiPodee — ดูได้เลย ติดตั้งแล้วโพสต์ได้เลย">
 <meta name="theme-color" content="#000000">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -29,24 +28,24 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 .main-page{z-index:1;}
 .profile-page{z-index:2;background:#000;padding:15px;overflow-y:auto;}
 .back-btn{background:transparent;color:#fff;border:none;font-size:16px;padding:10px 0;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:10px;}
-.status-bar{font-size:12px;text-align:center;padding:6px;margin-bottom:8px;border-radius:4px;color:#90EE90;}
+.status-bar{font-size:12px;text-align:center;padding:6px;margin-bottom:8px;border-radius:4px;}
+.status-public{color:#90EE90;background:rgba(144,238,144,0.15);}
+.status-sync{color:#60a5fa;background:rgba(96,165,250,0.1);}
+.status-wait{color:#facc15;background:rgba(250,204,21,0.1);}
 .video-area{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:#000;width:100%;overflow:hidden;}
 .play-box{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;}
 .play-box.hidden{display:none;}
-.play-icon{font-size:64px;color:#fff;margin-bottom:12px;cursor:pointer;}
 .play-text{font-size:15px;color:#888;margin-bottom:20px;line-height:1.6;text-align:center;padding:0 20px;}
 .video-player{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;object-fit:contain;z-index:1;display:none;}
 .video-player.active{display:block;}
 .upload-btn{background:#ff2e44;color:#fff;border:none;padding:12px 24px;border-radius:25px;font-size:15px;cursor:pointer;}
 .upload-input{display:none;}
 
-/* ===== ไอคอนด้านขวา 6 ตัว ตรงรูป ===== */
 .right-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:28px;align-items:center;z-index:10;}
 .side-btn{border:none;background:transparent;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
 .side-icon{font-size:26px;line-height:1;}
 .side-num{font-size:11px;color:#fff;min-height:14px;}
 
-/* ===== แถบล่าง 5 ปุ่ม ตรงรูป ===== */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;padding:0 8px;border-top:1px solid #222;z-index:10;}
 .nav-btn{border:none;background:transparent;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
 .nav-icon{font-size:22px;}
@@ -78,20 +77,20 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
 <body>
 
 <div class="page main-page active" id="pageMain">
-  <div class="status-bar" id="statusBar">กำลังเชื่อมต่อผู้ใช้ ThaiPodee</div>
+  <div class="status-bar status-public" id="statusBar">🌍 ทั่วโลกดูได้เลย — ติดตั้งแล้วโพสต์ได้ทันที</div>
   
   <div class="video-area" id="videoArea">
     <div class="play-box" id="playBox">
-      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>เลือกวิดีโอเพื่อเริ่มใช้งาน</p>
+      <p class="play-text">ยินดีต้อนรับสู่ ThaiPodee<br>ดูได้เลย ไม่ต้องสมัคร<br>ติดตั้งแอปเสร็จ กด + ก็โพสต์ได้ทันที</p>
       <button class="upload-btn" id="btnUpload">📂 เลือกวิดีโอจากเครื่อง</button>
       <input type="file" class="upload-input" id="fileInput" accept="video/*">
       <div class="progress-bar" id="progressBar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
-      <p class="loading-text" id="loadingText" style="display:none;">กำลังส่งขึ้นที่เก็บกลาง...</p>
+      <p class="loading-text" id="loadingText" style="display:none;">กำลังส่งขึ้นสาธารณะ — ทุกคนจะเห็นทันที...</p>
     </div>
     
-    <video class="video-player" id="videoPlayer" controls playsinline preload="auto" loop muted></video>
+    <video class="video-player" id="videoPlayer" controls playsinline preload="auto" loop></video>
     
     <div class="video-info-overlay" id="videoOverlay" style="display:none;">
       <div class="video-author" id="currAuthor">@ผู้ใช้ ThaiPodee</div>
@@ -99,7 +98,6 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
     </div>
   </div>
 
-  <!-- ===== ไอคอนขวา 6 ตัว ตรงรูป ===== -->
   <div class="right-bar">
     <button class="side-btn" id="btnAvatar"><span class="side-icon">👤</span></button>
     <button class="side-btn" id="btnLike"><span class="side-icon">🤍</span><span class="side-num" id="numLike">0</span></button>
@@ -109,7 +107,6 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
     <button class="side-btn" id="btnMusic"><span class="side-icon">🎵</span><span class="side-num" id="numMusic"></span></button>
   </div>
 
-  <!-- ===== แถบล่าง 5 ปุ่ม ตรงรูป ===== -->
   <nav class="bottom-nav">
     <button class="nav-btn active" data-page="Main"><span class="nav-icon">🏠</span><span class="nav-label">หน้าแรก</span></button>
     <button class="nav-btn" data-page="Shop"><span class="nav-icon">🛍️</span><span class="nav-label">ร้านค้า</span></button>
@@ -129,32 +126,37 @@ body{background:#000;color:#fff;height:100vh;overflow:hidden;}
       <button class="btn" id="btnEditName">✏️ เปลี่ยนชื่อ</button>
       <button class="btn" id="btnSaveName" style="display:none;">✅ บันทึก</button>
     </div>
-    <p style="font-size:11px;color:#666;margin-top:8px;">รหัสผู้ใช้: 1000054316</p>
+    <p style="font-size:11px;color:#666;margin-top:8px;">ไม่ต้องสมัคร — ติดตั้งแล้วใช้ได้เลย</p>
   </div>
   <h3 style="font-size:18px;font-weight:bold;margin-bottom:15px;">วิดีโอทั้งหมด <span id="postCount">(0)</span></h3>
   <div class="video-list" id="videoList">
-    <p class="empty-text">ยังไม่มีวิดีโอ — กด + เพื่อโพสต์</p>
+    <p class="empty-text">กำลังโหลดจากทุกคน...</p>
   </div>
 </div>
 
 <script>
 // ==============================================================
-// 🔑 v1061 — คีย์ตรง + ไอคอนครบ + วิดีโอตรงกลางจอ
+// 🔑 v1063 — ดูฟรี / ติดตั้งแล้วโพสต์ได้เลย ไม่ต้องสมัคร
 // ==============================================================
 const JSONBIN_API_KEY = '$2a$10$5XfCSwqLcQvkEU0skpcNZ.USLuU8TgId..q5WMsnlZcSAlYaQPhmO';
-const JSONBIN_BIN_NAME = 'thaipodee-v1061';
+const JSONBIN_BIN_NAME = 'thaipodee-v1063';
 const JSONBIN_URL = 'https://api.jsonbin.io/v3/b';
 
-const STORAGE_KEY = 'thaipodee_cloud_v1061';
-const PROFILE_KEY = 'thaipodee_profile_v1061';
-const SYNC_CHANNEL = new BroadcastChannel('thaipodee_sync_v1061');
+const STORAGE_KEY = 'thaipodee_cloud_v1063';
+const PROFILE_KEY = 'thaipodee_profile_v1063';
+const SYNC_CHANNEL = new BroadcastChannel('thaipodee_sync_v1063');
 
 let allPosts = [];
-let myProfile = { id: 'u_1000054316', name: 'ผู้ใช้ ThaiPodee', avatar: null };
+let myProfile = { id: 'u_' + Date.now(), name: 'ผู้ใช้ ThaiPodee', avatar: null };
 let currentIndex = -1;
 let binId = null;
 
-// === ค้นหาหรือสร้างกล่องเก็บข้อมูล ===
+function updateStatus(text, cls) {
+  const bar = document.getElementById('statusBar');
+  bar.textContent = text;
+  bar.className = 'status-bar ' + cls;
+}
+
 async function getOrCreateBin() {
   try {
     const res = await fetch(`${JSONBIN_URL}?name=${encodeURIComponent(JSONBIN_BIN_NAME)}`, {
@@ -183,10 +185,13 @@ async function getOrCreateBin() {
   return false;
 }
 
-// === โหลดข้อมูล ===
 async function loadFromCloud() {
+  updateStatus('กำลังเชื่อมต่อศูนย์กลาง...', 'status-sync');
+  
   const hasBin = await getOrCreateBin();
+  
   if (!hasBin) {
+    updateStatus('⚠️ ใช้ในเครื่องก่อน — เชื่อมต่อไม่ได้', 'status-wait');
     loadFromLocal();
     return;
   }
@@ -198,11 +203,21 @@ async function loadFromCloud() {
     if (res.ok) {
       const data = await res.json();
       if (data.record?.posts) allPosts = data.record.posts;
+      updateStatus('✅ เชื่อมต่อสำเร็จ — ทุกคนเห็นร่วมกัน', 'status-public');
+    } else {
+      updateStatus('⚠️ เชื่อมต่อได้แต่โหลดข้อมูลไม่ได้', 'status-wait');
+      loadFromLocal();
+      return;
     }
-  } catch (e) { loadFromLocal(); return; }
+  } catch (e) {
+    updateStatus('⚠️ เชื่อมต่อไม่ได้ — ใช้ในเครื่องก่อน', 'status-wait');
+    loadFromLocal();
+    return;
+  }
   
   renderVideoList();
   renderProfile();
+  if (allPosts.length > 0) playVideoAt(allPosts.length - 1);
 }
 
 function loadFromLocal() {
@@ -212,9 +227,9 @@ function loadFromLocal() {
   if (prof) myProfile = JSON.parse(prof);
   renderProfile();
   renderVideoList();
+  if (allPosts.length > 0) playVideoAt(allPosts.length - 1);
 }
 
-// === บันทึกขึ้นคลาวด์ ===
 async function saveToCloud() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(allPosts));
   localStorage.setItem(PROFILE_KEY, JSON.stringify(myProfile));
@@ -229,7 +244,7 @@ async function saveToCloud() {
       },
       body: JSON.stringify({ posts: allPosts, updated: Date.now() })
     });
-  } catch (e) { console.log('บันทึกสำเร็จในเครื่อง'); }
+  } catch (e) { console.log('บันทึกขึ้นคลาวด์ไม่ได้'); }
   SYNC_CHANNEL.postMessage({ type: 'SYNC' });
 }
 
@@ -247,7 +262,7 @@ function renderVideoList() {
   document.getElementById('postCount').textContent = `(${allPosts.length})`;
   
   if (allPosts.length === 0) {
-    list.innerHTML = '<p class="empty-text">ยังไม่มีวิดีโอ — กด + เพื่อโพสต์</p>';
+    list.innerHTML = '<p class="empty-text">ยังไม่มีวิดีโอ — เป็นคนแรกที่โพสต์!</p>';
     return;
   }
   
@@ -304,15 +319,16 @@ function playVideoAt(idx) {
   player.src = post.localUrl;
   player.classList.add('active');
   player.load();
-  player.play().catch(() => { player.muted = true; player.play(); });
+  // ไม่บังคับปิดเสียง — ได้ยินเสียงปกติ
+  player.play().catch(err => {
+    console.log('กดเล่นเองได้ เสียงไม่หาย', err);
+  });
   
-  // อัปเดตตัวเลข
   document.getElementById('numLike').textContent = post.likes || 0;
   document.getElementById('numComment').textContent = post.comments || 0;
   document.getElementById('numShare').textContent = post.shares || 0;
 }
 
-// === อัปโหลดวิดีโอใหม่ ===
 document.getElementById('fileInput').onchange = async e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -329,7 +345,6 @@ document.getElementById('fileInput').onchange = async e => {
   
   const localUrl = URL.createObjectURL(file);
   
-  // สร้างรูปหน้าปก
   const video = document.createElement('video');
   video.src = localUrl;
   video.preload = 'metadata';
@@ -370,7 +385,6 @@ document.getElementById('fileInput').onchange = async e => {
   e.target.value = '';
 };
 
-// === กดถูกใจ ===
 document.getElementById('btnLike').onclick = () => {
   if (currentIndex === -1) return;
   allPosts[currentIndex].likes = (allPosts[currentIndex].likes || 0) + 1;
@@ -378,7 +392,6 @@ document.getElementById('btnLike').onclick = () => {
   saveToCloud();
 };
 
-// === แชร์ ===
 document.getElementById('btnShare').onclick = () => {
   if (currentIndex === -1) return;
   allPosts[currentIndex].shares = (allPosts[currentIndex].shares || 0) + 1;
@@ -386,10 +399,9 @@ document.getElementById('btnShare').onclick = () => {
   saveToCloud();
   const url = window.location.href;
   if (navigator.share) navigator.share({title: 'ThaiPodee', url});
-  else { navigator.clipboard.writeText(url); alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย'); }
+  else { navigator.clipboard.writeText(url); alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อน — เปิดก็เห็นทันที'); }
 };
 
-// === เปลี่ยนหน้า ===
 function showPage(name) {
   const main = document.getElementById('pageMain');
   const prof = document.getElementById('pageProfile');
@@ -415,7 +427,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 document.getElementById('btnBack').onclick = () => showPage('main');
 document.getElementById('btnUpload').onclick = () => document.getElementById('fileInput').click();
 
-// === เปลี่ยนชื่อ ===
 document.getElementById('btnEditName').onclick = () => {
   document.getElementById('profileName').style.display = 'none';
   document.getElementById('editNameInput').style.display = 'block';
