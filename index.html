@@ -1,6 +1,6 @@
 <!-- ==============================================================
-   ThaiPodee v1065 — แจ้งทุกขั้นตอน เห็นชัดเจน ✅
-   27 กันยายน 2569 23:18 น.
+   ThaiPodee v1066 — รับไฟล์ชัด ไม่หาย ✅
+   27 กันยายน 2569 23:42 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,12 +17,12 @@ body,html{background:#000;color:#fff;height:100%;overflow:hidden;font-family:san
 .top-info p{font-size:13px;color:#aaa;margin-top:4px}
 
 .video-wrap{width:100%;height:calc(100% - 80px);display:flex;align-items:center;justify-content:center}
-video{width:100%;height:100%;object-fit:contain;background:#111}
+video{width:100%;height:100%;object-fit:contain;background:#111;display:none}
 .placeholder{font-size:48px;color:#444}
 
 .right-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:20}
 .icon{display:flex;flex-direction:column;align-items:center;gap:2px}
-.icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px}
 .icon span{font-size:10px;color:#ccc}
 
 .bottom-bar{position:absolute;bottom:0;left:0;right:0;height:75px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:99999}
@@ -32,7 +32,6 @@ video{width:100%;height:100%;object-fit:contain;background:#111}
 
 .upload-circle{position:relative;top:-15px}
 #uploadBtn{width:65px;height:65px;background:#ff3333;border-radius:50%;border:none;color:#fff;font-size:32px;cursor:pointer;box-shadow:0 0 12px rgba(255,51,51,0.7);z-index:999999}
-#uploadBtn:active{transform:scale(0.95)}
 
 #fileInput{display:none}
 
@@ -53,8 +52,8 @@ video{width:100%;height:100%;object-fit:contain;background:#111}
   <p>ของไทย ไปไกลทั่วโลก</p>
 </div>
 
-<div class="video-wrap" id="videoWrap">
-  <video id="vid" controls autoplay loop playsinline style="display:none">
+<div class="video-wrap">
+  <video id="vid" controls autoplay loop playsinline>
     <source src="" type="video/mp4">
   </video>
   <div class="placeholder" id="vidPlaceholder">📷</div>
@@ -98,7 +97,7 @@ const storage = firebase.storage();
 
 let videos = [];
 
-function showMsg(text, type='normal', dur=4000) {
+function showMsg(text, type='normal', dur=5000) {
   const el = document.getElementById('msgBox');
   el.textContent = text;
   el.className = 'msg';
@@ -108,87 +107,77 @@ function showMsg(text, type='normal', dur=4000) {
   if(dur>0) setTimeout(()=>el.classList.add('hidden'), dur);
 }
 
-document.getElementById('uploadBtn').addEventListener('click', (e)=>{
+// เปิดหน้าเลือกไฟล์
+document.getElementById('uploadBtn').addEventListener('click', function(e){
   e.preventDefault();
-  e.stopPropagation();
-  console.log('กดปุ่มอัปโหลด');
-  showMsg('เปิดหน้าเลือกไฟล์...');
-  document.getElementById('fileInput').click();
+  showMsg('กดเลือกไฟล์วิดีโอ...');
+  setTimeout(()=>document.getElementById('fileInput').click(), 100);
 });
 
-document.getElementById('fileInput').addEventListener('change', async e=>{
+// รับไฟล์ที่เลือก — ตรงนี้สำคัญที่สุด
+document.getElementById('fileInput').addEventListener('change', async function(e){
   const file = e.target.files[0];
-  if(!file) {
+  
+  if(!file){
     showMsg('ไม่ได้เลือกไฟล์', 'err');
     return;
   }
-  
-  console.log('เลือกไฟล์:', file.name, 'ขนาด:', (file.size/1024/1024).toFixed(2), 'MB');
-  showMsg(`พบไฟล์: ${file.name} กำลังอัปโหลด...`, 'normal', 0);
-  
+
+  // แจ้งชื่อและขนาดไฟล์
+  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+  showMsg(`พบไฟล์: ${file.name} (${sizeMB} MB) → กำลังอัปโหลด...`, 'normal', 0);
+
   try {
     const fileName = Date.now() + '_' + file.name;
     const ref = storage.ref('videos/' + fileName);
     
-    // อัปโหลดพร้อมเช็คความคืบหน้า
-    const uploadTask = ref.put(file);
+    // อัปโหลด
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
     
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        showMsg(`กำลังอัปโหลด... ${pct}%`, 'normal', 0);
-      },
-      (err) => {
-        console.error('อัปโหลดผิดพลาด:', err);
-        showMsg('ผิดพลาด: ' + err.message, 'err');
-      },
-      async () => {
-        const url = await uploadTask.snapshot.ref.getDownloadURL();
-        console.log('อัปโหลดเสร็จ:', url);
-        
-        await db.collection('videos').add({
-          url,
-          name: file.name,
-          size: file.size,
-          likes: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        showMsg('✅ อัปโหลดสำเร็จ!', 'ok');
-        await loadVideos();
-      }
-    );
+    // บันทึกลงฐานข้อมูล
+    await db.collection('videos').add({
+      url: url,
+      name: file.name,
+      likes: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    showMsg('✅ อัปโหลดสำเร็จ!', 'ok');
     
-  } catch(err) {
-    console.error('ผิดพลาดหลัก:', err);
+    // โหลดวิดีโอขึ้นมาแสดงทันที
+    await loadVideos();
+    
+  } catch (err) {
+    console.error('Error:', err);
     showMsg('ผิดพลาด: ' + err.message, 'err');
   }
-  
-  e.target.value = ''; // รีเซ็ตเพื่อเลือกไฟล์เดิมซ้ำได้
+
+  // รีเซ็ตให้เลือกไฟล์เดิมซ้ำได้
+  e.target.value = '';
 });
 
+// โหลดวิดีโอมาแสดง
 async function loadVideos() {
   try {
-    const snap = await db.collection('videos').orderBy('createdAt','desc').limit(10).get();
+    const snap = await db.collection('videos').orderBy('createdAt','desc').limit(1).get();
     videos = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    console.log('โหลดวิดีโอ:', videos.length, 'รายการ');
     
     if(videos.length > 0) {
       const vidEl = document.getElementById('vid');
-      const placeholder = document.getElementById('vidPlaceholder');
       vidEl.src = videos[0].url;
       vidEl.style.display = 'block';
-      placeholder.style.display = 'none';
+      document.getElementById('vidPlaceholder').style.display = 'none';
       document.getElementById('likeNum').textContent = videos[0].likes || 0;
     } else {
       showMsg('ยังไม่มีวิดีโอ — กด + เพิ่มเลย!', 'normal');
     }
-  } catch(e) {
-    console.error('โหลดวิดีโอผิดพลาด:', e);
+  } catch (e) {
     showMsg('เชื่อมต่อสำเร็จ ✅ กด + เพิ่มวิดีโอ', 'ok');
   }
 }
 
+// กดถูกใจ
 document.getElementById('like').addEventListener('click', async ()=>{
   if(!videos[0]) return;
   try {
@@ -197,14 +186,11 @@ document.getElementById('like').addEventListener('click', async ()=>{
     videos[0].likes = (videos[0].likes || 0) + 1;
     document.getElementById('likeNum').textContent = videos[0].likes;
   } catch(err) {
-    showMsg('กดถูกใจไม่ได้: ' + err.message, 'err');
+    showMsg('ผิดพลาด: ' + err.message, 'err');
   }
 });
 
-window.onload = () => {
-  console.log('หน้าโหลดเสร็จแล้ว');
-  loadVideos();
-};
+window.onload = loadVideos;
 </script>
 </body>
 </html>
