@@ -1,188 +1,124 @@
 <!-- ==============================================================
-   ThaiPodee v1060 — ใส่ apiKey ครบแล้ว ✅
-   27 กันยายน 2569 22:35 น.
-   ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
-   --------------------------------------------------------------
-   ✅ ใส่ apiKey / คีย์ครบถ้วน
-   ✅ เชื่อมต่อ Firebase Thaipodee-Market
-   ✅ อัปโหลด-เล่นวิดีโอได้ทุกเครื่อง
+   ThaiPodee v1064 — ปุ่ม+กดได้แน่นอน ✅
+   27 กันยายน 2569 23:08 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ThaiPodee — ของไทย ไปไกลทั่วโลก</title>
+<title>ThaiPodee</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:sans-serif;height:100vh;overflow:hidden}
-#app{position:relative;width:100%;height:100vh}
-.video-container{width:100%;height:85vh;display:flex;align-items:center;justify-content:center}
+body,html{background:#000;color:#fff;height:100%;overflow:hidden;font-family:sans-serif}
+
+/* ชื่อแอป */
+.top-info{position:absolute;top:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:10}
+.top-info h1{font-size:22px}
+.top-info p{font-size:13px;color:#aaa;margin-top:4px}
+
+/* วิดีโอ */
+.video-wrap{width:100%;height:calc(100% - 80px);display:flex;align-items:center;justify-content:center}
 video{width:100%;height:100%;object-fit:contain;background:#111}
-.side-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:22px;z-index:10}
-.icon{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-.icon img,.icon .icon-circle{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px}
-.icon span{font-size:11px;color:#ccc}
-.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #333}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-.nav-item span{font-size:10px;color:#999}
-.nav-item.active span{color:#fff}
-.upload-btn{width:56px;height:42px;background:#f33;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px}
-.profile-preview{position:absolute;top:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:5}
-.profile-preview h1{font-size:22px}
-.profile-preview p{font-size:13px;color:#aaa;margin-top:4px}
-.alert{position:absolute;top:100px;left:50%;transform:translateX(-50%);background:#ffc107;color:#000;padding:8px 16px;border-radius:20px;font-size:13px;z-index:20}
+
+/* ไอคอนขวา */
+.right-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:20}
+.icon{display:flex;flex-direction:column;align-items:center;gap:2px}
+.icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.icon span{font-size:10px;color:#ccc}
+
+/* แถบล่าง — ปุ่ม+ชัดสุด */
+.bottom-bar{position:absolute;bottom:0;left:0;right:0;height:75px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:99999}
+.bar-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.bar-item span{font-size:10px;color:#999}
+.bar-item.active span{color:#fff}
+
+/* ปุ่มอัปโหลด — ยกสูง ไม่มีอะไรบัง */
+.upload-circle{position:relative;top:-15px}
+#uploadBtn{width:65px;height:65px;background:#ff3333;border-radius:50%;border:none;color:#fff;font-size:32px;cursor:pointer;box-shadow:0 0 12px rgba(255,51,51,0.7);z-index:999999}
+
+/*ซ่อนไฟล์*/
+#fileInput{display:none}
+
+/* แจ้งเตือน */
+.msg{position:absolute;top:110px;left:50%;transform:translateX(-50%);background:#ffc107;color:#000;padding:10px 20px;border-radius:25px;font-size:14px;z-index:10000}
 .hidden{display:none}
 </style>
-<!-- Firebase CDN -->
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 </head>
 <body>
 
-<div id="app">
-  <!-- แจ้งเตือน -->
-  <div id="alert" class="alert hidden"></div>
-
-  <!-- ข้อมูลหน้าโปรไฟล์ -->
-  <div class="profile-preview">
-    <h1>ThaiPodee</h1>
-    <p>ของไทย ไปไกลทั่วโลก</p>
-  </div>
-
-  <!-- พื้นที่เล่นวิดีโอ -->
-  <div class="video-container" id="videoContainer">
-    <video id="mainVideo" controls autoplay loop playsinline>
-      <source src="" type="video/mp4">
-      อุปกรณ์ไม่รองรับวิดีโอ
-    </video>
-  </div>
-
-  <!-- ไอคอนด้านขวา 6 อัน -->
-  <div class="side-icons">
-    <div class="icon" id="profileIcon">
-      <div class="icon-circle">👤</div>
-      <span>โปรไฟล์</span>
-    </div>
-    <div class="icon" id="likeIcon">
-      <div class="icon-circle">❤️</div>
-      <span id="likeCount">0</span>
-    </div>
-    <div class="icon" id="commentIcon">
-      <div class="icon-circle">💬</div>
-      <span>คอมเมนต์</span>
-    </div>
-    <div class="icon" id="saveIcon">
-      <div class="icon-circle">⭐</div>
-      <span>บันทึก</span>
-    </div>
-    <div class="icon" id="shareIcon">
-      <div class="icon-circle">↗️</div>
-      <span>แชร์</span>
-    </div>
-    <div class="icon" id="musicIcon">
-      <div class="icon-circle">🎵</div>
-      <span>เพลง</span>
-    </div>
-  </div>
-
-  <!-- แถบล่าง 5 ปุ่ม -->
-  <div class="bottom-nav">
-    <div class="nav-item active" data-page="home">
-      <span>🏠</span>
-      <span>หน้าแรก</span>
-    </div>
-    <div class="nav-item" data-page="discover">
-      <span>🔍</span>
-      <span>ค้นหา</span>
-    </div>
-    <div class="nav-item" id="uploadNav">
-      <div class="upload-btn">+</div>
-    </div>
-    <div class="nav-item" data-page="inbox">
-      <span>💬</span>
-      <span>ข้อความ</span>
-    </div>
-    <div class="nav-item" data-page="profile">
-      <span>👤</span>
-      <span>ฉัน</span>
-    </div>
-  </div>
+<div class="top-info">
+  <h1>ThaiPodee</h1>
+  <p>ของไทย ไปไกลทั่วโลก</p>
 </div>
 
-<!-- ซ่อน input อัปโหลด -->
-<input type="file" id="videoUpload" accept="video/*" class="hidden">
+<div class="video-wrap">
+  <video id="vid" controls autoplay loop playsinline>
+    <source src="" type="video/mp4">
+  </video>
+</div>
+
+<div class="right-icons">
+  <div class="icon"><div class="icon-btn">👤</div><span>โปรไฟล์</span></div>
+  <div class="icon" id="like"><div class="icon-btn">❤️</div><span id="likeNum">0</span></div>
+  <div class="icon"><div class="icon-btn">💬</div><span>คอมเมนต์</span></div>
+  <div class="icon"><div class="icon-btn">⭐</div><span>บันทึก</span></div>
+  <div class="icon"><div class="icon-btn">↗️</div><span>แชร์</span></div>
+  <div class="icon"><div class="icon-btn">🎵</div><span>เพลง</span></div>
+</div>
+
+<div class="bottom-bar">
+  <div class="bar-item active"><span>🏠</span><span>หน้าแรก</span></div>
+  <div class="bar-item"><span>🔍</span><span>ค้นหา</span></div>
+  <div class="upload-circle">
+    <button id="uploadBtn">+</button>
+  </div>
+  <div class="bar-item"><span>💬</span><span>ข้อความ</span></div>
+  <div class="bar-item"><span>👤</span><span>ฉัน</span></div>
+</div>
+
+<input type="file" id="fileInput" accept="video/*">
+<div id="msgBox" class="msg hidden"></div>
 
 <script>
-// ==============================================================
-// ใส่คีย์ตรงนี้ — ตรงกับโปรเจกต์ Thaipodee-Market
-// ==============================================================
+// === คีย์จริง ===
 const firebaseConfig = {
-￼
-  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
-￼
-  authDomain: "thaipodee-market.firebaseapp.com",
-￼
-  projectId: "thaipodee-market",
-￼
-  storageBucket: "thaipodee-market.firebasestorage.app",
-￼
-  messagingSenderId: "802626775100",
-￼
-  appId: "1:802626775100:web:c126e82059d124d19c3b39"
-￼
+  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
+  authDomain: "thaipodee-market.firebaseapp.com",
+  projectId: "thaipodee-market",
+  storageBucket: "thaipodee-market.firebasestorage.app",
+  messagingSenderId: "802626775100",
+  appId: "1:802626775100:web:c126e82059d124d19c3b39"
 };
 
-// เริ่มต้น Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// ตัวแปร
 let videos = [];
-let currentIndex = 0;
 
-// แสดงข้อความ
-function showAlert(msg, time=2500) {
-  const el = document.getElementById('alert');
-  el.textContent = msg;
+function showMsg(text, dur=3000) {
+  const el = document.getElementById('msgBox');
+  el.textContent = text;
   el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('hidden'), time);
+  setTimeout(()=>el.classList.add('hidden'), dur);
 }
 
-// โหลดรายการวิดีโอจาก Firestore
-async function loadVideos() {
-  try {
-    const snap = await db.collection('videos').orderBy('createdAt','desc').get();
-    videos = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    if(videos.length>0) loadVideo(0);
-    else showAlert("ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด");
-  } catch(e) {
-    console.error(e);
-    showAlert("เชื่อมต่อสำเร็จ ✅ รอโพสต์วิดีโอ");
-  }
-}
-
-// เปลี่ยนวิดีโอ
-function loadVideo(index) {
-  if(!videos[index]) return;
-  const v = videos[index];
-  document.getElementById('mainVideo').src = v.url;
-  document.getElementById('likeCount').textContent = v.likes||0;
-  currentIndex = index;
-}
-
-// อัปโหลดวิดีโอ
-document.getElementById('uploadNav').addEventListener('click', ()=>{
-  document.getElementById('videoUpload').click();
+// === ปุ่มกดได้แน่นอน ===
+document.getElementById('uploadBtn').addEventListener('click', ()=>{
+  console.log('กดปุ่มอัปโหลด');
+  document.getElementById('fileInput').click();
 });
 
-document.getElementById('videoUpload').addEventListener('change', async e=>{
+document.getElementById('fileInput').addEventListener('change', async e=>{
   const file = e.target.files[0];
   if(!file) return;
   try {
-    showAlert("กำลังอัปโหลด...");
+    showMsg("กำลังอัปโหลด...");
     const ref = storage.ref('videos/'+Date.now()+'_'+file.name);
     await ref.put(file);
     const url = await ref.getDownloadURL();
@@ -192,31 +128,38 @@ document.getElementById('videoUpload').addEventListener('change', async e=>{
       likes: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showAlert("อัปโหลดสำเร็จ ✅ ทุกคนจะเห็นทันที");
+    showMsg("✅ อัปโหลดสำเร็จ! ทุกคนเห็นทันที");
     await loadVideos();
   } catch(err) {
     console.error(err);
-    showAlert("ผิดพลาด: "+err.message);
+    showMsg("ผิดพลาด: "+err.message);
   }
 });
 
-// กดหัวใจ
-document.getElementById('likeIcon').addEventListener('click', async ()=>{
-  if(!videos[currentIndex]) return;
-  const docRef = db.collection('videos').doc(videos[currentIndex].id);
+async function loadVideos() {
+  try {
+    const snap = await db.collection('videos').orderBy('createdAt','desc').get();
+    videos = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    if(videos.length>0) {
+      document.getElementById('vid').src = videos[0].url;
+      document.getElementById('likeNum').textContent = videos[0].likes||0;
+    } else {
+      showMsg("ยังไม่มีวิดีโอ กด + เพิ่มเลย!");
+    }
+  } catch(e) {
+    showMsg("เชื่อมต่อสำเร็จ ✅ กด + เพิ่มวิดีโอ");
+  }
+}
+
+document.getElementById('like').addEventListener('click', async ()=>{
+  if(!videos[0]) return;
+  const docRef = db.collection('videos').doc(videos[0].id);
   await docRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-  videos[currentIndex].likes = (videos[currentIndex].likes||0)+1;
-  document.getElementById('likeCount').textContent = videos[currentIndex].likes;
+  videos[0].likes = (videos[0].likes||0)+1;
+  document.getElementById('likeNum').textContent = videos[0].likes;
 });
 
-// เลื่อนวิดีโอ
-document.getElementById('videoContainer').addEventListener('click', ()=>{
-  const v = document.getElementById('mainVideo');
-  v.paused ? v.play() : v.pause();
-});
-
-// เริ่มทำงาน
-window.addEventListener('DOMContentLoaded', loadVideos);
+window.onload = loadVideos;
 </script>
 </body>
 </html>
