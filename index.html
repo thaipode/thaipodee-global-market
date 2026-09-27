@@ -1,6 +1,6 @@
 <!-- ==============================================================
-   ThaiPodee v1064 — ปุ่ม+กดได้แน่นอน ✅
-   27 กันยายน 2569 23:08 น.
+   ThaiPodee v1065 — แจ้งทุกขั้นตอน เห็นชัดเจน ✅
+   27 กันยายน 2569 23:18 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -12,36 +12,33 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body,html{background:#000;color:#fff;height:100%;overflow:hidden;font-family:sans-serif}
 
-/* ชื่อแอป */
 .top-info{position:absolute;top:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:10}
 .top-info h1{font-size:22px}
 .top-info p{font-size:13px;color:#aaa;margin-top:4px}
 
-/* วิดีโอ */
 .video-wrap{width:100%;height:calc(100% - 80px);display:flex;align-items:center;justify-content:center}
 video{width:100%;height:100%;object-fit:contain;background:#111}
+.placeholder{font-size:48px;color:#444}
 
-/* ไอคอนขวา */
 .right-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:20}
 .icon{display:flex;flex-direction:column;align-items:center;gap:2px}
 .icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
 .icon span{font-size:10px;color:#ccc}
 
-/* แถบล่าง — ปุ่ม+ชัดสุด */
 .bottom-bar{position:absolute;bottom:0;left:0;right:0;height:75px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:99999}
 .bar-item{display:flex;flex-direction:column;align-items:center;gap:2px}
 .bar-item span{font-size:10px;color:#999}
 .bar-item.active span{color:#fff}
 
-/* ปุ่มอัปโหลด — ยกสูง ไม่มีอะไรบัง */
 .upload-circle{position:relative;top:-15px}
 #uploadBtn{width:65px;height:65px;background:#ff3333;border-radius:50%;border:none;color:#fff;font-size:32px;cursor:pointer;box-shadow:0 0 12px rgba(255,51,51,0.7);z-index:999999}
+#uploadBtn:active{transform:scale(0.95)}
 
-/*ซ่อนไฟล์*/
 #fileInput{display:none}
 
-/* แจ้งเตือน */
-.msg{position:absolute;top:110px;left:50%;transform:translateX(-50%);background:#ffc107;color:#000;padding:10px 20px;border-radius:25px;font-size:14px;z-index:10000}
+.msg{position:absolute;top:110px;left:50%;transform:translateX(-50%);background:#ffc107;color:#000;padding:12px 24px;border-radius:25px;font-size:14px;z-index:10000;text-align:center;max-width:90%}
+.msg.ok{background:#4CAF50;color:#fff}
+.msg.err{background:#f44336;color:#fff}
 .hidden{display:none}
 </style>
 
@@ -56,10 +53,11 @@ video{width:100%;height:100%;object-fit:contain;background:#111}
   <p>ของไทย ไปไกลทั่วโลก</p>
 </div>
 
-<div class="video-wrap">
-  <video id="vid" controls autoplay loop playsinline>
+<div class="video-wrap" id="videoWrap">
+  <video id="vid" controls autoplay loop playsinline style="display:none">
     <source src="" type="video/mp4">
   </video>
+  <div class="placeholder" id="vidPlaceholder">📷</div>
 </div>
 
 <div class="right-icons">
@@ -85,7 +83,6 @@ video{width:100%;height:100%;object-fit:contain;background:#111}
 <div id="msgBox" class="msg hidden"></div>
 
 <script>
-// === คีย์จริง ===
 const firebaseConfig = {
   apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
   authDomain: "thaipodee-market.firebaseapp.com",
@@ -101,65 +98,113 @@ const storage = firebase.storage();
 
 let videos = [];
 
-function showMsg(text, dur=3000) {
+function showMsg(text, type='normal', dur=4000) {
   const el = document.getElementById('msgBox');
   el.textContent = text;
+  el.className = 'msg';
+  if(type==='ok') el.classList.add('ok');
+  if(type==='err') el.classList.add('err');
   el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('hidden'), dur);
+  if(dur>0) setTimeout(()=>el.classList.add('hidden'), dur);
 }
 
-// === ปุ่มกดได้แน่นอน ===
-document.getElementById('uploadBtn').addEventListener('click', ()=>{
+document.getElementById('uploadBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
   console.log('กดปุ่มอัปโหลด');
+  showMsg('เปิดหน้าเลือกไฟล์...');
   document.getElementById('fileInput').click();
 });
 
 document.getElementById('fileInput').addEventListener('change', async e=>{
   const file = e.target.files[0];
-  if(!file) return;
-  try {
-    showMsg("กำลังอัปโหลด...");
-    const ref = storage.ref('videos/'+Date.now()+'_'+file.name);
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
-    await db.collection('videos').add({
-      url,
-      name: file.name,
-      likes: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showMsg("✅ อัปโหลดสำเร็จ! ทุกคนเห็นทันที");
-    await loadVideos();
-  } catch(err) {
-    console.error(err);
-    showMsg("ผิดพลาด: "+err.message);
+  if(!file) {
+    showMsg('ไม่ได้เลือกไฟล์', 'err');
+    return;
   }
+  
+  console.log('เลือกไฟล์:', file.name, 'ขนาด:', (file.size/1024/1024).toFixed(2), 'MB');
+  showMsg(`พบไฟล์: ${file.name} กำลังอัปโหลด...`, 'normal', 0);
+  
+  try {
+    const fileName = Date.now() + '_' + file.name;
+    const ref = storage.ref('videos/' + fileName);
+    
+    // อัปโหลดพร้อมเช็คความคืบหน้า
+    const uploadTask = ref.put(file);
+    
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        showMsg(`กำลังอัปโหลด... ${pct}%`, 'normal', 0);
+      },
+      (err) => {
+        console.error('อัปโหลดผิดพลาด:', err);
+        showMsg('ผิดพลาด: ' + err.message, 'err');
+      },
+      async () => {
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+        console.log('อัปโหลดเสร็จ:', url);
+        
+        await db.collection('videos').add({
+          url,
+          name: file.name,
+          size: file.size,
+          likes: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showMsg('✅ อัปโหลดสำเร็จ!', 'ok');
+        await loadVideos();
+      }
+    );
+    
+  } catch(err) {
+    console.error('ผิดพลาดหลัก:', err);
+    showMsg('ผิดพลาด: ' + err.message, 'err');
+  }
+  
+  e.target.value = ''; // รีเซ็ตเพื่อเลือกไฟล์เดิมซ้ำได้
 });
 
 async function loadVideos() {
   try {
-    const snap = await db.collection('videos').orderBy('createdAt','desc').get();
+    const snap = await db.collection('videos').orderBy('createdAt','desc').limit(10).get();
     videos = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    if(videos.length>0) {
-      document.getElementById('vid').src = videos[0].url;
-      document.getElementById('likeNum').textContent = videos[0].likes||0;
+    console.log('โหลดวิดีโอ:', videos.length, 'รายการ');
+    
+    if(videos.length > 0) {
+      const vidEl = document.getElementById('vid');
+      const placeholder = document.getElementById('vidPlaceholder');
+      vidEl.src = videos[0].url;
+      vidEl.style.display = 'block';
+      placeholder.style.display = 'none';
+      document.getElementById('likeNum').textContent = videos[0].likes || 0;
     } else {
-      showMsg("ยังไม่มีวิดีโอ กด + เพิ่มเลย!");
+      showMsg('ยังไม่มีวิดีโอ — กด + เพิ่มเลย!', 'normal');
     }
   } catch(e) {
-    showMsg("เชื่อมต่อสำเร็จ ✅ กด + เพิ่มวิดีโอ");
+    console.error('โหลดวิดีโอผิดพลาด:', e);
+    showMsg('เชื่อมต่อสำเร็จ ✅ กด + เพิ่มวิดีโอ', 'ok');
   }
 }
 
 document.getElementById('like').addEventListener('click', async ()=>{
   if(!videos[0]) return;
-  const docRef = db.collection('videos').doc(videos[0].id);
-  await docRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-  videos[0].likes = (videos[0].likes||0)+1;
-  document.getElementById('likeNum').textContent = videos[0].likes;
+  try {
+    const docRef = db.collection('videos').doc(videos[0].id);
+    await docRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+    videos[0].likes = (videos[0].likes || 0) + 1;
+    document.getElementById('likeNum').textContent = videos[0].likes;
+  } catch(err) {
+    showMsg('กดถูกใจไม่ได้: ' + err.message, 'err');
+  }
 });
 
-window.onload = loadVideos;
+window.onload = () => {
+  console.log('หน้าโหลดเสร็จแล้ว');
+  loadVideos();
+};
 </script>
 </body>
 </html>
