@@ -1,113 +1,310 @@
+<!-- ==============================================================
+   ThaiPodee v1062 — สำหรับบันทึกในโน้ตบุ๊ก / ใช้งานทันที
+   27 กันยายน 2569 10:10 น.
+   ไม่ต้อง Firebase ไม่ต้องบัตร
+   ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="ThaiPodee — วิดีโอ & ช้อปปิ้ง">
-<meta name="version" content="ver.1">
 <title>ThaiPodee</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:#000;color:#fff;overflow:hidden;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+:root{--red:#ff2d55;--black:#000;--white:#fff;--gray:#999}
+html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 
 /* หน้าหลัก */
-.app-container{width:100%;height:100%;position:relative}
-.video-feed{width:100%;height:100vh;position:relative}
-.video-card{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a1a2e,#16213e)}
+.page{position:absolute;width:100%;height:100%;transition:transform .3s ease;z-index:1}
+.page-main{transform:translateX(0)}
+.page-profile{transform:translateX(100%)}
+.page-profile.active{transform:translateX(0)}
 
-/* พื้นหลังแทนวิดีโอ */
-.bg-placeholder{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#888;font-size:16px;text-align:center;padding:20px}
+/* ฟีดวิดีโอ */
+.video-feed{width:100%;height:100vh;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+.video-feed::-webkit-scrollbar{display:none}
+.video-slide{width:100%;height:100vh;position:relative;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;background:#000}
+video{width:100%;height:100%;object-fit:cover;cursor:pointer}
 
-/* ข้อมูล */
-.video-info{position:absolute;bottom:110px;left:16px;right:90px;z-index:10}
-.user-name{font-weight:bold;font-size:15px;margin-bottom:6px}
-.video-desc{font-size:13px;color:#eee;line-height:1.4;margin-bottom:8px}
-.music-line{font-size:12px;color:#ddd;display:flex;align-items:center;gap:6px}
+/* ปุ่มด้านขวา 6 ปุ่ม */
+.side-buttons{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.side-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;text-decoration:none}
+.side-btn .icon{font-size:28px}
+.side-btn .num{font-size:11px}
+.side-btn .avatar{width:48px;height:48px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff;position:relative}
+.side-btn .avatar .add{position:absolute;bottom:-2px;right:-2px;background:var(--red);width:18px;height:18px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center}
 
-/* ปุ่มด้านขวา */
-.side-actions{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;align-items:center;gap:22px;z-index:10}
-.action-btn{display:flex;flex-direction:column;align-items:center;color:#fff;text-decoration:none;font-size:11px;gap:4px}
-.action-icon{font-size:24px;line-height:1}
-.avatar{width:44px;height:44px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;margin-bottom:4px;overflow:hidden}
-.music-disc{width:44px;height:44px;border-radius:50%;background:linear-gradient(45deg,#f60,#c00);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite}
+/* ข้อมูลด้านล่างซ้าย */
+.bottom-info{position:absolute;left:16px;right:90px;bottom:90px}
+.bottom-info .name{font-weight:bold;font-size:15px;margin-bottom:6px}
+.bottom-info .desc{font-size:13px;line-height:1.4;color:#eee;margin-bottom:8px}
+.music-line{display:flex;align-items:center;gap:6px;font-size:12px;color:#ddd}
+.music-icon{animation:spin 3s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* เมนูล่าง */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.nav-item{display:flex;flex-direction:column;align-items:center;color:#fff;text-decoration:none;font-size:10px;gap:3px}
-.nav-icon{font-size:22px;line-height:1}
-.nav-center{width:44px;height:30px;background:linear-gradient(180deg,#fff,#ddd);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:16px}
+/* แถบเมนูล่าง 5 ปุ่ม */
+.nav-bar{position:absolute;bottom:0;left:0;right:0;height:60px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;color:#999;text-decoration:none;font-size:10px}
+.nav-btn.active{color:#fff}
+.nav-btn .nav-icon{font-size:22px}
+.nav-btn.upload{background:linear-gradient(45deg,#ff6600,#ff2d55);padding:6px 14px;border-radius:8px;color:#fff;font-weight:bold}
+
+/* หน้าโปรไฟล์ */
+.profile-page{background:#000;padding:20px;height:100vh;overflow-y:auto}
+.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.back-btn{font-size:20px;cursor:pointer;padding:8px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;cursor:pointer}
+.profile-avatar .edit-mark{position:absolute;bottom:0;right:0;background:var(--red);width:24px;height:24px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center}
+.profile-name{font-size:20px;font-weight:bold;margin-bottom:4px}
+.profile-stats{display:flex;gap:24px;margin:16px 0}
+.stat{text-align:center}
+.stat-num{font-weight:bold;font-size:18px}
+.stat-label{font-size:11px;color:#999}
+.edit-btn{background:#333;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;margin:20px 0}
+.form-box{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.form-box input,.form-box textarea{background:#222;border:none;padding:10px;border-radius:6px;color:#fff}
+.form-box button{background:var(--red);color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer}
+.my-videos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.my-video-item{aspect-ratio:9/16;background:#222;position:relative;cursor:pointer}
+.my-video-item video{width:100%;height:100%;object-fit:cover}
+.delete-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:6px;z-index:100;display:none}
 </style>
 </head>
 <body>
-<!-- ThaiPodee ver.1 — ไม่ต้องรอวิดีโอ -->
 
-<div class="app-container">
-  <div class="video-feed">
-    <div class="video-card">
-      
-      <!-- พื้นหลัง แทนวิดีโอ -->
-      <div class="bg-placeholder">
-        <div>
-          📱 ThaiPodee<br>
-          <span style="font-size:12px;color:#666;margin-top:8px;display:block;">อัปโหลดวิดีโอทีหลังได้เลย</span>
-        </div>
-      </div>
-      
-      <!-- ข้อมูล -->
-      <div class="video-info">
-        <div class="user-name">@ThaiPodee_Official</div>
-        <div class="video-desc">ยินดีต้อนรับสู่ ThaiPodee! 🎉</div>
-        <div class="music-line">🎵 เพลงตัวอย่าง — ThaiPodee</div>
-      </div>
+<div class="toast" id="toast"></div>
 
-      <!-- ปุ่มด้านขวา -->
-      <div class="side-actions">
-        <div class="avatar">👤</div>
-        <a class="action-btn" href="javascript:;">
-          <span class="action-icon">❤️</span>
-          <span>1.2K</span>
-        </a>
-        <a class="action-btn" href="javascript:;">
-          <span class="action-icon">💬</span>
-          <span>89</span>
-        </a>
-        <a class="action-btn" href="javascript:;">
-          <span class="action-icon">⭐</span>
-          <span>บันทึก</span>
-        </a>
-        <a class="action-btn" href="javascript:;">
-          <span class="action-icon">📤</span>
-          <span>แชร์</span>
-        </a>
-        <div class="music-disc">🎵</div>
+<!-- หน้าหลัก -->
+<div class="page page-main" id="pageMain">
+  <div class="video-feed" id="videoFeed"></div>
+  <nav class="nav-bar">
+    <a class="nav-btn active" id="navHome"><span class="nav-icon">🏠</span><span>หน้าแรก</span></a>
+    <a class="nav-btn" id="navTrend"><span class="nav-icon">🔥</span><span>มาแรง</span></a>
+    <a class="nav-btn upload" id="navUpload">+ อัปโหลด</a>
+    <a class="nav-btn" id="navSearch"><span class="nav-icon">🔍</span><span>ค้นหา</span></a>
+    <a class="nav-btn" id="navMe"><span class="nav-icon">👤</span><span>ฉัน</span></a>
+  </nav>
+</div>
+
+<!-- หน้าโปรไฟล์ -->
+<div class="page page-profile" id="pageProfile">
+  <div class="profile-page">
+    <div class="profile-header">
+      <span class="back-btn" id="btnBack">←</span>
+      <div class="profile-avatar" id="avatarBox">
+        <span id="avatarLetter">ท</span>
+        <span class="edit-mark">✏</span>
+      </div>
+      <div>
+        <div class="profile-name" id="showName">thaipodee</div>
+        <div style="font-size:12px;color:#999">@thaipodee</div>
       </div>
     </div>
+    <div class="profile-stats">
+      <div class="stat"><div class="stat-num" id="numFollowing">0</div><div class="stat-label">กำลังติดตาม</div></div>
+      <div class="stat"><div class="stat-num" id="numFollower">0</div><div class="stat-label">ผู้ติดตาม</div></div>
+      <div class="stat"><div class="stat-num" id="numLike">0</div><div class="stat-label">ถูกใจ</div></div>
+    </div>
+
+    <button class="edit-btn" id="btnEdit">แก้ไขโปรไฟล์</button>
+    
+    <div class="form-box" id="editForm" style="display:none">
+      <input type="text" id="editName" placeholder="ชื่อที่แสดง">
+      <textarea id="editBio" rows="2" placeholder="คำอธิบายตัวเอง"></textarea>
+      <button id="btnSave">บันทึก</button>
+    </div>
+
+    <h4 style="margin:16px 0 8px">อัปโหลดวิดีโอใหม่</h4>
+    <div class="form-box">
+      <input type="file" id="vidFile" accept="video/*">
+      <input type="text" id="vidDesc" placeholder="คำอธิบายวิดีโอ">
+      <button id="btnPost">โพสต์</button>
+    </div>
+
+    <h4 style="margin:20px 0 8px">วิดีโอของฉัน</h4>
+    <div class="my-videos" id="myList"></div>
   </div>
 </div>
 
-<!-- เมนูล่าง -->
-<nav class="bottom-nav">
-  <a class="nav-item" href="javascript:;">
-    <span class="nav-icon">🏠</span>
-    <span>หน้าแรก</span>
-  </a>
-  <a class="nav-item" href="javascript:;">
-    <span class="nav-icon">🔍</span>
-    <span>ค้นหา</span>
-  </a>
-  <a class="nav-item" href="javascript:;">
-    <span class="nav-center">+</span>
-  </a>
-  <a class="nav-item" href="javascript:;">
-    <span class="nav-icon">🛒</span>
-    <span>ร้านค้า</span>
-  </a>
-  <a class="nav-item" href="javascript:;">
-    <span class="nav-icon">👤</span>
-    <span>โปรไฟล์</span>
-  </a>
-</nav>
+<script>
+// ===== ข้อมูลผู้ใช้ =====
+let me = {
+  name: 'thaipodee',
+  bio: '',
+  following: 0,
+  follower: 0,
+  totalLike: 0
+};
+let videos = [];
 
+// โหลดข้อมูลเมื่อเปิด
+window.onload = function(){
+  loadMyData();
+  loadVideos();
+  renderFeed();
+  renderMyVideos();
+  refreshProfile();
+};
+
+function loadMyData(){
+  const s = localStorage.getItem('tp_user');
+  if(s) me = JSON.parse(s);
+}
+function saveMyData(){
+  localStorage.setItem('tp_user', JSON.stringify(me));
+}
+function loadVideos(){
+  const s = localStorage.getItem('tp_videos');
+  if(s) videos = JSON.parse(s);
+}
+function saveVideos(){
+  localStorage.setItem('tp_videos', JSON.stringify(videos));
+}
+
+// แสดงฟีดวิดีโอ
+function renderFeed(){
+  const feed = document.getElementById('videoFeed');
+  feed.innerHTML = '';
+  if(videos.length === 0){
+    feed.innerHTML = `<div style="height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px">
+      <div><div style="font-size:40px;margin-bottom:16px">📹</div>
+      <div style="color:#999">ยังไม่มีวิดีโอ<br>กด + อัปโหลด ด้านล่างเพื่อโพสต์คนแรก!</div></div>
+    </div>`;
+    return;
+  }
+  videos.forEach((v, i)=>{
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `
+      <video src="${v.url}" autoplay loop muted playsinline id="v${i}"></video>
+      <div class="side-buttons">
+        <div class="side-btn"><div class="avatar">${v.av}</div></div>
+        <div class="side-btn" data-like="${i}"><span class="icon">❤️</span><span class="num">${v.like}</span></div>
+        <div class="side-btn"><span class="icon">💬</span><span class="num">0</span></div>
+        <div class="side-btn"><span class="icon">⭐</span><span class="num">บันทึก</span></div>
+        <div class="side-btn"><span class="icon">↗️</span><span class="num">แชร์</span></div>
+        <div class="side-btn"><span class="icon">🎵</span></div>
+      </div>
+      <div class="bottom-info">
+        <div class="name">${v.by}</div>
+        <div class="desc">${v.desc}</div>
+        <div class="music-line"><span class="music-icon">🎵</span><span>เสียงต้นฉบับ - ${v.by}</span></div>
+      </div>`;
+    feed.appendChild(slide);
+    // เปิด/ปิดเสียงเมื่อกดวิดีโอ
+    const vid = slide.querySelector('video');
+    vid.addEventListener('click', ()=>{
+      vid.muted = !vid.muted;
+      vid.volume = vid.muted ? 0 : 1;
+    });
+    // กดถูกใจ
+    slide.querySelector(`[data-like="${i}"]`).addEventListener('click', ()=>{
+      videos[i].like++;
+      saveVideos();
+      renderFeed();
+    });
+  });
+}
+
+// แสดงรายการวิดีโอของฉัน
+function renderMyVideos(){
+  const list = document.getElementById('myList');
+  list.innerHTML = '';
+  videos.filter(v=>v.by===me.name).forEach((v)=>{
+    const idx = videos.indexOf(v);
+    const item = document.createElement('div');
+    item.className = 'my-video-item';
+    item.innerHTML = `<video src="${v.url}" muted playsinline></video>
+      <button class="delete-btn" data-del="${idx}">×</button>`;
+    list.appendChild(item);
+  });
+  // ปุ่มลบ
+  document.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(confirm('ลบวิดีโอนี้?')){
+        videos.splice(parseInt(b.dataset.del), 1);
+        saveVideos();
+        renderFeed();
+        renderMyVideos();
+        showMsg('ลบเรียบร้อย ✅');
+      }
+    });
+  });
+}
+
+// โพสต์วิดีโอใหม่
+document.getElementById('btnPost').addEventListener('click', ()=>{
+  const f = document.getElementById('vidFile').files[0];
+  const d = document.getElementById('vidDesc').value.trim();
+  if(!f){ showMsg('เลือกไฟล์วิดีโอก่อนครับ'); return; }
+  
+  const newVid = {
+    id: Date.now(),
+    url: URL.createObjectURL(f),
+    desc: d || 'วิดีโอจาก ThaiPodee',
+    by: me.name,
+    av: me.name.charAt(0).toUpperCase(),
+    like: 0
+  };
+  videos.unshift(newVid);
+  saveVideos();
+  
+  // ล้างช่อง
+  document.getElementById('vidFile').value = '';
+  document.getElementById('vidDesc').value = '';
+  
+  renderFeed();
+  renderMyVideos();
+  showMsg('โพสต์สำเร็จ! 🎉');
+});
+
+// แก้ไขโปรไฟล์
+document.getElementById('btnEdit').addEventListener('click', ()=>{
+  const form = document.getElementById('editForm');
+  form.style.display = form.style.display==='none' ? 'flex' : 'none';
+  document.getElementById('editName').value = me.name;
+  document.getElementById('editBio').value = me.bio;
+});
+document.getElementById('btnSave').addEventListener('click', ()=>{
+  me.name = document.getElementById('editName').value.trim() || 'thaipodee';
+  me.bio = document.getElementById('editBio').value.trim();
+  saveMyData();
+  refreshProfile();
+  document.getElementById('editForm').style.display = 'none';
+  showMsg('บันทึกเรียบร้อย ✅');
+});
+function refreshProfile(){
+  document.getElementById('showName').textContent = me.name;
+  document.getElementById('avatarLetter').textContent = me.name.charAt(0).toUpperCase();
+  document.getElementById('numFollowing').textContent = me.following;
+  document.getElementById('numFollower').textContent = me.follower;
+  document.getElementById('numLike').textContent = me.totalLike;
+}
+
+// เปลี่ยนหน้า
+document.getElementById('navMe').addEventListener('click', ()=>{
+  document.getElementById('pageProfile').classList.add('active');
+});
+document.getElementById('btnBack').addEventListener('click', ()=>{
+  document.getElementById('pageProfile').classList.remove('active');
+});
+document.getElementById('navHome').addEventListener('click', ()=>{
+  document.getElementById('pageProfile').classList.remove('active');
+});
+document.getElementById('navUpload').addEventListener('click', ()=>{
+  document.getElementById('pageProfile').classList.add('active');
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+});
+
+// แจ้งเตือน
+function showMsg(m){
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.style.display = 'block';
+  setTimeout(()=>t.style.display='none', 2500);
+}
+</script>
 </body>
 </html>
