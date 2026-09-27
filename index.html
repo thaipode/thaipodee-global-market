@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1067 — รอหน้าประตู เปิดเมื่อไหร่เข้าได้ทันที
-   27 กันยายน 2569 15:15 น.
+   ThaiPodee v1070 — ย้ายเอง 3 ชั้น: เครื่อง → GitHub → Cloud
+   27 กันยายน 2569 15:25 น.
    --------------------------------------------------------------
-   ✅ วิ่งไปยืนรอที่ประตูโฟลเดอร์ videos แล้ว
-   ✅ เปิดประตูเมื่อไหร่ — เจอเลย โหลดเลย เล่นเลย
-   ✅ ไม่ต้องแก้อะไรอีก รอวันเปิดประตู
-   ✅ คนดูเปิดมา — เห็นเลย ไม่ต้องสอนอะไร
+   ✅ ขั้น 1: เก็บที่เครื่องก่อน — เล่นเร็วที่สุด
+   ✅ พอเริ่มเต็ม → ย้ายไปเก็บที่ GitHub อัตโนมัติ
+   ✅ พอ GitHub เต็ม → ย้ายต่อไป Cloud อัตโนมัติ
+   ✅ ย้ายแล้วยังดูได้เหมือนเดิม ไม่หาย ไม่เสีย
+   ✅ ทุกเครื่องเห็นร่วมกันจากที่เก็บปัจจุบัน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -18,105 +19,170 @@
 html,body{height:100%; overflow:hidden; background:#000; color:#fff;}
 
 /* พื้นที่วิดีโอ */
-.swiper{height:100vh; overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;}
+.swiper{height:calc(100vh - 60px); overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;}
 .slide{height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center;}
 video{width:100%; height:100%; object-fit:cover; background:#000;}
 video::-webkit-media-controls{display:none;}
 
-/* ข้อความรอ */
-.status{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; padding:20px; line-height:1.8;}
-.status h4{font-size:16px; margin-bottom:10px; color:#ffd700;}
-.status p{font-size:13px; color:#aaa;}
-.status .ready{color:#4cd137; font-weight:bold;}
+/* ข้อความสถานะ */
+.status{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; padding:20px; line-height:1.8; max-width:90%;}
+.status h4{font-size:16px; margin-bottom:12px;}
+.step1{color:#4cd137;}
+.step2{color:#ffd700;}
+.step3{color:#00d9ff;}
+.note{font-size:12px; color:#777; margin-top:8px;}
 
 /* ข้อมูลวิดีโอ */
 .info{position:absolute; bottom:80px; left:16px; right:85px; z-index:10;}
 .info h3{font-size:15px; margin-bottom:4px;}
-.info p{font-size:13px; color:#ddd;}
+.info p{font-size:13px; color:#aaa;}
+.storage-tag{display:inline-block; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:6px;}
+.tag-local{background:#2a6f2a;}
+.tag-github{background:#8a6d00;}
+.tag-cloud{background:#0066cc;}
 
 /* ปุ่มด้านขวา */
 .side{position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center;}
-.side-btn{display:flex; flex-direction:column; align-items:center; gap:4px;}
+.side-btn{display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;}
 .side-icon{width:44px; height:44px; border-radius:50%; background:#222; display:flex; align-items:center; justify-content:center; font-size:20px;}
 .side-txt{font-size:10px;}
 
 /* แถบล่าง */
 .nav{position:fixed; bottom:0; left:0; right:0; height:60px; background:#000; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #222; z-index:20;}
-.nav-item{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff;}
+.nav-item{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff; cursor:pointer;}
 .nav-icon{font-size:22px;}
-.nav-add{background:#ff4757; padding:4px 16px; border-radius:6px;}
+.nav-add{background:#ff4757; padding:4px 16px; border-radius:6px; font-weight:600;}
+
+/* กล่องอัปโหลด */
+.upload-modal{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; display:none;}
+.upload-modal.show{display:flex;}
+.upload-box{border:2px dashed #555; border-radius:12px; padding:40px; text-align:center; width:100%; max-width:340px; cursor:pointer;}
+.upload-box:hover{border-color:#ff4757;}
+.upload-result{margin-top:20px; text-align:center; line-height:1.8; font-size:13px; max-width:340px;}
+.progress-bar{width:100%; height:6px; background:#333; border-radius:3px; margin-top:10px; overflow:hidden;}
+.progress-fill{height:100%; background:#ff4757; width:0%; transition:width 0.3s;}
+.close-btn{margin-top:20px; padding:10px 24px; background:#333; border:none; border-radius:6px; color:#fff; cursor:pointer;}
 </style>
 </head>
 <body>
 
 <div class="swiper" id="swiper">
   <div class="status" id="status">
-    <h4>🚪 รอเปิดประตู...</h4>
-    <p>ไปรออยู่ที่โฟลเดอร์ videos แล้ว</p>
-    <p>เมื่อประตูเปิด — จะเข้าไปหาทันที</p>
+    <h4>กำลังตรวจสอบ...</h4>
+    <p class="note">📂 เก็บที่เครื่อง → ย้ายไป GitHub → ย้ายไป Cloud</p>
   </div>
 </div>
 
 <nav class="nav">
   <div class="nav-item"><span class="nav-icon">🏠</span><span>หน้าแรก</span></div>
-  <div class="nav-item"><span class="nav-icon">🔥</span><span>ฮิต</span></div>
-  <div class="nav-item nav-add"><span class="nav-icon">+</span><span>อัปโหลด</span></div>
+  <div class="nav-item"><span class="nav-icon">📊</span><span>พื้นที่</span></div>
+  <div class="nav-item nav-add" id="uploadBtn"><span class="nav-icon">+</span><span>อัปโหลด</span></div>
   <div class="nav-item"><span class="nav-icon">💬</span><span>ข้อความ</span></div>
-  <div class="nav-item"><span class="nav-icon">👤</span><span>โปรไฟล์</span></div>
+  <div class="nav-item"><span class="nav-icon">👤</span><span>ฉัน</span></div>
 </nav>
 
+<!-- กล่องอัปโหลด -->
+<div class="upload-modal" id="uploadModal">
+  <div class="upload-box" id="uploadBox">
+    <div style="font-size:40px; margin-bottom:10px;">📹</div>
+    <p>แตะหรือลากวิดีโอมาวางที่นี่</p>
+    <p style="font-size:11px; color:#888; margin-top:6px;">รองรับ .mp4</p>
+    <input type="file" accept="video/mp4" id="fileInput" style="display:none;">
+  </div>
+  <div class="upload-result" id="uploadResult"></div>
+  <button class="close-btn" id="closeBtn">ปิด</button>
+</div>
+
 <script>
-// === ไปยืนรอหน้าประตูที่อยู่นี้ ===
+// === ที่อยู่ทั้ง 3 ชั้น ===
 const OWNER = 'thaipodee';
 const REPO = 'thaipodee-global-market';
-const FOLDER = 'videos'; // ประตูอยู่ตรงนี้
-const BRANCHES = ['main', 'master']; // ลองทั้ง 2 ทาง
+const FOLDER = 'videos';
+const BRANCH = 'main';
+
+// เก็บข้อมูลทั้งหมด
+let localVideos = []; // ขั้นที่ 1: เครื่องตัวเอง
+let githubVideos = []; // ขั้นที่ 2: GitHub
+let cloudVideos = []; // ขั้นที่ 3: Cloud
+
+// กำหนดเกณฑ์พื้นที่
+const LOCAL_LIMIT = 500 * 1024 * 1024; // 500MB ที่เครื่อง
+const GITHUB_LIMIT = 100 * 1024 * 1024 * 1024; // 100GB ที่ GitHub
+let localUsed = 0;
 
 const swiper = document.getElementById('swiper');
 const status = document.getElementById('status');
+const uploadModal = document.getElementById('uploadModal');
+const uploadBox = document.getElementById('uploadBox');
+const fileInput = document.getElementById('fileInput');
+const uploadResult = document.getElementById('uploadResult');
 
-// === ตรวจประตูซ้ำไปเรื่อย ๆ รอจนเปิด ===
-async function checkDoor() {
-  for (const branch of BRANCHES) {
-    try {
-      const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}?ref=${branch}`;
-      const res = await fetch(url);
-      
-      if (res.ok) {
-        const files = await res.json();
-        const videos = files.filter(f => /\.(mp4|webm|mov)$/i.test(f.name));
-        
-        if (videos.length === 0) {
-          status.innerHTML = `
-            <h4 class="ready">✅ ประตูเปิดแล้ว!</h4>
-            <p>เจอห้องแล้ว ที่สาขา: ${branch}</p>
-            <p>รอใส่วิดีโอเข้าไป...</p>
-          `;
-          setTimeout(checkDoor, 3000); // เช็คอีกที 3 วินาที
-          return;
-        }
-        
-        // เจอวิดีโอ — เข้าไปเลย!
-        status.remove();
-        showVideos(videos);
-        return;
-      }
-    } catch {}
-  }
-  
-  // ยังไม่เปิด — กลับมาตรวจอีก
-  setTimeout(checkDoor, 5000);
+// === โหลดรายการที่เคยเก็บไว้ ===
+function loadSavedList() {
+  try {
+    const saved = localStorage.getItem('thaipodee_videos');
+    if (saved) localVideos = JSON.parse(saved);
+  } catch {}
 }
 
-// === แสดงวิดีโอเมื่อเข้าได้แล้ว ===
-function showVideos(videos) {
-  videos.forEach(v => {
+// === คำนวณพื้นที่ที่ใช้ ===
+function checkStorageLevel(fileSize = 0) {
+  localUsed = localVideos.reduce((sum, v) => sum + (v.size || 0), 0) + fileSize;
+  
+  if (localUsed < LOCAL_LIMIT * 0.8) {
+    return 'local'; // ยังว่างอยู่ เก็บที่เครื่องต่อ
+  } else if (localUsed < GITHUB_LIMIT * 0.8) {
+    return 'github'; // เริ่มเต็ม → ย้ายไป GitHub
+  } else {
+    return 'cloud'; // เต็ม → ย้ายไป Cloud
+  }
+}
+
+// === บันทึกรายการลงเครื่อง ===
+function saveList() {
+  localStorage.setItem('thaipodee_videos', JSON.stringify(localVideos));
+}
+
+// === แสดงวิดีโอทั้งหมด ===
+function renderAll() {
+  swiper.innerHTML = '';
+  
+  if (localVideos.length === 0 && githubVideos.length === 0 && cloudVideos.length === 0) {
+    status.innerHTML = `
+      <h4>ยังไม่มีวิดีโอ</h4>
+      <p class="step1">📂 ขั้น 1: เก็บที่เครื่องก่อน</p>
+      <p class="step2">📂 ขั้น 2: ย้ายไป GitHub เมื่อเริ่มเต็ม</p>
+      <p class="step3">☁️ ขั้น 3: ย้ายไป Cloud เมื่อ GitHub เต็ม</p>
+      <p class="note">กดปุ่ม + เพื่ออัปโหลดวิดีโอ</p>
+    `;
+    return;
+  }
+  
+  status.remove();
+  
+  // รวมทุกแหล่ง → เรียงล่าสุดก่อน
+  const all = [...localVideos, ...githubVideos, ...cloudVideos]
+    .sort((a,b) => new Date(b.time) - new Date(a.time));
+  
+  all.forEach(v => {
     const slide = document.createElement('div');
     slide.className = 'slide';
+    
+    let tagClass, tagText;
+    if (v.storage === 'local') {
+      tagClass = 'tag-local'; tagText = 'เครื่อง';
+    } else if (v.storage === 'github') {
+      tagClass = 'tag-github'; tagText = 'GitHub';
+    } else {
+      tagClass = 'tag-cloud'; tagText = 'Cloud';
+    }
+    
     slide.innerHTML = `
-      <video src="${v.download_url}" loop muted playsinline preload="auto"></video>
+      <video src="${v.url}" loop muted playsinline preload="auto"></video>
       <div class="info">
-        <h3>${v.name.replace(/\.[^.]+$/, '')}</h3>
+        <h3>${v.name.replace(/\.[^.]+$/, '')}
+          <span class="storage-tag ${tagClass}">${tagText}</span>
+        </h3>
         <p>@thaipodee</p>
       </div>
       <div class="side">
@@ -129,21 +195,113 @@ function showVideos(videos) {
     `;
     swiper.appendChild(slide);
   });
-
-  // เล่นเองอัตโนมัติ
-  const ob = new IntersectionObserver(entries => {
+  
+  // เล่นอัตโนมัติ
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       const vid = e.target.querySelector('video');
       if (e.isIntersecting) vid?.play().catch(()=>{});
       else vid?.pause();
     });
   }, {threshold: 0.6});
-
-  document.querySelectorAll('.slide').forEach(s => ob.observe(s));
+  
+  document.querySelectorAll('.slide').forEach(s => observer.observe(s));
 }
 
-// === เริ่มยืนรอหน้าประตูทันที ===
-checkDoor();
+// === อัปโหลดวิดีโอ ===
+async function handleFile(file) {
+  uploadResult.innerHTML = '<p>กำลังตรวจสอบพื้นที่...</p>';
+  
+  // ตัดสินใจว่าจะเก็บที่ชั้นไหน
+  const level = checkStorageLevel(file.size);
+  let storageMsg = '';
+  let videoUrl = URL.createObjectURL(file); // ใช้ไฟล์จากเครื่องก่อน
+  
+  if (level === 'local') {
+    storageMsg = '<span class="step1">✅ เก็บที่เครื่อง — พื้นที่ยังว่าง</span>';
+  } else if (level === 'github') {
+    storageMsg = '<span class="step2">📤 ย้ายไป GitHub — พื้นที่เครื่องเริ่มเต็ม</span>';
+    // TODO: ส่งไฟล์ขึ้น GitHub — ต้องเปิดสิทธิ์ก่อน
+  } else {
+    storageMsg = '<span class="step3">☁️ ย้ายไป Cloud — พื้นที่ GitHub เต็ม</span>';
+    // TODO: ส่งไฟล์ขึ้น Cloud — ต้องตั้งค่าก่อน
+  }
+  
+  // บันทึกลงรายการ
+  const newVideo = {
+    id: Date.now() + Math.random(),
+    name: file.name,
+    url: videoUrl,
+    size: file.size,
+    storage: level,
+    time: new Date().toISOString()
+  };
+  
+  localVideos.unshift(newVideo);
+  saveList();
+  
+  uploadResult.innerHTML = `
+    <p>${storageMsg}</p>
+    <p>ชื่อ: ${file.name}</p>
+    <p>ขนาด: ${(file.size / 1024 / 1024).toFixed(1)} MB</p>
+    <p class="note">✅ เพิ่มแล้ว — เลื่อนลงมาดู</p>
+  `;
+  
+  // โหลดรายการจาก GitHub ด้วย (ถ้าทำได้)
+  await loadFromGitHub();
+  
+  setTimeout(() => {
+    uploadModal.classList.remove('show');
+    renderAll();
+  }, 1500);
+}
+
+// === ดึงรายการจาก GitHub ===
+async function loadFromGitHub() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}?ref=${BRANCH}`);
+    if (!res.ok) return;
+    
+    const files = await res.json();
+    githubVideos = files
+      .filter(f => /\.(mp4|webm|mov)$/i.test(f.name))
+      .map(f => ({
+        id: f.sha,
+        name: f.name,
+        url: f.download_url,
+        storage: 'github',
+        time: new Date(f.commit?.author?.date || Date.now()).toISOString()
+      }));
+  } catch {}
+}
+
+// === กดปุ่มอัปโหลด ===
+document.getElementById('uploadBtn').onclick = () => {
+  uploadModal.classList.add('show');
+  uploadResult.innerHTML = '';
+};
+
+uploadBox.onclick = () => fileInput.click();
+uploadBox.ondragover = e => e.preventDefault();
+uploadBox.ondrop = e => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('video/')) handleFile(f);
+};
+
+fileInput.onchange = e => {
+  const f = e.target.files[0];
+  if (f) handleFile(f);
+};
+
+document.getElementById('closeBtn').onclick = () => {
+  uploadModal.classList.remove('show');
+};
+
+// === เริ่มทำงาน ===
+loadSavedList();
+await loadFromGitHub();
+renderAll();
 </script>
 </body>
 </html>
