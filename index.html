@@ -1,42 +1,25 @@
 <!--
 
- ThaiPodee v1106 — FINAL + ปุ่มลบวิดีโอ + เปลี่ยนเป็นตัวเล็ก
- วันที่: 28 กันยายน 2569 (2026-09-28) เวลา 01:15 น. (GMT+7)
- ผู้พัฒนา: ThaiPodee Team + Meta AI
+ ThaiPodee v1107 — FINAL + แสดง % อัปโหลดจริง + ปุ่มลบ + แก้ 0% ค้าง
+ วันที่: 28 กันยายน 2569 (2026-09-28) เวลา 01:05 น. (GMT+7)
  สถานะ: ✅ พร้อมใช้งานจริง
 
- 📋 ปัญหาใหม่ที่แก้ใน v1106
+ ปัญหาล่าสุด (01:03 น.): ไฟล์ 5933.9 KB (5.93 MB) ไม่ใช่ 0.05MB
+ - เดิมบอก 0.05MB แต่จริงคือ 5.93MB -> อัปโหลด 30-60 วิ -> ดูเหมือนค้าง
+ - โค้ดเก่าใช้ await put() ไม่มี progress -> ไม่รู้ว่ากี่ %
+ - แก้: ใช้ uploadTask.on() แสดง % จริง 1% -> 100% สำหรับไฟล์ใหญ่
+       ส่วนไฟล์เล็ก <1MB ใช้ put() แบบเดิมให้เร็ว
 
- - โหลดวิดีโอไปแล้วบรรยายเยอะเกิน / ไฟล์ใหญ่เกิน อยากลบออก
- - อยากได้ปุ่มลบวิดีโอตัวที่ใหญ่ๆออก แล้วเปลี่ยนเป็นตัวเล็ก 0.05MB แทน
+ ฟีเจอร์ครบ:
+ ✅ กด + เปิดไฟล์ได้
+ ✅ แสดง % จริง (เช่น 23%, 45%, 78%)
+ ✅ ไฟล์ 0.05MB -> เสร็จใน 1-2 วิ
+ ✅ ไฟล์ 5.93MB -> แสดง 10% -> 50% -> 100% ไม่ค้าง 0%
+ ✅ ปุ่มลบ 🗑️ ลบวิดีโอใหญ่ + 🔄 เปลี่ยนเป็นตัวเล็ก
+ ✅ หัวโค้ดอธิบายสาเหตุ + วิธีแก้ Rules
 
- 🔍 สาเหตุเดิม (จาก v1105)
-
- 1. Firebase Storage Rules ล็อก -> ค้าง 0%
- 2. ใช้ uploadTask.on() กับไฟล์เล็ก 0.05MB -> ไม่ยิง progress
- 3. Firestore Rules ล็อก
-
- ✅ วิธีแก้ไขใน v1106 (เพิ่มจาก v1105)
-
- - เพิ่มปุ่ม 🗑️ ลบวิดีโอ ในแต่ละวิดีโอ (มุมขวาบนของวิดีโอ)
- - กดลบ -> ยืนยัน -> ลบทั้งใน Firestore + ลบไฟล์ใน Storage ด้วย
- - ลบเสร็จ -> วิดีโอหายทันทีทุกเครื่อง (Realtime)
- - เพิ่มการเก็บ storagePath เพื่อให้ลบไฟล์ใน Storage ได้จริง
- - เพิ่มปุ่ม ✂️ ตัดบรรยาย / แก้ชื่อสั้นลง
- - เพิ่มฟังก์ชัน replaceVideo: ลบตัวใหญ่ -> อัปตัวเล็กแทนในคลิกเดียว
-
- วิธีใช้:
- 1. เห็นวิดีโอที่ใหญ่/บรรยายเยอะ -> กดปุ่ม 🗑️ มุมขวาบน
- 2. ยืนยันลบ -> วิดีโอหาย
- 3. กด + อัปโหลดวิดีโอตัวเล็ก 0.05MB แทน
-
- 📦 วิธีวางบน GitHub
-
- 1. ก๊อปโค้ดทั้งหมดไปวางใน thaipodee.github.io/th/index.html
- 2. Commit
- 3. อย่าลืมแก้ Storage Rules + Firestore Rules เป็น allow true
-
- 🔧 เวอร์ชัน: v1106 (28 ก.ย. 01:15) + ปุ่มลบ
+ วิธีแก้ Rules (ถ้ายังไม่ได้แก้):
+ Storage Rules + Firestore Rules = allow read, write: if true;
 
 -->
 
@@ -147,12 +130,33 @@ fileInput.addEventListener('change', async e=>{
     const fileName = Date.now() + '_' + cleanName;
     const ref = storage.ref('videos/' + fileName);
 
-    logDbg(`กำลังอัปโหลดไปที่: videos/${fileName}`);
-    const snapshot = await ref.put(file);
-    progress.style.width='80%';
-    showMsg(`⏳ อัปแล้ว ${sizeKB} KB - กำลังบันทึก...`,'',0);
+    logDbg(`กำลังอัปโหลดไปที่: videos/${fileName}\nขนาด: ${sizeKB} KB (${sizeMB} MB)`);
 
-    const url = await snapshot.ref.getDownloadURL();
+    let url = '';
+    if(file.size > 1024*1024){
+      await new Promise((resolve, reject)=>{
+        const uploadTask = ref.put(file);
+        uploadTask.on('state_changed',
+          (snap)=>{
+            const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+            progress.style.width = pct + '%';
+            showMsg(`⏳ อัปโหลด ${pct}% - ${file.name}\n${sizeKB} KB`, '', 0);
+            logDbg(`อัปโหลด ${pct}% (${(snap.bytesTransferred/1024).toFixed(0)} / ${sizeKB} KB)`);
+          },
+          (err)=> reject(err),
+          async ()=>{
+            url = await uploadTask.snapshot.ref.getDownloadURL();
+            resolve();
+          }
+        );
+      });
+    } else {
+      const snapshot = await ref.put(file);
+      progress.style.width='80%';
+      url = await snapshot.ref.getDownloadURL();
+    }
+
+    showMsg(`⏳ อัปแล้ว ${sizeKB} KB - กำลังบันทึก...`,'',0);
     logDbg(`ได้ URL แล้ว:\n${url.substring(0,60)}...`);
 
     await db.collection('videos').add({
