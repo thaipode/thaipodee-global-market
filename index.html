@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1065 — วิ่งไปหาเองจากห้องที่สร้างไว้แล้ว
-   27 กันยายน 2569 14:45 น.
+   ThaiPodee v1066 — ตรวจห้องอัตโนมัติ แก้ปัญหาไม่เจอโฟลเดอร์
+   27 กันยายน 2569 15:05 น.
    --------------------------------------------------------------
-   ✅ "ห้อง" = โฟลเดอร์ videos ใน GitHub — สร้างไว้แล้ว
-   ✅ เปิดแอป → วิ่งเข้าห้องเอง → เจอวิดีโอ → เล่นเอง
-   ✅ ไม่ต้องบอกชื่อ ไม่ต้องวางตัวอย่าง ไม่ต้องแก้อะไร
-   ✅ คนใช้เปิดมาก็เห็นเลย เหมือนเข้ามาเจอของในห้อง
+   ✅ ตรวจหลายชื่อสาขา (main / master) อัตโนมัติ
+   ✅ บอกชัดเจนว่าติดตรงไหน
+   ✅ เจอแล้วโหลดเองทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,42 +13,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee</title>
 <style>
-*{margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, BlinkMacSystemFont, sans-serif;}
+*{margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, sans-serif;}
 html,body{height:100%; overflow:hidden; background:#000; color:#fff;}
 
-/* พื้นที่เลื่อนดูวิดีโอ */
 .video-swiper{height:100vh; overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;}
 .video-slide{height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center;}
-
-/* ตัวเล่นวิดีโอ */
 video{width:100%; height:100%; object-fit:cover; background:#000;}
-video::-webkit-media-controls{display:none !important;}
+video::-webkit-media-controls{display:none;}
 
-/* ข้อความแจ้ง */
-.status-msg{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#888; text-align:center; padding:20px;}
+.status-msg{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#888; text-align:center; padding:20px; line-height:1.6;}
+.status-msg h4{font-size:16px; margin-bottom:10px; color:#ff6b6b;}
+.status-msg p{font-size:13px; color:#aaa; margin-bottom:5px;}
+.status-msg .ok{color:#4cd137;}
 
-/* ข้อมูลด้านล่างซ้าย */
 .video-info{position:absolute; bottom:80px; left:16px; right:85px; z-index:10;}
-.video-info h3{font-size:15px; font-weight:600; margin-bottom:4px;}
+.video-info h3{font-size:15px; margin-bottom:4px;}
 .video-info p{font-size:13px; color:#ddd;}
 
-/* ปุ่มด้านขวา */
-.side-buttons{position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center; z-index:10;}
-.side-btn{display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;}
+.side-buttons{position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center;}
+.side-btn{display:flex; flex-direction:column; align-items:center; gap:4px;}
 .side-icon{width:44px; height:44px; border-radius:50%; background:#222; display:flex; align-items:center; justify-content:center; font-size:20px;}
-.side-label{font-size:10px; color:#fff;}
+.side-label{font-size:10px;}
 
-/* แถบเมนูล่าง */
 .nav-bar{position:fixed; bottom:0; left:0; right:0; height:60px; background:#000; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #222; z-index:20;}
-.nav-item{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff; cursor:pointer;}
+.nav-item{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff;}
 .nav-icon{font-size:22px;}
-.nav-upload{background:#ff4757; padding:4px 16px; border-radius:6px; font-weight:600;}
+.nav-upload{background:#ff4757; padding:4px 16px; border-radius:6px;}
 </style>
 </head>
 <body>
 
 <div class="video-swiper" id="swiper">
-  <div class="status-msg" id="status">กำลังเข้าไปหาวิดีโอ...</div>
+  <div class="status-msg" id="status">กำลังตรวจสอบที่เก็บวิดีโอ...</div>
 </div>
 
 <nav class="nav-bar">
@@ -61,84 +56,93 @@ video::-webkit-media-controls{display:none !important;}
 </nav>
 
 <script>
-// === ที่อยู่ "ห้อง" ที่สร้างไว้แล้ว — ไม่ต้องเปลี่ยนอะไรตรงนี้ ===
-const GITHUB_OWNER = 'thaipodee';
-const GITHUB_REPO = 'thaipodee-global-market';
-const VIDEO_FOLDER = 'videos'; // นี่คือห้องที่เก็บวิดีโอ
-const GITHUB_BRANCH = 'main';
+const OWNER = 'thaipodee';
+const REPO = 'thaipodee-global-market';
+const FOLDER = 'videos';
 
 const swiper = document.getElementById('swiper');
 const status = document.getElementById('status');
 
-// === ระบบวิ่งเข้าห้องเอง อัตโนมัติ ===
-async function goFindVideos() {
+// ลองหาทั้ง main และ master
+async function tryLoadVideos(branch) {
   try {
-    // วิ่งไปหาในห้องที่สร้างไว้
-    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${VIDEO_FOLDER}?ref=${GITHUB_BRANCH}`;
-    const res = await fetch(apiUrl);
-    
-    if (!res.ok) throw new Error('ห้องว่างหรือไม่มีห้อง');
-    
-    const files = await res.json();
-    
-    // เลือกเอาเฉพาะไฟล์วิดีโอที่อยู่ในห้อง
-    const videoFiles = files.filter(file => {
-      const ext = file.name.toLowerCase().split('.').pop();
-      return ['mp4', 'webm', 'mov', 'ogg'].includes(ext);
-    });
-
-    if (!videoFiles.length) {
-      status.innerHTML = 'ยังไม่มีวิดีโอในห้อง<br>รอเจ้าของใส่ของเข้ามา';
-      return;
-    }
-
-    // เจอแล้ว — ลบข้อความแจ้ง เตรียมแสดง
-    status.remove();
-
-    // เอาทุกอย่างที่เจอในห้อง มาสร้างหน้าแสดงเอง
-    videoFiles.forEach(file => {
-      const slide = document.createElement('div');
-      slide.className = 'video-slide';
-      slide.innerHTML = `
-        <video src="${file.download_url}" loop muted playsinline preload="auto"></video>
-        <div class="video-info">
-          <h3>${file.name.replace(/\.[^.]+$/, '')}</h3>
-          <p>@thaipodee</p>
-        </div>
-        <div class="side-buttons">
-          <div class="side-btn"><div class="side-icon">❤️</div><div class="side-label">0</div></div>
-          <div class="side-btn"><div class="side-icon">💬</div><div class="side-label">0</div></div>
-          <div class="side-btn"><div class="side-icon">⭐</div><div class="side-label">บันทึก</div></div>
-          <div class="side-btn"><div class="side-icon">↗️</div><div class="side-label">แชร์</div></div>
-          <div class="side-btn"><div class="side-icon">🎵</div><div class="side-label">เสียง</div></div>
-        </div>
-      `;
-      swiper.appendChild(slide);
-    });
-
-    // เล่นเองเมื่ออยู่ในจอ
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const video = entry.target.querySelector('video');
-        if (entry.isIntersecting) {
-          video?.play().catch(() => {});
-        } else {
-          video?.pause();
-        }
-      });
-    }, { threshold: 0.6 });
-
-    document.querySelectorAll('.video-slide').forEach(slide => {
-      observer.observe(slide);
-    });
-
-  } catch (err) {
-    status.textContent = 'ผิดพลาด: ' + err.message;
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}?ref=${branch}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 }
 
-// เปิดปุ๊บ — วิ่งไปหาเลย ทันที
-goFindVideos();
+async function start() {
+  status.innerHTML = 'กำลังหาโฟลเดอร์...';
+  
+  let files = await tryLoadVideos('main');
+  let branchUsed = 'main';
+  
+  if (!files) {
+    files = await tryLoadVideos('master');
+    branchUsed = 'master';
+  }
+  
+  if (!files) {
+    status.innerHTML = `
+      <h4>❌ ไม่พบโฟลเดอร์วิดีโอ</h4>
+      <p>ตรวจสอบสิ่งเหล่านี้:</p>
+      <p>1. มีโฟลเดอร์ชื่อ <b>videos</b> ในโปรเจกต์หรือไม่?</p>
+      <p>2. อยู่ในสาขา <b>main</b> หรือ <b>master</b>?</p>
+      <p>3. ชื่อสะกดถูกไหม: v-i-d-e-o-s</p>
+    `;
+    return;
+  }
+  
+  const videos = files.filter(f => /\.(mp4|webm|mov)$/i.test(f.name));
+  
+  if (!videos.length) {
+    status.innerHTML = `
+      <h4>📂 เจอโฟลเดอร์แล้ว</h4>
+      <p class="ok">สาขา: ${branchUsed}</p>
+      <p>แต่ยังไม่มีไฟล์วิดีโอ</p>
+      <p>อัปโหลดไฟล์ .mp4 เข้าโฟลเดอร์ videos</p>
+    `;
+    return;
+  }
+  
+  status.remove();
+  
+  videos.forEach(v => {
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `
+      <video src="${v.download_url}" loop muted playsinline preload="auto"></video>
+      <div class="video-info">
+        <h3>${v.name.replace(/\.[^.]+$/, '')}</h3>
+        <p>@thaipodee</p>
+      </div>
+      <div class="side-buttons">
+        <div class="side-btn"><div class="side-icon">❤️</div><div class="side-label">0</div></div>
+        <div class="side-btn"><div class="side-icon">💬</div><div class="side-label">0</div></div>
+        <div class="side-btn"><div class="side-icon">⭐</div><div class="side-label">บันทึก</div></div>
+        <div class="side-btn"><div class="side-icon">↗️</div><div class="side-label">แชร์</div></div>
+        <div class="side-btn"><div class="side-icon">🎵</div><div class="side-label">เสียง</div></div>
+      </div>
+    `;
+    swiper.appendChild(slide);
+  });
+  
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const vid = e.target.querySelector('video');
+      if (e.isIntersecting) vid?.play().catch(()=>{});
+      else vid?.pause();
+    });
+  }, {threshold: 0.6});
+  
+  document.querySelectorAll('.video-slide').forEach(s => observer.observe(s));
+}
+
+start();
 </script>
 </body>
 </html>
