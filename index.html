@@ -1,11 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1062 — เปิดปุ๊บเจอ เล่นได้เลย อัตโนมัติ
-   27 กันยายน 2569 13:25 น.
+   ThaiPodee v1065 — วิ่งไปหาเองจากห้องที่สร้างไว้แล้ว
+   27 กันยายน 2569 14:45 น.
    --------------------------------------------------------------
-   ✅ เปิดแอป → โหลดวิดีโอเองจากโฟลเดอร์ videos
-   ✅ อัปโหลดไฟล์อะไรเข้าไปก็เจอเอง ไม่ต้องเขียนชื่อ
-   ✅ เล่นวนซ้ำ อัตโนมัติ เหมือน TikTok
-   ✅ ไม่ต้องแก้ไฟล์อื่นเลย
+   ✅ "ห้อง" = โฟลเดอร์ videos ใน GitHub — สร้างไว้แล้ว
+   ✅ เปิดแอป → วิ่งเข้าห้องเอง → เจอวิดีโอ → เล่นเอง
+   ✅ ไม่ต้องบอกชื่อ ไม่ต้องวางตัวอย่าง ไม่ต้องแก้อะไร
+   ✅ คนใช้เปิดมาก็เห็นเลย เหมือนเข้ามาเจอของในห้อง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,112 +14,131 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee</title>
 <style>
-*{margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, sans-serif;}
+*{margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, BlinkMacSystemFont, sans-serif;}
 html,body{height:100%; overflow:hidden; background:#000; color:#fff;}
 
-/* พื้นที่วิดีโอ */
-.swiper{height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory;}
-.slide{height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center;}
+/* พื้นที่เลื่อนดูวิดีโอ */
+.video-swiper{height:100vh; overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;}
+.video-slide{height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center;}
+
+/* ตัวเล่นวิดีโอ */
 video{width:100%; height:100%; object-fit:cover; background:#000;}
-video::-webkit-media-controls{display:none;}
+video::-webkit-media-controls{display:none !important;}
 
-/* ข้อความรอ */
-.loading{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#888; text-align:center;}
-.empty{color:#555; text-align:center; padding:30px;}
+/* ข้อความแจ้ง */
+.status-msg{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#888; text-align:center; padding:20px;}
 
-/* ข้อมูลล่างซ้าย */
-.info{position:absolute; bottom:80px; left:15px; right:80px; z-index:10;}
-.info h3{font-size:15px; margin-bottom:4px;}
-.info p{font-size:13px; color:#ccc;}
+/* ข้อมูลด้านล่างซ้าย */
+.video-info{position:absolute; bottom:80px; left:16px; right:85px; z-index:10;}
+.video-info h3{font-size:15px; font-weight:600; margin-bottom:4px;}
+.video-info p{font-size:13px; color:#ddd;}
 
 /* ปุ่มด้านขวา */
-.side{position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center;}
+.side-buttons{position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center; z-index:10;}
 .side-btn{display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;}
 .side-icon{width:44px; height:44px; border-radius:50%; background:#222; display:flex; align-items:center; justify-content:center; font-size:20px;}
-.side-text{font-size:10px; color:#fff;}
+.side-label{font-size:10px; color:#fff;}
 
-/* แถบล่าง */
-.nav{position:fixed; bottom:0; left:0; right:0; height:60px; background:#000; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #222; z-index:20;}
-.nav-btn{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff; cursor:pointer;}
-.nav-icon{font-size:20px;}
-.nav-add{background:#ff4757; padding:4px 16px; border-radius:6px;}
+/* แถบเมนูล่าง */
+.nav-bar{position:fixed; bottom:0; left:0; right:0; height:60px; background:#000; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #222; z-index:20;}
+.nav-item{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:#fff; cursor:pointer;}
+.nav-icon{font-size:22px;}
+.nav-upload{background:#ff4757; padding:4px 16px; border-radius:6px; font-weight:600;}
 </style>
 </head>
 <body>
 
-<div class="swiper" id="swiper">
-  <div class="loading" id="msg">กำลังโหลด...</div>
+<div class="video-swiper" id="swiper">
+  <div class="status-msg" id="status">กำลังเข้าไปหาวิดีโอ...</div>
 </div>
 
-<nav class="nav">
-  <div class="nav-btn"><span class="nav-icon">🏠</span><span>หน้าแรก</span></div>
-  <div class="nav-btn"><span class="nav-icon">🔥</span><span>ฮิต</span></div>
-  <div class="nav-btn nav-add"><span class="nav-icon">+</span><span>อัปโหลด</span></div>
-  <div class="nav-btn"><span class="nav-icon">💬</span><span>ข้อความ</span></div>
-  <div class="nav-btn"><span class="nav-icon">👤</span><span>ฉัน</span></div>
+<nav class="nav-bar">
+  <div class="nav-item"><span class="nav-icon">🏠</span><span>หน้าแรก</span></div>
+  <div class="nav-item"><span class="nav-icon">🔥</span><span>ฮิต</span></div>
+  <div class="nav-item nav-upload"><span class="nav-icon">+</span><span>อัปโหลด</span></div>
+  <div class="nav-item"><span class="nav-icon">💬</span><span>ข้อความ</span></div>
+  <div class="nav-item"><span class="nav-icon">👤</span><span>โปรไฟล์</span></div>
 </nav>
 
 <script>
-const OWNER = 'thaipodee';
-const REPO = 'thaipodee-global-market';
-const FOLDER = 'videos';
-const BRANCH = 'main';
+// === ที่อยู่ "ห้อง" ที่สร้างไว้แล้ว — ไม่ต้องเปลี่ยนอะไรตรงนี้ ===
+const GITHUB_OWNER = 'thaipodee';
+const GITHUB_REPO = 'thaipodee-global-market';
+const VIDEO_FOLDER = 'videos'; // นี่คือห้องที่เก็บวิดีโอ
+const GITHUB_BRANCH = 'main';
 
 const swiper = document.getElementById('swiper');
-const msg = document.getElementById('msg');
+const status = document.getElementById('status');
 
-async function init() {
+// === ระบบวิ่งเข้าห้องเอง อัตโนมัติ ===
+async function goFindVideos() {
   try {
-    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}?ref=${BRANCH}`);
-    if (!res.ok) throw new Error('เชื่อมต่อไม่ได้');
+    // วิ่งไปหาในห้องที่สร้างไว้
+    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${VIDEO_FOLDER}?ref=${GITHUB_BRANCH}`;
+    const res = await fetch(apiUrl);
+    
+    if (!res.ok) throw new Error('ห้องว่างหรือไม่มีห้อง');
     
     const files = await res.json();
-    const videos = files.filter(f => /\.(mp4|webm|mov)$/i.test(f.name));
     
-    if (!videos.length) {
-      msg.outerHTML = '<div class="empty">ยังไม่มีวิดีโอ<br>อัปโหลดไฟล์ .mp4 เข้าโฟลเดอร์ videos</div>';
+    // เลือกเอาเฉพาะไฟล์วิดีโอที่อยู่ในห้อง
+    const videoFiles = files.filter(file => {
+      const ext = file.name.toLowerCase().split('.').pop();
+      return ['mp4', 'webm', 'mov', 'ogg'].includes(ext);
+    });
+
+    if (!videoFiles.length) {
+      status.innerHTML = 'ยังไม่มีวิดีโอในห้อง<br>รอเจ้าของใส่ของเข้ามา';
       return;
     }
-    
-    msg.remove();
-    
-    videos.forEach(v => {
+
+    // เจอแล้ว — ลบข้อความแจ้ง เตรียมแสดง
+    status.remove();
+
+    // เอาทุกอย่างที่เจอในห้อง มาสร้างหน้าแสดงเอง
+    videoFiles.forEach(file => {
       const slide = document.createElement('div');
-      slide.className = 'slide';
+      slide.className = 'video-slide';
       slide.innerHTML = `
-        <video src="${v.download_url}" loop muted playsinline></video>
-        <div class="info">
-          <h3>${v.name.replace(/\.[^.]+$/, '')}</h3>
+        <video src="${file.download_url}" loop muted playsinline preload="auto"></video>
+        <div class="video-info">
+          <h3>${file.name.replace(/\.[^.]+$/, '')}</h3>
           <p>@thaipodee</p>
         </div>
-        <div class="side">
-          <div class="side-btn"><div class="side-icon">❤️</div><div class="side-text">0</div></div>
-          <div class="side-btn"><div class="side-icon">💬</div><div class="side-text">0</div></div>
-          <div class="side-btn"><div class="side-icon">⭐</div><div class="side-text">บันทึก</div></div>
-          <div class="side-btn"><div class="side-icon">↗️</div><div class="side-text">แชร์</div></div>
-          <div class="side-btn"><div class="side-icon">🎵</div><div class="side-text">เสียง</div></div>
+        <div class="side-buttons">
+          <div class="side-btn"><div class="side-icon">❤️</div><div class="side-label">0</div></div>
+          <div class="side-btn"><div class="side-icon">💬</div><div class="side-label">0</div></div>
+          <div class="side-btn"><div class="side-icon">⭐</div><div class="side-label">บันทึก</div></div>
+          <div class="side-btn"><div class="side-icon">↗️</div><div class="side-label">แชร์</div></div>
+          <div class="side-btn"><div class="side-icon">🎵</div><div class="side-label">เสียง</div></div>
         </div>
       `;
       swiper.appendChild(slide);
     });
 
-    // เล่นอัตโนมัติตอนเข้ามา
+    // เล่นเองเมื่ออยู่ในจอ
     const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        const video = e.target.querySelector('video');
-        if (e.isIntersecting) video?.play();
-        else video?.pause();
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (entry.isIntersecting) {
+          video?.play().catch(() => {});
+        } else {
+          video?.pause();
+        }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.6 });
 
-    document.querySelectorAll('.slide').forEach(s => observer.observe(s));
+    document.querySelectorAll('.video-slide').forEach(slide => {
+      observer.observe(slide);
+    });
 
   } catch (err) {
-    msg.textContent = 'ผิดพลาด: ' + err.message;
+    status.textContent = 'ผิดพลาด: ' + err.message;
   }
 }
 
-init();
+// เปิดปุ๊บ — วิ่งไปหาเลย ทันที
+goFindVideos();
 </script>
 </body>
 </html>
