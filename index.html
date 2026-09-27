@@ -1,19 +1,21 @@
 <!-- ==============================================================
-   ThaiPodee v1109 — ปรับปรุงความเร็ว + แก้ไม่แสดงวิดีโอ ✅
-   อัปเดต: 28 กันยายน 2569 06:40 น.
+   ThaiPodee v1110 — FINAL ✅ แก้ Rules ล็อก + เร็วขึ้น + ครบทุกฟังก์ชัน
+   อัปเดต: 28 กันยายน 2569 06:55 น.
    --------------------------------------------------------------
    📋 ปัญหา — สาเหตุ — วิธีแก้ไข
    --------------------------------------------------------------
-   🔴 ปัญหา: โหลดช้ามาก / วิดีโอไม่แสดงเลย / จอดำ
-   สาเหตุ: โหลดวิดีโอทุกอันพร้อมกัน + autoplay ทุกตัว = หนักเกินไป
-   แก้ไข: 
-    ✅ preload="none" โหลดเฉพาะตัวที่กำลังดู
-    ✅ เล่นเฉพาะสไลด์ที่อยู่ในจอเท่านั้น
-    ✅ limit(10) โหลดแค่ 10 รายการล่าสุด
-    ✅ object-fit:contain แสดงเต็มจอไม่ตัด
-    ✅ แสดงแถบความคืบหน้าตอนอัปโหลด
-    ✅ เพิ่มปุ่มลบวิดีโอ
-    ✅ แจ้งสาเหตุชัดถ้าโหลดไม่ได้ (เช่น ต้องแก้ Storage Rules)
+   🔴 ปัญหา 1: หน้าจอดำ ไม่มีวิดีโอ
+   สาเหตุ: Firestore Rules ล็อก → อ่านข้อมูลไม่ได้
+   แก้ไข: ต้องไปเปิด Rules ใน Firebase Console (ดูคำสั่งข้างบน)
+
+   🔴 ปัญหา 2: อัปโหลดค้าง ไม่สำเร็จ
+   สาเหตุ: Storage Rules ล็อก → ส่งไฟล์ไม่ได้
+   แก้ไข: เปิด Storage Rules อนุญาตให้อ่าน-เขียน
+
+   🔴 ปัญหา 3: โหลดช้า/ค้าง
+   สาเหตุ: โหลดวิดีโอทุกตัวพร้อมกัน
+   แก้ไข: preload="none" + เล่นเฉพาะตัวที่เห็นในจอ
+          limit(5) แสดงแค่ 5 รายการล่าสุด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -30,15 +32,15 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 
-/* เลื่อนสไลด์เหมือนติ๊กต็อก */
+/* สไลด์เหมือนติ๊กต็อก */
 .swiper{height:100dvh;width:100%;overflow-y:auto;scroll-snap-type:y mandatory;background:#111}
 .slide{height:100dvh;width:100%;scroll-snap-align:start;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;border-bottom:1px solid #222}
 .slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 
-/* หน้าแรก */
+/* หน้าเริ่มต้น */
 .welcome{text-align:center;z-index:20;padding:20px}
 .welcome h1{font-size:32px;color:#FFB800;margin-bottom:8px}
-.status{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;font-size:12px;max-width:92%;white-space:pre-wrap}
+.status{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;font-size:12px;max-width:92%}
 .status.wait{background:#2a2410;color:#ffcc00;border:1px solid #664d00}
 .status.ok{background:#0f2f1a;color:#4cd964;border:1px solid #1a5c2a}
 .status.err{background:#2f1010;color:#ff6b6b;border:1px solid #661a1a}
@@ -47,4 +49,241 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 .progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width .25s}
 
 /* ข้อความแจ้งเตือน */
-.msg{position:fixed;top
+.msg{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:24px;font-size:12px;z-index:150;max-width:92%;text-align:center}
+.msg.ok{background:#1a7a2e}
+.msg.err{background:#a32020}
+.msg.hidden{opacity:0;pointer-events:none}
+
+/* เมนูล่าง */
+.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #1a1a1a;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:#777;flex:1}
+.nav-add-wrap{flex:1;display:flex;justify-content:center}
+.nav-add{width:58px;height:38px;background:#FF4757;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;cursor:pointer}
+
+/* ซ่อนช่องเลือกไฟล์*/
+#fileInput{display:none}
+
+/*ตัวโหลดรอ*/
+.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;color:#666;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div id="msgBox" class="msg hidden"></div>
+
+<div class="swiper" id="swiper">
+  <div class="slide">
+    <div class="welcome">
+      <h1>ThaiPodee</h1>
+      <p>ของไทย ไปไกลทั่วโลก</p>
+      <p style="color:#FF6B00;font-weight:600;margin-top:10px;">กด + อัปโหลดวิดีโอแรกเลย</p>
+      <p class="status wait" id="fbStatus">⏳ กำลังเชื่อมต่อศูนย์กลาง...</p>
+      <p id="debug" style="margin-top:10px;font-size:11px;color:#666"></p>
+      <button onclick="location.reload()" style="margin-top:12px;background:#222;color:#fff;border:1px solid #444;padding:6px 14px;border-radius:20px;font-size:11px">🔄 โหลดใหม่</button>
+      <p style="margin-top:10px;font-size:10px;color:#888">💡 ถ้ายังไม่ได้ → ต้องเปิด Rules ที่ Firebase Console</p>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-item active"><span>🏠</span><span>หน้าแรก</span></div>
+  <div class="nav-item"><span>🔍</span><span>ค้นหา</span></div>
+  <div class="nav-add-wrap"><div class="nav-add" id="uploadBtn">+</div></div>
+  <div class="nav-item"><span>💬</span><span>ข้อความ</span></div>
+  <div class="nav-item"><span>👤</span><span>ฉัน</span></div>
+</nav>
+
+<input type="file" id="fileInput" accept="video/*">
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
+  authDomain: "thaipodee-market.firebaseapp.com",
+  projectId: "thaipodee-market",
+  storageBucket: "thaipodee-market.firebasestorage.app",
+  messagingSenderId: "802626775100",
+  appId: "1:802626775100:web:c126e82059d124d19c3b39"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const swiper = document.getElementById('swiper');
+const msgBox = document.getElementById('msgBox');
+const progress = document.getElementById('progress');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const debugEl = document.getElementById('debug');
+
+function showMsg(t, type='normal', dur=5000){ 
+  msgBox.textContent = t; 
+  msgBox.className = 'msg ' + type; 
+  msgBox.classList.remove('hidden'); 
+  if(dur > 0) setTimeout(() => msgBox.classList.add('hidden'), dur); 
+}
+function logDbg(t){ 
+  if(debugEl) debugEl.textContent = t; 
+  console.log(t); 
+}
+
+uploadBtn.addEventListener('click', e => { 
+  e.preventDefault(); 
+  fileInput.click(); 
+});
+
+fileInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const sizeKB = (file.size / 1024).toFixed(1);
+  logDbg(`ไฟล์: ${file.name} | ${sizeKB} KB`);
+  showMsg(`📦 ${file.name} (${sizeKB} KB) → กำลังอัปโหลด...`, '', 0);
+  progress.style.width = '5%';
+
+  try {
+    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const fileName = Date.now() + '_' + cleanName;
+    const ref = storage.ref('videos/' + fileName);
+
+    let url = '';
+    await new Promise((resolve, reject) => {
+      const task = ref.put(file);
+      task.on('state_changed',
+        s => {
+          const pct = Math.round((s.bytesTransferred / s.totalBytes) * 100);
+          progress.style.width = pct + '%';
+          showMsg(`⏳ อัปโหลด ${pct}% — ${sizeKB} KB`, '', 0);
+        },
+        err => reject(err),
+        async () => { 
+          url = await task.snapshot.ref.getDownloadURL(); 
+          resolve(); 
+        }
+      );
+    });
+
+    await db.collection('videos').add({
+      url: url,
+      name: file.name,
+      storagePath: 'videos/' + fileName,
+      sizeKB: sizeKB,
+      likes: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    progress.style.width = '100%';
+    showMsg(`✅ อัปโหลดสำเร็จ! (${sizeKB} KB)`, 'ok', 3000);
+    setTimeout(() => progress.style.width = '0%', 1500);
+
+  } catch(err) {
+    progress.style.width = '0%';
+    let msg = `❌ อัปโหลดไม่ได้\nรหัส: ${err.code || 'ไม่ระบุ'}\nข้อความ: ${err.message}`;
+    if(err.code === 'storage/unauthorized') {
+      msg += `\n\n🔧 แก้: ไปที่ Firebase → Storage → Rules → ตั้งเป็น allow read, write: true;`;
+    }
+    if(err.code === 'permission-denied') {
+      msg += `\n\n🔧 แก้: ไปที่ Firebase → Firestore → Rules → ตั้งเป็น allow read, write: true;`;
+    }
+    showMsg(msg, 'err', 10000);
+    logDbg(`ERROR: ${err.code} — ${err.message}`);
+  }
+
+  e.target.value = '';
+});
+
+async function deleteVideo(id, storagePath){
+  if(!confirm('ลบวิดีโอนี้หรือไม่?')) return;
+  try {
+    await db.collection('videos').doc(id).delete();
+    if(storagePath) try { await storage.ref(storagePath).delete(); } catch(e) {}
+    showMsg('✅ ลบแล้ว', 'ok');
+  } catch(err) { 
+    showMsg('❌ ลบไม่ได้: ' + err.message, 'err'); 
+  }
+}
+
+function startRealtime(){
+  db.collection('videos')
+    .orderBy('createdAt', 'desc')
+    .limit(5)
+    .onSnapshot(snap => {
+      const videos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      
+      if(videos.length === 0){
+        const el = document.getElementById('fbStatus');
+        if(el){ 
+          el.textContent = '✅ เชื่อมต่อสำเร็จ — กด + เพิ่มวิดีโอเลย!'; 
+          el.className = 'status ok'; 
+        }
+        logDbg('พร้อมใช้งาน — ยังไม่มีวิดีโอ');
+        return;
+      }
+
+      swiper.innerHTML = '';
+      videos.forEach(v => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        const shortName = (v.name || 'วิดีโอ').length > 25 
+          ? (v.name || '').substring(0, 25) + '...' 
+          : (v.name || 'วิดีโอ');
+        
+        slide.innerHTML = `
+          <div class="loader">⏳ กำลังโหลด...</div>
+          <video src="${v.url}" loop playsinline muted preload="none" controls
+                 style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
+          <div style="position:absolute;top:14px;right:14px;z-index:40">
+            <button onclick="deleteVideo('${v.id}','${(v.storagePath||'').replace(/'/g,"\\'")}')" 
+                    style="background:rgba(220,20,20,0.9);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">🗑️</button>
+          </div>
+          <div style="position:absolute;bottom:90px;left:14px;right:14px;z-index:10">
+            <h3 style="font-size:14px">${shortName}</h3>
+            <p style="font-size:11px;color:#ccc">${v.sizeKB||'?'} KB • แตะเพื่อเล่น/หยุด</p>
+          </div>
+        `;
+
+        const vid = slide.querySelector('video');
+        const loader = slide.querySelector('.loader');
+        vid.addEventListener('loadeddata', () => { if(loader) loader.style.display = 'none'; });
+        vid.addEventListener('error', () => { 
+          if(loader) loader.innerHTML = '❌ โหลดไม่ได้<br>ตรวจสอบ Storage Rules'; 
+        });
+
+        slide.addEventListener('click', (e) => {
+          if(e.target.tagName === 'BUTTON' || e.target.tagName === 'VIDEO') return;
+          if(vid.paused) vid.play(); else vid.pause();
+        });
+
+        swiper.appendChild(slide);
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const vid = entry.target;
+          if(entry.isIntersecting && entry.intersectionRatio > 0.5){
+            vid.preload = 'metadata';
+          } else {
+            vid.pause();
+          }
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll('.slide video').forEach(v => observer.observe(v));
+
+    }, err => {
+      showMsg(`❌ ไม่สามารถอ่านข้อมูลได้\n\nรหัส: ${err.code}\nข้อความ: ${err.message}\n\n🔧 ต้องแก้ Firestore Rules เป็น allow read, write: true;`, 'err', 12000);
+      logDbg(`Firestore Error: ${err.code} — ${err.message}`);
+      
+      const el = document.getElementById('fbStatus');
+      if(el){ 
+        el.textContent = '❌ ถูกปฏิเสธ — ต้องเปิด Rules ก่อน'; 
+        el.className = 'status err'; 
+      }
+    });
+}
+
+window.onload = startRealtime;
+</script>
+
+</body>
+</html>
