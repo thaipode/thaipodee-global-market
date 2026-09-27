@@ -1,86 +1,95 @@
 <!-- ==============================================================
-   ThaiPodee v1066 — รับไฟล์ชัด ไม่หาย ✅
-   27 กันยายน 2569 23:42 น.
+   ThaiPodee v1102 FINAL FULL - แก้ไฟล์หาย + พอดีจอ + เห็นกันทุกเครื่อง
+   28 กันยายน 2569 08:00 น. - Full Code พร้อมวาง GitHub
+
+   ✅ กด + → เปิดไฟล์ได้
+   ✅ เลือกไฟล์ → มีคำสั่งรับค่า (ไม่หายแล้ว)
+   ✅ เก็บกลาง Firebase Storage + Firestore
+   ✅ ทุกเครื่องเห็นกันแบบ TikTok (onSnapshot Realtime)
+   ✅ วิดีโอพอดีจอ ไม่ล้น (100dvh + object-fit:cover)
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ThaiPodee</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body,html{background:#000;color:#fff;height:100%;overflow:hidden;font-family:sans-serif}
-
-.top-info{position:absolute;top:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:10}
-.top-info h1{font-size:22px}
-.top-info p{font-size:13px;color:#aaa;margin-top:4px}
-
-.video-wrap{width:100%;height:calc(100% - 80px);display:flex;align-items:center;justify-content:center}
-video{width:100%;height:100%;object-fit:contain;background:#111;display:none}
-.placeholder{font-size:48px;color:#444}
-
-.right-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:20}
-.icon{display:flex;flex-direction:column;align-items:center;gap:2px}
-.icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px}
-.icon span{font-size:10px;color:#ccc}
-
-.bottom-bar{position:absolute;bottom:0;left:0;right:0;height:75px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:99999}
-.bar-item{display:flex;flex-direction:column;align-items:center;gap:2px}
-.bar-item span{font-size:10px;color:#999}
-.bar-item.active span{color:#fff}
-
-.upload-circle{position:relative;top:-15px}
-#uploadBtn{width:65px;height:65px;background:#ff3333;border-radius:50%;border:none;color:#fff;font-size:32px;cursor:pointer;box-shadow:0 0 12px rgba(255,51,51,0.7);z-index:999999}
-
-#fileInput{display:none}
-
-.msg{position:absolute;top:110px;left:50%;transform:translateX(-50%);background:#ffc107;color:#000;padding:12px 24px;border-radius:25px;font-size:14px;z-index:10000;text-align:center;max-width:90%}
-.msg.ok{background:#4CAF50;color:#fff}
-.msg.err{background:#f44336;color:#fff}
-.hidden{display:none}
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>ThaiPodee — ของไทย ไปไกลทั่วโลก</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+html,body{height:100%;background:#000;color:#fff;overflow:hidden}
+.swiper{height:100dvh;width:100%;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;background:#000}
+.slide{height:100dvh;width:100%;scroll-snap-align:start;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
+.slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.top-info{position:absolute;top:50px;left:50%;transform:translateX(-50%);text-align:center;z-index:30;pointer-events:none}
+.top-info h1{font-size:24px;color:#FFB800;font-weight:800;letter-spacing:1px;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+.top-info p{font-size:13px;color:#aaa;margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,0.8)}
+.welcome{text-align:center;z-index:20;padding:20px}
+.welcome h1{font-size:32px;color:#FFB800;margin-bottom:8px}
+.welcome p{font-size:14px;color:#888;margin:6px 0}
+.status{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;font-size:12px}
+.status.wait{background:#2a2410;color:#ffcc00;border:1px solid #664d00}
+.status.ok{background:#0f2f1a;color:#4cd964;border:1px solid #1a5c2a}
+.status.err{background:#2f1010;color:#ff6b6b;border:1px solid #661a1a}
+.info{position:absolute;bottom:90px;left:14px;right:85px;z-index:25;pointer-events:none}
+.info h3{font-size:15px;font-weight:600;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info p{font-size:12px;color:#ccc;text-shadow:0 1px 4px rgba(0,0,0,0.9)}
+.side{position:absolute;right:10px;bottom:110px;display:flex;flex-direction:column;gap:18px;align-items:center;z-index:30}
+.side-btn{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.side-icon{width:48px;height:48px;border-radius:50%;background:rgba(40,40,40,0.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(255,255,255,0.1);transition:transform.15s,background.15s}
+.side-btn:active.side-icon{transform:scale(0.88);background:rgba(60,60,60,0.9)}
+.side-txt{font-size:10px;color:#ddd;text-shadow:0 1px 3px rgba(0,0,0,0.8)}
+.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #1a1a1a;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:#777;cursor:pointer;flex:1;padding:6px 0;user-select:none;-webkit-tap-highlight-color:transparent}
+.nav-item.active{color:#fff}
+.nav-icon{font-size:22px}
+.nav-add-wrap{flex:1;display:flex;justify-content:center;align-items:center}
+.nav-add{width:58px;height:38px;background:#FF4757;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;box-shadow:0 0 12px rgba(255,71,87,0.5);cursor:pointer;transition:transform.15s}
+.nav-add:active{transform:scale(0.9)}
+.progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width.25s}
+.msg{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:24px;font-size:13px;z-index:150;max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.5);transition:opacity.3s,transform.3s}
+.msg.ok{background:#1a7a2e;color:#fff}
+.msg.err{background:#a32020;color:#fff}
+.msg.hidden{opacity:0;transform:translateX(-50%) translateY(-10px);pointer-events:none}
+#fileInput{display:none}
+.play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none}
+.play-icon{width:70px;height:70px;background:rgba(0,0,0,0.45);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0;transition:opacity.2s}
+.play-icon.show{opacity:1}
+</style>
 </head>
 <body>
-
-<div class="top-info">
-  <h1>ThaiPodee</h1>
-  <p>ของไทย ไปไกลทั่วโลก</p>
-</div>
-
-<div class="video-wrap">
-  <video id="vid" controls autoplay loop playsinline>
-    <source src="" type="video/mp4">
-  </video>
-  <div class="placeholder" id="vidPlaceholder">📷</div>
-</div>
-
-<div class="right-icons">
-  <div class="icon"><div class="icon-btn">👤</div><span>โปรไฟล์</span></div>
-  <div class="icon" id="like"><div class="icon-btn">❤️</div><span id="likeNum">0</span></div>
-  <div class="icon"><div class="icon-btn">💬</div><span>คอมเมนต์</span></div>
-  <div class="icon"><div class="icon-btn">⭐</div><span>บันทึก</span></div>
-  <div class="icon"><div class="icon-btn">↗️</div><span>แชร์</span></div>
-  <div class="icon"><div class="icon-btn">🎵</div><span>เพลง</span></div>
-</div>
-
-<div class="bottom-bar">
-  <div class="bar-item active"><span>🏠</span><span>หน้าแรก</span></div>
-  <div class="bar-item"><span>🔍</span><span>ค้นหา</span></div>
-  <div class="upload-circle">
-    <button id="uploadBtn">+</button>
-  </div>
-  <div class="bar-item"><span>💬</span><span>ข้อความ</span></div>
-  <div class="bar-item"><span>👤</span><span>ฉัน</span></div>
-</div>
-
-<input type="file" id="fileInput" accept="video/*">
+<div class="progress" id="progress"></div>
 <div id="msgBox" class="msg hidden"></div>
-
+<div class="swiper" id="swiper">
+  <div class="slide">
+    <div class="welcome">
+      <h1>ThaiPodee</h1>
+      <p>ของไทย ไปไกลทั่วโลก</p>
+      <p style="color:#FF6B00;font-weight:600;margin-top:10px;">กด + อัปโหลดวิดีโอแรกเลย</p>
+      <p class="status wait" id="fbStatus">⏳ กำลังเชื่อมต่อศูนย์กลาง...</p>
+    </div>
+    <div class="side">
+      <div class="side-btn"><div class="side-icon">👤</div><div class="side-txt">โปรไฟล์</div></div>
+      <div class="side-btn"><div class="side-icon">❤️</div><div class="side-txt">0</div></div>
+      <div class="side-btn"><div class="side-icon">💬</div><div class="side-txt">0</div></div>
+      <div class="side-btn"><div class="side-icon">⭐</div><div class="side-txt">บันทึก</div></div>
+      <div class="side-btn"><div class="side-icon">↗️</div><div class="side-txt">แชร์</div></div>
+      <div class="side-btn"><div class="side-icon">🎵</div><div class="side-txt">เสียง</div></div>
+    </div>
+  </div>
+</div>
+<nav class="nav">
+  <div class="nav-item active" onclick="document.getElementById('swiper').scrollTo({top:0,behavior:'smooth'})"><span class="nav-icon">🏠</span><span>หน้าแรก</span></div>
+  <div class="nav-item" onclick="showMsg('🛒 ตะกร้าเร็วๆนี้')"><span class="nav-icon">🧺</span><span>ตะกร้า</span></div>
+  <div class="nav-add-wrap"><div class="nav-add" id="uploadBtn">+</div></div>
+  <div class="nav-item" onclick="showMsg('💬 ข้อความเร็วๆนี้')"><span class="nav-icon">💬</span><span>ข้อความ</span></div>
+  <div class="nav-item" onclick="showMsg('👤 โปรไฟล์: ผู้ใช้ ThaiPodee')"><span class="nav-icon">👤</span><span>ฉัน</span></div>
+</nav>
+<input type="file" id="fileInput" accept="video/*">
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
@@ -90,107 +99,170 @@ const firebaseConfig = {
   messagingSenderId: "802626775100",
   appId: "1:802626775100:web:c126e82059d124d19c3b39"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
-
 let videos = [];
-
-function showMsg(text, type='normal', dur=5000) {
-  const el = document.getElementById('msgBox');
-  el.textContent = text;
-  el.className = 'msg';
-  if(type==='ok') el.classList.add('ok');
-  if(type==='err') el.classList.add('err');
-  el.classList.remove('hidden');
-  if(dur>0) setTimeout(()=>el.classList.add('hidden'), dur);
+const swiper = document.getElementById('swiper');
+const msgBox = document.getElementById('msgBox');
+const progress = document.getElementById('progress');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const fbStatus = document.getElementById('fbStatus');
+function showMsg(text, type='normal', dur=4000){
+  msgBox.textContent = text;
+  msgBox.className = 'msg';
+  if(type==='ok') msgBox.classList.add('ok');
+  if(type==='err') msgBox.classList.add('err');
+  msgBox.classList.remove('hidden');
+  if(dur>0) setTimeout(()=>msgBox.classList.add('hidden'), dur);
 }
-
-// เปิดหน้าเลือกไฟล์
-document.getElementById('uploadBtn').addEventListener('click', function(e){
+function updateStatus(text, type){
+  if(fbStatus){
+    fbStatus.textContent = text;
+    fbStatus.className = 'status ' + type;
+  }
+}
+uploadBtn.addEventListener('click', (e)=>{
   e.preventDefault();
-  showMsg('กดเลือกไฟล์วิดีโอ...');
-  setTimeout(()=>document.getElementById('fileInput').click(), 100);
+  showMsg('📁 เปิดเลือกไฟล์วิดีโอ...', 'normal', 2000);
+  setTimeout(()=> fileInput.click(), 100);
 });
-
-// รับไฟล์ที่เลือก — ตรงนี้สำคัญที่สุด
-document.getElementById('fileInput').addEventListener('change', async function(e){
+fileInput.addEventListener('change', async (e)=>{
   const file = e.target.files[0];
-  
   if(!file){
     showMsg('ไม่ได้เลือกไฟล์', 'err');
     return;
   }
-
-  // แจ้งชื่อและขนาดไฟล์
-  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-  showMsg(`พบไฟล์: ${file.name} (${sizeMB} MB) → กำลังอัปโหลด...`, 'normal', 0);
-
-  try {
-    const fileName = Date.now() + '_' + file.name;
-    const ref = storage.ref('videos/' + fileName);
-    
-    // อัปโหลด
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
-    
-    // บันทึกลงฐานข้อมูล
-    await db.collection('videos').add({
-      url: url,
-      name: file.name,
-      likes: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    showMsg('✅ อัปโหลดสำเร็จ!', 'ok');
-    
-    // โหลดวิดีโอขึ้นมาแสดงทันที
-    await loadVideos();
-    
-  } catch (err) {
-    console.error('Error:', err);
-    showMsg('ผิดพลาด: ' + err.message, 'err');
+  const sizeMB = (file.size/1024/1024).toFixed(2);
+  if(file.size > 100*1024*1024){
+    showMsg(`❌ ไฟล์ใหญ่เกิน 100MB (${sizeMB} MB)`, 'err');
+    e.target.value = '';
+    return;
   }
-
-  // รีเซ็ตให้เลือกไฟล์เดิมซ้ำได้
+  showMsg(`📦 พบไฟล์: ${file.name} (${sizeMB} MB) → กำลังอัปโหลด...`, 'normal', 0);
+  progress.style.width = '5%';
+  try{
+    const fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const ref = storage.ref('videos/' + fileName);
+    const uploadTask = ref.put(file);
+    uploadTask.on('state_changed',
+      (snapshot)=>{
+        const pct = Math.round((snapshot.bytesTransferred/snapshot.totalBytes)*100);
+        progress.style.width = pct + '%';
+        if(pct < 100) showMsg(`⏳ อัปโหลด ${pct}% - ${file.name}`, 'normal', 0);
+      },
+      (err)=>{
+        console.error(err);
+        progress.style.width = '0%';
+        showMsg('❌ อัปโหลดผิดพลาด: ' + err.message, 'err');
+      },
+      async ()=>{
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+        await db.collection('videos').add({
+          url: url,
+          name: file.name,
+          likes: 0,
+          comments: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          timestamp: Date.now()
+        });
+        progress.style.width = '100%';
+        showMsg('✅ อัปโหลดสำเร็จ! ทุกเครื่องเห็นแล้ว', 'ok');
+        setTimeout(()=>{ progress.style.width = '0%'; }, 1000);
+      }
+    );
+  }catch(err){
+    console.error(err);
+    progress.style.width = '0%';
+    showMsg('❌ ผิดพลาด: ' + err.message, 'err');
+  }
   e.target.value = '';
 });
-
-// โหลดวิดีโอมาแสดง
-async function loadVideos() {
-  try {
-    const snap = await db.collection('videos').orderBy('createdAt','desc').limit(1).get();
-    videos = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    
-    if(videos.length > 0) {
-      const vidEl = document.getElementById('vid');
-      vidEl.src = videos[0].url;
-      vidEl.style.display = 'block';
-      document.getElementById('vidPlaceholder').style.display = 'none';
-      document.getElementById('likeNum').textContent = videos[0].likes || 0;
-    } else {
-      showMsg('ยังไม่มีวิดีโอ — กด + เพิ่มเลย!', 'normal');
+function startRealtime(){
+  updateStatus('✅ เชื่อมต่อศูนย์กลางแล้ว', 'ok');
+  db.collection('videos').orderBy('createdAt','desc').onSnapshot((snapshot)=>{
+    videos = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+    if(videos.length===0){
+      swiper.innerHTML = `
+        <div class="slide">
+          <div class="welcome">
+            <h1>ThaiPodee</h1>
+            <p>ของไทย ไปไกลทั่วโลก</p>
+            <p style="color:#FF6B00;font-weight:600;margin-top:10px;">ยังไม่มีวิดีโอ - กด + อัปโหลดเลย</p>
+            <p class="status ok" id="fbStatus">✅ เชื่อมต่อแล้ว - พร้อมใช้งาน</p>
+          </div>
+          <div class="side">
+            <div class="side-btn"><div class="side-icon">👤</div><div class="side-txt">โปรไฟล์</div></div>
+            <div class="side-btn"><div class="side-icon">❤️</div><div class="side-txt">0</div></div>
+            <div class="side-btn"><div class="side-icon">💬</div><div class="side-txt">0</div></div>
+            <div class="side-btn"><div class="side-icon">⭐</div><div class="side-txt">บันทึก</div></div>
+            <div class="side-btn"><div class="side-icon">↗️</div><div class="side-txt">แชร์</div></div>
+            <div class="side-btn"><div class="side-icon">🎵</div><div class="side-txt">เสียง</div></div>
+          </div>
+        </div>`;
+      return;
     }
-  } catch (e) {
-    showMsg('เชื่อมต่อสำเร็จ ✅ กด + เพิ่มวิดีโอ', 'ok');
-  }
+    renderAll();
+  }, (err)=>{
+    updateStatus('❌ อ่านไม่ได้: ' + err.message, 'err');
+    showMsg('❌ เชื่อมต่อไม่ได้: ' + err.message, 'err');
+  });
 }
-
-// กดถูกใจ
-document.getElementById('like').addEventListener('click', async ()=>{
-  if(!videos[0]) return;
-  try {
-    const docRef = db.collection('videos').doc(videos[0].id);
-    await docRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-    videos[0].likes = (videos[0].likes || 0) + 1;
-    document.getElementById('likeNum').textContent = videos[0].likes;
-  } catch(err) {
-    showMsg('ผิดพลาด: ' + err.message, 'err');
-  }
-});
-
-window.onload = loadVideos;
+function renderAll(){
+  swiper.innerHTML = '';
+  videos.forEach((v, idx)=>{
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.innerHTML = `
+      <video src="${v.url}" loop playsinline muted preload="metadata" data-id="${v.id}"></video>
+      <div class="play-overlay"><div class="play-icon">▶️</div></div>
+      <div class="top-info"><h1>ThaiPodee</h1><p>ของไทย ไปไกลทั่วโลก</p></div>
+      <div class="info"><h3>${escapeHtml(v.name||'วิดีโอ ThaiPodee')}</h3><p>@ThaiPodee • ${v.likes||0} ถูกใจ</p></div>
+      <div class="side">
+        <div class="side-btn" onclick="showMsg('👤 โปรไฟล์')"><div class="side-icon">👤</div><div class="side-txt">โปรไฟล์</div></div>
+        <div class="side-btn" onclick="likeVideo('${v.id}')"><div class="side-icon">❤️</div><div class="side-txt" id="like-${v.id}">${v.likes||0}</div></div>
+        <div class="side-btn" onclick="showMsg('💬 คอมเมนต์เร็วๆนี้')"><div class="side-icon">💬</div><div class="side-txt">${v.comments||0}</div></div>
+        <div class="side-btn" onclick="showMsg('⭐ บันทึกแล้ว')"><div class="side-icon">⭐</div><div class="side-txt">บันทึก</div></div>
+        <div class="side-btn" onclick="navigator.share?navigator.share({title:'ThaiPodee',url:'${v.url}'}):showMsg('🔗 คัดลอกลิงก์แล้ว')"><div class="side-icon">↗️</div><div class="side-txt">แชร์</div></div>
+        <div class="side-btn"><div class="side-icon">🎵</div><div class="side-txt">เสียง</div></div>
+      </div>
+    `;
+    const vid = slide.querySelector('video');
+    const overlay = slide.querySelector('.play-icon');
+    slide.addEventListener('click', (ev)=>{
+      if(ev.target.closest('.side-btn')) return;
+      if(vid.paused){ vid.play(); overlay.classList.remove('show'); } else { vid.pause(); overlay.classList.add('show'); }
+    });
+    swiper.appendChild(slide);
+  });
+  setupAutoPlay();
+}
+function setupAutoPlay(){
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const vid = entry.target;
+      if(entry.isIntersecting && entry.intersectionRatio > 0.6){
+        vid.play().catch(()=>{});
+      }else{
+        vid.pause();
+      }
+    });
+  }, {threshold:0.6});
+  document.querySelectorAll('.slide video').forEach(v=>observer.observe(v));
+}
+async function likeVideo(id){
+  try{
+    const ref = db.collection('videos').doc(id);
+    await ref.update({likes: firebase.firestore.FieldValue.increment(1)});
+    const el = document.getElementById('like-'+id);
+    if(el){ el.textContent = (parseInt(el.textContent||'0')+1); }
+  }catch(e){ showMsg('❌ ไลก์ไม่ได้: '+e.message,'err'); }
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+window.onload = ()=>{
+  try{ startRealtime(); }catch(e){ updateStatus('❌ เริ่มไม่ได้: '+e.message,'err'); }
+};
 </script>
 </body>
 </html>
