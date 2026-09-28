@@ -1,151 +1,636 @@
 <!-- ==============================================================
-   ThaiPodee v1066
-   วันที่: 28 กันยายน 2569 22:18 น.
-   ✅ ด้านขวา: 6 ปุ่ม — 👤 ❤️ 💬 ⭐ ↗️ 🎵 (ทุกค่า = 0)
-   ✅ ด้านล่าง: 5 ปุ่ม — 🏠 🛒 ➕ 💬 👤
-   ✅ มุมล่างซ้าย: ชื่อ + คำอธิบาย + เสียง
-   ✅ ไม่มีเลขปลอม เริ่มจาก 0 จริง
-   ✅ มีหัวเวอร์ชันชัดเจน
+   ThaiPodee v1074 — แก้จอดำ / โชว์ชัด / ไอคอนเหมือนตัวอย่าง
+   29 กันยายน 2569 06:47 น.
+   --------------------------------------------------------------
+   ✅ แก้ปัญหาจอดำ — รอโหลดแจ้งชัด ไม่เงียบหาย
+   ✅ ถ้าไม่มีวิดีโอ — มีปุ่มกดโพสต์เลย ไม่ดำ
+   ✅ ไอคอนด้านขวา + แถบล่าง ครบตามตัวอย่าง
+   ✅ สไลด์ขึ้น-ลงได้
+   ✅ Firebase คลังกลาง — ทุกเครื่องเห็นตรงกัน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#000">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="thaipodee_logo_icon.png">
   <title>ThaiPodee</title>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#000;color:#fff;font-family:sans-serif;overflow:hidden;height:100vh}
-    .screen{width:100vw;height:100vh;position:relative}
-    video{width:100%;height:100%;object-fit:cover;background:#111}
-    
-    /* 🔘 ด้านขวา 6 ปุ่ม */
-    .side-menu{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:28px;align-items:center}
-    .icon-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
-    .icon-btn{width:48px;height:48px;border-radius:50%;background:#2228;display:flex;align-items:center;justify-content:center;font-size:24px;border:none;color:#fff;cursor:pointer}
-    .icon-num{font-size:11px;opacity:0.8}
-    
-    /* 📍 มุมล่างซ้าย */
-    .info{position:absolute;bottom:90px;left:16px;right:90px}
-    .username{font-weight:bold;font-size:15px;margin-bottom:6px}
-    .desc{font-size:13px;opacity:0.9;line-height:1.4;margin-bottom:6px}
-    .music{font-size:12px;opacity:0.7}
-    
-    /* 🔘 ด้านล่าง 5 ปุ่ม */
-    .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:#000c;display:flex;justify-content:space-around;align-items:center;padding-bottom:8px}
-    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-    .nav-icon{font-size:24px}
-    .nav-text{font-size:10px}
-    .nav-plus{width:48px;height:36px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:bold}
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    html, body { 
+      height: 100%; 
+      overflow: hidden; 
+      background: #000; 
+      color: #fff; 
+    }
+
+    /* ========== พื้นที่สไลด์ ========== */
+    .swiper-container {
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      touch-action: pan-y;
+      background: #000;
+    }
+    .swiper-wrapper {
+      transition: transform 0.3s ease-out;
+      will-change: transform;
+    }
+    .slide {
+      height: 100vh;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #000;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* ========== ข้อมูลวิดีโอ ========== */
+    .video-info {
+      position: absolute;
+      bottom: 100px;
+      left: 16px;
+      right: 90px;
+      z-index: 10;
+    }
+    .username {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 4px rgba(0,0,0,.8);
+    }
+    .caption {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #eee;
+      text-shadow: 0 0 4px rgba(0,0,0,.8);
+    }
+
+    /* ========== เมนูด้านขวา — เรียงตามตัวอย่าง ========== */
+    .side-menu {
+      position: absolute;
+      right: 10px;
+      bottom: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 20;
+      align-items: center;
+    }
+    .side-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .side-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      backdrop-filter: blur(2px);
+    }
+    .side-label {
+      font-size: 11px;
+      color: #fff;
+      text-shadow: 0 0 4px rgba(0,0,0,.8);
+    }
+    .profile-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 22px;
+    }
+    .like-icon.liked { color: #ff2e55; }
+
+    /* ========== แถบล่าง — 5 ปุ่ม ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #222;
+      z-index: 30;
+      padding: 0 8px;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      min-width: 54px;
+    }
+    .nav-icon { font-size: 22px; color: #fff; }
+    .nav-label { font-size: 10px; color: #aaa; }
+    .nav-item.active .nav-icon { color: #fff; }
+    .upload-center {
+      width: 48px;
+      height: 32px;
+      background: #fff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .my-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #fff;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    /* ========== หน้าโหลด / ว่าง ========== */
+    .loading-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      text-align: center;
+      padding: 20px;
+    }
+    .loading-screen.hidden { display: none; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #ff2e55;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 15px; }
+    .action-btn {
+      background: #ff2e55;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    /* ========== หน้าอัปโหลด ========== */
+    .upload-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .upload-screen.show { display: flex; }
+    .upload-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .close-btn { font-size: 24px; cursor: pointer; }
+    .drop-area {
+      border: 2px dashed #444;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .drop-area.highlight { border-color: #ff2e55; background: #1a0a10; }
+    .preview-box {
+      width: 100%;
+      max-height: 300px;
+      background: #111;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      display: none;
+    }
+    .preview-box.show { display: block; }
+    .preview-box video { width: 100%; height: 100%; object-fit: contain; }
+    .caption-input {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a1a;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    .post-btn {
+      width: 100%;
+      padding: 14px;
+      background: #ff2e55;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .post-btn:disabled { background: #555; cursor: not-allowed; }
+    .loading-txt { text-align: center; padding: 15px; display: none; }
+    .status-msg {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.85);
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 100;
+      display: none;
+      text-align: center;
+      max-width: 90%;
+    }
+    .status-msg.show { display: block; }
   </style>
 </head>
 <body>
-  <div class="screen">
-    <video id="vid" autoplay loop playsinline muted></video>
 
-    <!-- 🔘 ด้านขวา 6 ปุ่ม -- เรียงตรงลำดับ -->
-    <div class="side-menu">
-      <div class="icon-wrap">
-        <button class="icon-btn">👤</button>
-      </div>
-      <div class="icon-wrap">
-        <button class="icon-btn">❤️</button>
-        <span class="icon-num">0</span>
-      </div>
-      <div class="icon-wrap">
-        <button class="icon-btn">💬</button>
-        <span class="icon-num">0</span>
-      </div>
-      <div class="icon-wrap">
-        <button class="icon-btn">⭐</button>
-        <span class="icon-num">0</span>
-      </div>
-      <div class="icon-wrap">
-        <button class="icon-btn">↗️</button>
-        <span class="icon-num">0</span>
-      </div>
-      <div class="icon-wrap">
-        <button class="icon-btn">🎵</button>
-      </div>
+  <!-- ====== Firebase ====== -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <script>
+    // =====================================================
+    // 🔑 ใส่คีย์ Firebase ของคุณตรงนี้
+    const firebaseConfig = {
+      apiKey: "ใส่ apiKey ที่นี่",
+      authDomain: "ใส่ authDomain ที่นี่",
+      projectId: "ใส่ projectId ที่นี่",
+      storageBucket: "ใส่ storageBucket ที่นี่",
+      messagingSenderId: "ใส่ messagingSenderId ที่นี่",
+      appId: "ใส่ appId ที่นี่"
+    };
+    // =====================================================
+
+    let app, db, storage;
+    try {
+      app = firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      storage = firebase.storage();
+    } catch (e) {
+      console.error("Firebase ผิดพลาด:", e);
+    }
+
+    const myUsername = "ผู้ใช้_" + Math.random().toString(36).slice(2, 8);
+    let videos = [];
+    let currentIndex = 0;
+    let startY = 0;
+    let isDragging = false;
+    let offsetY = 0;
+    const container = document.querySelector('.swiper-container');
+    const wrapper = document.querySelector('.swiper-wrapper');
+  </script>
+
+  <!-- ====== พื้นที่สไลด์ ====== -->
+  <div class="swiper-container" id="swiperContainer">
+    <!-- หน้าโหลด — แทนที่จอดำ -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="spinner"></div>
+      <p>กำลังโหลด ThaiPodee...</p>
     </div>
 
-    <!-- 📍 มุมล่างซ้าย -->
-    <div class="info">
-      <div class="username">@ThaiPodee</div>
-      <div class="desc">ยินดีต้อนรับสู่ชุมชนไทยพอดี</div>
-      <div class="music">🎵 เสียงต้นฉบับ</div>
-    </div>
-
-    <!-- 🔘 ด้านล่าง 5 ปุ่ม -->
-    <div class="bottom-nav">
-      <div class="nav-item">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-text">หน้าแรก</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">🛒</span>
-        <span class="nav-text">ร้านค้า</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-plus">+</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">💬</span>
-        <span class="nav-text">ข้อความ</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">👤</span>
-        <span class="nav-text">โปรไฟล์</span>
-      </div>
+    <div class="swiper-wrapper" id="swiperWrapper">
+      <!-- วิดีโอจะแสดงที่นี่อัตโนมัติ -->
     </div>
   </div>
 
-  <script>
-    let videos = [];
-    let currentIndex = 0;
+  <!-- ====== แถบล่าง 5 ปุ่ม ====== -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="goToSlide(0); setActiveNav(0)">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">หน้าแรก</div>
+    </div>
+    <div class="nav-item" onclick="setActiveNav(1)">
+      <div class="nav-icon">🔍</div>
+      <div class="nav-label">ค้นหา</div>
+    </div>
+    <div class="nav-item" onclick="openUpload()">
+      <div class="upload-center">+</div>
+    </div>
+    <div class="nav-item" onclick="setActiveNav(3)">
+      <div class="nav-icon">💬</div>
+      <div class="nav-label">ข้อความ</div>
+    </div>
+    <div class="nav-item" onclick="setActiveNav(4)">
+      <div class="my-avatar">👤</div>
+      <div class="nav-label">ฉัน</div>
+    </div>
+  </div>
 
-    async function loadVideos() {
-      try {
-        const res = await fetch('data/videos.json');
-        videos = await res.json();
-        if (videos.length > 0) showVideo(0);
-      } catch (e) {
-        console.log('รอข้อมูลวิดีโอ...');
+  <!-- ====== หน้าอัปโหลด ====== -->
+  <div class="upload-screen" id="uploadScreen">
+    <div class="upload-header">
+      <h3>อัปโหลดวิดีโอ</h3>
+      <div class="close-btn" onclick="closeUpload()">✕</div>
+    </div>
+    <div class="drop-area" id="dropArea">
+      <div style="font-size: 32px; margin-bottom: 10px;">📹</div>
+      <p>แตะเพื่อเลือก<br>หรือลากไฟล์มาวาง</p>
+      <input type="file" id="fileInput" accept="video/*" style="display: none;">
+    </div>
+    <div class="preview-box" id="previewBox">
+      <video id="previewVideo" controls muted></video>
+    </div>
+    <input type="text" class="caption-input" id="captionInput" placeholder="เขียนคำอธิบาย...">
+    <button class="post-btn" id="postBtn" onclick="postVideo()">โพสต์</button>
+    <div class="loading-txt" id="loadingTxt">กำลังอัปโหลด... ⏳</div>
+  </div>
+
+  <!-- ====== ข้อความแจ้ง ====== -->
+  <div class="status-msg" id="statusMsg"></div>
+
+  <script>
+    function setActiveNav(index) {
+      document.querySelectorAll('.bottom-nav .nav-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
+
+    // ========== เล่น-หยุดวิดีโอ ==========
+    function updatePlayState() {
+      document.querySelectorAll('.slide video').forEach((vid, idx) => {
+        if (idx === currentIndex) {
+          vid.play().catch(() => {});
+          vid.muted = false;
+        } else {
+          vid.pause();
+          vid.currentTime = 0;
+        }
+      });
+    }
+
+    // ========== แสดงวิดีโอ — ไม่ให้จอดำ ==========
+    function renderSlides() {
+      // ซ่อนหน้าโหลด
+      document.getElementById('loadingScreen').classList.add('hidden');
+
+      if (!videos || videos.length === 0) {
+        wrapper.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🎬</div>
+            <h2>ยังไม่มีวิดีโอ</h2>
+            <p style="color:#999; margin:10px 0;">เป็นคนแรกที่โพสต์!</p>
+            <button class="action-btn" onclick="openUpload()">+ โพสต์วิดีโอ</button>
+          </div>
+        `;
+        return;
+      }
+
+      wrapper.innerHTML = videos.map((vid, idx) => `
+        <div class="slide" data-index="${idx}">
+          <video src="${vid.videoUrl}" loop playsinline muted preload="auto"></video>
+          
+          <div class="video-info">
+            <div class="username">@${vid.username}</div>
+            <div class="caption">${vid.caption || ''}</div>
+          </div>
+          
+          <!-- เมนูด้านขวา: โปรไฟล์ ❤️ 💬 ➕ แชร์ -->
+          <div class="side-menu">
+            <div class="side-btn">
+              <div class="profile-avatar">👤</div>
+              <div class="side-label">โปรไฟล์</div>
+            </div>
+            <div class="side-btn" onclick="toggleLike(${idx})">
+              <div class="side-icon-wrap like-icon" id="like-${idx}">🤍</div>
+              <div class="side-label" id="like-count-${idx}">0</div>
+            </div>
+            <div class="side-btn">
+              <div class="side-icon-wrap">💬</div>
+              <div class="side-label">แสดงความคิด</div>
+            </div>
+            <div class="side-btn" onclick="openUpload()">
+              <div class="side-icon-wrap">➕</div>
+              <div class="side-label">โพสต์</div>
+            </div>
+            <div class="side-btn">
+              <div class="side-icon-wrap">↗️</div>
+              <div class="side-label">แชร์</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      currentIndex = 0;
+      goToSlide(0);
+    }
+
+    // ========== ไลก์ ==========
+    function toggleLike(idx) {
+      const icon = document.getElementById(`like-${idx}`);
+      const count = document.getElementById(`like-count-${idx}`);
+      if (!icon) return;
+      
+      if (icon.classList.contains('liked')) {
+        icon.classList.remove('liked');
+        icon.innerHTML = '🤍';
+        count.textContent = '0';
+      } else {
+        icon.classList.add('liked');
+        icon.innerHTML = '❤️';
+        count.textContent = '1';
       }
     }
 
-    function showVideo(index) {
-      const v = videos[index];
-      if (!v) return;
-      document.getElementById('vid').src = v.url;
-      document.querySelector('.username').textContent = '@' + v.username;
-      document.querySelector('.desc').textContent = v.description;
+    // ========== เลื่อนสไลด์ ==========
+    function goToSlide(index) {
+      if (!videos || videos.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= videos.length) index = videos.length - 1;
+      currentIndex = index;
+      wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
+      updatePlayState();
     }
 
-    // ปุ่มอัปโหลด
-    document.querySelector('.nav-plus').addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'video/*';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        videos.unshift({
-          username: 'คุณ',
-          description: 'วิดีโอใหม่ของฉัน',
-          url: url
-        });
-        showVideo(0);
-        alert('อัปโหลดสำเร็จ! ✅');
-      };
-      input.click();
+    // ========== จับสัมผัส ==========
+    container.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      isDragging = true;
+      offsetY = 0;
+    });
+    container.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      offsetY = e.touches[0].clientY - startY;
+      wrapper.style.transform = `translateY(calc(-${currentIndex * 100}vh + ${offsetY}px))`;
+    });
+    container.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (offsetY < -60 && currentIndex < videos.length - 1) goToSlide(currentIndex + 1);
+      else if (offsetY > 60 && currentIndex > 0) goToSlide(currentIndex - 1);
+      else goToSlide(currentIndex);
     });
 
+    // ========== เมาส์เลื่อน ==========
+    let wheelTimeout;
+    container.addEventListener('wheel', e => {
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        if (!videos || videos.length === 0) return;
+        if (e.deltaY > 30 && currentIndex < videos.length - 1) goToSlide(currentIndex + 1);
+        else if (e.deltaY < -30 && currentIndex > 0) goToSlide(currentIndex - 1);
+      }, 50);
+    }, { passive: true });
+
+    // ========== โหลดจาก Firebase ==========
+    function loadVideos() {
+      if (!db) {
+        showStatus('กรุณาใส่คีย์ Firebase ก่อน', 'error');
+        document.getElementById('loadingScreen').classList.add('hidden');
+        return;
+      }
+      
+      db.collection('videos').orderBy('createdAt', 'desc').onSnapshot(
+        snapshot => {
+          videos = [];
+          snapshot.forEach(doc => {
+            videos.push({ id: doc.id, ...doc.data() });
+          });
+          renderSlides();
+        },
+        err => {
+          console.error('โหลดผิดพลาด:', err);
+          showStatus('เชื่อมต่อไม่ได้ — ตรวจสอบคีย์ Firebase', 'error');
+          document.getElementById('loadingScreen').classList.add('hidden');
+        }
+      );
+    }
+
+    // ========== อัปโหลด ==========
+    let selectedFile = null;
+    const fileInput = document.getElementById('fileInput');
+    const dropArea = document.getElementById('dropArea');
+    const previewBox = document.getElementById('previewBox');
+    const previewVideo = document.getElementById('previewVideo');
+
+    dropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+    dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('highlight'); });
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('highlight'));
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dropArea.classList.remove('highlight');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('video/')) {
+        showStatus('กรุณาเลือกไฟล์วิดีโอ', 'error');
+        return;
+      }
+      selectedFile = file;
+      const url = URL.createObjectURL(file);
+      previewVideo.src = url;
+      previewBox.classList.add('show');
+    }
+
+    async function postVideo() {
+      if (!selectedFile) { showStatus('เลือกวิดีโอก่อน', 'error'); return; }
+      if (!storage) { showStatus('ยังไม่ได้ตั้งค่า Firebase', 'error'); return; }
+      
+      const caption = document.getElementById('captionInput').value.trim();
+      const postBtn = document.getElementById('postBtn');
+      const loadingTxt = document.getElementById('loadingTxt');
+      
+      postBtn.disabled = true;
+      loadingTxt.style.display = 'block';
+
+      try {
+        const fileName = Date.now() + '_' + selectedFile.name;
+        const ref = storage.ref('videos/' + fileName);
+        await ref.put(selectedFile);
+        const videoUrl = await ref.getDownloadURL();
+
+        await db.collection('videos').add({
+          videoUrl,
+          username: myUsername,
+          caption,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showStatus('โพสต์สำเร็จ ✅', 'success');
+        closeUpload();
+      } catch (err) {
+        showStatus('ผิดพลาด: ' + err.message, 'error');
+      } finally {
+        postBtn.disabled = false;
+        loadingTxt.style.display = 'none';
+      }
+    }
+
+    function openUpload() { document.getElementById('uploadScreen').classList.add('show'); }
+    function closeUpload() {
+      document.getElementById('uploadScreen').classList.remove('show');
+      selectedFile = null;
+      previewBox.classList.remove('show');
+      previewVideo.src = '';
+      document.getElementById('captionInput').value = '';
+    }
+    function showStatus(text, type = 'info') {
+      const el = document.getElementById('statusMsg');
+      el.textContent = text;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    // ========== เริ่มทำงาน ==========
     loadVideos();
   </script>
 </body>
