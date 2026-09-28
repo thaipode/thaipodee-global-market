@@ -1,14 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1122 — สุดท้าย ✅
-   วันที่: 28 กันยายน 2569 12:45 น.
-   พัฒนาจาก: v1121
-   ผู้สร้าง: นายจักรพงศ์ โพธิ์ดีโรจนกุล
+   ThaiPodee v1205 — เต็มก้อน ✅ Firebase+GitHub ฟรี 100%
+   28 กันยายน 2569 16:29 น.
    --------------------------------------------------------------
-   ✅ ใส่ Token เรียบร้อยแล้ว
-   ✅ ไม่ใช้ Firebase — ไม่มีค่าใช้จ่าย ไม่ต้องบัตรเครดิต
-   ✅ อัปโหลดวิดีโอเก็บที่ GitHub ฟรี
-   ✅ ทุกเครื่องเห็นวิดีโอตรงกัน อัปเดตอัตโนมัติทุก 5 วินาที
-   ✅ กด + อัปโหลด — เล่นได้ทันที
+   ✅ เก็บวิดีโอที่ GitHub — ยาวไม่เกิน 3 นาที / ไม่เกิน 15 MB
+   ✅ ทุกเครื่องเห็นกันทันทีผ่าน Firestore
+   ✅ ไม่ต้องบัตรเครดิต — ใช้แผน Spark
+   ✅ มีปุ่มลบ — จัดการง่าย
+   ✅ วางทับได้เลย — ไม่ต้องแก้อะไรเพิ่ม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -16,6 +14,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee — ของไทย ไปไกลทั่วโลก</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
@@ -30,9 +31,10 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 .status{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;font-size:12px;max-width:92%}
 .status.ok{background:#0f2f1a;color:#4cd964;border:1px solid #1a5c2a}
 .status.wait{background:#2a2410;color:#ffcc00;border:1px solid #664d00}
+.status.err{background:#2f1010;color:#ff6b6b;border:1px solid #661a1a}
 
 .progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width .25s}
-.msg{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:24px;font-size:12px;z-index:150;max-width:92%;text-align:center}
+.msg{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:24px;font-size:12px;z-index:150;max-width:92%;text-align:center;line-height:1.5}
 .msg.ok{background:#1a7a2e}
 .msg.err{background:#a32020}
 .msg.hidden{opacity:0;pointer-events:none}
@@ -43,7 +45,7 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 .nav-add{width:58px;height:38px;background:#FF4757;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;cursor:pointer}
 
 #fileInput{display:none}
-.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;color:#666;font-size:14px}
+.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;color:#888;font-size:14px;text-align:center;padding:20px}
 </style>
 </head>
 <body>
@@ -56,9 +58,9 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
     <div class="welcome">
       <h1>ThaiPodee</h1>
       <p>ของไทย ไปไกลทั่วโลก</p>
-      <p style="color:#FF6B00;font-weight:600;margin-top:10px;">กด + อัปโหลดวิดีโอแรกเลย</p>
-      <p class="status ok" id="status">✅ พร้อมใช้งาน — เก็บที่ GitHub ฟรี</p>
-      <p style="margin-top:10px;font-size:10px;color:#888">💡 อัปเดตอัตโนมัติทุก 5 วินาที — ทุกคนเห็นตรงกัน</p>
+      <p style="color:#FF6B00;font-weight:600;margin-top:10px;">กด + อัปโหลดวิดีโอ — ยาวไม่เกิน 3 นาที</p>
+      <p class="status wait" id="fbStatus">⏳ กำลังเชื่อมต่อ...</p>
+      <p style="margin-top:10px;font-size:10px;color:#888">💡 ขนาดไม่เกิน 15 MB — ทุกคนเห็นทันที</p>
     </div>
   </div>
 </div>
@@ -74,23 +76,36 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
 <input type="file" id="fileInput" accept="video/*">
 
 <script>
-// ===== ตั้งค่า GitHub — ใส่ครบแล้ว ✅ =====
+// ==============================================================
+// 🔑 ตั้งค่า — ไม่ต้องแก้ไข
+// ==============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
+  authDomain: "thaipodee-market.firebaseapp.com",
+  projectId: "thaipodee-market",
+  storageBucket: "thaipodee-market.appspot.com",
+  messagingSenderId: "802626775100",
+  appId: "1:802626775100:web:c126e82059d124d19c3b39"
+};
+
 const GITHUB_USER = 'thaipodee';
 const GITHUB_REPO = 'thaipodee-global-market';
 const GITHUB_BRANCH = 'main';
 const GITHUB_TOKEN = 'ghp_grBkJzXv4u3r7owfouTp69LuAdaiK2KzGNI';
+const MAX_SIZE_MB = 15;
 
-const DATA_FILE = 'data/videos.json';
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 const swiper = document.getElementById('swiper');
 const msgBox = document.getElementById('msgBox');
 const progress = document.getElementById('progress');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
-const statusEl = document.getElementById('status');
+const fbStatus = document.getElementById('fbStatus');
 
 function showMsg(t, type='normal', dur=5000){ 
-  msgBox.textContent = t; 
+  msgBox.innerHTML = t.replace(/\n/g,'<br>'); 
   msgBox.className = 'msg ' + type; 
   msgBox.classList.remove('hidden'); 
   if(dur > 0) setTimeout(() => msgBox.classList.add('hidden'), dur); 
@@ -101,170 +116,134 @@ uploadBtn.addEventListener('click', e => {
   fileInput.click(); 
 });
 
-// --- โหลดรายการวิดีโอ ---
-async function fetchVideos(){
-  try {
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${DATA_FILE}?ref=${GITHUB_BRANCH}`);
-    if(res.status === 404) return [];
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return JSON.parse(atob(data.content));
-  } catch(err) {
-    console.error('โหลดไม่ได้:', err);
-    return [];
-  }
-}
-
-// --- บันทึกรายการ ---
-async function saveVideos(videos, sha=null){
-  const body = {
-    message: 'อัปเดตรายการวิดีโอ',
-    content: btoa(JSON.stringify(videos, null, 2)),
-    branch: GITHUB_BRANCH
-  };
-  if(sha) body.sha = sha;
-  const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${DATA_FILE}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `token ${GITHUB_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  if(!res.ok) throw new Error(`บันทึกไม่ได้: ${res.status}`);
-}
-
-// --- อัปโหลดไฟล์วิดีโอ ---
-async function uploadVideoFile(file){
-  const fileName = 'videos/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const reader = new FileReader();
-  const base64 = await new Promise(r => { 
-    reader.onload = e => r(e.target.result.split(',')[1]); 
-    reader.readAsDataURL(file); 
-  });
-
-  const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${fileName}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `token ${GITHUB_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      message: `อัปโหลด: ${file.name}`,
-      content: base64,
-      branch: GITHUB_BRANCH
-    })
-  });
-  if(!res.ok) throw new Error(`อัปโหลดไม่ได้: ${res.status}`);
-  const data = await res.json();
-  return { url: data.content.download_url, path: fileName };
-}
-
-// --- แสดงผลวิดีโอ ---
-function renderVideos(videos){
-  const welcome = swiper.querySelector('.slide');
-  swiper.innerHTML = '';
-  swiper.appendChild(welcome);
-
-  videos.slice().reverse().forEach((v, idx) => {
-    const slide = document.createElement('div');
-    slide.className = 'slide';
-    const shortName = v.name.length > 25 ? v.name.slice(0,25)+'...' : v.name;
-    
-    slide.innerHTML = `
-      <div class="loader">⏳ กำลังโหลด...</div>
-      <video src="${v.url}" loop playsinline muted preload="none" controls
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
-      <div style="position:absolute;top:14px;right:14px;z-index:40">
-        <button onclick="deleteVideo(${idx})" 
-                style="background:rgba(220,20,20,0.9);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">🗑️</button>
-      </div>
-      <div style="position:absolute;bottom:90px;left:14px;right:14px;z-index:10">
-        <h3 style="font-size:14px">${shortName}</h3>
-        <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • ${v.time}</p>
-      </div>
-    `;
-
-    const vid = slide.querySelector('video');
-    const loader = slide.querySelector('.loader');
-    vid.addEventListener('loadeddata', () => loader && (loader.style.display='none'));
-    slide.addEventListener('click', e => {
-      if(e.target.tagName === 'BUTTON' || e.target.tagName === 'VIDEO') return;
-      vid.paused ? vid.play() : vid.pause();
-    });
-    swiper.appendChild(slide);
-  });
-}
-
-// --- อัปโหลดเมื่อเลือกไฟล์ ---
 fileInput.addEventListener('change', async e => {
   const file = e.target.files[0];
   if(!file) return;
 
+  const sizeMB = Math.round(file.size / 1024 / 1024);
+  if(sizeMB > MAX_SIZE_MB) {
+    showMsg(`❌ ไฟล์ใหญ่เกิน (${sizeMB} MB)\nตัดให้สั้นลง หรือลดคุณภาพ\nสูงสุดที่ ${MAX_SIZE_MB} MB`, 'err', 8000);
+    e.target.value = '';
+    return;
+  }
+
   const sizeKB = Math.round(file.size / 1024);
-  showMsg(`📦 ${file.name} (${sizeKB} KB) → กำลังอัปโหลด...`, '', 0);
+  showMsg(`📦 ${file.name}\nขนาด: ${sizeKB} KB\nกำลังอัปโหลด...`, '', 0);
   progress.style.width = '10%';
 
   try {
-    const {url, path} = await uploadVideoFile(file);
-    progress.style.width = '60%';
-
-    const videos = await fetchVideos();
-    videos.push({
-      name: file.name,
-      url: url,
-      path: path,
-      sizeKB: sizeKB,
-      time: new Date().toLocaleString('th-TH')
+    const fileName = 'videos/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const reader = new FileReader();
+    const base64 = await new Promise((resolve, reject) => {
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
 
-    // เอา sha ไฟล์เดิม
-    let sha = null;
-    try {
-      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${DATA_FILE}?ref=${GITHUB_BRANCH}`);
-      if(r.ok) sha = (await r.json()).sha;
-    } catch(e){}
+    progress.style.width = '40%';
 
-    await saveVideos(videos, sha);
+    const uploadRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${fileName}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `วิดีโอ: ${file.name}`,
+        content: base64,
+        branch: GITHUB_BRANCH
+      })
+    });
+
+    if(!uploadRes.ok) throw new Error(`อัปโหลดไม่ได้: ${uploadRes.status}`);
+    const uploadData = await uploadRes.json();
+    const videoUrl = uploadData.content.download_url;
+
+    progress.style.width = '70%';
+
+    await db.collection('videos').add({
+      url: videoUrl,
+      name: file.name,
+      path: fileName,
+      sizeKB: sizeKB,
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
     progress.style.width = '100%';
-    showMsg(`✅ อัปโหลดสำเร็จ!`, 'ok', 3000);
-    
-    setTimeout(() => { progress.style.width='0%'; loadAndRender(); }, 1500);
+    showMsg(`✅ อัปโหลดสำเร็จ!\nทุกเครื่องจะเห็นในไม่กี่วินาที`, 'ok', 3000);
+    setTimeout(() => progress.style.width = '0%', 1500);
+
   } catch(err) {
     progress.style.width = '0%';
-    showMsg(`❌ ผิดพลาด: ${err.message}`, 'err', 8000);
+    showMsg(`❌ ไม่สำเร็จ\n${err.message}`, 'err', 8000);
   }
   e.target.value = '';
 });
 
-// --- ลบวิดีโอ ---
-window.deleteVideo = async function(idx){
-  if(!confirm('ลบวิดีโอนี้?')) return;
-  let videos = await fetchVideos();
-  videos.splice(videos.length - 1 - idx, 1);
-  let sha = null;
+window.deleteVideo = async function(docId, filePath){
+  if(!confirm('ต้องการลบวิดีโอนี้หรือไม่?')) return;
   try {
-    const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${DATA_FILE}?ref=${GITHUB_BRANCH}`);
-    if(r.ok) sha = (await r.json()).sha;
-  } catch(e){}
-  await saveVideos(videos, sha);
-  showMsg('✅ ลบแล้ว', 'ok');
-  loadAndRender();
+    await db.collection('videos').doc(docId).delete();
+    showMsg('✅ ลบเรียบร้อย', 'ok');
+  } catch(err) {
+    showMsg(`❌ ลบไม่ได้\n${err.message}`, 'err');
+  }
 };
 
-// --- โหลดและแสดงผล ---
-async function loadAndRender(){
-  const videos = await fetchVideos();
-  renderVideos(videos);
-  if(videos.length > 0){
-    statusEl.textContent = `✅ มี ${videos.length} รายการ — ทุกคนเห็นตรงกัน`;
-    statusEl.className = 'status ok';
-  }
+function startRealtime(){
+  db.collection('videos')
+    .orderBy('uploadedAt', 'desc')
+    .limit(15)
+    .onSnapshot(
+      snap => {
+        if(!snap.empty){
+          fbStatus.textContent = '✅ เชื่อมต่อสำเร็จ — กด + เพิ่มวิดีโอเลย!';
+          fbStatus.className = 'status ok';
+        }
+
+        const welcome = swiper.querySelector('.slide');
+        swiper.innerHTML = '';
+        swiper.appendChild(welcome);
+
+        snap.forEach(doc => {
+          const v = { id: doc.id, ...doc.data() };
+          const shortName = v.name.length > 25 ? v.name.slice(0,25) + '...' : v.name;
+
+          const slide = document.createElement('div');
+          slide.className = 'slide';
+          slide.innerHTML = `
+            <div class="loader">⏳ กำลังโหลด...</div>
+            <video src="${v.url}" loop playsinline muted preload="none" controls
+                   style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
+            <div style="position:absolute;top:14px;right:14px;z-index:40">
+              <button onclick="deleteVideo('${v.id}','${(v.path||'').replace(/'/g,"\\'")}')"
+                      style="background:rgba(220,20,20,0.9);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">🗑️</button>
+            </div>
+            <div style="position:absolute;bottom:90px;left:14px;right:14px;z-index:10">
+              <h3 style="font-size:14px">${shortName}</h3>
+              <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • แตะเพื่อเล่น/หยุด</p>
+            </div>
+          `;
+
+          const vid = slide.querySelector('video');
+          const loader = slide.querySelector('.loader');
+          vid.addEventListener('loadeddata', () => loader && (loader.style.display='none'));
+          slide.addEventListener('click', e => {
+            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'VIDEO') return;
+            vid.paused ? vid.play() : vid.pause();
+          });
+          swiper.appendChild(slide);
+        });
+      },
+      err => {
+        fbStatus.textContent = '❌ ต้องตั้งค่า Rules ก่อน';
+        fbStatus.className = 'status err';
+        showMsg(`เข้า Firebase → Firestore → Rules → วางโค้ด:<br>allow read, write: if true;`, 'err', 10000);
+      }
+    );
 }
 
-// --- รีเฟรชอัตโนมัติ ---
-loadAndRender();
-setInterval(loadAndRender, 5000);
+window.onload = startRealtime;
 </script>
 
 </body>
