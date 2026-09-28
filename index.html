@@ -1,51 +1,35 @@
-<!-- ==============================================================
-   ThaiPodee v1205 — เต็มก้อน ✅ Firebase+GitHub ฟรี 100%
-   28 กันยายน 2569 16:29 น.
-   --------------------------------------------------------------
-   ✅ เก็บวิดีโอที่ GitHub — ยาวไม่เกิน 3 นาที / ไม่เกิน 15 MB
-   ✅ ทุกเครื่องเห็นกันทันทีผ่าน Firestore
-   ✅ ไม่ต้องบัตรเครดิต — ใช้แผน Spark
-   ✅ มีปุ่มลบ — จัดการง่าย
-   ✅ วางทับได้เลย — ไม่ต้องแก้อะไรเพิ่ม
-   ============================================================== -->
+<!-- ThaiPodee v1123 FIX 401/404 FOR RENDER -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ThaiPodee — ของไทย ไปไกลทั่วโลก</title>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-html,body{height:100%;background:#000;color:#fff;overflow:hidden}
+body{background:#000;color:#fff;height:100dvh;overflow:hidden}
 
-.swiper{height:100dvh;width:100%;overflow-y:auto;scroll-snap-type:y mandatory;background:#111}
-.slide{height:100dvh;width:100%;scroll-snap-align:start;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;border-bottom:1px solid #222}
+.swiper{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory}
+.slide{height:100dvh;scroll-snap-align:start;position:relative;background:#000;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #222}
 .slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 
-.welcome{text-align:center;z-index:20;padding:20px}
+.welcome{text-align:center;padding:20px}
 .welcome h1{font-size:32px;color:#FFB800;margin-bottom:8px}
-.status{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;font-size:12px;max-width:92%}
-.status.ok{background:#0f2f1a;color:#4cd964;border:1px solid #1a5c2a}
-.status.wait{background:#2a2410;color:#ffcc00;border:1px solid #664d00}
-.status.err{background:#2f1010;color:#ff6b6b;border:1px solid #661a1a}
+.status{margin-top:12px;font-size:12px;color:#888}
 
-.progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width .25s}
-.msg{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:24px;font-size:12px;z-index:150;max-width:92%;text-align:center;line-height:1.5}
+.msg{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;padding:12px 22px;border-radius:24px;z-index:100;max-width:92%;text-align:center;line-height:1.5}
+.msg.hidden{display:none}
 .msg.ok{background:#1a7a2e}
 .msg.err{background:#a32020}
-.msg.hidden{opacity:0;pointer-events:none}
 
-.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#000;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #1a1a1a;z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:#777;flex:1}
-.nav-add-wrap{flex:1;display:flex;justify-content:center}
+.progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width .25s}
+
+.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#000;display:flex;justify-content:center;align-items:center;border-top:1px solid #222;z-index:100}
 .nav-add{width:58px;height:38px;background:#FF4757;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;cursor:pointer}
 
 #fileInput{display:none}
-.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;color:#888;font-size:14px;text-align:center;padding:20px}
+.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px}
 </style>
 </head>
 <body>
@@ -58,81 +42,106 @@ html,body{height:100%;background:#000;color:#fff;overflow:hidden}
     <div class="welcome">
       <h1>ThaiPodee</h1>
       <p>ของไทย ไปไกลทั่วโลก</p>
-      <p style="color:#FF6B00;font-weight:600;margin-top:10px;">กด + อัปโหลดวิดีโอ — ยาวไม่เกิน 3 นาที</p>
-      <p class="status wait" id="fbStatus">⏳ กำลังเชื่อมต่อ...</p>
-      <p style="margin-top:10px;font-size:10px;color:#888">💡 ขนาดไม่เกิน 15 MB — ทุกคนเห็นทันที</p>
+      <p style="color:#FF6B00;margin-top:10px;">กด + อัปโหลดวิดีโอ — ไม่เกิน 15 MB</p>
+      <p class="status" id="status">✅ พร้อมใช้งาน — กด + เลย!</p>
     </div>
   </div>
 </div>
 
-<nav class="nav">
-  <div class="nav-item active"><span>🏠</span><span>หน้าแรก</span></div>
-  <div class="nav-item"><span>🔍</span><span>ค้นหา</span></div>
-  <div class="nav-add-wrap"><div class="nav-add" id="uploadBtn">+</div></div>
-  <div class="nav-item"><span>💬</span><span>ข้อความ</span></div>
-  <div class="nav-item"><span>👤</span><span>ฉัน</span></div>
-</nav>
+<div class="nav">
+  <div class="nav-add" id="uploadBtn">+</div>
+</div>
 
 <input type="file" id="fileInput" accept="video/*">
 
 <script>
 // ==============================================================
-// 🔑 ตั้งค่า — ไม่ต้องแก้ไข
+// ✅ ไม่มี Token ในโค้ด — ปลอดภัย ไม่โดนลบเอง
 // ==============================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
-  authDomain: "thaipodee-market.firebaseapp.com",
-  projectId: "thaipodee-market",
-  storageBucket: "thaipodee-market.appspot.com",
-  messagingSenderId: "802626775100",
-  appId: "1:802626775100:web:c126e82059d124d19c3b39"
-};
-
-const GITHUB_USER = 'thaipodee';
-const GITHUB_REPO = 'thaipodee-global-market';
-const GITHUB_BRANCH = 'main';
-const GITHUB_TOKEN = 'ghp_grBkJzXv4u3r7owfouTp69LuAdaiK2KzGNI';
-const MAX_SIZE_MB = 15;
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const REPO = 'thaipodee/thaipodee-global-market';
+const DATA_FILE = 'data/videos.json';
+const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/main/`;
 
 const swiper = document.getElementById('swiper');
 const msgBox = document.getElementById('msgBox');
 const progress = document.getElementById('progress');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
-const fbStatus = document.getElementById('fbStatus');
+const statusEl = document.getElementById('status');
 
-function showMsg(t, type='normal', dur=5000){ 
-  msgBox.innerHTML = t.replace(/\n/g,'<br>'); 
-  msgBox.className = 'msg ' + type; 
-  msgBox.classList.remove('hidden'); 
-  if(dur > 0) setTimeout(() => msgBox.classList.add('hidden'), dur); 
+function showMsg(t, isErr=false, dur=4000){
+  msgBox.innerHTML = t.replace(/\n/g,'<br>');
+  msgBox.className = 'msg ' + (isErr ? 'err' : 'ok');
+  msgBox.classList.remove('hidden');
+  if(dur > 0) setTimeout(() => msgBox.classList.add('hidden'), dur);
 }
 
-uploadBtn.addEventListener('click', e => { 
-  e.preventDefault(); 
-  fileInput.click(); 
+// โหลดรายการวิดีโอจากไฟล์สาธารณะ — ไม่ต้องสิทธิ์
+async function loadVideos(){
+  try{
+    const res = await fetch(RAW_BASE + DATA_FILE + '?t=' + Date.now());
+    if(!res.ok) throw new Error('ยังไม่มีวิดีโอ');
+    const videos = await res.json();
+    
+    const welcome = swiper.querySelector('.slide');
+    swiper.innerHTML = '';
+    swiper.appendChild(welcome);
+
+    if(videos.length === 0){
+      statusEl.textContent = '✅ พร้อมแล้ว — เป็นคนแรกที่อัปโหลด!';
+      return;
+    }
+
+    statusEl.textContent = `✅ มี ${videos.length} วิดีโอ — ทุกคนเห็นตรงกัน`;
+    
+    videos.slice().reverse().forEach(v => {
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.innerHTML = `
+        <div class="loader">⏳ กำลังโหลด...</div>
+        <video src="${v.url}" loop playsinline muted preload="none" controls
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
+        <div style="position:absolute;bottom:90px;left:14px;z-index:10">
+          <h3 style="font-size:14px">${v.name}</h3>
+          <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • แตะเพื่อเล่น</p>
+        </div>
+      `;
+      const vid = slide.querySelector('video');
+      const loader = slide.querySelector('.loader');
+      vid.addEventListener('loadeddata', () => loader.style.display = 'none');
+      slide.addEventListener('click', e => {
+        if(e.target.tagName === 'VIDEO') return;
+        vid.paused ? vid.play() : vid.pause();
+      });
+      swiper.appendChild(slide);
+    });
+  }catch(e){
+    statusEl.textContent = '✅ พร้อมแล้ว — กด + เพิ่มวิดีโอแรกเลย!';
+  }
+}
+
+// อัปโหลดผ่าน Backend ที่ Render — Token อยู่ข้างใน ไม่โชว์ให้ใครเห็น
+uploadBtn.addEventListener('click', e => {
+  e.preventDefault();
+  fileInput.click();
 });
 
 fileInput.addEventListener('change', async e => {
   const file = e.target.files[0];
   if(!file) return;
 
-  const sizeMB = Math.round(file.size / 1024 / 1024);
-  if(sizeMB > MAX_SIZE_MB) {
-    showMsg(`❌ ไฟล์ใหญ่เกิน (${sizeMB} MB)\nตัดให้สั้นลง หรือลดคุณภาพ\nสูงสุดที่ ${MAX_SIZE_MB} MB`, 'err', 8000);
+  const maxMB = 15;
+  if(file.size > maxMB * 1024 * 1024){
+    showMsg(`❌ ไฟล์ใหญ่เกิน<br>สูงสุด ${maxMB} MB<br>ตัดให้สั้นลงก่อนอัป`, true, 6000);
     e.target.value = '';
     return;
   }
 
   const sizeKB = Math.round(file.size / 1024);
-  showMsg(`📦 ${file.name}\nขนาด: ${sizeKB} KB\nกำลังอัปโหลด...`, '', 0);
-  progress.style.width = '10%';
+  showMsg(`📦 ${file.name}<br>${sizeKB} KB<br>กำลังอัปโหลด...`, false, 0);
+  progress.style.width = '20%';
 
-  try {
-    const fileName = 'videos/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  try{
     const reader = new FileReader();
     const base64 = await new Promise((resolve, reject) => {
       reader.onload = e => resolve(e.target.result.split(',')[1]);
@@ -140,110 +149,50 @@ fileInput.addEventListener('change', async e => {
       reader.readAsDataURL(file);
     });
 
-    progress.style.width = '40%';
+    progress.style.width = '50%';
 
-    const uploadRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${fileName}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
+    // ส่งไปที่ API ของ Render — จัดการ Token ข้างใน
+    const fileName = `videos/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: `วิดีโอ: ${file.name}`,
+        fileName,
         content: base64,
-        branch: GITHUB_BRANCH
+        name: file.name,
+        sizeKB
       })
     });
 
-    if(!uploadRes.ok) throw new Error(`อัปโหลดไม่ได้: ${uploadRes.status}`);
-    const uploadData = await uploadRes.json();
-    const videoUrl = uploadData.content.download_url;
+    progress.style.width = '80%';
 
-    progress.style.width = '70%';
-
-    await db.collection('videos').add({
-      url: videoUrl,
-      name: file.name,
-      path: fileName,
-      sizeKB: sizeKB,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    if(!res.ok){
+      const text = await res.text();
+      if(text.includes('401') || text.includes('Unauthorized')){
+        throw new Error('Token หมดอายุ → สร้างใหม่ที่ Render Environment');
+      }
+      throw new Error(text.slice(0, 150));
+    }
 
     progress.style.width = '100%';
-    showMsg(`✅ อัปโหลดสำเร็จ!\nทุกเครื่องจะเห็นในไม่กี่วินาที`, 'ok', 3000);
-    setTimeout(() => progress.style.width = '0%', 1500);
+    showMsg('✅ อัปโหลดสำเร็จ!<br>ทุกคนจะเห็นในไม่กี่วินาที', false, 3000);
+    setTimeout(() => {
+      progress.style.width = '0%';
+      loadVideos();
+    }, 1000);
 
-  } catch(err) {
+  }catch(err){
     progress.style.width = '0%';
-    showMsg(`❌ ไม่สำเร็จ\n${err.message}`, 'err', 8000);
+    showMsg(`❌ ไม่สำเร็จ<br>${err.message}`, true, 8000);
+    console.error(err);
   }
+
   e.target.value = '';
 });
 
-window.deleteVideo = async function(docId, filePath){
-  if(!confirm('ต้องการลบวิดีโอนี้หรือไม่?')) return;
-  try {
-    await db.collection('videos').doc(docId).delete();
-    showMsg('✅ ลบเรียบร้อย', 'ok');
-  } catch(err) {
-    showMsg(`❌ ลบไม่ได้\n${err.message}`, 'err');
-  }
-};
-
-function startRealtime(){
-  db.collection('videos')
-    .orderBy('uploadedAt', 'desc')
-    .limit(15)
-    .onSnapshot(
-      snap => {
-        if(!snap.empty){
-          fbStatus.textContent = '✅ เชื่อมต่อสำเร็จ — กด + เพิ่มวิดีโอเลย!';
-          fbStatus.className = 'status ok';
-        }
-
-        const welcome = swiper.querySelector('.slide');
-        swiper.innerHTML = '';
-        swiper.appendChild(welcome);
-
-        snap.forEach(doc => {
-          const v = { id: doc.id, ...doc.data() };
-          const shortName = v.name.length > 25 ? v.name.slice(0,25) + '...' : v.name;
-
-          const slide = document.createElement('div');
-          slide.className = 'slide';
-          slide.innerHTML = `
-            <div class="loader">⏳ กำลังโหลด...</div>
-            <video src="${v.url}" loop playsinline muted preload="none" controls
-                   style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
-            <div style="position:absolute;top:14px;right:14px;z-index:40">
-              <button onclick="deleteVideo('${v.id}','${(v.path||'').replace(/'/g,"\\'")}')"
-                      style="background:rgba(220,20,20,0.9);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">🗑️</button>
-            </div>
-            <div style="position:absolute;bottom:90px;left:14px;right:14px;z-index:10">
-              <h3 style="font-size:14px">${shortName}</h3>
-              <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • แตะเพื่อเล่น/หยุด</p>
-            </div>
-          `;
-
-          const vid = slide.querySelector('video');
-          const loader = slide.querySelector('.loader');
-          vid.addEventListener('loadeddata', () => loader && (loader.style.display='none'));
-          slide.addEventListener('click', e => {
-            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'VIDEO') return;
-            vid.paused ? vid.play() : vid.pause();
-          });
-          swiper.appendChild(slide);
-        });
-      },
-      err => {
-        fbStatus.textContent = '❌ ต้องตั้งค่า Rules ก่อน';
-        fbStatus.className = 'status err';
-        showMsg(`เข้า Firebase → Firestore → Rules → วางโค้ด:<br>allow read, write: if true;`, 'err', 10000);
-      }
-    );
-}
-
-window.onload = startRealtime;
+// โหลดซ้ำอัตโนมัติทุก 5 วินาที — เห็นทันที
+loadVideos();
+setInterval(loadVideos, 5000);
 </script>
 
 </body>
