@@ -1,67 +1,94 @@
-import express from 'express';
-import cors from 'cors';
-const app = express();
-app.use(cors());
-app.use(express.json({limit: '25mb'}));
-app.use(express.static('.'));
-const REPO='thaipodee/thaipodee-global-market';
-const BRANCH='main';
-const getToken=()=>{ const t=process.env.GITHUB_TOKEN; if(!t) throw new Error('ยังไม่ได้ตั้ง GITHUB_TOKEN'); return t.trim(); };
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FFB800">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="thaipodee_logo_icon.png">
+  <title>ThaiPodee</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#000;color:#fff;font-family:sans-serif;overflow:hidden}
+    .screen{width:100vw;height:100vh;display:flex;flex-direction:column}
+    .video-area{flex:1;display:flex;align-items:center;justify-content:center;background:#111;position:relative}
+    video{max-width:100%;max-height:85%;object-fit:contain}
+    .info{padding:12px 16px}
+    .username{font-weight:bold;font-size:16px;margin-bottom:4px}
+    .caption{font-size:14px;opacity:0.9;line-height:1.4}
+    .side-menu{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:20px;align-items:center}
+    .icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;color:#fff}
+    .bottom-nav{height:60px;background:#111;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #333}
+    .nav-item{text-align:center;opacity:0.7;font-size:12px}
+    .nav-item.active{opacity:1}
+    .upload-btn{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#FFB800;display:flex;align-items:center;justify-content:center;font-size:30px;color:#000;font-weight:bold;cursor:pointer;border:none}
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="video-area" id="videoArea">
+      <video id="mainVideo" controls autoplay loop playsinline></video>
+      <div class="side-menu">
+        <button class="icon-btn">❤️</button>
+        <button class="icon-btn">💬</button>
+        <button class="icon-btn">↗️</button>
+      </div>
+      <div class="info" id="videoInfo" style="position:absolute;bottom:20px;left:16px;right:80px">
+        <div class="username" id="vidUser">ThaiPodee</div>
+        <div class="caption" id="vidDesc">ยินดีต้อนรับสู่ชุมชนของเรา</div>
+      </div>
+    </div>
+    <button class="upload-btn" id="uploadBtn">+</button>
+    <div class="bottom-nav">
+      <div class="nav-item active">หน้าแรก</div>
+      <div class="nav-item">ค้นหา</div>
+      <div class="nav-item">กล่องจดหมาย</div>
+      <div class="nav-item">โปรไฟล์</div>
+    </div>
+  </div>
+  <script>
+    let videos = [];
+    let currentIndex = 0;
 
-// โหลดรายการ
-app.get('/api/videos', async (req,res)=>{
-  try{
-    const token=getToken();
-    const r=await fetch(`https://api.github.com/repos/${REPO}/contents/data/videos.json?ref=${BRANCH}`,{headers:{'Authorization':`token ${token}`}});
-    if(r.status===404) return res.json([]);
-    if(!r.ok) return res.status(r.status).send(await r.text());
-    const d=await r.json();
-    const videos=JSON.parse(Buffer.from(d.content,'base64').toString('utf-8'));
-    res.json(videos);
-  }catch(e){ res.status(500).send(e.message); }
-});
+    async function loadVideos() {
+      try {
+        const res = await fetch('data/videos.json');
+        videos = await res.json();
+        if(videos.length > 0) showVideo(0);
+      } catch (e) {
+        console.log('รอข้อมูล...');
+      }
+    }
 
-// Proxy วิดีโอ - ทำให้ Private ก็เล่นได้
-app.get('/api/file', async (req,res)=>{
-  try{
-    const token=getToken();
-    const path=req.query.path;
-    if(!path) return res.status(400).send('no path');
-    const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3.raw'}});
-    if(!r.ok) return res.status(r.status).send(await r.text());
-    res.setHeader('Content-Type', r.headers.get('content-type')||'video/mp4');
-    res.setHeader('Cache-Control','public, max-age=3600');
-    const buf=Buffer.from(await r.arrayBuffer());
-    res.send(buf);
-  }catch(e){ res.status(500).send(e.message); }
-});
+    function showVideo(index) {
+      const v = videos[index];
+      if(!v) return;
+      document.getElementById('mainVideo').src = v.url;
+      document.getElementById('vidUser').textContent = '@' + v.username;
+      document.getElementById('vidDesc').textContent = v.description;
+    }
 
-// อัปโหลด
-app.post('/api/upload', async (req,res)=>{
-  try{
-    const token=getToken();
-    const {fileName,content,name,sizeKB}=req.body;
-    const up=await fetch(`https://api.github.com/repos/${REPO}/contents/${fileName}`,{
-      method:'PUT',
-      headers:{'Authorization':`token ${token}`,'Content-Type':'application/json'},
-      body: JSON.stringify({message:`upload ${name}`,content,branch:BRANCH})
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'video/*';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const url = URL.createObjectURL(file);
+        videos.unshift({
+          username: 'คุณ',
+          description: 'วิดีโอใหม่ของฉัน',
+          url: url
+        });
+        showVideo(0);
+        alert('อัปโหลดแล้ว! (บันทึกสู่ระบบจะทำในขั้นตอนต่อไป)');
+      };
+      input.click();
     });
-    if(!up.ok) return res.status(up.status).send(await up.text());
-    let videos=[],sha=null;
-    try{
-      const rr=await fetch(`https://api.github.com/repos/${REPO}/contents/data/videos.json?ref=${BRANCH}`,{headers:{'Authorization':`token ${token}`}});
-      if(rr.ok){ const d=await rr.json(); sha=d.sha; videos=JSON.parse(Buffer.from(d.content,'base64').toString('utf-8')); }
-    }catch(e){}
-    videos.push({name,path:fileName,sizeKB,time:new Date().toLocaleString('th-TH'),timestamp:Date.now()});
-    if(videos.length>50) videos=videos.slice(-50);
-    const newContent=Buffer.from(JSON.stringify(videos,null,2),'utf-8').toString('base64');
-    await fetch(`https://api.github.com/repos/${REPO}/contents/data/videos.json`,{
-      method:'PUT',
-      headers:{'Authorization':`token ${token}`,'Content-Type':'application/json'},
-      body: JSON.stringify({message:`update videos.json`,content:newContent,branch:BRANCH,...(sha?{sha}:{})})
-    });
-    res.json({ok:true});
-  }catch(e){ res.status(500).send(e.message); }
-});
-const PORT=process.env.PORT||10000;
-app.listen(PORT,()=>console.log('running '+PORT));
+
+    loadVideos();
+  </script>
+</body>
+</html>
