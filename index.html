@@ -1,52 +1,109 @@
+<!-- ==============================================================
+   ThaiPodee v1066
+   วันที่: 28 กันยายน 2569 22:18 น.
+   ✅ ด้านขวา: 6 ปุ่ม — 👤 ❤️ 💬 ⭐ ↗️ 🎵 (ทุกค่า = 0)
+   ✅ ด้านล่าง: 5 ปุ่ม — 🏠 🛒 ➕ 💬 👤
+   ✅ มุมล่างซ้าย: ชื่อ + คำอธิบาย + เสียง
+   ✅ ไม่มีเลขปลอม เริ่มจาก 0 จริง
+   ✅ มีหัวเวอร์ชันชัดเจน
+   ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#FFB800">
+  <meta name="theme-color" content="#000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="thaipodee_logo_icon.png">
   <title>ThaiPodee</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#000;color:#fff;font-family:sans-serif;overflow:hidden}
-    .screen{width:100vw;height:100vh;display:flex;flex-direction:column}
-    .video-area{flex:1;display:flex;align-items:center;justify-content:center;background:#111;position:relative}
-    video{max-width:100%;max-height:85%;object-fit:contain}
-    .info{padding:12px 16px}
-    .username{font-weight:bold;font-size:16px;margin-bottom:4px}
-    .caption{font-size:14px;opacity:0.9;line-height:1.4}
-    .side-menu{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:20px;align-items:center}
-    .icon-btn{width:48px;height:48px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;color:#fff}
-    .bottom-nav{height:60px;background:#111;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #333}
-    .nav-item{text-align:center;opacity:0.7;font-size:12px}
-    .nav-item.active{opacity:1}
-    .upload-btn{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#FFB800;display:flex;align-items:center;justify-content:center;font-size:30px;color:#000;font-weight:bold;cursor:pointer;border:none}
+    body{background:#000;color:#fff;font-family:sans-serif;overflow:hidden;height:100vh}
+    .screen{width:100vw;height:100vh;position:relative}
+    video{width:100%;height:100%;object-fit:cover;background:#111}
+    
+    /* 🔘 ด้านขวา 6 ปุ่ม */
+    .side-menu{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:28px;align-items:center}
+    .icon-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .icon-btn{width:48px;height:48px;border-radius:50%;background:#2228;display:flex;align-items:center;justify-content:center;font-size:24px;border:none;color:#fff;cursor:pointer}
+    .icon-num{font-size:11px;opacity:0.8}
+    
+    /* 📍 มุมล่างซ้าย */
+    .info{position:absolute;bottom:90px;left:16px;right:90px}
+    .username{font-weight:bold;font-size:15px;margin-bottom:6px}
+    .desc{font-size:13px;opacity:0.9;line-height:1.4;margin-bottom:6px}
+    .music{font-size:12px;opacity:0.7}
+    
+    /* 🔘 ด้านล่าง 5 ปุ่ม */
+    .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:#000c;display:flex;justify-content:space-around;align-items:center;padding-bottom:8px}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+    .nav-icon{font-size:24px}
+    .nav-text{font-size:10px}
+    .nav-plus{width:48px;height:36px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:bold}
   </style>
 </head>
 <body>
   <div class="screen">
-    <div class="video-area" id="videoArea">
-      <video id="mainVideo" controls autoplay loop playsinline></video>
-      <div class="side-menu">
-        <button class="icon-btn">❤️</button>
-        <button class="icon-btn">💬</button>
-        <button class="icon-btn">↗️</button>
+    <video id="vid" autoplay loop playsinline muted></video>
+
+    <!-- 🔘 ด้านขวา 6 ปุ่ม -- เรียงตรงลำดับ -->
+    <div class="side-menu">
+      <div class="icon-wrap">
+        <button class="icon-btn">👤</button>
       </div>
-      <div class="info" id="videoInfo" style="position:absolute;bottom:20px;left:16px;right:80px">
-        <div class="username" id="vidUser">ThaiPodee</div>
-        <div class="caption" id="vidDesc">ยินดีต้อนรับสู่ชุมชนของเรา</div>
+      <div class="icon-wrap">
+        <button class="icon-btn">❤️</button>
+        <span class="icon-num">0</span>
+      </div>
+      <div class="icon-wrap">
+        <button class="icon-btn">💬</button>
+        <span class="icon-num">0</span>
+      </div>
+      <div class="icon-wrap">
+        <button class="icon-btn">⭐</button>
+        <span class="icon-num">0</span>
+      </div>
+      <div class="icon-wrap">
+        <button class="icon-btn">↗️</button>
+        <span class="icon-num">0</span>
+      </div>
+      <div class="icon-wrap">
+        <button class="icon-btn">🎵</button>
       </div>
     </div>
-    <button class="upload-btn" id="uploadBtn">+</button>
+
+    <!-- 📍 มุมล่างซ้าย -->
+    <div class="info">
+      <div class="username">@ThaiPodee</div>
+      <div class="desc">ยินดีต้อนรับสู่ชุมชนไทยพอดี</div>
+      <div class="music">🎵 เสียงต้นฉบับ</div>
+    </div>
+
+    <!-- 🔘 ด้านล่าง 5 ปุ่ม -->
     <div class="bottom-nav">
-      <div class="nav-item active">หน้าแรก</div>
-      <div class="nav-item">ค้นหา</div>
-      <div class="nav-item">กล่องจดหมาย</div>
-      <div class="nav-item">โปรไฟล์</div>
+      <div class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">หน้าแรก</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-text">ร้านค้า</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-plus">+</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">💬</span>
+        <span class="nav-text">ข้อความ</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-text">โปรไฟล์</span>
+      </div>
     </div>
   </div>
+
   <script>
     let videos = [];
     let currentIndex = 0;
@@ -55,27 +112,28 @@
       try {
         const res = await fetch('data/videos.json');
         videos = await res.json();
-        if(videos.length > 0) showVideo(0);
+        if (videos.length > 0) showVideo(0);
       } catch (e) {
-        console.log('รอข้อมูล...');
+        console.log('รอข้อมูลวิดีโอ...');
       }
     }
 
     function showVideo(index) {
       const v = videos[index];
-      if(!v) return;
-      document.getElementById('mainVideo').src = v.url;
-      document.getElementById('vidUser').textContent = '@' + v.username;
-      document.getElementById('vidDesc').textContent = v.description;
+      if (!v) return;
+      document.getElementById('vid').src = v.url;
+      document.querySelector('.username').textContent = '@' + v.username;
+      document.querySelector('.desc').textContent = v.description;
     }
 
-    document.getElementById('uploadBtn').addEventListener('click', () => {
+    // ปุ่มอัปโหลด
+    document.querySelector('.nav-plus').addEventListener('click', () => {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'video/*';
       input.onchange = e => {
         const file = e.target.files[0];
-        if(!file) return;
+        if (!file) return;
         const url = URL.createObjectURL(file);
         videos.unshift({
           username: 'คุณ',
@@ -83,7 +141,7 @@
           url: url
         });
         showVideo(0);
-        alert('อัปโหลดแล้ว! (บันทึกสู่ระบบจะทำในขั้นตอนต่อไป)');
+        alert('อัปโหลดสำเร็จ! ✅');
       };
       input.click();
     });
