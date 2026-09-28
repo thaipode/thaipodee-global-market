@@ -1,199 +1,131 @@
-<!-- ThaiPodee v1123 FIX 401/404 FOR RENDER -->
+<!-- ThaiPodee v1124 FINAL FIX 401/404 - ก๊อปวางใน GitHub ได้เลย -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee — ของไทย ไปไกลทั่วโลก</title>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 body{background:#000;color:#fff;height:100dvh;overflow:hidden}
-
-.swiper{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory}
-.slide{height:100dvh;scroll-snap-align:start;position:relative;background:#000;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #222}
+.swiper{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;background:#000}
+.slide{height:100dvh;width:100%;scroll-snap-align:start;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
-
-.welcome{text-align:center;padding:20px}
+.welcome{text-align:center;padding:20px;max-width:90%}
 .welcome h1{font-size:32px;color:#FFB800;margin-bottom:8px}
-.status{margin-top:12px;font-size:12px;color:#888}
-
-.msg{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;padding:12px 22px;border-radius:24px;z-index:100;max-width:92%;text-align:center;line-height:1.5}
+.status{margin-top:12px;padding:10px 16px;border-radius:20px;font-size:12px;background:#0f2f1a;color:#4cd964;border:1px solid #1a5c2a;white-space:pre-wrap}
+.msg{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(40,40,40,0.95);color:#fff;padding:14px 22px;border-radius:24px;z-index:150;max-width:92%;text-align:center;backdrop-filter:blur(8px)}
 .msg.hidden{display:none}
-.msg.ok{background:#1a7a2e}
-.msg.err{background:#a32020}
-
-.progress{position:fixed;top:0;left:0;height:3px;background:#FF4757;width:0%;z-index:200;transition:width .25s}
-
-.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#000;display:flex;justify-content:center;align-items:center;border-top:1px solid #222;z-index:100}
-.nav-add{width:58px;height:38px;background:#FF4757;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;cursor:pointer}
-
+.msg.ok{background:rgba(26,122,46,0.95)}
+.msg.err{background:rgba(163,32,32,0.95)}
+.progress{position:fixed;top:0;left:0;height:4px;background:#FF4757;width:0%;z-index:200;transition:width.3s}
+.nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:rgba(0,0,0,0.95);display:flex;justify-content:center;align-items:center;border-top:1px solid #222;z-index:100}
+.nav-add{width:64px;height:42px;background:#FF4757;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;cursor:pointer;box-shadow:0 2px 12px rgba(255,71,87,0.4)}
 #fileInput{display:none}
-.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px}
+.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888}
 </style>
 </head>
 <body>
-
 <div class="progress" id="progress"></div>
 <div id="msgBox" class="msg hidden"></div>
-
 <div class="swiper" id="swiper">
   <div class="slide">
     <div class="welcome">
       <h1>ThaiPodee</h1>
       <p>ของไทย ไปไกลทั่วโลก</p>
-      <p style="color:#FF6B00;margin-top:10px;">กด + อัปโหลดวิดีโอ — ไม่เกิน 15 MB</p>
-      <p class="status" id="status">✅ พร้อมใช้งาน — กด + เลย!</p>
+      <p style="color:#FF6B00;margin-top:10px;font-weight:600">กด + อัปโหลดวิดีโอ — ไม่เกิน 15 MB</p>
+      <p class="status" id="status">⏳ กำลังเชื่อมต่อ...</p>
+      <p style="margin-top:8px;font-size:11px;color:#666">💡 อัปเดตทุก 5 วินาที — ทุกคนเห็นตรงกัน</p>
     </div>
   </div>
 </div>
-
-<div class="nav">
-  <div class="nav-add" id="uploadBtn">+</div>
-</div>
-
+<div class="nav"><div class="nav-add" id="uploadBtn">+</div></div>
 <input type="file" id="fileInput" accept="video/*">
 
 <script>
-// ==============================================================
-// ✅ ไม่มี Token ในโค้ด — ปลอดภัย ไม่โดนลบเอง
-// ==============================================================
-const REPO = 'thaipodee/thaipodee-global-market';
-const DATA_FILE = 'data/videos.json';
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/main/`;
+const swiper=document.getElementById('swiper');
+const msgBox=document.getElementById('msgBox');
+const progress=document.getElementById('progress');
+const statusEl=document.getElementById('status');
+const fileInput=document.getElementById('fileInput');
 
-const swiper = document.getElementById('swiper');
-const msgBox = document.getElementById('msgBox');
-const progress = document.getElementById('progress');
-const fileInput = document.getElementById('fileInput');
-const uploadBtn = document.getElementById('uploadBtn');
-const statusEl = document.getElementById('status');
-
-function showMsg(t, isErr=false, dur=4000){
-  msgBox.innerHTML = t.replace(/\n/g,'<br>');
-  msgBox.className = 'msg ' + (isErr ? 'err' : 'ok');
+function showMsg(t,err=false,dur=4000){
+  msgBox.innerHTML=t.replace(/\n/g,'<br>');
+  msgBox.className='msg '+(err?'err':'ok');
   msgBox.classList.remove('hidden');
-  if(dur > 0) setTimeout(() => msgBox.classList.add('hidden'), dur);
+  if(dur>0) setTimeout(()=>msgBox.classList.add('hidden'),dur);
 }
 
-// โหลดรายการวิดีโอจากไฟล์สาธารณะ — ไม่ต้องสิทธิ์
 async function loadVideos(){
   try{
-    const res = await fetch(RAW_BASE + DATA_FILE + '?t=' + Date.now());
-    if(!res.ok) throw new Error('ยังไม่มีวิดีโอ');
-    const videos = await res.json();
-    
-    const welcome = swiper.querySelector('.slide');
-    swiper.innerHTML = '';
-    swiper.appendChild(welcome);
-
-    if(videos.length === 0){
-      statusEl.textContent = '✅ พร้อมแล้ว — เป็นคนแรกที่อัปโหลด!';
+    const res=await fetch('/api/videos?t='+Date.now());
+    if(!res.ok) throw new Error();
+    const videos=await res.json();
+    if(!videos.length){
+      statusEl.textContent='✅ พร้อมแล้ว — เป็นคนแรกที่อัปโหลดเลย!';
       return;
     }
-
-    statusEl.textContent = `✅ มี ${videos.length} วิดีโอ — ทุกคนเห็นตรงกัน`;
-    
-    videos.slice().reverse().forEach(v => {
-      const slide = document.createElement('div');
-      slide.className = 'slide';
-      slide.innerHTML = `
-        <div class="loader">⏳ กำลังโหลด...</div>
-        <video src="${v.url}" loop playsinline muted preload="none" controls
-               style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
-        <div style="position:absolute;bottom:90px;left:14px;z-index:10">
-          <h3 style="font-size:14px">${v.name}</h3>
-          <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • แตะเพื่อเล่น</p>
+    statusEl.textContent=`✅ มี ${videos.length} วิดีโอ — เลื่อนดูได้เลย`;
+    swiper.innerHTML='';
+    videos.slice().reverse().forEach((v,i)=>{
+      const slide=document.createElement('div');
+      slide.className='slide';
+      slide.innerHTML=`
+        <div class="loader">⏳ โหลด...</div>
+        <video id="v${i}" src="${v.url}" loop playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video>
+        <div style="position:absolute;top:14px;left:14px;z-index:20">
+          <button onclick="toggleSound('v${i}',this)" style="width:44px;height:44px;border-radius:50%;border:1px solid #555;background:rgba(0,0,0,0.6);color:#fff;font-size:18px">🔇</button>
         </div>
-      `;
-      const vid = slide.querySelector('video');
-      const loader = slide.querySelector('.loader');
-      vid.addEventListener('loadeddata', () => loader.style.display = 'none');
-      slide.addEventListener('click', e => {
-        if(e.target.tagName === 'VIDEO') return;
-        vid.paused ? vid.play() : vid.pause();
-      });
+        <div style="position:absolute;bottom:85px;left:14px;right:14px;z-index:10;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:8px">
+          <h3 style="font-size:13px">${v.name}</h3>
+          <p style="font-size:11px;color:#ccc">${v.sizeKB} KB • แตะเพื่อเล่น/หยุด</p>
+        </div>`;
+      const vid=slide.querySelector('video');
+      const loader=slide.querySelector('.loader');
+      vid.addEventListener('loadeddata',()=>loader.style.display='none');
+      slide.addEventListener('click',e=>{ if(e.target.tagName!=='BUTTON'){ vid.paused?vid.play():vid.pause(); }});
       swiper.appendChild(slide);
     });
   }catch(e){
-    statusEl.textContent = '✅ พร้อมแล้ว — กด + เพิ่มวิดีโอแรกเลย!';
+    statusEl.textContent='✅ พร้อมใช้งาน — กด + เลย!';
   }
 }
-
-// อัปโหลดผ่าน Backend ที่ Render — Token อยู่ข้างใน ไม่โชว์ให้ใครเห็น
-uploadBtn.addEventListener('click', e => {
-  e.preventDefault();
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const maxMB = 15;
-  if(file.size > maxMB * 1024 * 1024){
-    showMsg(`❌ ไฟล์ใหญ่เกิน<br>สูงสุด ${maxMB} MB<br>ตัดให้สั้นลงก่อนอัป`, true, 6000);
-    e.target.value = '';
-    return;
-  }
-
-  const sizeKB = Math.round(file.size / 1024);
-  showMsg(`📦 ${file.name}<br>${sizeKB} KB<br>กำลังอัปโหลด...`, false, 0);
-  progress.style.width = '20%';
-
+function toggleSound(id,btn){
+  const v=document.getElementById(id);
+  if(!v) return;
+  v.muted=!v.muted;
+  if(!v.muted){ v.volume=1; btn.textContent='🔊'; }
+  else{ btn.textContent='🔇'; }
+  if(v.paused) v.play();
+}
+document.getElementById('uploadBtn').onclick=()=>fileInput.click();
+fileInput.onchange=async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  if(file.size>15*1024*1024){ showMsg('❌ ใหญ่เกิน 15MB<br>ตัดให้สั้นลง',true,6000); e.target.value=''; return; }
+  const sizeKB=Math.round(file.size/1024);
+  showMsg(`📦 ${file.name}<br>${sizeKB} KB<br>กำลังอัปโหลด...`,false,0);
+  progress.style.width='20%';
   try{
-    const reader = new FileReader();
-    const base64 = await new Promise((resolve, reject) => {
-      reader.onload = e => resolve(e.target.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    progress.style.width = '50%';
-
-    // ส่งไปที่ API ของ Render — จัดการ Token ข้างใน
-    const fileName = `videos/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName,
-        content: base64,
-        name: file.name,
-        sizeKB
-      })
-    });
-
-    progress.style.width = '80%';
-
-    if(!res.ok){
-      const text = await res.text();
-      if(text.includes('401') || text.includes('Unauthorized')){
-        throw new Error('Token หมดอายุ → สร้างใหม่ที่ Render Environment');
-      }
-      throw new Error(text.slice(0, 150));
+    const base64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
+    progress.style.width='50%';
+    const fileName=`videos/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const resp=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileName,content:base64,name:file.name,sizeKB})});
+    if(!resp.ok){
+      const txt=await resp.text();
+      if(txt.includes('401')||resp.status===401) throw new Error('401 Token หมดอายุ - ไปตั้ง GITHUB_TOKEN ใหม่ใน Render > Environment');
+      throw new Error(txt.slice(0,150));
     }
-
-    progress.style.width = '100%';
-    showMsg('✅ อัปโหลดสำเร็จ!<br>ทุกคนจะเห็นในไม่กี่วินาที', false, 3000);
-    setTimeout(() => {
-      progress.style.width = '0%';
-      loadVideos();
-    }, 1000);
-
+    progress.style.width='100%';
+    showMsg('✅ สำเร็จ!<br>ทุกคนเห็นแล้ว',false,4000);
+    setTimeout(()=>{ progress.style.width='0%'; loadVideos(); },1000);
   }catch(err){
-    progress.style.width = '0%';
-    showMsg(`❌ ไม่สำเร็จ<br>${err.message}`, true, 8000);
-    console.error(err);
+    progress.style.width='0%';
+    showMsg(`❌ ไม่สำเร็จ<br>${err.message}`,true,8000);
   }
-
-  e.target.value = '';
-});
-
-// โหลดซ้ำอัตโนมัติทุก 5 วินาที — เห็นทันที
+  e.target.value='';
+};
 loadVideos();
-setInterval(loadVideos, 5000);
+setInterval(loadVideos,5000);
 </script>
-
 </body>
 </html>
