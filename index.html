@@ -1,10 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1128 — แก้เลือกรูปจากเครื่องได้โดยตรง
-   อัปเดต: 29 กันยายน 2569 23:10 น.
+   ThaiPodee v1129 — ✅ ปุ่มบวกอัปโหลดวิดีโอทำงาน + เปลี่ยนรูปได้
+   อัปเดต: 29 กันยายน 2569 23:18 น.
    --------------------------------------------------------------
-   ✅ เปลี่ยนชื่อได้ — ทำงานปกติ
-   ✅ เปลี่ยนรูปได้ — กดรูป → เลือกจากในเครื่องเลย ไม่ต้องพิมพ์ลิงก์
-   ✅ จดจำชื่อ+รูป แยกแต่ละเครื่อง
+   ✅ ข้อ1: v1129 บนสุด — แว่นขยายลงมา ไม่ทับ
+   ✅ ข้อ2: เปลี่ยนชื่อ+รูปโปรไฟล์ได้ เลือกจากเครื่อง
+   ✅ ข้อ3: ปุ่มบวกสีแดง → กดเลือกวิดีโอจากเครื่อง เล่นได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -16,7 +16,7 @@
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ===== ข้อที่1: ส่วนบนสุด ===== */
+  /* ===== บนสุด ===== */
   .top-version {
     position: absolute;
     top: 8px;
@@ -57,6 +57,11 @@
     justify-content: center;
   }
   .play-btn { font-size: 60px; opacity: 0.8; cursor: pointer; }
+  .main-video {
+    max-width: 100%;
+    max-height: 100%;
+    display: none;
+  }
 
   /* ===== ไอคอนด้านขวา ===== */
   .side-icons {
@@ -98,7 +103,7 @@
     background: #000;
     border-top: 1px solid #222;
   }
-  .nav-item { text-align: center; cursor: pointer; }
+  .nav-item { text-align: center; cursor: pointer; font-size: 13px; }
   .nav-item .plus-btn {
     width: 48px; height: 32px;
     background: #f00;
@@ -108,6 +113,8 @@
     justify-content: center;
     font-size: 24px;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
   }
 
   /* ===== หน้าแก้ไขโปรไฟล์ ===== */
@@ -126,7 +133,7 @@
     width: 90px; height: 90px;
     border-radius: 50%;
     background: #333;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     overflow: hidden;
     border: 3px solid #666;
     cursor: pointer;
@@ -143,9 +150,7 @@
     border-radius: 8px;
     margin-bottom: 16px;
   }
-  .edit-buttons {
-    display: flex; gap: 12px;
-  }
+  .edit-buttons { display: flex; gap: 12px; }
   .edit-btn {
     padding: 10px 24px;
     border-radius: 6px;
@@ -156,10 +161,10 @@
   .edit-btn.save { background: #00c853; color: #fff; }
   .edit-btn.cancel { background: #444; color: #fff; }
 
-  /* ===== ซ่อนช่องเลือกไฟล์จริง ===== */
-  #avatar-file-input { display: none; }
+  /* ===== ซ่อนช่องเลือกไฟล์ ===== */
+  #avatar-file-input, #video-file-input { display: none; }
 
-  /* ===== ข้อมูลล่างวิดีโอ ===== */
+  /* ===== ข้อมูลใต้วิดีโอ ===== */
   .video-info {
     position: absolute;
     bottom: 90px;
@@ -172,22 +177,24 @@
 </head>
 <body>
 
-<div class="top-version">v1128</div>
+<div class="top-version">v1129</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
 </div>
 
-<div class="search-icon" onclick="alert('ค้นหา — รุ่นต่อไป')">🔍</div>
+<div class="search-icon">🔍</div>
 
-<div class="video-container">
-  <div class="play-btn">▶</div>
+<!-- พื้นที่วิดีโอ -->
+<div class="video-container" id="video-area">
+  <div class="play-btn" id="play-icon">▶</div>
+  <video id="main-video" class="main-video" controls playsinline></video>
 </div>
 
 <div class="video-info">
   <div class="acc-name" id="display-name">@ThaiPodee</div>
-  <div class="desc">Lamai Plai Mat Nights — สินค้าและบริการ</div>
+  <div class="desc" id="video-desc">Lamai Plai Mat Nights — สินค้าและบริการ</div>
 </div>
 
 <div class="side-icons">
@@ -204,26 +211,27 @@
 <div class="bottom-nav">
   <div class="nav-item">🏠<br>หน้าหลัก</div>
   <div class="nav-item">🛒<br>ร้านค้า</div>
-  <div class="nav-item"><div class="plus-btn">+</div></div>
+  <div class="nav-item">
+    <button class="plus-btn" onclick="document.getElementById('video-file-input').click()">+</button>
+  </div>
   <div class="nav-item">💬<br>ข้อความ</div>
   <div class="nav-item" onclick="openEditProfile()">👤<br>โปรไฟล์</div>
 </div>
 
+<!-- ช่องเลือกวิดีโอ ซ่อนไว้ -->
+<input type="file" id="video-file-input" accept="video/*">
+
+<!-- ช่องเลือกรูปโปรไฟล์ -->
+<input type="file" id="avatar-file-input" accept="image/*">
+
 <!-- หน้าแก้ไขโปรไฟล์ -->
 <div class="edit-profile-overlay" id="edit-profile-panel">
   <h3 style="margin-bottom:20px">ตั้งค่าโปรไฟล์</h3>
-  
-  <!-- กดรูป → เปิดเลือกจากเครื่อง -->
   <div class="edit-avatar" onclick="document.getElementById('avatar-file-input').click()">
-    <img id="edit-avatar-preview" src="https://via.placeholder.com/100" alt="รูปโปรไฟล์">
+    <img id="edit-avatar-preview" src="https://via.placeholder.com/100" alt="รูป">
   </div>
   <p style="font-size:12px; color:#aaa; margin-bottom:12px">กดที่รูปเพื่อเปลี่ยน</p>
-  
-  <!-- ช่องเลือกไฟล์จริง ซ่อนไว้ -->
-  <input type="file" id="avatar-file-input" accept="image/*">
-  
   <input type="text" class="edit-input" id="name-input" placeholder="ตั้งชื่อ เช่น เครื่องที่ 1">
-  
   <div class="edit-buttons">
     <button class="edit-btn cancel" onclick="closeEditProfile()">ยกเลิก</button>
     <button class="edit-btn save" onclick="saveProfile()">บันทึก</button>
@@ -231,21 +239,19 @@
 </div>
 
 <script>
-// โหลดที่บันทึกไว้
+// === โหลดข้อมูลที่บันทึกไว้ ===
 let savedName = localStorage.getItem('userDisplayName') || '@ThaiPodee';
 let savedAvatar = localStorage.getItem('userAvatar');
 
-// แสดงชื่อ
 document.getElementById('display-name').textContent = savedName;
 document.getElementById('name-input').value = savedName.replace('@','');
 
-// แสดงรูป — ถ้ามี → ใช้ ถ้าไม่มี → รูปเริ่มต้น
 if (savedAvatar) {
   document.getElementById('avatar-img').src = savedAvatar;
   document.getElementById('edit-avatar-preview').src = savedAvatar;
 }
 
-// เปิด-ปิด
+// === เปิด-ปิด แก้ไขโปรไฟล์ ===
 function openEditProfile() {
   document.getElementById('edit-profile-panel').classList.add('show');
 }
@@ -253,39 +259,59 @@ function closeEditProfile() {
   document.getElementById('edit-profile-panel').classList.remove('show');
 }
 
-// เลือกรูปจากเครื่อง → แสดงทันที
-const fileInput = document.getElementById('avatar-file-input');
-fileInput.addEventListener('change', function(e) {
+// === เปลี่ยนรูปโปรไฟล์ ===
+document.getElementById('avatar-file-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  
   const reader = new FileReader();
-  reader.onload = function(event) {
-    const imgData = event.target.result;
-    document.getElementById('avatar-img').src = imgData;
-    document.getElementById('edit-avatar-preview').src = imgData;
-    savedAvatar = imgData;
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    document.getElementById('avatar-img').src = dataUrl;
+    document.getElementById('edit-avatar-preview').src = dataUrl;
+    savedAvatar = dataUrl;
   };
   reader.readAsDataURL(file);
 });
 
-// บันทึกชื่อ
+// === บันทึกชื่อ ===
 function saveProfile() {
   let name = document.getElementById('name-input').value.trim();
   if (!name) { alert('กรุณาใส่ชื่อ'); return; }
   if (!name.startsWith('@')) name = '@' + name;
-  
   savedName = name;
   document.getElementById('display-name').textContent = savedName;
   localStorage.setItem('userDisplayName', savedName);
-  
-  if (savedAvatar) {
-    localStorage.setItem('userAvatar', savedAvatar);
-  }
-  
+  if (savedAvatar) localStorage.setItem('userAvatar', savedAvatar);
   closeEditProfile();
-  alert('✅ บันทึกแล้ว!\nชื่อ: ' + savedName);
+  alert('✅ บันทึกแล้ว!\n' + savedName);
 }
+
+// === ปุ่มบวก — เลือกและแสดงวิดีโอ ===
+document.getElementById('video-file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const videoEl = document.getElementById('main-video');
+  const playIcon = document.getElementById('play-icon');
+
+  // สร้างลิงก์ชั่วคราวจากไฟล์ในเครื่อง
+  const url = URL.createObjectURL(file);
+  videoEl.src = url;
+
+  // ซ่อนปุ่มเล่น แสดงวิดีโอ
+  playIcon.style.display = 'none';
+  videoEl.style.display = 'block';
+
+  // เปลี่ยนคำอธิบายเป็นชื่อไฟล์
+  document.getElementById('video-desc').textContent = file.name;
+
+  alert('✅ โหลดวิดีโอสำเร็จ!\nชื่อ: ' + file.name);
+});
+
+// กดเล่นตรงกลาง
+document.getElementById('play-icon').addEventListener('click', function() {
+  alert('กดปุ่ม + สีแดงเพื่อเลือกวิดีโอจากเครื่องของคุณ');
+});
 </script>
 
 </body>
