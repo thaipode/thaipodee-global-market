@@ -1,10 +1,14 @@
 <!-- ==============================================================
-   ThaiPodee v1129-2 — ✅ ดินสอหลังชื่อ → เปลี่ยนชื่อได้
-   อัปเดต: 30 กันยายน 2569 00:40 น.
+   ThaiPodee v1129-4 — ✅ แตะหยุด/เล่น + เล่นวนซ้ำไม่จบ
+   อัปเดต: 30 กันยายน 2569 01:05 น.
    --------------------------------------------------------------
    🔒 หน้าจอหลัก — ล็อกไว้ ไม่แก้เลย
-   ✅ ไอคอนดินสอ ✏️ อยู่ข้างหลังชื่อโปรไฟล์ตรงรูป
-   ✅ กดดินสอ → เปลี่ยนชื่อได้ → บันทึก → แสดงทันที
+   ✅ เพิ่ม: โหลดเสร็จ → เล่นเองทันที
+   ✅ แตะหน้าจอ 1 ครั้ง → หยุด
+   ✅ แตะอีกครั้ง → เล่นต่อ
+   ✅ จบแล้วเล่นใหม่อัตโนมัติ วนไปเรื่อย ๆ ไม่หยุด
+   ✅ หยุดได้ก็ต่อเมื่อคนดูแตะเอง
+   ✅ ดินสอเปลี่ยนชื่อ + เปิด-ปิดโปรไฟล์ — เหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -16,18 +20,22 @@
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ===== หน้าจอหลัก — ล็อกไว้ ไม่แก้เลย ===== */
+  /* ===== หน้าจอหลัก — ล็อกไว้ ===== */
   .top-version { position:absolute; top:8px; right:12px; font-size:13px; color:#888; z-index:100; }
   .search-icon { position:absolute; top:36px; right:16px; font-size:20px; cursor:pointer; z-index:100; }
   .tabs { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:24px; font-size:15px; }
   .tabs span { opacity:0.5; cursor:pointer; }
   .tabs span.active { opacity:1; border-bottom:2px solid #fff; padding-bottom:2px; }
 
-  .video-container { position:absolute; top:70px; bottom:80px; left:0; right:0; display:flex; align-items:center; justify-content:center; }
+  .video-container {
+    position:absolute; top:70px; bottom:80px; left:0; right:0;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; /* บอกให้รู้ว่าแตะได้ */
+  }
   .play-btn { font-size:60px; opacity:0.8; cursor:pointer; }
   .main-video { max-width:100%; max-height:100%; display:none; }
 
-  .video-info { position:absolute; bottom:90px; left:12px; right:70px; }
+  .video-info { position:absolute; bottom:90px; left:12px; right:70px; pointer-events:none; }
   .video-info .acc-name { font-weight:bold; margin-bottom:4px; }
   .video-info .desc { font-size:13px; opacity:0.8; }
 
@@ -41,7 +49,7 @@
   .nav-item { text-align:center; cursor:pointer; font-size:13px; }
   .nav-item .plus-btn { width:48px; height:32px; background:#f00; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold; border:none; cursor:pointer; }
 
-  /* ===== หน้าโปรไฟล์ ===== */
+  /* ===== หน้าโปรไฟล์ — เหมือนเดิม ===== */
   .profile-page {
     position:fixed; top:0; left:0; right:0; bottom:0;
     background:#fff; color:#000; z-index:150;
@@ -70,7 +78,6 @@
     font-size:18px; cursor:pointer;
   }
 
-  /* ===== ชื่อ + ดินสออยู่ข้างหลัง ตรงรูป ===== */
   .profile-name-wrap {
     display:flex; align-items:center; justify-content:center; gap:6px;
     margin-bottom:4px;
@@ -110,7 +117,6 @@
     grid-column:1/-1; text-align:center; padding:40px 20px; color:#999; font-size:14px;
   }
 
-  /* ===== กล่องแก้ชื่อ ===== */
   .name-edit-popup {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     background:#fff; border:1px solid #ddd; border-radius:10px;
@@ -135,8 +141,7 @@
 </head>
 <body>
 
-<!-- ===== หน้าจอหลัก — ล็อกไว้ เหมือนเดิม ===== -->
-<div class="top-version">v1129-2</div>
+<div class="top-version">v1129-4</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
@@ -145,9 +150,10 @@
 
 <div class="search-icon">🔍</div>
 
-<div class="video-container" id="video-area">
+<!-- พื้นที่วิดีโอ — แตะเพื่อหยุด/เล่น -->
+<div class="video-container" id="video-area" onclick="togglePlayPause()">
   <div class="play-btn" id="play-icon">▶</div>
-  <video id="main-video" class="main-video" controls playsinline></video>
+  <video id="main-video" class="main-video" controls playsinline loop></video>
 </div>
 
 <div class="video-info">
@@ -156,7 +162,7 @@
 </div>
 
 <div class="side-icons">
-  <div class="side-icon p-avatar" onclick="toggleProfile()">
+  <div class="side-icon p-avatar" onclick="event.stopPropagation(); toggleProfile()">
     <img id="avatar-img" src="https://via.placeholder.com/100" alt="โปรไฟล์">
   </div>
   <div class="side-icon">❤️<span>27</span></div>
@@ -167,13 +173,13 @@
 </div>
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="goHome()">🏠<br>หน้าหลัก</div>
+  <div class="nav-item" onclick="event.stopPropagation(); goHome()">🏠<br>หน้าหลัก</div>
   <div class="nav-item">🛒<br>ร้านค้า</div>
   <div class="nav-item">
-    <button class="plus-btn" onclick="document.getElementById('video-file-input').click()">+</button>
+    <button class="plus-btn" onclick="event.stopPropagation(); document.getElementById('video-file-input').click()">+</button>
   </div>
   <div class="nav-item">💬<br>ข้อความ</div>
-  <div class="nav-item" id="profile-nav-btn" onclick="toggleProfile()">👤<br>โปรไฟล์</div>
+  <div class="nav-item" onclick="event.stopPropagation(); toggleProfile()">👤<br>โปรไฟล์</div>
 </div>
 
 <input type="file" id="video-file-input" accept="video/*">
@@ -197,7 +203,6 @@
       <div class="add-photo-badge">+</div>
     </div>
 
-    <!-- ✅ ชื่อ + ดินสออยู่ข้างหลัง ตรงรูป -->
     <div class="profile-name-wrap">
       <h1 class="profile-fullname" id="profile-fullname">THAIPODEE PRODUCT ENGINEERING</h1>
       <span class="edit-name-pencil" onclick="openNameEdit()">✏️</span>
@@ -233,7 +238,6 @@
   </div>
 </div>
 
-<!-- ✅ กล่องแก้ชื่อ -->
 <div class="name-edit-popup" id="name-edit-popup">
   <h4>เปลี่ยนชื่อโปรไฟล์</h4>
   <input type="text" id="new-name-input" placeholder="ใส่ชื่อใหม่ตรงนี้">
@@ -250,7 +254,7 @@ let savedUsername = localStorage.getItem('userDisplayName') || '@ThaiPodee';
 let savedAvatar = localStorage.getItem('userAvatar');
 let uploadedVideos = JSON.parse(localStorage.getItem('uploadedVideos') || '[]');
 
-// === โหลดชื่อที่บันทึก ===
+// === โหลดชื่อ+รูป ===
 document.getElementById('profile-fullname').textContent = savedDisplayName;
 document.getElementById('display-name').textContent = savedUsername;
 if (savedAvatar) {
@@ -282,7 +286,7 @@ document.getElementById('profile-avatar-input').addEventListener('change', e => 
   r.readAsDataURL(f);
 });
 
-// === ✅ กดดินสอ → เปลี่ยนชื่อ ===
+// === เปลี่ยนชื่อผ่านดินสอ ===
 function openNameEdit() {
   document.getElementById('new-name-input').value = savedDisplayName;
   document.getElementById('name-edit-popup').classList.add('show');
@@ -300,21 +304,46 @@ function saveNewName() {
   alert('✅ เปลี่ยนชื่อเป็น:\n' + newName);
 }
 
-// === อัปโหลดวิดีโอ ===
+// === ✅ แตะหน้าจอ → หยุด / เล่นต่อ ===
+function togglePlayPause() {
+  const video = document.getElementById('main-video');
+  const playIcon = document.getElementById('play-icon');
+  
+  if (!video.src) return; // ยังไม่มีวิดีโอ ไม่ทำอะไร
+
+  if (video.paused) {
+    video.play();
+    playIcon.style.display = 'none';
+  } else {
+    video.pause();
+    playIcon.style.display = 'block';
+  }
+}
+
+// === ✅ อัปโหลดวิดีโอ → เล่นเองทันที + วนซ้ำตลอด ===
 document.getElementById('video-file-input').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
-  const videoEl = document.getElementById('main-video');
+  const video = document.getElementById('main-video');
   const playIcon = document.getElementById('play-icon');
   const url = URL.createObjectURL(f);
-  videoEl.src = url;
+
+  video.src = url;
   playIcon.style.display = 'none';
-  videoEl.style.display = 'block';
+  video.style.display = 'block';
+  
+  // เล่นเองทันที + วนซ้ำอัตโนมัติ
+  video.loop = true; // จบแล้วเล่นใหม่เอง วนไปเรื่อย
+  video.play().catch(() => {
+    video.muted = true;
+    video.play();
+  });
+
   document.getElementById('video-desc').textContent = f.name;
 
   uploadedVideos.unshift({ name: f.name, url: url, time: new Date().toLocaleString('th-TH') });
   localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
   renderVideoGrid();
-  alert('✅ อัปโหลดสำเร็จ!');
+  alert('✅ อัปโหลดสำเร็จ!\n▶ เล่นอัตโนมัติ — แตะหน้าจอเพื่อหยุด/เล่นต่อ');
 });
 
 // === แสดงตารางวิดีโอ ===
@@ -326,16 +355,19 @@ function renderVideoGrid() {
   }
   grid.innerHTML = uploadedVideos.map(v => `
     <div class="grid-item" title="${v.name}">
-      <video muted><source src="${v.url}"></video>
+      <video muted playsinline><source src="${v.url}"></video>
       <span class="grid-duration">▶</span>
     </div>
   `).join('');
 }
 renderVideoGrid();
 
-// === กดเล่นตรงกลาง ===
-document.getElementById('play-icon').addEventListener('click', () => {
-  alert('กดปุ่ม + สีแดงเพื่อเลือกวิดีโอจากเครื่องของคุณ');
+// === กดปุ่มเล่นตรงกลางเมื่อยังไม่มีวิดีโอ ===
+document.getElementById('play-icon').addEventListener('click', e => {
+  const video = document.getElementById('main-video');
+  if (!video.src) {
+    alert('กดปุ่ม + สีแดงเพื่อเลือกวิดีโอจากเครื่องของคุณ');
+  }
 });
 </script>
 
