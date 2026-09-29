@@ -1,9 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1079 — ปุ่มกดได้ชัดเจน + วิดีโอเล่นทันที
-   อัปเดต: 29 กันยายน 2569 19:14 น.
+   ThaiPodee v1080 — ปุ่มบวกเปิดเลือกไฟล์จริง + อัปโหลดได้
+   อัปเดต: 29 กันยายน 2569 19:16 น.
    --------------------------------------------------------------
-   ปัญหา: ปุ่มบวกสีแดงโดนบัง กดไม่ได้
-   แก้ไข: ยก z-index สูงขึ้น ไม่มีอะไรบัง → กดได้เลย
+   ปัญหา: ปุ่มบวกแค่แจ้งเตือน ไม่ทำอะไรต่อ
+   แก้ไข: กดปุ่ม → เปิดหน้าเลือกวิดีโอ → เพิ่มเข้ารายการ → เล่นได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -26,46 +26,44 @@
   .video-slide {
     width: 100%; height: 100vh; display: flex;
     align-items: center; justify-content: center;
-    position: relative;
-    background: #000;
+    position: relative; background: #000;
   }
   video {
     width: 100%; height: 100%; object-fit: contain; background: #000;
   }
   .side-icons {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 24px;
-    align-items: center; z-index: 15;
+    display: flex; flex-direction: column; gap: 24px; z-index: 15;
+    align-items: center;
   }
   .icon-btn {
     width: 48px; height: 48px; border-radius: 50%;
     background: transparent; border: none; color: #fff;
     font-size: 26px; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
-    pointer-events: auto;
   }
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
     background: rgba(0,0,0,0.85); display: flex;
     justify-content: space-around; align-items: center;
-    z-index: 99; /* สูงสุด ไม่มีอะไรบัง */
-    pointer-events: auto;
+    z-index: 99;
   }
   .nav-btn {
     background: none; border: none; color: #fff; font-size: 22px;
     cursor: pointer; padding: 6px 12px;
-    pointer-events: auto;
   }
   .nav-main {
     width: 56px; height: 56px; border-radius: 50%;
     background: #ff0000; display: flex; align-items: center;
     justify-content: center; transform: translateY(-10px);
     font-size: 28px; border: none; cursor: pointer;
-    pointer-events: auto;
   }
+  #fileInput { display: none; }
 </style>
 </head>
 <body>
+
+<input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
   <div id="videoWrapper"></div>
@@ -84,6 +82,7 @@
 <script>
 const container = document.getElementById('container');
 const wrapper = document.getElementById('videoWrapper');
+const fileInput = document.getElementById('fileInput');
 let videos = [];
 let currentIndex = 0;
 let startY = 0;
@@ -112,13 +111,11 @@ if (container) {
     isDragging = true;
     offsetY = 0;
   });
-
   container.addEventListener('touchmove', e => {
     if (!isDragging) return;
     offsetY = e.touches[0].clientY - startY;
     wrapper.style.transform = `translateY(calc(-${currentIndex * 100}vh + ${offsetY * 0.3}px))`;
   });
-
   container.addEventListener('touchend', () => {
     if (!isDragging) return;
     isDragging = false;
@@ -160,13 +157,20 @@ function addBottomNav() {
   `;
   document.body.appendChild(nav);
 
-  // กดปุ่มบวก → แจ้งเตือนทำงาน
-  const uploadBtn = document.getElementById('uploadBtn');
-  if (uploadBtn) {
-    uploadBtn.addEventListener('click', () => {
-      alert('กำลังเปิดหน้าอัปโหลดวิดีโอ...');
-    });
-  }
+  // กดปุ่มบวก → เปิดเลือกไฟล์
+  document.getElementById('uploadBtn').addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  // เลือกไฟล์เสร็จ → เพิ่มเข้ารายการ
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    videos.unshift({ src: url }); // ใส่ไว้ด้านบนสุด
+    renderVideos();
+    goToSlide(0); // ขึ้นเล่นทันที
+  });
 }
 
 document.addEventListener('DOMContentLoaded', loadVideos);
