@@ -1,10 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1109 — เพิ่มแถบเส้นเวลาวิดีโอ
-   อัปเดต: 29 กันยายน 2569 21:05 น.
+   ThaiPodee v1110 — LOCKED ✅ ล็อกทั้งหมด ไม่ขยับ ไม่เปลี่ยน
+   อัปเดต: 29 กันยายน 2569 21:08 น.
    --------------------------------------------------------------
-   ✅ เพิ่มแถบความคืบหน้าด้านล่างวิดีโอ — เลื่อนได้
-   ✅ แสดงเวลาปัจจุบัน / เวลารวม
-   ✅ ทุกอย่างเดิมยังทำงานครบถ้วน
+   🔒 ล็อกไอคอนด้านขวา — ตำแหน่ง ขนาด ระยะห่าง คงที่ 100%
+   🔒 ล็อกแถบล่าง — ปุ่ม ตำแหน่ง ขนาด สี คงที่
+   🔒 ล็อกข้อมูลมุมล่างซ้าย — ชื่อ คำอธิบาย แท็ก คงที่
+   🔒 ล็อกวิดีโอ — แนวตั้งเต็มจอ / แนวนอนอยู่ตรงกลาง
+   🔒 ล็อกเส้นเวลา — ตำแหน่ง คงที่
+   🔒 ทั้งหน้าล็อกไว้ — ไม่เปลี่ยนจนกว่าจะมีคำสั่งใหม่
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -13,150 +16,298 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
   html, body {
-    width: 100%; height: 100%; overflow: hidden;
-    background: #000; color: #fff; font-family: -apple-system, sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
   }
 
   .version-tag {
-    position: absolute; top: 12px; right: 12px;
-    background: rgba(0,0,0,0.55); color: #fff;
-    font-size: 12px; padding: 3px 8px; border-radius: 10px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 10px;
     z-index: 100;
   }
 
-  .loading-box {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8); color: #fff;
-    padding: 24px 32px; border-radius: 12px; text-align: center;
-    z-index: 60; display: none;
-  }
-  .loading-box.show { display: block; }
-  .ratio-text { font-size: 22px; font-weight: bold; margin-top: 8px; }
-
+  /* === ล็อกแท็บบน === */
   .top-tabs {
-    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 24px; z-index: 99;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 24px;
+    z-index: 99;
   }
   .tab-item {
-    font-size: 15px; color: #aaa; padding-bottom: 4px;
+    font-size: 15px;
+    color: #aaa;
+    padding-bottom: 4px;
     border-bottom: 2px solid transparent;
   }
   .tab-item.active {
-    color: #fff; border-bottom-color: #fff; font-weight: 600;
+    color: #fff;
+    border-bottom-color: #fff;
+    font-weight: 600;
   }
   .search-icon {
-    position: absolute; top: 12px; right: 45px; font-size: 20px; z-index: 99;
+    position: absolute;
+    top: 12px;
+    right: 45px;
+    font-size: 20px;
+    z-index: 99;
   }
 
   #container {
-    width: 100%; height: 100vh; overflow: hidden; position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
     background: #000;
   }
+
   #videoWrapper {
-    width: 100%; height: 100%; transition: transform 0.15s ease-out;
-    position: relative; z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
   }
+
   .video-slide {
-    width: 100%; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    background: #000; position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    position: relative;
   }
 
   video {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #000; z-index: 2; display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 2;
+    display: block;
   }
-  video.is-portrait { object-fit: cover; }
-  video.is-landscape { object-fit: contain; }
+  /* 🔒 ล็อกการแสดงวิดีโอ */
+  video.is-portrait {
+    object-fit: cover;  /* แนวตั้งเต็มจอพอดี */
+  }
+  video.is-landscape {
+    object-fit: contain; /* แนวนอนอยู่ตรงกลาง ไม่ขยาย */
+  }
 
   video::cue { display: none !important; }
   [id*="silent"], [class*="silent"], .debug, .meta {
-    display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important;
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
   }
 
-  /* === แถบเส้นเวลาวิดีโอ === */
+  /* === 🔒 ล็อกเส้นเวลา === */
   .progress-container {
-    position: absolute; bottom: 85px; left: 12px; right: 12px;
-    z-index: 10; display: flex; align-items: center; gap: 8px;
+    position: absolute;
+    bottom: 85px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 4px 0;
+    pointer-events: auto;
   }
   .time-text {
-    font-size: 11px; color: #ccc; min-width: 40px; text-align: center;
+    font-size: 11px;
+    color: #ccc;
+    min-width: 40px;
+    text-align: center;
   }
   .progress-bar-bg {
-    flex: 1; height: 3px; background: rgba(255,255,255,0.2);
-    border-radius: 3px; cursor: pointer;
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    cursor: pointer;
   }
   .progress-bar-fill {
-    height: 100%; background: #ff2d55; width: 0%; border-radius: 3px;
+    height: 100%;
+    background: #ff2d55;
+    width: 0%;
+    border-radius: 3px;
     transition: width 0.1s linear;
   }
 
+  /* === 🔒 ล็อกข้อมูลมุมล่างซ้าย — คงที่ === */
   .video-info {
-    position: absolute; bottom: 55px; left: 12px; right: 70px;
-    z-index: 5; pointer-events: none;
+    position: absolute;
+    bottom: 55px;
+    left: 12px;
+    right: 70px;
+    z-index: 5;
+    pointer-events: none;
   }
   .info-username {
-    font-weight: 600; font-size: 14px; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .follow-badge {
-    background: #fff; color: #000; font-size: 10px; padding: 1px 6px;
-    border-radius: 4px; font-weight: bold;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: bold;
   }
-  .info-title { font-size: 13px; margin-bottom: 4px; color: #f0f0f0; }
-  .info-tags { font-size: 12px; color: #ccc; }
+  .info-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #f0f0f0;
+  }
+  .info-tags {
+    font-size: 12px;
+    color: #ccc;
+  }
 
+  /* === 🔒 ล็อกไอคอนด้านขวา — ตำแหน่ง+ขนาด+ระยะ คงที่ === */
   .side-icons {
-    position: absolute; right: 10px; bottom: 110px;
-    display: flex; flex-direction: column; gap: 22px;
-    z-index: 5; align-items: center;
+    position: absolute;
+    right: 10px;
+    bottom: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;           /* ระยะห่างระหว่างไอคอน คงที่ */
+    z-index: 5;
+    align-items: center;
   }
   .icon-wrap {
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
   }
   .icon-btn {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: rgba(255,255,255,0.15); border: none; color: #fff;
-    font-size: 22px; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
+    width: 44px;          /* ขนาดปุ่ม คงที่ */
+    height: 44px;
+    border-radius: 50%;   /* ทรงกลม คงที่ */
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    font-size: 22px;      /* ขนาดไอคอน คงที่ */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .icon-count { font-size: 11px; color: #fff; }
-  .profile-icon-wrap { position: relative; }
+  .icon-count {
+    font-size: 11px;
+    color: #fff;
+  }
+  .profile-icon-wrap {
+    position: relative;
+  }
   .follow-plus {
-    position: absolute; bottom: -4px; right: -4px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #ff2d55; color: #fff; font-size: 12px;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff2d55;
+    color: #fff;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
   }
 
+  /* === 🔒 ล็อกแถบนำทางด้านล่าง — คงที่ทั้งแถบ === */
   .bottom-nav {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;         /* ความสูงแถบ คงที่ */
     background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7), transparent);
-    display: flex; justify-content: space-around; align-items: center;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     z-index: 6;
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
   .nav-btn {
-    background: none; border: none; color: #fff;
-    font-size: 22px; cursor: pointer;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 2px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;      /* ขนาดไอคอน คงที่ */
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
   }
-  .nav-label { font-size: 10px; }
+  .nav-label {
+    font-size: 10px;      /* ขนาดตัวหนังสือ คงที่ */
+  }
   .nav-main {
-    width: 52px; height: 36px; border-radius: 8px;
-    background: #ff2d55; display: flex; align-items: center;
-    justify-content: center; font-size: 24px; border: none;
+    width: 52px;          /* ปุ่มกลางสีแดง — ขนาด คงที่ */
+    height: 36px;
+    border-radius: 8px;
+    background: #ff2d55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: none;
     cursor: pointer;
   }
 
   #fileInput { display: none; }
+
+  /* กล่องแสดงสัดส่วนตอนโหลด */
+  .loading-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 24px 32px;
+    border-radius: 12px;
+    text-align: center;
+    z-index: 60;
+    display: none;
+  }
+  .loading-box.show { display: block; }
+  .ratio-text {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 8px;
+  }
 </style>
 </head>
 <body>
@@ -164,7 +315,7 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1109</div>
+  <div class="version-tag">v1110 🔒</div>
 
   <div class="loading-box" id="loadingBox">
     <div>กำลังโหลดวิดีโอ...</div>
@@ -179,7 +330,6 @@
 
   <div id="videoWrapper"></div>
 
-  <!-- === แถบเส้นเวลา === -->
   <div class="progress-container" id="progressContainer" style="display:none;">
     <span class="time-text" id="currentTime">0:00</span>
     <div class="progress-bar-bg" id="progressBarBg">
@@ -287,7 +437,6 @@ function updatePlayState() {
   });
 }
 
-// อัปเดตแถบเวลา
 function updateProgress() {
   if (!activeVideo) return;
   const pct = (activeVideo.currentTime / activeVideo.duration) * 100;
@@ -296,7 +445,6 @@ function updateProgress() {
   totalTimeEl.textContent = formatTime(activeVideo.duration);
 }
 
-// กดข้ามเวลา
 function seekVideo(e) {
   if (!activeVideo) return;
   const rect = progressBarBg.getBoundingClientRect();
