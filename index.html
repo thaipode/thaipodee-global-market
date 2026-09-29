@@ -1,15 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130 — ✅ คืนครบทุกอย่าง ตรงรูปเป๊ะ
-   อัปเดต: 29 กันยายน 2569 23:56 น.
+   ThaiPodee v1129 — ✅ ปุ่มบวกอัปโหลดวิดีโอทำงาน + เปลี่ยนรูปได้
+   อัปเดต: 29 กันยายน 2569 23:18 น.
    --------------------------------------------------------------
-   📋 ครบทุกจุดตามรูป:
-   ✅ บาร์บน: กำลังติดตาม / สำหรับคุณ / v1129 / 🔍
-   ✅ พื้นดำ ปุ่มเล่นสามเหลี่ยมตรงกลาง
-   ✅ ไอคอนขวาแนวตั้งครบทุกอัน: เข็มทิศ, ❤️27, 💬0, 📌0, ↗0, 🎵3:02
-   ✅ ชื่อผู้ใช้ + ชื่อวิดีโอ + ความยาว ที่ด้านล่างซ้าย — คืนมาแล้ว
-   ✅ แถบล่างแนวนอนครบ: หน้าหลัก, ร้านค้า, +แดง, ข้อความ, โปรไฟล์
-   ✅ กด + → เลือก→โพสต์วิดีโอได้
-   ✅ ไม่มีอะไรเพิ่ม ไม่มีอะไรหาย ตรงเป๊ะรูปเลย
+   ✅ ข้อ1: v1129 บนสุด — แว่นขยายลงมา ไม่ทับ
+   ✅ ข้อ2: เปลี่ยนชื่อ+รูปโปรไฟล์ได้ เลือกจากเครื่อง
+   ✅ ข้อ3: ปุ่มบวกสีแดง → กดเลือกวิดีโอจากเครื่อง เล่นได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -18,165 +13,305 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThaiPodee</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, sans-serif; }
-  html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
+  body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ===== บาร์บน ตรงเป๊ะ ===== */
-  .top-bar {
-    position: fixed; top: 0; left: 0; right: 0; height: 50px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px; z-index: 100; background: #000;
+  /* ===== บนสุด ===== */
+  .top-version {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 13px;
+    color: #888;
+    z-index: 100;
   }
-  .top-tabs { display: flex; gap: 24px; font-size: 14px; }
-  .top-tabs span { color: #888; cursor: pointer; padding-bottom: 4px; }
-  .top-tabs span.active { color: #fff; border-bottom: 1px solid #fff; }
-  .top-right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #888; }
-  .search-icon { font-size: 18px; cursor: pointer; }
+  .search-icon {
+    position: absolute;
+    top: 36px;
+    right: 16px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
+  }
+  .tabs {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 24px;
+    font-size: 15px;
+  }
+  .tabs span { opacity: 0.5; }
+  .tabs span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
 
-  /* ===== พื้นที่วิดีโอ ===== */
-  .video-wrap {
-    position: absolute; inset: 0; padding-top: 50px; padding-bottom: 70px;
+  /* ===== วิดีโอ ===== */
+  .video-container {
+    position: absolute;
+    top: 70px;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .video-center {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 48px; color: rgba(255,255,255,0.4); cursor: pointer;
-  }
-  video {
-    width: 100%; height: 100%; object-fit: contain; display: none;
-  }
-
-  /* ===== ข้อมูลล่างซ้าย — คืนมาแล้ว ===== */
-  .bottom-left-info {
-    position: absolute; left: 12px; bottom: 80px; right: 90px;
-  }
-  .acc-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; }
-  .vid-name { font-size: 13px; opacity: 0.85; margin-bottom: 2px; }
-  .vid-meta { font-size: 11px; color: #888; }
-
-  /* ===== ไอคอนขวาแนวตั้ง — ครบทุกอัน ===== */
-  .right-col {
-    position: absolute; right: 12px; bottom: 80px;
-    display: flex; flex-direction: column; gap: 20px; align-items: center;
-  }
-  .r-icon {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 2px; font-size: 22px;
-  }
-  .r-icon span { font-size: 11px; opacity: 0.7; }
-  .compass {
-    width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff;
-    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  .play-btn { font-size: 60px; opacity: 0.8; cursor: pointer; }
+  .main-video {
+    max-width: 100%;
+    max-height: 100%;
+    display: none;
   }
 
-  /* ===== แถบล่างแนวนอน — ครบทุกอัน ===== */
+  /* ===== ไอคอนด้านขวา ===== */
+  .side-icons {
+    position: absolute;
+    right: 12px;
+    bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+  }
+  .side-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    gap: 4px;
+  }
+  .side-icon.p-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #333;
+    overflow: hidden;
+    border: 2px solid #555;
+  }
+  .side-icon.p-avatar img { width:100%; height:100%; object-fit:cover; }
+  .side-icon span { font-size: 11px; opacity: 0.7; }
+
+  /* ===== แถบล่าง ===== */
   .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
-    background: #000; display: flex; justify-content: space-around;
-    align-items: center; border-top: 1px solid #222; z-index: 100;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #000;
+    border-top: 1px solid #222;
   }
-  .nav-btn { text-align: center; cursor: pointer; }
-  .nav-i { font-size: 20px; margin-bottom: 2px; }
-  .nav-t { font-size: 10px; color: #aaa; }
-  .plus-red {
-    width: 48px; height: 34px; background: #ff0000; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; font-weight: bold; cursor: pointer;
+  .nav-item { text-align: center; cursor: pointer; font-size: 13px; }
+  .nav-item .plus-btn {
+    width: 48px; height: 32px;
+    background: #f00;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
   }
 
-  /* ===== ซ่อนไฟล์===== */
-  #vid-input { display: none; }
+  /* ===== หน้าแก้ไขโปรไฟล์ ===== */
+  .edit-profile-overlay {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.92);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px;
+  }
+  .edit-profile-overlay.show { display: flex; }
+  .edit-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: #333;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 3px solid #666;
+    cursor: pointer;
+  }
+  .edit-avatar img { width:100%; height:100%; object-fit:cover; }
+  .edit-input {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 16px;
+    font-size: 16px;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .edit-buttons { display: flex; gap: 12px; }
+  .edit-btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .edit-btn.save { background: #00c853; color: #fff; }
+  .edit-btn.cancel { background: #444; color: #fff; }
+
+  /* ===== ซ่อนช่องเลือกไฟล์ ===== */
+  #avatar-file-input, #video-file-input { display: none; }
+
+  /* ===== ข้อมูลใต้วิดีโอ ===== */
+  .video-info {
+    position: absolute;
+    bottom: 90px;
+    left: 12px;
+    right: 70px;
+  }
+  .video-info .acc-name { font-weight: bold; margin-bottom: 4px; }
+  .video-info .desc { font-size: 13px; opacity: 0.8; }
 </style>
 </head>
 <body>
 
-<!-- บาร์บน -->
-<div class="top-bar">
-  <div class="top-tabs">
-    <span>กำลังติดตาม</span>
-    <span class="active">สำหรับคุณ</span>
-  </div>
-  <div class="top-right">
-    <span>v1129</span>
-    <span class="search-icon">🔍</span>
-  </div>
+<div class="top-version">v1129</div>
+
+<div class="tabs">
+  <span>กำลังติดตาม</span>
+  <span class="active">สำหรับคุณ</span>
 </div>
 
-<!-- พื้นที่หลัก -->
-<div class="video-wrap">
-  <div class="video-center" id="play-btn" onclick="playVid()">▶</div>
-  <video id="vid-player" controls playsinline loop></video>
+<div class="search-icon">🔍</div>
 
-  <!-- ข้อมูลล่างซ้าย — ครบแล้ว -->
-  <div class="bottom-left-info" id="info-block" style="display:none;">
-    <div class="acc-name" id="u-name">@Thaipodee Master No1</div>
-    <div class="vid-name" id="v-name">Lamai Plai Mat Nights – ลำปลายมาศนิทราฯ</div>
-    <div class="vid-meta" id="v-meta">3:02</div>
-  </div>
-
-  <!-- ไอคอนขวาแนวตั้ง — ครบทุกอัน -->
-  <div class="right-col">
-    <div class="r-icon"><div class="compass">⊕</div></div>
-    <div class="r-icon">❤️<span>27</span></div>
-    <div class="r-icon">💬<span>0</span></div>
-    <div class="r-icon">📌<span>0</span></div>
-    <div class="r-icon">↗️<span>0</span></div>
-    <div class="r-icon">🎵<span>3:02</span></div>
-  </div>
+<!-- พื้นที่วิดีโอ -->
+<div class="video-container" id="video-area">
+  <div class="play-btn" id="play-icon">▶</div>
+  <video id="main-video" class="main-video" controls playsinline></video>
 </div>
 
-<!-- แถบล่างแนวนอน — ครบทุกอัน -->
+<div class="video-info">
+  <div class="acc-name" id="display-name">@ThaiPodee</div>
+  <div class="desc" id="video-desc">Lamai Plai Mat Nights — สินค้าและบริการ</div>
+</div>
+
+<div class="side-icons">
+  <div class="side-icon p-avatar" onclick="openEditProfile()">
+    <img id="avatar-img" src="https://via.placeholder.com/100" alt="โปรไฟล์">
+  </div>
+  <div class="side-icon">❤️<span>27</span></div>
+  <div class="side-icon">💬<span>0</span></div>
+  <div class="side-icon">📌<span>0</span></div>
+  <div class="side-icon">↗️<span>0</span></div>
+  <div class="side-icon">🎵<span>3:02</span></div>
+</div>
+
 <div class="bottom-nav">
-  <div class="nav-btn">
-    <div class="nav-i">🏠</div>
-    <div class="nav-t">หน้าหลัก</div>
+  <div class="nav-item">🏠<br>หน้าหลัก</div>
+  <div class="nav-item">🛒<br>ร้านค้า</div>
+  <div class="nav-item">
+    <button class="plus-btn" onclick="document.getElementById('video-file-input').click()">+</button>
   </div>
-  <div class="nav-btn">
-    <div class="nav-i">🛒</div>
-    <div class="nav-t">ร้านค้า</div>
-  </div>
-  <div class="nav-btn" onclick="document.getElementById('vid-input').click()">
-    <div class="plus-red">+</div>
-  </div>
-  <div class="nav-btn">
-    <div class="nav-i">💬</div>
-    <div class="nav-t">ข้อความ</div>
-  </div>
-  <div class="nav-btn">
-    <div class="nav-i">👤</div>
-    <div class="nav-t">โปรไฟล์</div>
-  </div>
+  <div class="nav-item">💬<br>ข้อความ</div>
+  <div class="nav-item" onclick="openEditProfile()">👤<br>โปรไฟล์</div>
 </div>
 
-<input type="file" id="vid-input" accept="video/*">
+<!-- ช่องเลือกวิดีโอ ซ่อนไว้ -->
+<input type="file" id="video-file-input" accept="video/*">
+
+<!-- ช่องเลือกรูปโปรไฟล์ -->
+<input type="file" id="avatar-file-input" accept="image/*">
+
+<!-- หน้าแก้ไขโปรไฟล์ -->
+<div class="edit-profile-overlay" id="edit-profile-panel">
+  <h3 style="margin-bottom:20px">ตั้งค่าโปรไฟล์</h3>
+  <div class="edit-avatar" onclick="document.getElementById('avatar-file-input').click()">
+    <img id="edit-avatar-preview" src="https://via.placeholder.com/100" alt="รูป">
+  </div>
+  <p style="font-size:12px; color:#aaa; margin-bottom:12px">กดที่รูปเพื่อเปลี่ยน</p>
+  <input type="text" class="edit-input" id="name-input" placeholder="ตั้งชื่อ เช่น เครื่องที่ 1">
+  <div class="edit-buttons">
+    <button class="edit-btn cancel" onclick="closeEditProfile()">ยกเลิก</button>
+    <button class="edit-btn save" onclick="saveProfile()">บันทึก</button>
+  </div>
+</div>
 
 <script>
-const player = document.getElementById('vid-player');
-const playBtn = document.getElementById('play-btn');
-const infoBlock = document.getElementById('info-block');
+// === โหลดข้อมูลที่บันทึกไว้ ===
+let savedName = localStorage.getItem('userDisplayName') || '@ThaiPodee';
+let savedAvatar = localStorage.getItem('userAvatar');
 
-// เลือกและโพสต์วิดีโอ
-document.getElementById('vid-input').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
+document.getElementById('display-name').textContent = savedName;
+document.getElementById('name-input').value = savedName.replace('@','');
 
+if (savedAvatar) {
+  document.getElementById('avatar-img').src = savedAvatar;
+  document.getElementById('edit-avatar-preview').src = savedAvatar;
+}
+
+// === เปิด-ปิด แก้ไขโปรไฟล์ ===
+function openEditProfile() {
+  document.getElementById('edit-profile-panel').classList.add('show');
+}
+function closeEditProfile() {
+  document.getElementById('edit-profile-panel').classList.remove('show');
+}
+
+// === เปลี่ยนรูปโปรไฟล์ ===
+document.getElementById('avatar-file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
-    player.src = ev.target.result;
-    playBtn.style.display = 'none';
-    player.style.display = 'block';
-    
-    // แสดงชื่อและข้อมูล
-    infoBlock.style.display = 'block';
-    document.getElementById('v-name').textContent = f.name;
-    
-    alert('✅ อัปโหลดวิดีโอเรียบร้อย!');
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    document.getElementById('avatar-img').src = dataUrl;
+    document.getElementById('edit-avatar-preview').src = dataUrl;
+    savedAvatar = dataUrl;
   };
-  reader.readAsDataURL(f);
+  reader.readAsDataURL(file);
 });
 
-function playVid() {
-  if (player.src) player.play();
+// === บันทึกชื่อ ===
+function saveProfile() {
+  let name = document.getElementById('name-input').value.trim();
+  if (!name) { alert('กรุณาใส่ชื่อ'); return; }
+  if (!name.startsWith('@')) name = '@' + name;
+  savedName = name;
+  document.getElementById('display-name').textContent = savedName;
+  localStorage.setItem('userDisplayName', savedName);
+  if (savedAvatar) localStorage.setItem('userAvatar', savedAvatar);
+  closeEditProfile();
+  alert('✅ บันทึกแล้ว!\n' + savedName);
 }
+
+// === ปุ่มบวก — เลือกและแสดงวิดีโอ ===
+document.getElementById('video-file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const videoEl = document.getElementById('main-video');
+  const playIcon = document.getElementById('play-icon');
+
+  // สร้างลิงก์ชั่วคราวจากไฟล์ในเครื่อง
+  const url = URL.createObjectURL(file);
+  videoEl.src = url;
+
+  // ซ่อนปุ่มเล่น แสดงวิดีโอ
+  playIcon.style.display = 'none';
+  videoEl.style.display = 'block';
+
+  // เปลี่ยนคำอธิบายเป็นชื่อไฟล์
+  document.getElementById('video-desc').textContent = file.name;
+
+  alert('✅ โหลดวิดีโอสำเร็จ!\nชื่อ: ' + file.name);
+});
+
+// กดเล่นตรงกลาง
+document.getElementById('play-icon').addEventListener('click', function() {
+  alert('กดปุ่ม + สีแดงเพื่อเลือกวิดีโอจากเครื่องของคุณ');
+});
 </script>
 
 </body>
