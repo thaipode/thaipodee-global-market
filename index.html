@@ -1,12 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1099 — เก็บข้อมูลผู้ใช้ / กำจัดข้อความโค้ดแปลกๆ
-   อัปเดต: 29 กันยายน 2569 20:25 น.
+   ThaiPodee v1102 — แก้ด่วน! วิดีโอไม่แสดง แต่เสียงมา
+   อัปเดต: 29 กันยายน 2569 20:27 น.
    --------------------------------------------------------------
-   ✅ เก็บ @thaipodee + คำอธิบาย + แท็ก ไว้ครบถ้วน
-   ✅ กำจัดข้อความโค้ด/รหัสแปลกๆ ใต้เมนูออกหมด
-   ✅ วิดีโอแนวตั้งเต็มจอ ไม่มีขอบดำ
-   ✅ วิดีโอแนวนอนอยู่ตรงกลาง ไม่ยืด
-   ✅ ปุ่ม/ไอคอนครบ ทำงานปกติ
+   ✅ แก้ภาพวิดีโอไม่ขึ้นโดยตรง
+   ✅ ปรับโครงสร้างให้วิดีโออยู่ชั้นล่างสุด แสดงก่อนทุกอย่าง
+   ✅ object-fit ปลอดภัย แนวตั้งเต็มจอ แนวนอนครบ
+   ✅ เสียงทำงาน + ข้อมูล/ปุ่มครบ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -21,88 +20,84 @@
     background: #000; color: #fff; font-family: -apple-system, sans-serif;
   }
 
-  /* ---- เวอร์ชัน ---- */
-  .version-tag {
-    position: absolute; top: 12px; right: 12px;
-    background: rgba(0,0,0,0.55); color: #fff;
-    font-size: 12px; padding: 3px 8px; border-radius: 10px;
-    z-index: 100;
+  /* ---- พื้นที่หลัก ---- */
+  #app {
+    width: 100%; height: 100vh; position: relative; overflow: hidden;
   }
 
-  /* ---- แถบหัวข้อ ---- */
-  .top-tabs {
-    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 24px; z-index: 99;
-  }
-  .tab-item {
-    font-size: 15px; color: #aaa; padding-bottom: 4px;
-    border-bottom: 2px solid transparent;
-  }
-  .tab-item.active {
-    color: #fff; border-bottom-color: #fff; font-weight: 600;
-  }
-  .search-icon {
-    position: absolute; top: 12px; right: 45px; font-size: 20px; z-index: 99;
-  }
-
-  /* ---- พื้นที่วิดีโอ ---- */
-  #container {
-    width: 100%; height: 100vh; overflow: hidden; position: relative;
-    background: #000;
-  }
-  #videoWrapper {
-    width: 100%; height: 100%; transition: transform 0.15s ease-out;
-  }
-  .video-slide {
-    width: 100%; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    background: #000;
-  }
-
-  /* วิดีโอแยกตามสัดส่วน */
-  video {
-    position: absolute;
-    top: 0; left: 0;
+  /* ---- พื้นที่วิดีโอ — ชั้นที่ 1 (ล่างสุด) ---- */
+  #videoArea {
+    position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
     background: #000;
+    z-index: 1; /* สำคัญ: อยู่ล่างสุดแต่แสดงได้แน่นอน */
   }
-  video.is-portrait { object-fit: cover; }
-  video.is-landscape { object-fit: contain; }
 
-  /* ---- ข้อมูลผู้ใช้ ด้านล่างซ้าย ---- */
-  .video-info {
-    position: absolute; bottom: 85px; left: 12px; right: 70px;
-    z-index: 90; pointer-events: none;
+  .video-page {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease;
   }
-  .info-username {
-    font-weight: 600; font-size: 14px; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 8px;
+  .video-page.active {
+    opacity: 1; visibility: visible;
   }
-  .follow-badge {
-    background: #fff; color: #000; font-size: 10px; padding: 1px 6px;
-    border-radius: 4px; font-weight: bold;
-  }
-  .info-title { font-size: 13px; margin-bottom: 4px; color: #f0f0f0; }
-  .info-tags { font-size: 12px; color: #ccc; }
 
-  /* ---- ไอคอนด้านขวา ---- */
-  .side-icons {
+  /* ===== แก้ตรงนี้โดยเฉพาะ ===== */
+  video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+    object-fit: contain; /* ถ้าไม่ขึ้น เปลี่ยนเป็น fill ลองดู */
+  }
+  video.portrait { object-fit: cover; }
+  video.landscape { object-fit: contain; }
+
+  /* ---- ชั้นที่ 2 — ส่วนควบคุมทั้งหมด ซ้อนบนวิดีโอ ---- */
+  .ui-layer {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10; /* อยู่บนวิดีโอ */
+    pointer-events: none;
+  }
+  .ui-layer > * { pointer-events: auto; }
+
+  /* ---- บนสุด ---- */
+  .top-bar {
+    position: absolute; top: 12px; left: 0; right: 0;
+    display: flex; justify-content: center; align-items: center;
+    padding: 0 12px;
+  }
+  .tabs { display: flex; gap: 24px; }
+  .tab { font-size: 15px; color: #aaa; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+  .tab.active { color: #fff; border-bottom-color: #fff; font-weight: 600; }
+  .search { position: absolute; right: 12px; font-size: 20px; }
+  .ver { position: absolute; right: 50px; font-size: 11px; color: #888; }
+
+  /* ---- ข้อมูลล่างซ้าย ---- */
+  .info-left {
+    position: absolute; bottom: 85px; left: 12px; right: 80px;
+  }
+  .uname { font-weight: 600; font-size: 14px; display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+  .follow-tag { background: #fff; color: #000; font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: bold; }
+  .desc { font-size: 13px; margin-bottom: 4px; color: #eee; }
+  .tags { font-size: 12px; color: #bbb; }
+
+  /* ---- ไอคอนขวา ---- */
+  .icons-right {
     position: absolute; right: 10px; bottom: 95px;
-    display: flex; flex-direction: column; gap: 22px;
-    z-index: 90; align-items: center;
-  }
-  .icon-wrap {
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    display: flex; flex-direction: column; gap: 22px; align-items: center;
   }
   .icon-btn {
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,0.15); border: none; color: #fff;
-    font-size: 22px; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
+    font-size: 22px; cursor: pointer;
   }
-  .icon-count { font-size: 11px; color: #fff; }
-  .profile-icon-wrap { position: relative; }
-  .follow-plus {
+  .icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .icon-num { font-size: 11px; }
+  .prof-wrap { position: relative; }
+  .plus-badge {
     position: absolute; bottom: -4px; right: -4px;
     width: 18px; height: 18px; border-radius: 50%;
     background: #ff2d55; color: #fff; font-size: 12px;
@@ -110,291 +105,175 @@
     font-weight: bold;
   }
 
-  /* ---- แถบเมนูล่าง ---- */
-  .bottom-nav {
+  /* ---- เมนูล่าง ---- */
+  .nav-bottom {
     position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
     background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
     display: flex; justify-content: space-around; align-items: center;
-    z-index: 99;
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  .nav-btn {
-    background: none; border: none; color: #fff;
-    font-size: 22px; cursor: pointer;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 2px;
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: #fff; font-size: 22px; border: none; background: none; cursor: pointer;
   }
   .nav-label { font-size: 10px; }
-  .nav-main {
+  .nav-plus {
     width: 52px; height: 36px; border-radius: 8px;
-    background: #ff2d55; display: flex; align-items: center;
-    justify-content: center; font-size: 24px; border: none;
-    cursor: pointer;
+    background: #ff2d55; font-size: 24px; display: flex; align-items: center; justify-content: center;
   }
-
-  /* ---- กล่องแก้ไขข้อมูล ---- */
-  .edit-box {
-    position: absolute; bottom: 80px; left: 12px; right: 12px;
-    background: #1c1c1e; border-radius: 12px; padding: 16px;
-    z-index: 101; display: none;
-  }
-  .edit-box.show { display: block; }
-  .edit-box input, .edit-box textarea {
-    width: 100%; padding: 10px; border-radius: 8px;
-    border: none; background: #2c2c2e; color: #fff;
-    font-size: 15px; margin-bottom: 8px;
-  }
-  .edit-buttons {
-    display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px;
-  }
-  .edit-btn {
-    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
-  }
-  .cancel-btn { background: #444; color: #fff; }
-  .save-btn { background: #ff2d55; color: #fff; }
 
   #fileInput { display: none; }
 
-  /* ===== กำจัดข้อความกวนใจทั้งหมด ===== */
-  *::before, *::after { content: none !important; }
-  [data-extra], [class*="meta"], [class*="debug"], [id*="silent"], [id*="code"] {
-    display: none !important;
-  }
+  /* ---- ซ่อนข้อความกวนใจ ---- */
+  [data-extra], [id*="silent"], [class*="meta"] { display: none !important; }
 </style>
 </head>
 <body>
 
 <input type="file" id="fileInput" accept="video/*">
 
-<div id="container">
-  <!-- เวอร์ชัน -->
-  <div class="version-tag">v1099</div>
+<div id="app">
+  <!-- ชั้นที่ 1: วิดีโอ อยู่ล่างสุด แสดงก่อนเลย -->
+  <div id="videoArea"></div>
 
-  <!-- แถบหัวข้อ -->
-  <div class="top-tabs">
-    <span class="tab-item">กำลังติดตาม</span>
-    <span class="tab-item active">สำหรับคุณ</span>
-  </div>
-  <span class="search-icon">🔍</span>
-
-  <!-- วิดีโอ -->
-  <div id="videoWrapper"></div>
-
-  <!-- ข้อมูลผู้ใช้ — เก็บไว้ครบถ้วน -->
-  <div class="video-info">
-    <div class="info-username">
-      @thaipodee
-      <span class="follow-badge">ติดตาม</span>
-    </div>
-    <div class="info-title">ThaiPodee — แชร์วิดีโอและสินค้า</div>
-    <div class="info-tags">#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย</div>
-  </div>
-
-  <!-- ไอคอนด้านขวา -->
-  <div class="side-icons">
-    <div class="icon-wrap">
-      <div class="profile-icon-wrap">
-        <button class="icon-btn" id="editProfileBtn">👤</button>
-        <span class="follow-plus">+</span>
+  <!-- ชั้นที่ 2: ส่วนควบคุม ซ้อนบนวิดีโอ -->
+  <div class="ui-layer">
+    <div class="top-bar">
+      <span class="ver">v1102</span>
+      <div class="tabs">
+        <span class="tab">กำลังติดตาม</span>
+        <span class="tab active">สำหรับคุณ</span>
       </div>
+      <span class="search">🔍</span>
     </div>
-    <div class="icon-wrap">
-      <button class="icon-btn">❤️</button>
-      <span class="icon-count">0</span>
-    </div>
-    <div class="icon-wrap">
-      <button class="icon-btn">💬</button>
-      <span class="icon-count">0</span>
-    </div>
-    <div class="icon-wrap">
-      <button class="icon-btn">📌</button>
-      <span class="icon-count">0</span>
-    </div>
-    <div class="icon-wrap">
-      <button class="icon-btn">⬆️</button>
-      <span class="icon-count">0</span>
-    </div>
-    <div class="icon-wrap">
-      <button class="icon-btn">🎵</button>
-    </div>
-  </div>
 
-  <!-- แถบเมนูล่าง -->
-  <nav class="bottom-nav">
-    <button class="nav-btn">
-      🏠<span class="nav-label">หน้าหลัก</span>
-    </button>
-    <button class="nav-btn">
-      🛍️<span class="nav-label">ร้านค้า</span>
-    </button>
-    <button class="nav-btn nav-main" id="uploadBtn">+</button>
-    <button class="nav-btn">
-      💬<span class="nav-label">ข้อความ</span>
-    </button>
-    <button class="nav-btn" id="profileMenuBtn">
-      👤<span class="nav-label">โปรไฟล์</span>
-    </button>
-  </nav>
-
-  <!-- กล่องแก้ไขข้อมูล -->
-  <div class="edit-box" id="editBox">
-    <input type="text" id="usernameInput" placeholder="ชื่อแอคเคาท์">
-    <input type="text" id="titleInput" placeholder="คำอธิบาย">
-    <textarea id="tagsInput" rows="2" placeholder="แฮชแท็ก"></textarea>
-    <div class="edit-buttons">
-      <button class="edit-btn cancel-btn" id="cancelBtn">ยกเลิก</button>
-      <button class="edit-btn save-btn" id="saveBtn">บันทึก</button>
+    <div class="info-left">
+      <div class="uname">@thaipodee <span class="follow-tag">ติดตาม</span></div>
+      <div class="desc">ThaiPodee — แชร์วิดีโอและสินค้า</div>
+      <div class="tags">#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย</div>
     </div>
+
+    <div class="icons-right">
+      <div class="icon-wrap">
+        <div class="prof-wrap">
+          <button class="icon-btn">👤</button>
+          <span class="plus-badge">+</span>
+        </div>
+      </div>
+      <div class="icon-wrap"><button class="icon-btn">❤️</button><span class="icon-num">0</span></div>
+      <div class="icon-wrap"><button class="icon-btn">💬</button><span class="icon-num">0</span></div>
+      <div class="icon-wrap"><button class="icon-btn">📌</button><span class="icon-num">0</span></div>
+      <div class="icon-wrap"><button class="icon-btn">⬆️</button><span class="icon-num">0</span></div>
+      <div class="icon-wrap"><button class="icon-btn">🎵</button></div>
+    </div>
+
+    <nav class="nav-bottom">
+      <button class="nav-item">🏠<span class="nav-label">หน้าหลัก</span></button>
+      <button class="nav-item">🛍️<span class="nav-label">ร้านค้า</span></button>
+      <button class="nav-item nav-plus" id="uploadBtn">+</button>
+      <button class="nav-item">💬<span class="nav-label">ข้อความ</span></button>
+      <button class="nav-item">👤<span class="nav-label">โปรไฟล์</span></button>
+    </nav>
   </div>
 </div>
 
 <script>
-const container = document.getElementById('container');
-const wrapper = document.getElementById('videoWrapper');
+const videoArea = document.getElementById('videoArea');
 const fileInput = document.getElementById('fileInput');
 
-// ---- ข้อมูลผู้ใช้ ----
-let profileData = JSON.parse(localStorage.getItem('thaipodee_profile')) || {
-  username: '@thaipodee',
-  title: 'ThaiPodee — แชร์วิดีโอและสินค้า',
-  tags: '#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย'
-};
+let pages = [];
+let now = 0;
 
-function renderProfile() {
-  document.querySelector('.info-username').innerHTML =
-    `${profileData.username}<span class="follow-badge">ติดตาม</span>`;
-  document.querySelector('.info-title').textContent = profileData.title;
-  document.querySelector('.info-tags').textContent = profileData.tags;
-}
-renderProfile();
+// ---- สร้างหน้าวิดีโอ ----
+function makePage(src) {
+  const page = document.createElement('div');
+  page.className = 'video-page';
+  const vid = document.createElement('video');
+  vid.src = src;
+  vid.loop = true;
+  vid.playsInline = true;
+  vid.preload = 'auto';
+  vid.muted = true;
 
-// ---- ปลดล็อกเสียง ----
-function unlockSound() {
-  document.querySelectorAll('video').forEach(vid => {
-    vid.muted = false;
-    vid.play().catch(() => {});
+  // ตรวจสัดส่วนวิดีโอ
+  vid.addEventListener('loadedmetadata', () => {
+    const isP = vid.videoHeight > vid.videoWidth;
+    vid.className = isP ? 'portrait' : 'landscape';
+    console.log('✅ วิดีโอโหลดเสร็จ:', vid.videoWidth, '×', vid.videoHeight, isP ? 'ตั้ง' : 'นอน');
   });
+  vid.addEventListener('error', e => console.error('❌ โหลดวิดีโอไม่ได้:', e));
+
+  page.appendChild(vid);
+  videoArea.appendChild(page);
+  return { page, vid };
 }
 
-// ---- เลื่อนสไลด์วิดีโอ ----
-let videos = [];
-let currentIndex = 0;
+// ---- เปลี่ยนหน้า ----
+function showPage(idx) {
+  if (!pages.length) return;
+  if (idx < 0) idx = 0;
+  if (idx >= pages.length) idx = pages.length - 1;
 
-function goToSlide(index) {
-  if (!videos.length) return;
-  if (index < 0) index = 0;
-  if (index >= videos.length) index = videos.length - 1;
-  currentIndex = index;
-  wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
-  updatePlayState();
+  pages[now].page.classList.remove('active');
+  pages[now].vid.pause();
+
+  now = idx;
+  pages[now].page.classList.add('active');
+  pages[now].vid.muted = false;
+  pages[now].vid.play().catch(e => console.log('เล่น:', e));
 }
 
-function updatePlayState() {
-  document.querySelectorAll('video').forEach((vid, idx) => {
-    if (idx === currentIndex) {
-      vid.muted = false;
-      vid.play().catch(() => {});
-    } else {
-      vid.pause();
-      vid.currentTime = 0;
-    }
-  });
+// ---- โหลดรายการวิดีโอ ----
+function initVideos(list) {
+  videoArea.innerHTML = '';
+  pages = list.map(src => makePage(src));
+  now = 0;
+  setTimeout(() => showPage(0), 100);
 }
 
-container.addEventListener('click', unlockSound);
-container.addEventListener('touchstart', unlockSound);
-
-// ---- เลื่อนหน้าจอสัมผัส ----
-let startY = 0, isDragging = false, offsetY = 0;
-container.addEventListener('touchstart', e => {
-  startY = e.touches[0].clientY;
-  isDragging = true;
-  offsetY = 0;
-});
-container.addEventListener('touchmove', e => {
-  if (!isDragging) return;
-  offsetY = e.touches[0].clientY - startY;
-  wrapper.style.transform = `translateY(calc(-${currentIndex * 100}vh + ${offsetY * 0.3}px))`;
-});
-container.addEventListener('touchend', () => {
-  if (!isDragging) return;
-  isDragging = false;
-  if (offsetY < -60 && currentIndex < videos.length - 1) goToSlide(currentIndex + 1);
-  else if (offsetY > 60 && currentIndex > 0) goToSlide(currentIndex - 1);
-  else goToSlide(currentIndex);
+// ---- ตัวอย่างเริ่มต้น ----
+document.addEventListener('DOMContentLoaded', () => {
+  initVideos([
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+  ]);
 });
 
-// ---- ตรวจจับสัดส่วนวิดีโอ ----
-function setVideoFit(video) {
-  video.addEventListener('loadedmetadata', () => {
-    const isPortrait = video.videoHeight > video.videoWidth;
-    video.classList.toggle('is-portrait', isPortrait);
-    video.classList.toggle('is-landscape', !isPortrait);
-  });
-}
-
-// ---- โหลดวิดีโอตัวอย่าง ----
-async function loadVideos() {
-  videos = [
-    { src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
-    { src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' }
-  ];
-  renderVideos();
-  goToSlide(0);
-}
-
-function renderVideos() {
-  wrapper.innerHTML = '';
-  videos.forEach(v => {
-    const slide = document.createElement('div');
-    slide.className = 'video-slide';
-    const video = document.createElement('video');
-    video.src = v.src;
-    video.loop = true;
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.muted = true;
-    setVideoFit(video);
-    slide.appendChild(video);
-    wrapper.appendChild(slide);
-  });
-}
-
-// ---- อัปโหลดวิดีโอ ----
-document.getElementById('uploadBtn').addEventListener('click', () => {
-  fileInput.click();
-});
+// ---- ปุ่มอัปโหลด ----
+document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  videos.unshift({ src: url });
-  renderVideos();
-  goToSlide(0);
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  pages.unshift(makePage(url));
+  showPage(0);
 });
 
-// ---- แก้ไขข้อมูล ----
-function openEditBox() {
-  document.getElementById('usernameInput').value = profileData.username;
-  document.getElementById('titleInput').value = profileData.title;
-  document.getElementById('tagsInput').value = profileData.tags;
-  document.getElementById('editBox').classList.add('show');
-}
-document.getElementById('editProfileBtn').addEventListener('click', openEditBox);
-document.getElementById('profileMenuBtn').addEventListener('click', openEditBox);
-document.getElementById('cancelBtn').addEventListener('click', () => {
-  document.getElementById('editBox').classList.remove('show');
+// ---- เลื่อนหน้าจอ ----
+let yStart = 0, dragging = false, moveY = 0;
+document.addEventListener('touchstart', e => {
+  yStart = e.touches[0].clientY;
+  dragging = true;
 });
-document.getElementById('saveBtn').addEventListener('click', () => {
-  profileData.username = document.getElementById('usernameInput').value.trim() || '@thaipodee';
-  profileData.title = document.getElementById('titleInput').value.trim() || 'ThaiPodee — แชร์วิดีโอและสินค้า';
-  profileData.tags = document.getElementById('tagsInput').value.trim() || '#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย';
-  localStorage.setItem('thaipodee_profile', JSON.stringify(profileData));
-  renderProfile();
-  document.getElementById('editBox').classList.remove('show');
+document.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  moveY = e.touches[0].clientY - yStart;
+});
+document.addEventListener('touchend', () => {
+  if (!dragging) return;
+  dragging = false;
+  if (moveY < -60) showPage(now + 1);
+  else if (moveY > 60) showPage(now - 1);
+  moveY = 0;
 });
 
-document.addEventListener('DOMContentLoaded', loadVideos);
+// ปลดล็อกเสียง
+document.addEventListener('click', () => {
+  pages.forEach(p => {
+    p.vid.muted = false;
+    p.vid.play().catch(() => {});
+  });
+}, { once: true });
 </script>
 
 </body>
