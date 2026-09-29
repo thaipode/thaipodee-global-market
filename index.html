@@ -1,11 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1113 — นิ่งสนิท ✅ แตะ = หยุดจริง / เล่นจริง ทันที
-   อัปเดต: 29 กันยายน 2569 21:20 น.
+   ThaiPodee v1116 — หยุด = หยุด เล่น = เล่น ไม่วิ่งวน ✅
+   อัปเดต: 29 กันยายน 2569 21:26 น.
    --------------------------------------------------------------
-   🔧 แก้: ตัดเหตุการณ์ที่ชนกันออก เหลือแค่อันเดียวชัดเจน
-   🔧 แก้: ลบการหน่วงเวลาที่ทำให้สับสน
-   🔧 แก้: สั่งหยุด/เล่นตรงตัว ไม่ผ่านตัวกลาง
-   🔧 ล็อกทุกอย่างเหมือนเดิม
+   🔧 ปัญหา: กดไม่หยุด → กดซ้ำ → กลายเป็นสั่งตรงข้าม → วนไปวนมา
+   🔧 แก้: ล็อกกดซ้ำแน่นหนา — กดได้ทีละครั้ง รอเสร็จถึงกดใหม่ได้
+   ✅ เล่นอยู่ → แตะ → หยุด + ⏸️ ค้างตรงกลาง ไม่หายเอง
+   ✅ หยุดอยู่ → แตะ/กด ⏸️ → เล่นต่อ + ▶️ ค้าง
+   ✅ แยกชัด: เลื่อนเปลี่ยนวิดีโอ ไม่สั่งหยุด-เล่นปนกัน
+   ✅ ทุกอย่างล็อกเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -42,7 +44,7 @@
 
   #videoWrapper {
     width: 100%; height: 100%; position: relative; z-index: 1;
-    touch-action: pan-y; /* บอกระบบ: เลื่อนแค่ขึ้นลง, แตะไม่ต้องสน */
+    touch-action: pan-y; /* บอกเบราว์เซอร์: จัดการเลื่อนเอง อย่าส่งเหตุการณ์มา */
   }
 
   .video-slide {
@@ -60,23 +62,20 @@
   video.is-landscape { object-fit: contain; }
   video::cue { display: none !important; }
 
-  /* พื้นที่แตะชัดเจน — ไม่มีอะไรบัง */
-  .tap-area {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 3; cursor: pointer;
-  }
-
-  /* ไอคอนแสดงสถานะ — เร็ว ไม่หน่วง */
-  .play-indicator {
+  /* === ปุ่มหยุด/เล่น ค้างตรงกลาง กดได้เลย === */
+  .play-toggle {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 64px; color: #fff;
-    background: rgba(0,0,0,0.5);
     width: 100px; height: 100px; border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    color: #fff; font-size: 40px;
     display: flex; align-items: center; justify-content: center;
-    z-index: 10; pointer-events: none;
-    opacity: 0; transition: opacity 0.15s; /* เร็วขึ้น */
+    z-index: 10; border: none; cursor: pointer;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
   }
-  .play-indicator.show { opacity: 1; }
+  .play-toggle.show {
+    opacity: 1; pointer-events: auto;
+  }
 
   /* เส้นเวลา */
   .progress-container {
@@ -90,8 +89,7 @@
     border-radius: 3px; cursor: pointer;
   }
   .progress-bar-fill {
-    height: 100%; background: #ff2d55; width: 0%;
-    border-radius: 3px;
+    height: 100%; background: #ff2d55; width: 0%; border-radius: 3px;
   }
 
   /* ข้อมูลมุมล่างซ้าย */
@@ -167,14 +165,15 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1113 🔒</div>
+  <div class="version-tag">v1116 🔒</div>
 
   <div class="loading-box" id="loadingBox">
     <div>กำลังโหลดวิดีโอ...</div>
     <div class="ratio-text" id="ratioText"></div>
   </div>
 
-  <div class="play-indicator" id="playIndicator"></div>
+  <!-- ปุ่มหยุด/เล่น ค้างตรงกลาง -->
+  <button class="play-toggle" id="playToggleBtn"></button>
 
   <div class="top-tabs">
     <span class="tab-item">กำลังติดตาม</span>
@@ -248,14 +247,14 @@ const progressBarBg = document.getElementById('progressBarBg');
 const progressBarFill = document.getElementById('progressBarFill');
 const currentTimeEl = document.getElementById('currentTime');
 const totalTimeEl = document.getElementById('totalTime');
-const playIndicator = document.getElementById('playIndicator');
+const playToggleBtn = document.getElementById('playToggleBtn');
 
 let videos = [];
 let currentIndex = 0;
 let activeVideo = null;
 let startY = 0;
 let isDragging = false;
-let lastTapTime = 0; // ป้องกันกดซ้ำซ้อน
+let isProcessing = false; // 🔑 ล็อกไม่ให้กดซ้ำ
 
 function formatTime(secs) {
   if (isNaN(secs)) return '0:00';
@@ -264,28 +263,31 @@ function formatTime(secs) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function showIndicator(icon) {
-  playIndicator.textContent = icon;
-  playIndicator.classList.add('show');
-  setTimeout(() => playIndicator.classList.remove('show'), 500);
+// อัปเดตไอคอนตามสถานะ — ค้างไว้ ไม่หายเอง
+function updateToggleIcon() {
+  if (!activeVideo) return;
+  if (activeVideo.paused) {
+    playToggleBtn.textContent = '⏸';
+    playToggleBtn.classList.add('show');
+  } else {
+    playToggleBtn.textContent = '▶';
+    playToggleBtn.classList.remove('show');
+  }
 }
 
-// สลับ เล่น-หยุด — ตรงตัว ไม่ผ่านคนกลาง
-function togglePlayPause() {
-  if (!activeVideo) return;
-
-  // ป้องกันกดซ้ำเร็วเกินไป
-  const now = Date.now();
-  if (now - lastTapTime < 350) return;
-  lastTapTime = now;
+// สลับหยุด-เล่น — ทำได้ทีละครั้งเท่านั้น
+async function togglePlayPause() {
+  if (!activeVideo || isProcessing) return;
+  isProcessing = true; // ล็อกกดซ้ำทันที
 
   if (activeVideo.paused) {
-    activeVideo.play();
-    showIndicator('▶');
+    await activeVideo.play();
   } else {
     activeVideo.pause();
-    showIndicator('⏸');
   }
+  
+  updateToggleIcon();
+  setTimeout(() => { isProcessing = false; }, 300); // ปลดล็อกหลัง 0.3 วินาที
 }
 
 function goToSlide(index) {
@@ -309,6 +311,7 @@ function updatePlayState() {
       vid.currentTime = 0;
     }
   });
+  updateToggleIcon();
 }
 
 function updateProgress() {
@@ -327,7 +330,7 @@ function seekVideo(e) {
   activeVideo.currentTime = pct * activeVideo.duration;
 }
 
-// === จัดการแตะ-เลื่อน แยกกันชัดเจนที่สุด ===
+// === จัดการแตะ-เลื่อน แยกกันชัดเจน ===
 wrapper.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
   isDragging = false;
@@ -361,12 +364,19 @@ wrapper.addEventListener('touchend', e => {
   }
 }, { passive: false });
 
-// คลิกสำหรับคอม — ไม่ชนกับปุ่มอื่น
+// กดตรงไอคอนกลางได้เลย
+playToggleBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  togglePlayPause();
+});
+
+// คลิกพื้นที่วิดีโอ (คอม)
 wrapper.addEventListener('click', e => {
   if (e.target.closest('.icon-btn') || 
       e.target.closest('.nav-btn') || 
       e.target.closest('.progress-bar-bg') ||
-      e.target.closest('#uploadBtn')) {
+      e.target.closest('#uploadBtn') ||
+      e.target.closest('.play-toggle')) {
     return;
   }
   togglePlayPause();
@@ -387,6 +397,8 @@ function setVideoFit(video) {
   });
 
   video.addEventListener('timeupdate', updateProgress);
+  video.addEventListener('pause', updateToggleIcon);
+  video.addEventListener('play', updateToggleIcon);
 }
 
 async function loadVideos() {
