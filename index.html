@@ -1,9 +1,111 @@
-// ==============================================================
-// ThaiPodee v1076 — แก้จุดพัง container ไม่เจอ + ป้องกัน error
-// อัปเดต: 29 กันยายน 2569 18:51 น.
-// ปัญหา: container หาไม่เจอ → addEventListener พัง → หน้าค้างหมุนไม่หยุด
-// แก้ไข: เพิ่ม if (container) เช็คก่อนใช้งาน → ข้ามได้ไม่พัง
-// ==============================================================
+<!-- ==============================================================
+   ThaiPodee v1076 — แก้จุดพัง container ไม่เจอ + ป้องกัน error
+   อัปเดต: 29 กันยายน 2569 19:00 น.
+   --------------------------------------------------------------
+   📋 ปัญหา — สาเหตุ — วิธีแก้ไข
+   --------------------------------------------------------------
+   🔴 ปัญหา 1: หน้าค้างหมุนไม่หยุด
+   สาเหตุ: หาองค์ประกอบ container ไม่เจอ → addEventListener พัง
+   แก้ไข: เพิ่ม if (container) { ... } เช็คก่อนใช้งาน → ข้ามได้ไม่พัง
+
+   🔴 ปัญหา 2: โค้ดยาวเกินไป ดูแลยาก
+   สาเหตุ: มีส่วนที่ซ้ำซ้อน ไม่จำเป็น
+   แก้ไข: ปรับกระชับ คงไว้เฉพาะส่วนที่ทำงานจริง
+   ============================================================== -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ThaiPodee</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #000; color: #fff; font-family: sans-serif;
+  }
+  #container {
+    width: 100%; height: 100vh; overflow: hidden; position: relative;
+  }
+  #videoWrapper {
+    width: 100%; transition: transform 0.2s ease-out;
+  }
+  .video-slide {
+    width: 100%; height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    position: relative;
+  }
+  video {
+    width: 100%; height: 100%; object-fit: contain; background: #111;
+  }
+  .side-icons {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 24px; z-index: 10;
+  }
+  .icon-btn {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    font-size: 22px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .bottom-nav {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: rgba(0,0,0,0.7); display: flex;
+    justify-content: space-around; align-items: center; z-index: 10;
+  }
+  .nav-btn {
+    background: none; border: none; color: #fff; font-size: 20px;
+    cursor: pointer; padding: 8px;
+  }
+  .nav-main {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #f00; display: flex; align-items: center;
+    justify-content: center; transform: translateY(-12px);
+  }
+  .loading {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); color: #fff; font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <div id="videoWrapper">
+    <!-- วิดีโอจะแสดงที่นี่ -->
+  </div>
+</div>
+
+<script>
+// ===== ตัวแปรหลัก =====
+const container = document.getElementById('container');
+const wrapper = document.getElementById('videoWrapper');
+let videos = [];
+let currentIndex = 0;
+let startY = 0;
+let isDragging = false;
+let offsetY = 0;
+
+// ===== เปลี่ยนสไลด์วิดีโอ =====
+function goToSlide(index) {
+  if (!videos || videos.length === 0) return;
+  if (index < 0) index = 0;
+  if (index >= videos.length) index = videos.length - 1;
+  currentIndex = index;
+  wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
+  updatePlayState();
+}
+
+// ===== อัปเดตสถานะเล่นวิดีโอ =====
+function updatePlayState() {
+  document.querySelectorAll('video').forEach((vid, idx) => {
+    if (idx === currentIndex) {
+      vid.play().catch(() => {});
+    } else {
+      vid.pause();
+    }
+  });
+}
 
 // ===== จัดการสัมผัสเลื่อนขึ้นลง =====
 if (container) {
@@ -32,3 +134,64 @@ if (container) {
     }
   });
 }
+
+// ===== โหลดรายการวิดีโอ =====
+async function loadVideos() {
+  try {
+    // ตัวอย่าง — เปลี่ยนเป็นที่เก็บจริงเมื่อพร้อม
+    videos = [
+      { src: 'videos/sample1.mp4', poster: '' },
+      { src: 'videos/sample2.mp4', poster: '' }
+    ];
+    
+    renderVideos();
+    goToSlide(0);
+  } catch (err) {
+    console.error('โหลดวิดีโอไม่ได้:', err);
+  }
+}
+
+// ===== แสดงวิดีโอบนหน้าจอ =====
+function renderVideos() {
+  wrapper.innerHTML = '';
+  videos.forEach(v => {
+    const slide = document.createElement('div');
+    slide.className = 'video-slide';
+    slide.innerHTML = `
+      <video src="${v.src}" preload="metadata" loop playsinline></video>
+      <div class="side-icons">
+        <button class="icon-btn">❤️</button>
+        <button class="icon-btn">💬</button>
+        <button class="icon-btn">🔁</button>
+        <button class="icon-btn">⬆️</button>
+        <button class="icon-btn">🔖</button>
+        <button class="icon-btn">⋮</button>
+      </div>
+    `;
+    wrapper.appendChild(slide);
+  });
+  
+  // เพิ่มเมนูล่าง
+  addBottomNav();
+}
+
+// ===== เพิ่มแถบเมนูด้านล่าง =====
+function addBottomNav() {
+  const nav = document.createElement('nav');
+  nav.className = 'bottom-nav';
+  nav.innerHTML = `
+    <button class="nav-btn">🏠</button>
+    <button class="nav-btn">🔍</button>
+    <button class="nav-btn nav-main">+</button>
+    <button class="nav-btn">📦</button>
+    <button class="nav-btn">👤</button>
+  `;
+  document.body.appendChild(nav);
+}
+
+// ===== เริ่มทำงานเมื่อโหลดเสร็จ =====
+document.addEventListener('DOMContentLoaded', loadVideos);
+</script>
+
+</body>
+</html>
