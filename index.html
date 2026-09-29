@@ -1,10 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1107 — เหลือแค่ 9:16 กับ 16:9 ตามที่ต้องการ
-   อัปเดต: 29 กันยายน 2569 20:54 น.
+   ThaiPodee v1108 — ตรวจจับอัตโนมัติ แสดงเฉพาะตอนโหลด
+   อัปเดต: 29 กันยายน 2569 20:56 น.
    --------------------------------------------------------------
-   ✅ แสดงแค่ 9:16 กับ 16:9 เท่านั้น
-   ✅ ไม่มีคำอธิบายเพิ่ม ไม่ใส่ขนาดพิกเซล
-   ✅ ทุกอย่างทำงานเหมือนเดิมครบถ้วน
+   ✅ ซ่อนตัวเลขออกจากมุมขวาบน — ไม่รบกวน
+   ✅ ตรวจจับเอง: แนวตั้ง→9:16 / แนวนอน→16:9
+   ✅ แสดงเฉพาะตอนกำลังโหลด → หายเองเมื่อเสร็จ
+   ✅ ทุกอย่างอื่นทำงานเหมือนเดิมครบถ้วน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -26,14 +27,15 @@
     z-index: 100;
   }
 
-  /* === คู่มืออัตราส่วน — เหลือแค่ 9:16 กับ 16:9 === */
-  .ratio-guide {
-    position: absolute; top: 40px; right: 12px;
-    background: rgba(0,0,0,0.65);
-    color: #fff; font-size: 13px; line-height: 1.8;
-    padding: 10px 12px; border-radius: 8px;
-    z-index: 100; font-weight: 600;
+  /* === กล่องแสดงสถานะตอนโหลดเท่านั้น === */
+  .loading-box {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8); color: #fff;
+    padding: 24px 32px; border-radius: 12px; text-align: center;
+    z-index: 60; display: none;
   }
+  .loading-box.show { display: block; }
+  .ratio-text { font-size: 22px; font-weight: bold; margin-top: 8px; }
 
   .top-tabs {
     position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
@@ -47,7 +49,7 @@
     color: #fff; border-bottom-color: #fff; font-weight: 600;
   }
   .search-icon {
-    position: absolute; top: 12px; right: 130px; font-size: 20px; z-index: 99;
+    position: absolute; top: 12px; right: 45px; font-size: 20px; z-index: 99;
   }
 
   #container {
@@ -146,12 +148,12 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1107</div>
+  <div class="version-tag">v1108</div>
 
-  <!-- === แค่นี้พอแล้ว === -->
-  <div class="ratio-guide">
-    9 : 16<br>
-    16 : 9
+  <!-- === แสดงเฉพาะตอนโหลด === -->
+  <div class="loading-box" id="loadingBox">
+    <div>กำลังโหลดวิดีโอ...</div>
+    <div class="ratio-text" id="ratioText"></div>
   </div>
 
   <div class="top-tabs">
@@ -212,6 +214,8 @@
 const container = document.getElementById('container');
 const wrapper = document.getElementById('videoWrapper');
 const fileInput = document.getElementById('fileInput');
+const loadingBox = document.getElementById('loadingBox');
+const ratioText = document.getElementById('ratioText');
 
 let videos = [];
 let currentIndex = 0;
@@ -267,10 +271,19 @@ container.addEventListener('touchend', () => {
 });
 
 function setVideoFit(video) {
+  loadingBox.classList.add('show');
+  ratioText.textContent = '';
+
   video.addEventListener('loadedmetadata', () => {
     const isPortrait = video.videoHeight > video.videoWidth;
     video.classList.toggle('is-portrait', isPortrait);
     video.classList.toggle('is-landscape', !isPortrait);
+
+    // ตรวจจับเองอัตโนมัติ
+    ratioText.textContent = isPortrait ? '9 : 16' : '16 : 9';
+
+    // หายไปเองหลังโหลดเสร็จ
+    setTimeout(() => loadingBox.classList.remove('show'), 1500);
   });
 }
 
