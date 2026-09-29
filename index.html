@@ -1,10 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1094 — วิดีโอแนวตั้งเต็มจอไม่มีขอบดำ
+   ThaiPodee v1099 — เก็บข้อมูลผู้ใช้ / กำจัดข้อความโค้ดแปลกๆ
    อัปเดต: 29 กันยายน 2569 20:25 น.
    --------------------------------------------------------------
-   ✅ วิดีโอแนวตั้ง 9:16 → เต็มจอเลย ไม่มีขอบดำ
-   ✅ วิดีโอแนวนอน 16:9 → อยู่ตรงกลาง ไม่ยืด ไม่บิด
-   ✅ ปุ่ม/ไอคอนยังอยู่ครบ
+   ✅ เก็บ @thaipodee + คำอธิบาย + แท็ก ไว้ครบถ้วน
+   ✅ กำจัดข้อความโค้ด/รหัสแปลกๆ ใต้เมนูออกหมด
+   ✅ วิดีโอแนวตั้งเต็มจอ ไม่มีขอบดำ
+   ✅ วิดีโอแนวนอนอยู่ตรงกลาง ไม่ยืด
+   ✅ ปุ่ม/ไอคอนครบ ทำงานปกติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -19,7 +21,7 @@
     background: #000; color: #fff; font-family: -apple-system, sans-serif;
   }
 
-  /* ---- เวอร์ชัน มุมขวาบน ---- */
+  /* ---- เวอร์ชัน ---- */
   .version-tag {
     position: absolute; top: 12px; right: 12px;
     background: rgba(0,0,0,0.55); color: #fff;
@@ -27,7 +29,7 @@
     z-index: 100;
   }
 
-  /* ---- แถบหัวข้อ ด้านบน ---- */
+  /* ---- แถบหัวข้อ ---- */
   .top-tabs {
     position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
     display: flex; gap: 24px; z-index: 99;
@@ -57,31 +59,20 @@
     background: #000;
   }
 
-  /* 
-    v1094:
-    ถ้าเป็นแนวตั้ง จะเต็มจอเลย ไม่มีขอบดำ
-    ถ้าเป็นแนวนอน จะอยู่ตรงกลาง ไม่ยืด
-  */
+  /* วิดีโอแยกตามสัดส่วน */
   video {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: #000;
   }
+  video.is-portrait { object-fit: cover; }
+  video.is-landscape { object-fit: contain; }
 
-  video.is-portrait {
-    object-fit: cover;
-  }
-
-  video.is-landscape {
-    object-fit: contain;
-  }
-
-  /* ---- ข้อมูลด้านล่างซ้าย ---- */
+  /* ---- ข้อมูลผู้ใช้ ด้านล่างซ้าย ---- */
   .video-info {
-    position: absolute; bottom: 75px; left: 12px; right: 70px; z-index: 90;
+    position: absolute; bottom: 85px; left: 12px; right: 70px;
+    z-index: 90; pointer-events: none;
   }
   .info-username {
     font-weight: 600; font-size: 14px; margin-bottom: 4px;
@@ -91,16 +82,12 @@
     background: #fff; color: #000; font-size: 10px; padding: 1px 6px;
     border-radius: 4px; font-weight: bold;
   }
-  .info-title {
-    font-size: 13px; margin-bottom: 4px; color: #f0f0f0;
-  }
-  .info-tags {
-    font-size: 12px; color: #ccc;
-  }
+  .info-title { font-size: 13px; margin-bottom: 4px; color: #f0f0f0; }
+  .info-tags { font-size: 12px; color: #ccc; }
 
-  /* ---- ไอคอนด้านขวา แนวตั้ง ---- */
+  /* ---- ไอคอนด้านขวา ---- */
   .side-icons {
-    position: absolute; right: 10px; bottom: 90px;
+    position: absolute; right: 10px; bottom: 95px;
     display: flex; flex-direction: column; gap: 22px;
     z-index: 90; align-items: center;
   }
@@ -113,12 +100,8 @@
     font-size: 22px; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
   }
-  .icon-count {
-    font-size: 11px; color: #fff;
-  }
-  .profile-icon-wrap {
-    position: relative;
-  }
+  .icon-count { font-size: 11px; color: #fff; }
+  .profile-icon-wrap { position: relative; }
   .follow-plus {
     position: absolute; bottom: -4px; right: -4px;
     width: 18px; height: 18px; border-radius: 50%;
@@ -127,7 +110,7 @@
     font-weight: bold;
   }
 
-  /* ---- แถบเมนูด้านล่าง ---- */
+  /* ---- แถบเมนูล่าง ---- */
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
     background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
@@ -171,6 +154,12 @@
   .save-btn { background: #ff2d55; color: #fff; }
 
   #fileInput { display: none; }
+
+  /* ===== กำจัดข้อความกวนใจทั้งหมด ===== */
+  *::before, *::after { content: none !important; }
+  [data-extra], [class*="meta"], [class*="debug"], [id*="silent"], [id*="code"] {
+    display: none !important;
+  }
 </style>
 </head>
 <body>
@@ -179,9 +168,9 @@
 
 <div id="container">
   <!-- เวอร์ชัน -->
-  <div class="version-tag">v1094</div>
+  <div class="version-tag">v1099</div>
 
-  <!-- แถบหัวข้อ ด้านบน -->
+  <!-- แถบหัวข้อ -->
   <div class="top-tabs">
     <span class="tab-item">กำลังติดตาม</span>
     <span class="tab-item active">สำหรับคุณ</span>
@@ -191,14 +180,14 @@
   <!-- วิดีโอ -->
   <div id="videoWrapper"></div>
 
-  <!-- ข้อมูลด้านล่างซ้าย -->
+  <!-- ข้อมูลผู้ใช้ — เก็บไว้ครบถ้วน -->
   <div class="video-info">
-    <div class="info-username" id="infoUsername">
+    <div class="info-username">
       @thaipodee
       <span class="follow-badge">ติดตาม</span>
     </div>
-    <div class="info-title" id="infoTitle">ThaiPodee — แชร์วิดีโอและสินค้า</div>
-    <div class="info-tags" id="infoTags">#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย</div>
+    <div class="info-title">ThaiPodee — แชร์วิดีโอและสินค้า</div>
+    <div class="info-tags">#ThaiPodee #แชร์วิดีโอ #สินค้า #ไทย</div>
   </div>
 
   <!-- ไอคอนด้านขวา -->
@@ -207,24 +196,23 @@
       <div class="profile-icon-wrap">
         <button class="icon-btn" id="editProfileBtn">👤</button>
         <span class="follow-plus">+</span>
-        <bboxvoice id="followBbox"></bboxvoice>
       </div>
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">❤️</button>
-      <span class="icon-count" id="likeCount">0</span>
+      <span class="icon-count">0</span>
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">💬</button>
-      <span class="icon-count" id="commentCount">0</span>
+      <span class="icon-count">0</span>
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">📌</button>
-      <span class="icon-count" id="saveCount">0</span>
+      <span class="icon-count">0</span>
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">⬆️</button>
-      <span class="icon-count" id="shareCount">0</span>
+      <span class="icon-count">0</span>
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">🎵</button>
@@ -234,7 +222,7 @@
   <!-- แถบเมนูล่าง -->
   <nav class="bottom-nav">
     <button class="nav-btn">
-      🏠<span class="nav-label"><[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]></span>
+      🏠<span class="nav-label">หน้าหลัก</span>
     </button>
     <button class="nav-btn">
       🛍️<span class="nav-label">ร้านค้า</span>
@@ -248,11 +236,11 @@
     </button>
   </nav>
 
-  <!-- ก<[SILENT_never_used_51bce0c785ca2f68081bfa7d91973934]>กล่องแก้ไขข้อมูล -->
+  <!-- กล่องแก้ไขข้อมูล -->
   <div class="edit-box" id="editBox">
-    <input type="text" id="usernameInput" placeholder="ชื่อแอคเคาท์ เช่น @thaipodee">
-    <input type="text" id="titleInput" placeholder="คำอธิบายวิดีโอ/ช่อง">
-    <textarea id="tagsInput" rows="2" placeholder="แฮชแท็ก คั่นด้วยเว้นวรรค"></textarea>
+    <input type="text" id="usernameInput" placeholder="ชื่อแอคเคาท์">
+    <input type="text" id="titleInput" placeholder="คำอธิบาย">
+    <textarea id="tagsInput" rows="2" placeholder="แฮชแท็ก"></textarea>
     <div class="edit-buttons">
       <button class="edit-btn cancel-btn" id="cancelBtn">ยกเลิก</button>
       <button class="edit-btn save-btn" id="saveBtn">บันทึก</button>
@@ -273,9 +261,10 @@ let profileData = JSON.parse(localStorage.getItem('thaipodee_profile')) || {
 };
 
 function renderProfile() {
-  document.getElementById('infoUsername').textContent = profileData.username;
-  document.getElementById('infoTitle').textContent = profileData.title;
-  document.getElementById('infoTags').textContent = profileData.tags;
+  document.querySelector('.info-username').innerHTML =
+    `${profileData.username}<span class="follow-badge">ติดตาม</span>`;
+  document.querySelector('.info-title').textContent = profileData.title;
+  document.querySelector('.info-tags').textContent = profileData.tags;
 }
 renderProfile();
 
@@ -292,7 +281,7 @@ let videos = [];
 let currentIndex = 0;
 
 function goToSlide(index) {
-  if (!videos || videos.length === 0) return;
+  if (!videos.length) return;
   if (index < 0) index = 0;
   if (index >= videos.length) index = videos.length - 1;
   currentIndex = index;
@@ -381,7 +370,7 @@ fileInput.addEventListener('change', e => {
   const url = URL.createObjectURL(file);
   videos.unshift({ src: url });
   renderVideos();
-  goToSlide(currentIndex);
+  goToSlide(0);
 });
 
 // ---- แก้ไขข้อมูล ----
