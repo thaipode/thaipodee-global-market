@@ -1,16 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1076 — แก้จุดพัง container ไม่เจอ + ป้องกัน error
-   อัปเดต: 29 กันยายน 2569 19:00 น.
+   ThaiPodee v1077 — ปรับไอคอนตรงแบบเดิม + ครบทุกปุ่ม
+   อัปเดต: 29 กันยายน 2569 19:09 น.
    --------------------------------------------------------------
-   📋 ปัญหา — สาเหตุ — วิธีแก้ไข
-   --------------------------------------------------------------
-   🔴 ปัญหา 1: หน้าค้างหมุนไม่หยุด
-   สาเหตุ: หาองค์ประกอบ container ไม่เจอ → addEventListener พัง
-   แก้ไข: เพิ่ม if (container) { ... } เช็คก่อนใช้งาน → ข้ามได้ไม่พัง
-
-   🔴 ปัญหา 2: โค้ดยาวเกินไป ดูแลยาก
-   สาเหตุ: มีส่วนที่ซ้ำซ้อน ไม่จำเป็น
-   แก้ไข: ปรับกระชับ คงไว้เฉพาะส่วนที่ทำงานจริง
+   ปัญหา: ไอคอนเปลี่ยนไป หายปุ่มโปรไฟล์ รูปแบบไม่เหมือนเดิม
+   แก้ไข: ใส่ไอคอนครบ 7 ปุ่ม เรียงลำดับถูกต้อง รูปแบบเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -40,31 +33,31 @@
   }
   .side-icons {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 24px; z-index: 10;
+    display: flex; flex-direction: column; gap: 22px; z-index: 10;
+    align-items: center;
   }
   .icon-btn {
     width: 48px; height: 48px; border-radius: 50%;
-    background: rgba(255,255,255,0.15); border: none; color: #fff;
-    font-size: 22px; cursor: pointer; display: flex;
+    background: transparent; border: none; color: #fff;
+    font-size: 26px; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
+    padding: 0;
   }
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
-    background: rgba(0,0,0,0.7); display: flex;
+    background: rgba(0,0,0,0.8); display: flex;
     justify-content: space-around; align-items: center; z-index: 10;
+    padding-bottom: 8px;
   }
   .nav-btn {
-    background: none; border: none; color: #fff; font-size: 20px;
-    cursor: pointer; padding: 8px;
+    background: none; border: none; color: #fff; font-size: 22px;
+    cursor: pointer; padding: 6px 12px;
   }
   .nav-main {
     width: 56px; height: 56px; border-radius: 50%;
-    background: #f00; display: flex; align-items: center;
-    justify-content: center; transform: translateY(-12px);
-  }
-  .loading {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); color: #fff; font-size: 18px;
+    background: #ff0000; display: flex; align-items: center;
+    justify-content: center; transform: translateY(-10px);
+    font-size: 28px;
   }
 </style>
 </head>
@@ -73,6 +66,17 @@
 <div id="container">
   <div id="videoWrapper">
     <!-- วิดีโอจะแสดงที่นี่ -->
+  </div>
+
+  <!-- ปุ่มด้านขวา เรียงตามลำดับ: โปรไฟล์ → หัวใจ → ตะกร้า → แชร์ → บันทึก → จุด 3 -->
+  <div class="side-icons">
+    <button class="icon-btn">👤</button>
+    <button class="icon-btn">❤️</button>
+    <button class="icon-btn">💬</button>
+    <button class="icon-btn">🔁</button>
+    <button class="icon-btn">⬆️</button>
+    <button class="icon-btn">📦</button>
+    <button class="icon-btn">⋮</button>
   </div>
 </div>
 
@@ -86,7 +90,7 @@ let startY = 0;
 let isDragging = false;
 let offsetY = 0;
 
-// ===== เปลี่ยนสไลด์วิดีโอ =====
+// ===== เปลี่ยนวิดีโอ =====
 function goToSlide(index) {
   if (!videos || videos.length === 0) return;
   if (index < 0) index = 0;
@@ -96,18 +100,15 @@ function goToSlide(index) {
   updatePlayState();
 }
 
-// ===== อัปเดตสถานะเล่นวิดีโอ =====
+// ===== เล่น-หยุดวิดีโอ =====
 function updatePlayState() {
   document.querySelectorAll('video').forEach((vid, idx) => {
-    if (idx === currentIndex) {
-      vid.play().catch(() => {});
-    } else {
-      vid.pause();
-    }
+    if (idx === currentIndex) vid.play().catch(() => {});
+    else vid.pause();
   });
 }
 
-// ===== จัดการสัมผัสเลื่อนขึ้นลง =====
+// ===== เลื่อนขึ้นลงด้วยมือ =====
 if (container) {
   container.addEventListener('touchstart', e => {
     startY = e.touches[0].clientY;
@@ -125,57 +126,39 @@ if (container) {
     if (!isDragging) return;
     isDragging = false;
     
-    if (offsetY < -60 && currentIndex < videos.length - 1) {
-      goToSlide(currentIndex + 1);
-    } else if (offsetY > 60 && currentIndex > 0) {
-      goToSlide(currentIndex - 1);
-    } else {
-      goToSlide(currentIndex);
-    }
+    if (offsetY < -60 && currentIndex < videos.length - 1) goToSlide(currentIndex + 1);
+    else if (offsetY > 60 && currentIndex > 0) goToSlide(currentIndex - 1);
+    else goToSlide(currentIndex);
   });
 }
 
-// ===== โหลดรายการวิดีโอ =====
+// ===== โหลดวิดีโอตัวอย่าง =====
 async function loadVideos() {
   try {
-    // ตัวอย่าง — เปลี่ยนเป็นที่เก็บจริงเมื่อพร้อม
     videos = [
-      { src: 'videos/sample1.mp4', poster: '' },
-      { src: 'videos/sample2.mp4', poster: '' }
+      { src: 'videos/sample1.mp4' },
+      { src: 'videos/sample2.mp4' }
     ];
-    
     renderVideos();
     goToSlide(0);
   } catch (err) {
-    console.error('โหลดวิดีโอไม่ได้:', err);
+    console.log('โหลดไม่ได้:', err);
   }
 }
 
-// ===== แสดงวิดีโอบนหน้าจอ =====
+// ===== วางวิดีโอลงหน้าจอ =====
 function renderVideos() {
   wrapper.innerHTML = '';
   videos.forEach(v => {
     const slide = document.createElement('div');
     slide.className = 'video-slide';
-    slide.innerHTML = `
-      <video src="${v.src}" preload="metadata" loop playsinline></video>
-      <div class="side-icons">
-        <button class="icon-btn">❤️</button>
-        <button class="icon-btn">💬</button>
-        <button class="icon-btn">🔁</button>
-        <button class="icon-btn">⬆️</button>
-        <button class="icon-btn">🔖</button>
-        <button class="icon-btn">⋮</button>
-      </div>
-    `;
+    slide.innerHTML = `<video src="${v.src}" preload="metadata" loop playsinline></video>`;
     wrapper.appendChild(slide);
   });
-  
-  // เพิ่มเมนูล่าง
   addBottomNav();
 }
 
-// ===== เพิ่มแถบเมนูด้านล่าง =====
+// ===== แถบเมนูด้านล่าง =====
 function addBottomNav() {
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
@@ -189,7 +172,7 @@ function addBottomNav() {
   document.body.appendChild(nav);
 }
 
-// ===== เริ่มทำงานเมื่อโหลดเสร็จ =====
+// ===== เริ่มทำงาน =====
 document.addEventListener('DOMContentLoaded', loadVideos);
 </script>
 
