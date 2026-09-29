@@ -1,14 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1129-4 — ✅ แตะหยุด/เล่น + เล่นวนซ้ำไม่จบ
-   อัปเดต: 30 กันยายน 2569 01:05 น.
+   ThaiPodee v1129-5 — ✅ แก้หน้าโปรไฟล์: เล่นได้+ลบได้+ไม่ดำ
+   อัปเดต: 30 กันยายน 2569 01:15 น.
    --------------------------------------------------------------
-   🔒 หน้าจอหลัก — ล็อกไว้ ไม่แก้เลย
-   ✅ เพิ่ม: โหลดเสร็จ → เล่นเองทันที
-   ✅ แตะหน้าจอ 1 ครั้ง → หยุด
-   ✅ แตะอีกครั้ง → เล่นต่อ
-   ✅ จบแล้วเล่นใหม่อัตโนมัติ วนไปเรื่อย ๆ ไม่หยุด
-   ✅ หยุดได้ก็ต่อเมื่อคนดูแตะเอง
-   ✅ ดินสอเปลี่ยนชื่อ + เปิด-ปิดโปรไฟล์ — เหมือนเดิม
+   🔒 หน้าจอหลัก — เหมือน v1129-4: แตะหยุด/เล่น + วนซ้ำ
+   ✅ แก้: กลับมาหน้าโปรไฟล์แล้วไม่เป็นสีดำ วิดีโอไม่เสีย
+   ✅ กดรูปวิดีโอในตาราง → เปิดเล่นได้เต็มจอ
+   ✅ แต่ละวิดีโอมีปุ่มลบ → ยืนยันก่อนลบ
+   ✅ ข้อมูลบันทึกคงอยู่ เปิดใหม่ไม่หาย
+   ✅ ดินสอเปลี่ยนชื่อ — เหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -20,7 +19,7 @@
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ===== หน้าจอหลัก — ล็อกไว้ ===== */
+  /* ===== หน้าจอหลัก ===== */
   .top-version { position:absolute; top:8px; right:12px; font-size:13px; color:#888; z-index:100; }
   .search-icon { position:absolute; top:36px; right:16px; font-size:20px; cursor:pointer; z-index:100; }
   .tabs { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:24px; font-size:15px; }
@@ -30,7 +29,7 @@
   .video-container {
     position:absolute; top:70px; bottom:80px; left:0; right:0;
     display:flex; align-items:center; justify-content:center;
-    cursor:pointer; /* บอกให้รู้ว่าแตะได้ */
+    cursor:pointer;
   }
   .play-btn { font-size:60px; opacity:0.8; cursor:pointer; }
   .main-video { max-width:100%; max-height:100%; display:none; }
@@ -49,7 +48,7 @@
   .nav-item { text-align:center; cursor:pointer; font-size:13px; }
   .nav-item .plus-btn { width:48px; height:32px; background:#f00; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold; border:none; cursor:pointer; }
 
-  /* ===== หน้าโปรไฟล์ — เหมือนเดิม ===== */
+  /* ===== หน้าโปรไฟล์ ===== */
   .profile-page {
     position:fixed; top:0; left:0; right:0; bottom:0;
     background:#fff; color:#000; z-index:150;
@@ -102,20 +101,59 @@
   }
   .profile-tab { text-align:center; font-size:20px; cursor:pointer; }
 
+  /* ===== ตารางวิดีโอ — แก้ไม่ให้ดำ + มีปุ่มลบ ===== */
   .video-grid {
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; padding:4px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; padding:6px;
   }
   .grid-item {
-    aspect-ratio:9/12; background:#222; border-radius:2px; overflow:hidden;
+    aspect-ratio:9/12; background:#111; border-radius:4px; overflow:hidden;
     position:relative; cursor:pointer;
   }
-  .grid-item video { width:100%; height:100%; object-fit:cover; }
-  .grid-duration {
-    position:absolute; bottom:4px; left:4px; font-size:11px; color:#fff; text-shadow:0 0 3px #000;
+  .grid-item-video { width:100%; height:100%; object-fit:cover; display:block; }
+  .grid-item-placeholder {
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    color:#666; font-size:24px;
+  }
+  .grid-delete-btn {
+    position:absolute; top:4px; right:4px; width:28px; height:28px;
+    background:rgba(0,0,0,0.6); color:#fff; border-radius:50%;
+    border:none; font-size:16px; cursor:pointer; z-index:10;
+  }
+  .grid-play-icon {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:32px; color:#fff; text-shadow:0 0 6px rgba(0,0,0,0.8);
+    pointer-events:none;
   }
   .empty-state {
     grid-column:1/-1; text-align:center; padding:40px 20px; color:#999; font-size:14px;
   }
+
+  /* ===== ป๊อปอัพเล่นวิดีโอ ===== */
+  .video-play-popup {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.95); z-index:300;
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .video-play-popup.show { display:flex; }
+  .popup-video { max-width:100%; max-height:75vh; border-radius:8px; }
+  .popup-close {
+    margin-top:16px; padding:10px 24px; background:#f00; color:#fff;
+    border:none; border-radius:6px; font-size:15px; cursor:pointer;
+  }
+
+  /* ===== ป๊อปอัพยืนยันลบ ===== */
+  .confirm-popup {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:#fff; border-radius:10px; padding:24px; z-index:400;
+    display:none; width:85%; max-width:300px; text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.3);
+  }
+  .confirm-popup.show { display:block; }
+  .confirm-buttons { display:flex; gap:10px; justify-content:center; margin-top:16px; }
+  .confirm-btn { padding:8px 20px; border:none; border-radius:6px; cursor:pointer; }
+  .confirm-no { background:#eee; }
+  .confirm-yes { background:#f00; color:#fff; }
 
   .name-edit-popup {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -141,7 +179,7 @@
 </head>
 <body>
 
-<div class="top-version">v1129-4</div>
+<div class="top-version">v1129-5</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
@@ -150,7 +188,6 @@
 
 <div class="search-icon">🔍</div>
 
-<!-- พื้นที่วิดีโอ — แตะเพื่อหยุด/เล่น -->
 <div class="video-container" id="video-area" onclick="togglePlayPause()">
   <div class="play-btn" id="play-icon">▶</div>
   <video id="main-video" class="main-video" controls playsinline loop></video>
@@ -204,7 +241,7 @@
     </div>
 
     <div class="profile-name-wrap">
-      <h1 class="profile-fullname" id="profile-fullname">THAIPODEE PRODUCT ENGINEERING</h1>
+      <h1 class="profile-fullname" id="profile-fullname">THAIPODEE MASTER - 1</h1>
       <span class="edit-name-pencil" onclick="openNameEdit()">✏️</span>
     </div>
 
@@ -233,8 +270,24 @@
     <span class="profile-tab">❤️</span>
   </div>
 
+  <!-- ตารางวิดีโอ -->
   <div class="video-grid" id="user-videos-grid">
     <div class="empty-state">ยังไม่มีวิดีโอที่บันทึกไว้</div>
+  </div>
+</div>
+
+<!-- ป๊อปอัพเล่นวิดีโอ -->
+<div class="video-play-popup" id="video-play-popup">
+  <video id="popup-video-player" class="popup-video" controls playsinline loop></video>
+  <button class="popup-close" onclick="closeVideoPopup()">ปิด</button>
+</div>
+
+<!-- ป๊อปอัพยืนยันลบ -->
+<div class="confirm-popup" id="confirm-delete-popup">
+  <p>ต้องการลบวิดีโอนี้หรือไม่?</p>
+  <div class="confirm-buttons">
+    <button class="confirm-btn confirm-no" onclick="closeConfirmPopup()">ไม่</button>
+    <button class="confirm-btn confirm-yes" id="confirm-delete-yes">ใช่ ลบเลย</button>
   </div>
 </div>
 
@@ -249,10 +302,11 @@
 
 <script>
 // === ข้อมูล ===
-let savedDisplayName = localStorage.getItem('displayName') || 'THAIPODEE PRODUCT ENGINEERING';
-let savedUsername = localStorage.getItem('userDisplayName') || '@ThaiPodee';
+let savedDisplayName = localStorage.getItem('displayName') || 'THAIPODEE MASTER - 1';
+let savedUsername = localStorage.getItem('userDisplayName') || '@podee.office.cancel';
 let savedAvatar = localStorage.getItem('userAvatar');
 let uploadedVideos = JSON.parse(localStorage.getItem('uploadedVideos') || '[]');
+let deleteTargetIndex = null; // เก็บค่าที่จะลบ
 
 // === โหลดชื่อ+รูป ===
 document.getElementById('profile-fullname').textContent = savedDisplayName;
@@ -267,6 +321,7 @@ let profileOpen = false;
 function toggleProfile() {
   profileOpen = !profileOpen;
   document.getElementById('profile-page').classList.toggle('show', profileOpen);
+  renderVideoGrid(); // โหลดใหม่ทุกครั้งที่เปิด ไม่ให้ดำ
 }
 function goHome() {
   profileOpen = false;
@@ -304,12 +359,11 @@ function saveNewName() {
   alert('✅ เปลี่ยนชื่อเป็น:\n' + newName);
 }
 
-// === ✅ แตะหน้าจอ → หยุด / เล่นต่อ ===
+// === หยุด/เล่น วิดีโอหน้าหลัก ===
 function togglePlayPause() {
   const video = document.getElementById('main-video');
   const playIcon = document.getElementById('play-icon');
-  
-  if (!video.src) return; // ยังไม่มีวิดีโอ ไม่ทำอะไร
+  if (!video.src) return;
 
   if (video.paused) {
     video.play();
@@ -320,7 +374,7 @@ function togglePlayPause() {
   }
 }
 
-// === ✅ อัปโหลดวิดีโอ → เล่นเองทันที + วนซ้ำตลอด ===
+// === อัปโหลดวิดีโอ → เล่นเอง + บันทึก ===
 document.getElementById('video-file-input').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   const video = document.getElementById('main-video');
@@ -330,9 +384,7 @@ document.getElementById('video-file-input').addEventListener('change', e => {
   video.src = url;
   playIcon.style.display = 'none';
   video.style.display = 'block';
-  
-  // เล่นเองทันที + วนซ้ำอัตโนมัติ
-  video.loop = true; // จบแล้วเล่นใหม่เอง วนไปเรื่อย
+  video.loop = true;
   video.play().catch(() => {
     video.muted = true;
     video.play();
@@ -343,24 +395,67 @@ document.getElementById('video-file-input').addEventListener('change', e => {
   uploadedVideos.unshift({ name: f.name, url: url, time: new Date().toLocaleString('th-TH') });
   localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
   renderVideoGrid();
-  alert('✅ อัปโหลดสำเร็จ!\n▶ เล่นอัตโนมัติ — แตะหน้าจอเพื่อหยุด/เล่นต่อ');
+  alert('✅ อัปโหลดสำเร็จ!\n▶ แตะหน้าจอหยุด/เล่น\n📂 เข้าโปรไฟล์ดูรายการ — กดเล่นหรือลบได้');
 });
 
-// === แสดงตารางวิดีโอ ===
+// === ✅ แสดงตารางวิดีโอ — ไม่ดำ + มีปุ่มลบ + กดเล่นได้ ===
 function renderVideoGrid() {
   const grid = document.getElementById('user-videos-grid');
   if (uploadedVideos.length === 0) {
     grid.innerHTML = '<div class="empty-state">ยังไม่มีวิดีโอที่บันทึกไว้</div>';
     return;
   }
-  grid.innerHTML = uploadedVideos.map(v => `
-    <div class="grid-item" title="${v.name}">
-      <video muted playsinline><source src="${v.url}"></video>
-      <span class="grid-duration">▶</span>
+  grid.innerHTML = uploadedVideos.map((v, idx) => `
+    <div class="grid-item">
+      <button class="grid-delete-btn" onclick="event.stopPropagation(); openDeleteConfirm(${idx})">🗑️</button>
+      <div onclick="playVideoFromGrid(${idx})">
+        <video class="grid-item-video" muted preload="metadata" src="${v.url}"></video>
+        <span class="grid-play-icon">▶</span>
+      </div>
     </div>
   `).join('');
 }
-renderVideoGrid();
+
+// === กดเล่นจากตาราง ===
+function playVideoFromGrid(index) {
+  const v = uploadedVideos[index];
+  const player = document.getElementById('popup-video-player');
+  player.src = v.url;
+  player.loop = true;
+  document.getElementById('video-play-popup').classList.add('show');
+  player.play().catch(() => {
+    player.muted = true;
+    player.play();
+  });
+}
+
+// === ปิดหน้าต่างเล่น ===
+function closeVideoPopup() {
+  const player = document.getElementById('popup-video-player');
+  player.pause();
+  player.src = '';
+  document.getElementById('video-play-popup').classList.remove('show');
+}
+
+// === เปิดยืนยันลบ ===
+function openDeleteConfirm(index) {
+  deleteTargetIndex = index;
+  document.getElementById('confirm-delete-popup').classList.add('show');
+}
+function closeConfirmPopup() {
+  deleteTargetIndex = null;
+  document.getElementById('confirm-delete-popup').classList.remove('show');
+}
+
+// === ยืนยันลบ ===
+document.getElementById('confirm-delete-yes').addEventListener('click', () => {
+  if (deleteTargetIndex === null) return;
+  uploadedVideos.splice(deleteTargetIndex, 1);
+  localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
+  closeConfirmPopup();
+  renderVideoGrid();
+  alert('✅ ลบเรียบร้อยแล้ว');
+});
 
 // === กดปุ่มเล่นตรงกลางเมื่อยังไม่มีวิดีโอ ===
 document.getElementById('play-icon').addEventListener('click', e => {
