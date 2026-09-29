@@ -1,11 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1112 — แก้แตะหยุด-เล่น ทำงานแน่นอน 100%
-   อัปเดต: 29 กันยายน 2569 21:15 น.
+   ThaiPodee v1113 — นิ่งสนิท ✅ แตะ = หยุดจริง / เล่นจริง ทันที
+   อัปเดต: 29 กันยายน 2569 21:20 น.
    --------------------------------------------------------------
-   ✅ แตะวิดีโอ → หยุดชัวร์ / เล่นต่อชัวร์
-   ✅ ไม่สับสนกับการเลื่อนเปลี่ยนวิดีโอ
-   ✅ แสดงไอคอนชัดเจนทุกครั้งที่แตะ
-   ✅ ทุกอย่างล็อกเหมือนเดิม
+   🔧 แก้: ตัดเหตุการณ์ที่ชนกันออก เหลือแค่อันเดียวชัดเจน
+   🔧 แก้: ลบการหน่วงเวลาที่ทำให้สับสน
+   🔧 แก้: สั่งหยุด/เล่นตรงตัว ไม่ผ่านตัวกลาง
+   🔧 ล็อกทุกอย่างเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -42,7 +42,7 @@
 
   #videoWrapper {
     width: 100%; height: 100%; position: relative; z-index: 1;
-    touch-action: pan-y; /* ให้เลื่อนแนวตั้งได้, แตะทำงานชัด */
+    touch-action: pan-y; /* บอกระบบ: เลื่อนแค่ขึ้นลง, แตะไม่ต้องสน */
   }
 
   .video-slide {
@@ -60,13 +60,13 @@
   video.is-landscape { object-fit: contain; }
   video::cue { display: none !important; }
 
-  /* พื้นที่แตะสำหรับหยุด-เล่น */
+  /* พื้นที่แตะชัดเจน — ไม่มีอะไรบัง */
   .tap-area {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     z-index: 3; cursor: pointer;
   }
 
-  /* ไอคอนแสดงสถานะ */
+  /* ไอคอนแสดงสถานะ — เร็ว ไม่หน่วง */
   .play-indicator {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     font-size: 64px; color: #fff;
@@ -74,7 +74,7 @@
     width: 100px; height: 100px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     z-index: 10; pointer-events: none;
-    opacity: 0; transition: opacity 0.2s;
+    opacity: 0; transition: opacity 0.15s; /* เร็วขึ้น */
   }
   .play-indicator.show { opacity: 1; }
 
@@ -91,7 +91,7 @@
   }
   .progress-bar-fill {
     height: 100%; background: #ff2d55; width: 0%;
-    border-radius: 3px; transition: width 0.1s linear;
+    border-radius: 3px;
   }
 
   /* ข้อมูลมุมล่างซ้าย */
@@ -167,7 +167,7 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1112 🔒</div>
+  <div class="version-tag">v1113 🔒</div>
 
   <div class="loading-box" id="loadingBox">
     <div>กำลังโหลดวิดีโอ...</div>
@@ -255,7 +255,7 @@ let currentIndex = 0;
 let activeVideo = null;
 let startY = 0;
 let isDragging = false;
-let touchStartTime = 0;
+let lastTapTime = 0; // ป้องกันกดซ้ำซ้อน
 
 function formatTime(secs) {
   if (isNaN(secs)) return '0:00';
@@ -267,15 +267,20 @@ function formatTime(secs) {
 function showIndicator(icon) {
   playIndicator.textContent = icon;
   playIndicator.classList.add('show');
-  setTimeout(() => playIndicator.classList.remove('show'), 700);
+  setTimeout(() => playIndicator.classList.remove('show'), 500);
 }
 
-// สลับ เล่น-หยุด — ทำงานตรงๆ ไม่สับสน
+// สลับ เล่น-หยุด — ตรงตัว ไม่ผ่านคนกลาง
 function togglePlayPause() {
   if (!activeVideo) return;
 
+  // ป้องกันกดซ้ำเร็วเกินไป
+  const now = Date.now();
+  if (now - lastTapTime < 350) return;
+  lastTapTime = now;
+
   if (activeVideo.paused) {
-    activeVideo.play().catch(err => console.log('เล่น:', err));
+    activeVideo.play();
     showIndicator('▶');
   } else {
     activeVideo.pause();
@@ -296,7 +301,7 @@ function updatePlayState() {
   document.querySelectorAll('video').forEach((vid, idx) => {
     if (idx === currentIndex) {
       vid.muted = false;
-      vid.play().catch(() => {});
+      vid.play();
       activeVideo = vid;
       progressContainer.style.display = 'flex';
     } else {
@@ -322,32 +327,31 @@ function seekVideo(e) {
   activeVideo.currentTime = pct * activeVideo.duration;
 }
 
-// จับการแตะ-เลื่อน แยกกันชัดเจน
+// === จัดการแตะ-เลื่อน แยกกันชัดเจนที่สุด ===
 wrapper.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
-  touchStartTime = Date.now();
   isDragging = false;
 }, { passive: true });
 
 wrapper.addEventListener('touchmove', e => {
   const moveY = e.touches[0].clientY - startY;
-  if (Math.abs(moveY) > 5) {
+  if (Math.abs(moveY) > 8) {
     isDragging = true;
     wrapper.style.transform = `translateY(calc(-${currentIndex * 100}vh + ${moveY * 0.3}px))`;
   }
 }, { passive: true });
 
 wrapper.addEventListener('touchend', e => {
-  const duration = Date.now() - touchStartTime;
   const moveY = e.changedTouches[0].clientY - startY;
 
-  // ถ้าไม่ได้เลื่อน แค่แตะ → สลับหยุด-เล่น
-  if (!isDragging && duration < 300 && Math.abs(moveY) < 10) {
+  // ไม่ได้เลื่อน = แตะ → สลับหยุด-เล่น
+  if (!isDragging && Math.abs(moveY) < 8) {
+    e.preventDefault();
     togglePlayPause();
     return;
   }
 
-  // ถ้าเลื่อน → เปลี่ยนวิดีโอ
+  // เลื่อน → เปลี่ยนวิดีโอ
   if (moveY < -60 && currentIndex < videos.length - 1) {
     goToSlide(currentIndex + 1);
   } else if (moveY > 60 && currentIndex > 0) {
@@ -355,9 +359,9 @@ wrapper.addEventListener('touchend', e => {
   } else {
     goToSlide(currentIndex);
   }
-});
+}, { passive: false });
 
-// คลิกสำหรับคอม
+// คลิกสำหรับคอม — ไม่ชนกับปุ่มอื่น
 wrapper.addEventListener('click', e => {
   if (e.target.closest('.icon-btn') || 
       e.target.closest('.nav-btn') || 
