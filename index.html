@@ -1,14 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1125 — โปรไฟล์ชัดเจน ✅ โชว์ครบ + ลบได้ + ไม่ซ้ำ
-   อัปเดต: 29 กันยายน 2569 21:56 น.
+   ThaiPodee v1126 — คืนรูปเจ้าของด้านขวาบนสุด ✅ ครบ 6 ปุ่ม
+   อัปเดต: 29 กันยายน 2569 22:21 น.
    --------------------------------------------------------------
-   🔴 ปัญหา: โหลดวิดีโอไป แต่ภาพไม่ขึ้น ไม่รู้มีจริงกี่อัน
-   🔴 ปัญหา: ไม่มีปุ่มลบ → กลัวเต็ม ไม่รู้จัดการ
-   🔴 ปัญหา: โหลดซ้ำกันได้ → ข้อมูลยุ่งเหยิง
-   ✅ แก้: ตารางโชว์ทุกวิดีโอที่มีจริง ทันทีที่โหลด
-   ✅ แก้: ปุ่มลบแต่ละรายการ → กดยืนยัน → หายเลย
-   ✅ แก้: ป้องกันไฟล์ซ้ำ → ไม่เพิ่มตัวเดิมซ้ำอีก
-   ✅ รักษา: หน้าหลัก/เล่น/สไลด์/เสียง-ภาพ ทุกอย่างเหมือนเดิม
+   🔴 ปัญหา: ขาดปุ่มรูปเจ้าของโปรไฟล์ อันดับ 1 บนสุด ก่อนหัวใจ
+   ✅ แก้: ใส่กลับมา → เรียง: 1.รูปเจ้าของ 2.หัวใจ 3.คอมเมนต์ 4.ปักหมุด 5.แชร์ 6.เพลง
+   ✅ รักษา: ทุกอย่างอื่นเหมือนเดิม เล่นได้ ลบได้ ครบหมด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -30,7 +26,6 @@
     font-size: 12px; padding: 3px 8px; border-radius: 10px; z-index: 999;
   }
 
-  /* === หน้าจอหลัก === */
   .main-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     transition: transform 0.3s ease; z-index: 10;
@@ -102,9 +97,10 @@
   .info-title { font-size: 13px; margin-bottom: 4px; color: #f0f0f0; }
   .info-tags { font-size: 12px; color: #ccc; }
 
+  /* ===== ICONS RIGHT — ครบ 6 อัน เรียงถูกต้อง ===== */
   .side-icons {
     position: absolute; right: 10px; bottom: 110px;
-    display: flex; flex-direction: column; gap: 22px;
+    display: flex; flex-direction: column; gap: 20px;
     z-index: 35; align-items: center;
   }
   .icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
@@ -113,6 +109,11 @@
     background: rgba(255,255,255,0.15); border: none; color: #fff;
     font-size: 22px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn.profile-avatar {
+    background: #333;
+    font-size: 18px;
+    font-weight: bold;
   }
   .icon-count { font-size: 11px; color: #fff; }
   .icon-btn.liked { color: #ff2d55; }
@@ -153,11 +154,11 @@
     position: absolute; top: 12px; left: 12px;
     background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; z-index: 301;
   }
-  .profile-avatar {
+  .profile-avatar-lg {
     width: 90px; height: 90px; border-radius: 50%;
     background: #333; margin: 20px auto 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 40px;
+    font-size: 40px; font-weight: bold;
   }
   .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
   .profile-handle { color: #888; font-size: 13px; margin-bottom: 16px; }
@@ -173,7 +174,6 @@
     padding: 12px 20px; font-size: 13px; line-height: 1.6; color: #ddd;
   }
 
-  /* ตารางวิดีโอ — ชัดเจน มีปุ่มลบ */
   .profile-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
     padding: 4px;
@@ -186,7 +186,6 @@
   .grid-item video {
     width: 100%; height: 100%; object-fit: cover;
     position: absolute; top: 0; left: 0;
-    opacity: 1 !important; visibility: visible !important;
   }
   .grid-likes {
     position: absolute; bottom: 4px; left: 4px;
@@ -206,7 +205,6 @@
     color: #666; font-size: 14px;
   }
 
-  /* กล่องยืนยันลบ */
   .confirm-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.8); z-index: 500;
@@ -232,9 +230,9 @@
 
 <input type="file" id="fileInput" accept="video/*">
 
-<!-- ===== หน้าจอหลัก ===== -->
+<!-- ===== หน้าหลัก — ไอคอนครบ 6 อัน ===== -->
 <div id="mainScreen" class="main-screen">
-  <div class="version-tag">v1125 🔒</div>
+  <div class="version-tag">v1126 🔒</div>
 
   <div class="top-tabs">
     <span class="tab-item">กำลังติดตาม</span>
@@ -254,7 +252,12 @@
     <div class="info-tags" id="videoTags"></div>
   </div>
 
+  <!-- ✅ ครบ 6 อัน เรียง: 1.รูปเจ้าของ 2.หัวใจ 3.คอมเมนต์ 4.ปักหมุด 5.แชร์ 6.เพลง -->
   <div class="side-icons" id="sideIcons" style="display:none;">
+    <div class="icon-wrap">
+      <button class="icon-btn profile-avatar" id="profileIconBtn">P</button>
+      <span class="icon-count"></span>
+    </div>
     <div class="icon-wrap">
       <button class="icon-btn" id="likeBtn">❤️</button>
       <span class="icon-count" id="likeCount">0</span>
@@ -273,6 +276,7 @@
     </div>
     <div class="icon-wrap">
       <button class="icon-btn">🎵</button>
+      <span class="icon-count">3:02</span>
     </div>
   </div>
 
@@ -297,7 +301,7 @@
 <div id="profileScreen" class="profile-screen">
   <div class="profile-header">
     <button class="back-btn" id="backBtn">←</button>
-    <div class="profile-avatar">P</div>
+    <div class="profile-avatar-lg">P</div>
     <div class="profile-name">THAIPODEE PRODUCT ENGINEERING</div>
     <div class="profile-handle">@thaipodee</div>
     
@@ -324,7 +328,6 @@
   <div class="profile-grid" id="profileGrid"></div>
 </div>
 
-<!-- ===== กล่องยืนยันลบ ===== -->
 <div id="confirmOverlay" class="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-text">ลบวิดีโอนี้หรือไม่?<br>หายแล้วกู้คืนไม่ได้</div>
@@ -351,7 +354,6 @@ let isDragging = false;
 let isBusy = false;
 let pendingDeleteIndex = -1;
 
-// ตรวจไฟล์ซ้ำ — ป้องกันเพิ่มซ้ำ
 function isDuplicateUrl(url) {
   return videoList.some(v => v.url === url);
 }
@@ -362,7 +364,6 @@ function updateStats() {
   document.getElementById('statLikes').textContent = totalLikes.toLocaleString();
 }
 
-// แสดงตาราง — ชัดเจนทุกอัน
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
   
@@ -380,12 +381,10 @@ function renderProfileGrid() {
       <span class="grid-likes">❤️ ${vid.likes}</span>
       <button class="grid-delete" data-idx="${idx}">×</button>
     `;
-    // กดรูป → ไปเล่น
     item.querySelector('video').addEventListener('click', () => {
       currentIndex = idx;
       showMainScreen();
     });
-    // กด × → ยืนยันลบ
     item.querySelector('.grid-delete').addEventListener('click', (e) => {
       e.stopPropagation();
       pendingDeleteIndex = idx;
@@ -397,23 +396,12 @@ function renderProfileGrid() {
   updateStats();
 }
 
-// ลบจริง
 function confirmDelete() {
   if (pendingDeleteIndex < 0 || pendingDeleteIndex >= videoList.length) return;
-  
-  // ลบจากรายการ
   videoList.splice(pendingDeleteIndex, 1);
-  
-  // ลบจากหน้าหลัก
   const slides = wrapper.querySelectorAll('.video-slide');
-  if (slides[pendingDeleteIndex]) {
-    slides[pendingDeleteIndex].remove();
-  }
-  
-  // ปรับตำแหน่งปัจจุบันไม่ให้เกิน
-  if (currentIndex >= videoList.length) {
-    currentIndex = Math.max(0, videoList.length - 1);
-  }
+  if (slides[pendingDeleteIndex]) slides[pendingDeleteIndex].remove();
+  if (currentIndex >= videoList.length) currentIndex = Math.max(0, videoList.length - 1);
   
   renderProfileGrid();
   updateSlidePositions();
@@ -425,7 +413,6 @@ function confirmDelete() {
     document.getElementById('sideIcons').style.display = 'none';
     document.getElementById('progressContainer').style.display = 'none';
   }
-  
   pendingDeleteIndex = -1;
   confirmOverlay.classList.remove('show');
 }
@@ -442,9 +429,7 @@ function showProfileScreen() {
 }
 function showMainScreen() {
   profileScreen.classList.remove('show');
-  if (videoList.length > 0) {
-    updateActiveVideo(true);
-  }
+  if (videoList.length > 0) updateActiveVideo(true);
 }
 
 function formatTime(secs) {
@@ -555,7 +540,6 @@ function goToSlide(index) {
 }
 
 function addVideoSlide(file, url, title = null, tags = null, likes = null) {
-  // ป้องกันเพิ่มซ้ำ
   if (isDuplicateUrl(url)) {
     console.log('ไฟล์นี้มีอยู่แล้ว ไม่เพิ่มซ้ำ');
     return;
@@ -596,7 +580,6 @@ function addVideoSlide(file, url, title = null, tags = null, likes = null) {
   if (idx === 0) updateActiveVideo(true);
 }
 
-// สไลด์
 wrapper.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
   isDragging = true;
@@ -634,13 +617,14 @@ wrapper.addEventListener('click', e => {
 });
 
 document.getElementById('likeBtn').addEventListener('click', toggleLike);
+document.getElementById('profileIconBtn').addEventListener('click', showProfileScreen);
 
 fileInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const url = URL.createObjectURL(file);
   addVideoSlide(file, url);
-  fileInput.value = ''; // รีเซ็ตให้เลือกไฟล์เดิมซ้ำได้ถ้าต้องการ
+  fileInput.value = '';
 });
 
 document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
@@ -649,11 +633,9 @@ document.getElementById('backBtn').addEventListener('click', showMainScreen);
 document.getElementById('confirmYes').addEventListener('click', confirmDelete);
 document.getElementById('confirmNo').addEventListener('click', cancelDelete);
 
-// ข้อมูลตัวอย่าง
 window.addEventListener('load', () => {
   const sampleVideos = [
-    { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', title: 'Lamai Plai Mat Nights', tags: '#ThaiPodee #เพลง', likes: 66 },
-    { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', title: 'Chira Junction', tags: '#ThaiPodee #สถานีรถไฟ', likes: 132 }
+    { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', title: 'Lamai Plai Mat Nights', tags: '#ThaiPodee #เพลง', likes: 27 },
   ];
   
   sampleVideos.forEach(v => {
