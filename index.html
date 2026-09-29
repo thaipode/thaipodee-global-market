@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1104 — วิดีโอขึ้นแน่นอน + กำจัดข้อความกวนใจ
-   อัปเดต: 29 กันยายน 2569 20:35 น.
+   ThaiPodee v1105 — เอาแถบดำล่างเกินออก + ซ่อนข้อความกวนใจ
+   อัปเดต: 29 กันยายน 2569 20:40 น.
    --------------------------------------------------------------
-   ✅ วิดีโอแสดงผลชัดเจน — ไม่มีอะไรบัง
-   ✅ กำจัดข้อความที่ฝังมากับวิดีโอออกหมด
-   ✅ ใช้โครงสร้างที่ทำงานได้แน่นอน
-   ✅ ข้อมูลผู้ใช้ + ปุ่มครบถ้วน
+   ✅ วิดีโอแนวตั้งเต็มพื้นที่ ไม่มีแถบสีดำเกิน
+   ✅ ซ่อนข้อความกวนใจได้โดยไม่ต้องใช้แถบดำทับ
+   ✅ เสียงออก + เล่นได้ปกติ
+   ✅ ไอคอนขวา/ล่าง ครบตรงตำแหน่ง
+   ✅ ชื่อ+คำอธิบาย มุมล่างซ้าย ถูกต้อง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -42,7 +43,7 @@
     position: absolute; top: 12px; right: 45px; font-size: 20px; z-index: 99;
   }
 
-  /* === พื้นที่วิดีโอ — แก้ให้แสดงชัดเจน === */
+  /* === พื้นที่วิดีโอ — เต็มพื้นที่ ไม่มีแถบดำ === */
   #container {
     width: 100%; height: 100vh; overflow: hidden; position: relative;
     background: #000;
@@ -63,27 +64,29 @@
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: #000;
-    z-index: 2; /* วิดีโออยู่ชั้นที่ 2 — แสดงแน่นอน */
+    z-index: 2;
     display: block;
+    object-fit: cover; /* วิดีโอแนวตั้งเต็มจอ ไม่มีแถบดำ */
   }
-  video.is-portrait { object-fit: cover; }
-  video.is-landscape { object-fit: contain; }
 
-  /* === กล่องปิดข้อความกวนใจ — วางทับด้านล่างโดยเฉพาะ === */
-  .text-hide-cover {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 100px; /* ปิดเฉพาะส่วนล่าง ไม่กระทบวิดีโอ */
-    background: #000;
-    z-index: 3; /* บังข้อความกวนใจ แต่ไม่บังวิดีโอ */
-    pointer-events: none;
+  /* === ซ่อนข้อความกวนใจโดยไม่ใช้แถบดำ === */
+  video::cue { display: none !important; }
+  video::before, video::after { display: none !important; }
+  [id*="silent"], [class*="silent"],
+  [data-silent], [data-debug],
+  .debug, .meta, [class*="code"],
+  [style*="monospace"], pre {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
   }
 
   /* === ข้อมูลผู้ใช้ — วางเหนือสุด === */
   .video-info {
     position: absolute; bottom: 85px; left: 12px; right: 70px;
-    z-index: 5; /* อยู่เหนือกล่องปิด */
-    pointer-events: none;
+    z-index: 5; pointer-events: none;
   }
   .info-username {
     font-weight: 600; font-size: 14px; margin-bottom: 4px;
@@ -142,10 +145,6 @@
   }
 
   #fileInput { display: none; }
-
-  /* ปิดข้อความที่ฝังมากับวิดีโอ — ไม่ใช้ display:none เพราะจะกระทบวิดีโอ */
-  video::cue { display: none !important; }
-  video::before, video::after { display: none !important; }
 </style>
 </head>
 <body>
@@ -153,7 +152,7 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1104</div>
+  <div class="version-tag">v1105</div>
 
   <div class="top-tabs">
     <span class="tab-item">กำลังติดตาม</span>
@@ -162,9 +161,6 @@
   <span class="search-icon">🔍</span>
 
   <div id="videoWrapper"></div>
-
-  <!-- กล่องปิดข้อความกวนใจ -- วางทับด้านล่าง -->
-  <div class="text-hide-cover"></div>
 
   <div class="video-info">
     <div class="info-username">
