@@ -1,9 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1077 — ปรับไอคอนตรงแบบเดิม + ครบทุกปุ่ม
-   อัปเดต: 29 กันยายน 2569 19:09 น.
+   ThaiPodee v1078 — เร่งโหลดวิดีโอ เล่นได้ทันที
+   อัปเดต: 29 กันยายน 2569 19:10 น.
    --------------------------------------------------------------
-   ปัญหา: ไอคอนเปลี่ยนไป หายปุ่มโปรไฟล์ รูปแบบไม่เหมือนเดิม
-   แก้ไข: ใส่ไอคอนครบ 7 ปุ่ม เรียงลำดับถูกต้อง รูปแบบเหมือนเดิม
+   ปัญหา: วิดีโอโหลดช้า ไม่เล่น อ้างไฟล์ไม่มี
+   แก้ไข: ใส่วิดีโอตัวอย่างจริงจากอินเทอร์เน็ต → เล่นได้ทันที
+          ปรับ preload + autoplay → เร็วสุด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -21,19 +22,20 @@
     width: 100%; height: 100vh; overflow: hidden; position: relative;
   }
   #videoWrapper {
-    width: 100%; transition: transform 0.2s ease-out;
+    width: 100%; transition: transform 0.15s ease-out;
   }
   .video-slide {
     width: 100%; height: 100vh; display: flex;
     align-items: center; justify-content: center;
     position: relative;
+    background: #000;
   }
   video {
-    width: 100%; height: 100%; object-fit: contain; background: #111;
+    width: 100%; height: 100%; object-fit: contain; background: #000;
   }
   .side-icons {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 22px; z-index: 10;
+    display: flex; flex-direction: column; gap: 24px; z-index: 20;
     align-items: center;
   }
   .icon-btn {
@@ -41,13 +43,11 @@
     background: transparent; border: none; color: #fff;
     font-size: 26px; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
-    padding: 0;
   }
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
-    background: rgba(0,0,0,0.8); display: flex;
-    justify-content: space-around; align-items: center; z-index: 10;
-    padding-bottom: 8px;
+    background: rgba(0,0,0,0.85); display: flex;
+    justify-content: space-around; align-items: center; z-index: 20;
   }
   .nav-btn {
     background: none; border: none; color: #fff; font-size: 22px;
@@ -64,11 +64,9 @@
 <body>
 
 <div id="container">
-  <div id="videoWrapper">
-    <!-- วิดีโอจะแสดงที่นี่ -->
-  </div>
+  <div id="videoWrapper"></div>
 
-  <!-- ปุ่มด้านขวา เรียงตามลำดับ: โปรไฟล์ → หัวใจ → ตะกร้า → แชร์ → บันทึก → จุด 3 -->
+  <!-- ปุ่มข้างขวา เรียงถูกต้อง -->
   <div class="side-icons">
     <button class="icon-btn">👤</button>
     <button class="icon-btn">❤️</button>
@@ -81,7 +79,6 @@
 </div>
 
 <script>
-// ===== ตัวแปรหลัก =====
 const container = document.getElementById('container');
 const wrapper = document.getElementById('videoWrapper');
 let videos = [];
@@ -100,15 +97,19 @@ function goToSlide(index) {
   updatePlayState();
 }
 
-// ===== เล่น-หยุดวิดีโอ =====
+// ===== เล่นเฉพาะอันที่เห็น =====
 function updatePlayState() {
   document.querySelectorAll('video').forEach((vid, idx) => {
-    if (idx === currentIndex) vid.play().catch(() => {});
-    else vid.pause();
+    if (idx === currentIndex) {
+      vid.play().catch(e => console.log('กดเพื่อเล่น'));
+    } else {
+      vid.pause();
+      vid.currentTime = 0;
+    }
   });
 }
 
-// ===== เลื่อนขึ้นลงด้วยมือ =====
+// ===== เลื่อนขึ้นลง =====
 if (container) {
   container.addEventListener('touchstart', e => {
     startY = e.touches[0].clientY;
@@ -132,33 +133,32 @@ if (container) {
   });
 }
 
-// ===== โหลดวิดีโอตัวอย่าง =====
+// ===== วิดีโอตัวอย่าง — เล่นได้ทันที ไม่ต้องมีไฟล์เอง =====
 async function loadVideos() {
-  try {
-    videos = [
-      { src: 'videos/sample1.mp4' },
-      { src: 'videos/sample2.mp4' }
-    ];
-    renderVideos();
-    goToSlide(0);
-  } catch (err) {
-    console.log('โหลดไม่ได้:', err);
-  }
+  // วิดีโอตัวอย่างฟรี เร็ว ไม่ต้องอัปโหลดเอง
+  videos = [
+    { src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+    { src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' }
+  ];
+  renderVideos();
+  goToSlide(0);
 }
 
-// ===== วางวิดีโอลงหน้าจอ =====
+// ===== สร้างหน้าวิดีโอ =====
 function renderVideos() {
   wrapper.innerHTML = '';
   videos.forEach(v => {
     const slide = document.createElement('div');
     slide.className = 'video-slide';
-    slide.innerHTML = `<video src="${v.src}" preload="metadata" loop playsinline></video>`;
+    slide.innerHTML = `
+      <video src="${v.src}" autoplay muted loop playsinline preload="auto"></video>
+    `;
     wrapper.appendChild(slide);
   });
   addBottomNav();
 }
 
-// ===== แถบเมนูด้านล่าง =====
+// ===== เมนูล่าง =====
 function addBottomNav() {
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
@@ -172,7 +172,7 @@ function addBottomNav() {
   document.body.appendChild(nav);
 }
 
-// ===== เริ่มทำงาน =====
+// ===== เริ่มเลย =====
 document.addEventListener('DOMContentLoaded', loadVideos);
 </script>
 
