@@ -1,9 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1084 — เสียงออกชัวร์ + เวอร์ชันมุมขวาบน
-   อัปเดต: 29 กันยายน 2569 19:36 น.
+   ThaiPodee v1085 — เต็มจอพอดี ไม่มีแถบดำ + เสียงออก + เวอร์ชัน
+   อัปเดต: 29 กันยายน 2569 19:40 น.
    --------------------------------------------------------------
-   ปัญหา: เสียงไม่ออก เพราะเบราว์เซอร์บล็อก autoplay
-   แก้ไข: เอา muted ออกหมด + เปิดเสียงตอนแตะหน้าจอ + บอกให้กดเพื่อฟัง
+   ปัญหา: มีแถบดำด้านล่าง วิดีโอไม่เต็มจอ
+   แก้ไข: ปรับขนาดวิดีโอให้เต็มพื้นที่ จัดกึ่งกลาง ลดแถบดำ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -27,15 +27,17 @@
     width: 100%; height: 100vh; overflow: hidden; position: relative;
   }
   #videoWrapper {
-    width: 100%; transition: transform 0.15s ease-out;
+    width: 100%; height: 100%; transition: transform 0.15s ease-out;
   }
   .video-slide {
-    width: 100%; height: 100vh; display: flex;
-    align-items: center; justify-content: center;
-    position: relative; background: #000;
+    width: 100%; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
   }
   video {
-    width: 100%; height: 100%; object-fit: contain; background: #000;
+    width: 100%; height: 100%;
+    object-fit: cover; /* เต็มจอพอดี ตัดขอบนิดหน่อยไม่ให้มีช่องว่าง */
+    background: #000;
   }
   .side-icons {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -51,9 +53,10 @@
   }
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
-    background: rgba(0,0,0,0.85); display: flex;
-    justify-content: space-around; align-items: center;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    display: flex; justify-content: space-around; align-items: center;
     z-index: 99;
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
   .nav-btn {
     background: none; border: none; color: #fff; font-size: 22px;
@@ -66,12 +69,6 @@
     font-size: 28px; border: none; cursor: pointer;
   }
   #fileInput { display: none; }
-  .sound-hint {
-    position: absolute; top: 12px; left: 12px;
-    background: rgba(255,0,0,0.7); color: #fff;
-    font-size: 12px; padding: 5px 10px; border-radius: 12px;
-    z-index: 100;
-  }
 </style>
 </head>
 <body>
@@ -79,8 +76,7 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1084</div>
-  <div class="sound-hint" id="soundHint">🔊 แตะหน้าจอเพื่อเปิดเสียง</div>
+  <div class="version-tag">v1085</div>
 
   <div id="videoWrapper"></div>
 
@@ -99,7 +95,6 @@
 const container = document.getElementById('container');
 const wrapper = document.getElementById('videoWrapper');
 const fileInput = document.getElementById('fileInput');
-const soundHint = document.getElementById('soundHint');
 let videos = [];
 let currentIndex = 0;
 let startY = 0;
@@ -107,7 +102,6 @@ let isDragging = false;
 let offsetY = 0;
 let soundUnlocked = false;
 
-// เปิดเสียงเมื่อแตะหน้าจอครั้งแรก
 function unlockSound() {
   if (soundUnlocked) return;
   document.querySelectorAll('video').forEach(vid => {
@@ -115,7 +109,6 @@ function unlockSound() {
     vid.play().catch(() => {});
   });
   soundUnlocked = true;
-  if (soundHint) soundHint.style.display = 'none';
 }
 
 function goToSlide(index) {
