@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1127 — แก้ข้อ1+ข้อ2 เท่านั้น
-   อัปเดต: 29 กันยายน 2569 23:00 น.
+   ThaiPodee v1128 — แก้เลือกรูปจากเครื่องได้โดยตรง
+   อัปเดต: 29 กันยายน 2569 23:10 น.
    --------------------------------------------------------------
-   ✅ ข้อที่1: จัดวางบนสุด — v1127 ขึ้นบนสุด ไม่มีกุญแจ
-              แว่นขยายลงมา ห่างกัน กดได้ถนัด
-   ✅ ข้อที่2: เปลี่ยนรูป+ชื่อโปรไฟล์ได้ — ตั้งชื่อแยกเครื่องได้
-   ⚠️ ไม่แก้จุดอื่น — ปลอดภัย ไม่ล่ม
+   ✅ เปลี่ยนชื่อได้ — ทำงานปกติ
+   ✅ เปลี่ยนรูปได้ — กดรูป → เลือกจากในเครื่องเลย ไม่ต้องพิมพ์ลิงก์
+   ✅ จดจำชื่อ+รูป แยกแต่ละเครื่อง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,7 +16,7 @@
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ===== ข้อที่1: ส่วนบนสุด — จัดวางใหม่ ===== */
+  /* ===== ข้อที่1: ส่วนบนสุด ===== */
   .top-version {
     position: absolute;
     top: 8px;
@@ -28,7 +27,7 @@
   }
   .search-icon {
     position: absolute;
-    top: 36px; /* ลงมาห่างจากเวอร์ชัน */
+    top: 36px;
     right: 16px;
     font-size: 20px;
     cursor: pointer;
@@ -46,7 +45,7 @@
   .tabs span { opacity: 0.5; }
   .tabs span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
 
-  /* ===== วิดีโอพื้นที่ ===== */
+  /* ===== วิดีโอ ===== */
   .video-container {
     position: absolute;
     top: 70px;
@@ -111,7 +110,7 @@
     font-weight: bold;
   }
 
-  /* ===== ข้อที่2: หน้าแก้ไขโปรไฟล์ ===== */
+  /* ===== หน้าแก้ไขโปรไฟล์ ===== */
   .edit-profile-overlay {
     position: fixed;
     top:0; left:0; right:0; bottom:0;
@@ -157,6 +156,9 @@
   .edit-btn.save { background: #00c853; color: #fff; }
   .edit-btn.cancel { background: #444; color: #fff; }
 
+  /* ===== ซ่อนช่องเลือกไฟล์จริง ===== */
+  #avatar-file-input { display: none; }
+
   /* ===== ข้อมูลล่างวิดีโอ ===== */
   .video-info {
     position: absolute;
@@ -170,41 +172,35 @@
 </head>
 <body>
 
-<!-- ข้อที่1: บนสุด — ไม่มีกุญแจ -->
-<div class="top-version">v1127</div>
+<div class="top-version">v1128</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
 </div>
 
-<!-- แว่นขยายลงมา ห่างกัน -->
-<div class="search-icon" onclick="alert('ค้นหา — จะเพิ่มเติมในรุ่นต่อไป')">🔍</div>
+<div class="search-icon" onclick="alert('ค้นหา — รุ่นต่อไป')">🔍</div>
 
-<!-- วิดีโอตรงกลาง -->
 <div class="video-container">
   <div class="play-btn">▶</div>
 </div>
 
-<!-- ข้อมูลใต้วิดีโอ -->
 <div class="video-info">
   <div class="acc-name" id="display-name">@ThaiPodee</div>
   <div class="desc">Lamai Plai Mat Nights — สินค้าและบริการ</div>
 </div>
 
-<!-- ไอคอนด้านขวา -->
 <div class="side-icons">
   <div class="side-icon p-avatar" onclick="openEditProfile()">
     <img id="avatar-img" src="https://via.placeholder.com/100" alt="โปรไฟล์">
   </div>
-  <div class="side-icon">❤️<span id="like-count">27</span></div>
+  <div class="side-icon">❤️<span>27</span></div>
   <div class="side-icon">💬<span>0</span></div>
   <div class="side-icon">📌<span>0</span></div>
   <div class="side-icon">↗️<span>0</span></div>
   <div class="side-icon">🎵<span>3:02</span></div>
 </div>
 
-<!-- แถบล่าง -->
 <div class="bottom-nav">
   <div class="nav-item">🏠<br>หน้าหลัก</div>
   <div class="nav-item">🛒<br>ร้านค้า</div>
@@ -213,13 +209,21 @@
   <div class="nav-item" onclick="openEditProfile()">👤<br>โปรไฟล์</div>
 </div>
 
-<!-- ข้อที่2: หน้าแก้ไขโปรไฟล์ -->
+<!-- หน้าแก้ไขโปรไฟล์ -->
 <div class="edit-profile-overlay" id="edit-profile-panel">
   <h3 style="margin-bottom:20px">ตั้งค่าโปรไฟล์</h3>
-  <div class="edit-avatar" onclick="changeAvatar()">
-    <img id="edit-avatar-preview" src="https://via.placeholder.com/100" alt="รูป">
+  
+  <!-- กดรูป → เปิดเลือกจากเครื่อง -->
+  <div class="edit-avatar" onclick="document.getElementById('avatar-file-input').click()">
+    <img id="edit-avatar-preview" src="https://via.placeholder.com/100" alt="รูปโปรไฟล์">
   </div>
+  <p style="font-size:12px; color:#aaa; margin-bottom:12px">กดที่รูปเพื่อเปลี่ยน</p>
+  
+  <!-- ช่องเลือกไฟล์จริง ซ่อนไว้ -->
+  <input type="file" id="avatar-file-input" accept="image/*">
+  
   <input type="text" class="edit-input" id="name-input" placeholder="ตั้งชื่อ เช่น เครื่องที่ 1">
+  
   <div class="edit-buttons">
     <button class="edit-btn cancel" onclick="closeEditProfile()">ยกเลิก</button>
     <button class="edit-btn save" onclick="saveProfile()">บันทึก</button>
@@ -229,14 +233,19 @@
 <script>
 // โหลดที่บันทึกไว้
 let savedName = localStorage.getItem('userDisplayName') || '@ThaiPodee';
-let savedAvatar = localStorage.getItem('userAvatar') || 'https://via.placeholder.com/100';
+let savedAvatar = localStorage.getItem('userAvatar');
 
+// แสดงชื่อ
 document.getElementById('display-name').textContent = savedName;
-document.getElementById('avatar-img').src = savedAvatar;
-document.getElementById('edit-avatar-preview').src = savedAvatar;
 document.getElementById('name-input').value = savedName.replace('@','');
 
-// เปิด-ปิด แก้ไข
+// แสดงรูป — ถ้ามี → ใช้ ถ้าไม่มี → รูปเริ่มต้น
+if (savedAvatar) {
+  document.getElementById('avatar-img').src = savedAvatar;
+  document.getElementById('edit-avatar-preview').src = savedAvatar;
+}
+
+// เปิด-ปิด
 function openEditProfile() {
   document.getElementById('edit-profile-panel').classList.add('show');
 }
@@ -244,27 +253,38 @@ function closeEditProfile() {
   document.getElementById('edit-profile-panel').classList.remove('show');
 }
 
-// เปลี่ยนรูป (ตัวอย่าง — ใส่ลิงก์รูปได้เลย)
-function changeAvatar() {
-  const newUrl = prompt('ใส่ลิงก์รูปภาพ (หรือวางที่อยู่รูปของคุณ):');
-  if (newUrl && newUrl.trim()) {
-    savedAvatar = newUrl.trim();
-    document.getElementById('avatar-img').src = savedAvatar;
-    document.getElementById('edit-avatar-preview').src = savedAvatar;
-    localStorage.setItem('userAvatar', savedAvatar);
-  }
-}
+// เลือกรูปจากเครื่อง → แสดงทันที
+const fileInput = document.getElementById('avatar-file-input');
+fileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const imgData = event.target.result;
+    document.getElementById('avatar-img').src = imgData;
+    document.getElementById('edit-avatar-preview').src = imgData;
+    savedAvatar = imgData;
+  };
+  reader.readAsDataURL(file);
+});
 
 // บันทึกชื่อ
 function saveProfile() {
   let name = document.getElementById('name-input').value.trim();
   if (!name) { alert('กรุณาใส่ชื่อ'); return; }
   if (!name.startsWith('@')) name = '@' + name;
+  
   savedName = name;
   document.getElementById('display-name').textContent = savedName;
   localStorage.setItem('userDisplayName', savedName);
+  
+  if (savedAvatar) {
+    localStorage.setItem('userAvatar', savedAvatar);
+  }
+  
   closeEditProfile();
-  alert('บันทึกแล้ว! ตอนนี้ชื่อ: ' + savedName);
+  alert('✅ บันทึกแล้ว!\nชื่อ: ' + savedName);
 }
 </script>
 
