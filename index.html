@@ -1,10 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1082 — เร่งโหลดวิดีโอ + ปุ่มทำงาน + ไอคอนเรียงตรง
-   อัปเดต: 29 กันยายน 2569 19:30 น.
+   ThaiPodee v1083 — เวอร์ชันมุมขวาบนหน้าจอ + เสียงออก
+   อัปเดต: 29 กันยายน 2569 19:34 น.
    --------------------------------------------------------------
-   ปัญหา: วิดีโอโหลดช้า ไม่เล่น ไอคอนไม่ตรง ปุ่มกดไม่ได้
-   แก้ไข: ใช้วิดีโอที่โหลดเร็วที่สุด / จัดระยะห่างไอคอนให้ตรง /
-          ปุ่มบวกเปิดเลือกไฟล์จริง / z-index สูงไม่โดนบัง
+   ปัญหา: ไม่เห็นเวอร์ชัน / เสียงไม่ออก
+   แก้ไข: แสดง v1083 มุมขวาบนหน้าจอ / เปิดเสียง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,6 +16,18 @@
   html, body {
     width: 100%; height: 100%; overflow: hidden;
     background: #000; color: #fff; font-family: sans-serif;
+  }
+  /* ===== เลขเวอร์ชัน มุมขวาบนหน้าจอ ===== */
+  .version-tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    z-index: 100;
   }
   #container {
     width: 100%; height: 100vh; overflow: hidden; position: relative;
@@ -68,6 +79,9 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
+  <!-- เลขเวอร์ชันตรงนี้ มุมขวาบนหน้าจอ -->
+  <div class="version-tag">v1083</div>
+
   <div id="videoWrapper"></div>
 
   <div class="side-icons">
@@ -102,8 +116,16 @@ function goToSlide(index) {
 
 function updatePlayState() {
   document.querySelectorAll('video').forEach((vid, idx) => {
-    if (idx === currentIndex) vid.play().catch(() => {});
-    else { vid.pause(); vid.currentTime = 0; }
+    if (idx === currentIndex) {
+      vid.muted = false;
+      vid.play().catch(() => {
+        vid.muted = false;
+        vid.play();
+      });
+    } else {
+      vid.pause();
+      vid.currentTime = 0;
+    }
   });
 }
 
@@ -141,7 +163,7 @@ function renderVideos() {
   videos.forEach(v => {
     const slide = document.createElement('div');
     slide.className = 'video-slide';
-    slide.innerHTML = `<video src="${v.src}" autoplay muted loop playsinline preload="auto"></video>`;
+    slide.innerHTML = `<video src="${v.src}" loop playsinline preload="auto"></video>`;
     wrapper.appendChild(slide);
   });
   addBottomNav();
