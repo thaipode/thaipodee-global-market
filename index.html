@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1108 — ตรวจจับอัตโนมัติ แสดงเฉพาะตอนโหลด
-   อัปเดต: 29 กันยายน 2569 20:56 น.
+   ThaiPodee v1109 — เพิ่มแถบเส้นเวลาวิดีโอ
+   อัปเดต: 29 กันยายน 2569 21:05 น.
    --------------------------------------------------------------
-   ✅ ซ่อนตัวเลขออกจากมุมขวาบน — ไม่รบกวน
-   ✅ ตรวจจับเอง: แนวตั้ง→9:16 / แนวนอน→16:9
-   ✅ แสดงเฉพาะตอนกำลังโหลด → หายเองเมื่อเสร็จ
-   ✅ ทุกอย่างอื่นทำงานเหมือนเดิมครบถ้วน
+   ✅ เพิ่มแถบความคืบหน้าด้านล่างวิดีโอ — เลื่อนได้
+   ✅ แสดงเวลาปัจจุบัน / เวลารวม
+   ✅ ทุกอย่างเดิมยังทำงานครบถ้วน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -27,7 +26,6 @@
     z-index: 100;
   }
 
-  /* === กล่องแสดงสถานะตอนโหลดเท่านั้น === */
   .loading-box {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: rgba(0,0,0,0.8); color: #fff;
@@ -80,8 +78,26 @@
     display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important;
   }
 
+  /* === แถบเส้นเวลาวิดีโอ === */
+  .progress-container {
+    position: absolute; bottom: 85px; left: 12px; right: 12px;
+    z-index: 10; display: flex; align-items: center; gap: 8px;
+    padding: 4px 0;
+  }
+  .time-text {
+    font-size: 11px; color: #ccc; min-width: 40px; text-align: center;
+  }
+  .progress-bar-bg {
+    flex: 1; height: 3px; background: rgba(255,255,255,0.2);
+    border-radius: 3px; cursor: pointer;
+  }
+  .progress-bar-fill {
+    height: 100%; background: #ff2d55; width: 0%; border-radius: 3px;
+    transition: width 0.1s linear;
+  }
+
   .video-info {
-    position: absolute; bottom: 85px; left: 12px; right: 70px;
+    position: absolute; bottom: 55px; left: 12px; right: 70px;
     z-index: 5; pointer-events: none;
   }
   .info-username {
@@ -96,7 +112,7 @@
   .info-tags { font-size: 12px; color: #ccc; }
 
   .side-icons {
-    position: absolute; right: 10px; bottom: 95px;
+    position: absolute; right: 10px; bottom: 110px;
     display: flex; flex-direction: column; gap: 22px;
     z-index: 5; align-items: center;
   }
@@ -148,9 +164,8 @@
 <input type="file" id="fileInput" accept="video/*">
 
 <div id="container">
-  <div class="version-tag">v1108</div>
+  <div class="version-tag">v1109</div>
 
-  <!-- === แสดงเฉพาะตอนโหลด === -->
   <div class="loading-box" id="loadingBox">
     <div>กำลังโหลดวิดีโอ...</div>
     <div class="ratio-text" id="ratioText"></div>
@@ -163,6 +178,15 @@
   <span class="search-icon">🔍</span>
 
   <div id="videoWrapper"></div>
+
+  <!-- === แถบเส้นเวลา === -->
+  <div class="progress-container" id="progressContainer" style="display:none;">
+    <span class="time-text" id="currentTime">0:00</span>
+    <div class="progress-bar-bg" id="progressBarBg">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+    <span class="time-text" id="totalTime">0:00</span>
+  </div>
 
   <div class="video-info">
     <div class="info-username">
@@ -216,9 +240,22 @@ const wrapper = document.getElementById('videoWrapper');
 const fileInput = document.getElementById('fileInput');
 const loadingBox = document.getElementById('loadingBox');
 const ratioText = document.getElementById('ratioText');
+const progressContainer = document.getElementById('progressContainer');
+const progressBarBg = document.getElementById('progressBarBg');
+const progressBarFill = document.getElementById('progressBarFill');
+const currentTimeEl = document.getElementById('currentTime');
+const totalTimeEl = document.getElementById('totalTime');
 
 let videos = [];
 let currentIndex = 0;
+let activeVideo = null;
+
+function formatTime(secs) {
+  if (isNaN(secs)) return '0:00';
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
 
 function unlockSound() {
   document.querySelectorAll('video').forEach(vid => {
@@ -241,11 +278,31 @@ function updatePlayState() {
     if (idx === currentIndex) {
       vid.muted = false;
       vid.play().catch(() => {});
+      activeVideo = vid;
+      progressContainer.style.display = 'flex';
     } else {
       vid.pause();
       vid.currentTime = 0;
     }
   });
+}
+
+// อัปเดตแถบเวลา
+function updateProgress() {
+  if (!activeVideo) return;
+  const pct = (activeVideo.currentTime / activeVideo.duration) * 100;
+  progressBarFill.style.width = `${pct}%`;
+  currentTimeEl.textContent = formatTime(activeVideo.currentTime);
+  totalTimeEl.textContent = formatTime(activeVideo.duration);
+}
+
+// กดข้ามเวลา
+function seekVideo(e) {
+  if (!activeVideo) return;
+  const rect = progressBarBg.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const pct = x / rect.width;
+  activeVideo.currentTime = pct * activeVideo.duration;
 }
 
 container.addEventListener('click', unlockSound);
@@ -270,6 +327,8 @@ container.addEventListener('touchend', () => {
   else goToSlide(currentIndex);
 });
 
+progressBarBg.addEventListener('click', seekVideo);
+
 function setVideoFit(video) {
   loadingBox.classList.add('show');
   ratioText.textContent = '';
@@ -278,13 +337,11 @@ function setVideoFit(video) {
     const isPortrait = video.videoHeight > video.videoWidth;
     video.classList.toggle('is-portrait', isPortrait);
     video.classList.toggle('is-landscape', !isPortrait);
-
-    // ตรวจจับเองอัตโนมัติ
     ratioText.textContent = isPortrait ? '9 : 16' : '16 : 9';
-
-    // หายไปเองหลังโหลดเสร็จ
     setTimeout(() => loadingBox.classList.remove('show'), 1500);
   });
+
+  video.addEventListener('timeupdate', updateProgress);
 }
 
 async function loadVideos() {
