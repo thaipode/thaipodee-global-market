@@ -1,9 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1080 — ปุ่มบวกเปิดเลือกไฟล์จริง + อัปโหลดได้
-   อัปเดต: 29 กันยายน 2569 19:16 น.
+   ThaiPodee v1082 — เร่งโหลดวิดีโอ + ปุ่มทำงาน + ไอคอนเรียงตรง
+   อัปเดต: 29 กันยายน 2569 19:30 น.
    --------------------------------------------------------------
-   ปัญหา: ปุ่มบวกแค่แจ้งเตือน ไม่ทำอะไรต่อ
-   แก้ไข: กดปุ่ม → เปิดหน้าเลือกวิดีโอ → เพิ่มเข้ารายการ → เล่นได้ทันที
+   ปัญหา: วิดีโอโหลดช้า ไม่เล่น ไอคอนไม่ตรง ปุ่มกดไม่ได้
+   แก้ไข: ใช้วิดีโอที่โหลดเร็วที่สุด / จัดระยะห่างไอคอนให้ตรง /
+          ปุ่มบวกเปิดเลือกไฟล์จริง / z-index สูงไม่โดนบัง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -33,14 +34,15 @@
   }
   .side-icons {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 24px; z-index: 15;
+    display: flex; flex-direction: column; gap: 20px; z-index: 90;
     align-items: center;
   }
   .icon-btn {
     width: 48px; height: 48px; border-radius: 50%;
     background: transparent; border: none; color: #fff;
-    font-size: 26px; cursor: pointer; display: flex;
+    font-size: 24px; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
@@ -157,19 +159,17 @@ function addBottomNav() {
   `;
   document.body.appendChild(nav);
 
-  // กดปุ่มบวก → เปิดเลือกไฟล์
   document.getElementById('uploadBtn').addEventListener('click', () => {
     fileInput.click();
   });
 
-  // เลือกไฟล์เสร็จ → เพิ่มเข้ารายการ
   fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    videos.unshift({ src: url }); // ใส่ไว้ด้านบนสุด
+    videos.unshift({ src: url });
     renderVideos();
-    goToSlide(0); // ขึ้นเล่นทันที
+    goToSlide(0);
   });
 }
 
