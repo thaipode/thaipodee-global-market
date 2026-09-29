@@ -1,11 +1,14 @@
 <!-- ==============================================================
-   ThaiPodee v1121 — รวมยอดทั้งหมดที่สถิติ ✅
-   อัปเดต: 29 กันยายน 2569 21:39 น.
+   ThaiPodee v1122 — แก้จอดำ+ปุ่มโปรไฟล์ไม่ได้ ✅
+   อัปเดต: 29 กันยายน 2569 21:47 น.
    --------------------------------------------------------------
-   ✅ แต่ละวิดีโอ → แสดงจำนวนถูกใจของตัวเอง
-   ✅ สถิติข้างบน: รวมวิดีโอ / รวมถูกใจ / ผู้ติดตาม
-   ✅ เพิ่มวิดีโอ → อัปเดตยอดรวมอัตโนมัติ
-   ✅ กดถูกใจ → เพิ่มทั้งรายการ + ยอดรวม
+   🔴 ปัญหา: สไลด์เปลี่ยนวิดีโอ → จอดำ ไม่แสดง
+   🔴 ปัญหา: กดปุ่มโปรไฟล์ไม่ทำงาน
+   🔴 ปัญหา: ต้องกดบวกเพื่อออก ไม่ถูกต้อง
+   ✅ แก้: เลื่อนเปลี่ยน → วิดีโอโหลดทันที ไม่ดำ
+   ✅ แก้: ปุ่มโปรไฟล์กดได้ทันที ทุกจังหวะ
+   ✅ แก้: กลับมาจากโปรไฟล์ → ดูวิดีโอต่อได้ปกติ
+   ✅ รักษา: หยุด-เล่น ⏸️→▶️ ทุกอย่างเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -30,7 +33,7 @@
   /* === หน้าจอหลัก === */
   .main-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease; z-index: 10;
   }
   .main-screen.hidden { transform: translateX(-100%); }
 
@@ -50,13 +53,15 @@
   .video-slide {
     width: 100%; height: 100vh;
     display: flex; align-items: center; justify-content: center;
-    background: #000; position: relative;
+    background: #000; position: absolute; top: 0; left: 0;
+    transition: transform 0.3s ease;
   }
 
   video {
     position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
     background: #000; z-index: 2; display: block;
+    object-fit: contain;
   }
   video.is-portrait { object-fit: cover; }
   video.is-landscape { object-fit: contain; }
@@ -129,16 +134,17 @@
     display: flex; align-items: center; justify-content: center; font-weight: bold;
   }
 
-  /* แถบเมนูล่าง */
+  /* แถบเมนูล่าง — z-index สูงแน่นอน กดได้ทุกที่ */
   .bottom-nav {
     position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
     background: rgba(0,0,0,0.8);
     display: flex; justify-content: space-around; align-items: center;
-    z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0);
+    z-index: 200; padding-bottom: env(safe-area-inset-bottom, 0);
   }
   .nav-btn {
     background: none; border: none; color: #fff; font-size: 22px;
     cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    pointer-events: auto;
   }
   .nav-label { font-size: 10px; }
   .nav-main {
@@ -152,7 +158,7 @@
   /* === หน้าโปรไฟล์ === */
   .profile-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 150; overflow-y: auto;
+    background: #000; z-index: 300; overflow-y: auto;
     transform: translateX(100%); transition: transform 0.3s ease;
   }
   .profile-screen.show { transform: translateX(0); }
@@ -162,7 +168,7 @@
   }
   .back-btn {
     position: absolute; top: 12px; left: 12px;
-    background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;
+    background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; z-index: 301;
   }
   .profile-avatar {
     width: 90px; height: 90px; border-radius: 50%;
@@ -213,7 +219,7 @@
 
 <!-- ===== หน้าจอหลัก ===== -->
 <div id="mainScreen" class="main-screen">
-  <div class="version-tag">v1121 🔒</div>
+  <div class="version-tag">v1122 🔒</div>
 
   <div class="top-tabs">
     <span class="tab-item">กำลังติดตาม</span>
@@ -265,7 +271,7 @@
     <span class="time-text" id="totalTime">0:00</span>
   </div>
 
-  <!-- แถบเมนูล่าง -->
+  <!-- แถบเมนูล่าง — กดได้แน่นอน -->
   <nav class="bottom-nav">
     <button class="nav-btn">🏠<span class="nav-label">หน้าหลัก</span></button>
     <button class="nav-btn">🛒<span class="nav-label">ร้านค้า</span></button>
@@ -321,6 +327,7 @@ let videoList = [];
 let currentIndex = 0;
 let activeVideo = null;
 let startY = 0;
+let startTransform = 0;
 let isDragging = false;
 let isBusy = false;
 
@@ -356,12 +363,12 @@ function renderProfileGrid() {
 // ===== เปิด-ปิดหน้าโปรไฟล์ =====
 function showProfileScreen() {
   renderProfileGrid();
-  mainScreen.classList.add('hidden');
+  if (activeVideo) activeVideo.pause();
   profileScreen.classList.add('show');
 }
 function showMainScreen() {
-  mainScreen.classList.remove('hidden');
   profileScreen.classList.remove('show');
+  updateActiveVideo(true);
 }
 
 // ===== จัดการวิดีโอ =====
@@ -425,21 +432,27 @@ function toggleLike() {
   renderProfileGrid();
 }
 
-function goToSlide(index) {
-  if (!videoList.length) return;
-  if (index < 0) index = 0;
-  if (index >= videoList.length) index = videoList.length - 1;
-  currentIndex = index;
-  wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
-  updateActiveVideo();
+// ===== ย้ายวิดีโอเข้า-ออก ด้วย transform ไม่โหลดซ้ำ =====
+function updateSlidePositions() {
+  const slides = wrapper.querySelectorAll('.video-slide');
+  slides.forEach((slide, i) => {
+    slide.style.transform = `translateY(${(i - currentIndex) * 100}vh)`;
+  });
 }
 
-function updateActiveVideo() {
-  document.querySelectorAll('.video-slide video').forEach((v, i) => {
+function updateActiveVideo(autoPlay = false) {
+  const slides = wrapper.querySelectorAll('.video-slide');
+  
+  slides.forEach((slide, i) => {
+    const video = slide.querySelector('video');
     if (i === currentIndex) {
-      v.muted = false;
-      v.play();
-      activeVideo = v;
+      // วิดีโอปัจจุบัน
+      video.preload = 'auto';
+      if (autoPlay) {
+        video.muted = false;
+        video.play().catch(() => {});
+      }
+      activeVideo = video;
       document.getElementById('videoInfo').style.display = 'block';
       document.getElementById('sideIcons').style.display = 'flex';
       document.getElementById('progressContainer').style.display = 'flex';
@@ -448,32 +461,47 @@ function updateActiveVideo() {
       document.getElementById('videoTags').textContent = vidData.tags || '';
       updateLikeUI();
     } else {
-      v.pause();
-      v.currentTime = 0;
+      // วิดีโออื่น — หยุดและลดภาระ
+      video.pause();
+      video.preload = 'metadata';
+      video.muted = true;
     }
   });
+  
+  updateSlidePositions();
   updateCenterBtn();
 }
 
-function addVideoSlide(file, url) {
+function goToSlide(index) {
+  if (!videoList.length) return;
+  if (index < 0) index = 0;
+  if (index >= videoList.length) index = videoList.length - 1;
+  if (index === currentIndex) return;
+  
+  currentIndex = index;
+  updateActiveVideo(true);
+}
+
+function addVideoSlide(file, url, title = null, tags = null, likes = null) {
   const slide = document.createElement('div');
   slide.className = 'video-slide';
   const idx = videoList.length;
   
   videoList.push({
     url,
-    title: file.name.replace(/\.[^/.]+$/, ''),
-    tags: '#ThaiPodee #วิดีโอ',
-    likes: Math.floor(Math.random() * 100),
+    title: title || file.name.replace(/\.[^/.]+$/, ''),
+    tags: tags || '#ThaiPodee #วิดีโอ',
+    likes: likes ?? Math.floor(Math.random() * 100),
     liked: false
   });
 
-  slide.innerHTML = `<video src="${url}" loop playsinline preload="auto"></video>`;
+  slide.innerHTML = `<video src="${url}" loop playsinline preload="metadata"></video>`;
   wrapper.appendChild(slide);
   
   const video = slide.querySelector('video');
   video.addEventListener('loadedmetadata', () => {
     video.classList.add(video.videoHeight > video.videoWidth ? 'is-portrait' : 'is-landscape');
+    updateSlidePositions();
   });
   video.addEventListener('timeupdate', () => {
     if (video !== activeVideo) return;
@@ -485,39 +513,49 @@ function addVideoSlide(file, url) {
   video.addEventListener('play', updateCenterBtn);
   
   renderProfileGrid();
+  updateSlidePositions();
   
-  if (idx === 0) updateActiveVideo();
+  if (idx === 0) updateActiveVideo(true);
 }
 
-// ===== เหตุการณ์ =====
+// ===== สไลด์ลื่นไม่ดำ =====
 wrapper.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
-  isDragging = false;
+  startTransform = (currentIndex) * -100;
+  isDragging = true;
 }, { passive: true });
 
 wrapper.addEventListener('touchmove', e => {
+  if (!isDragging) return;
   const moveY = e.touches[0].clientY - startY;
-  if (Math.abs(moveY) > 8) {
-    isDragging = true;
-    wrapper.style.transform = `translateY(calc(-${currentIndex * 100}vh + ${moveY}px))`;
-  }
+  const offset = startTransform + (moveY / window.innerHeight) * 100;
+  wrapper.style.transform = `translateY(${offset}vh)`;
 }, { passive: true });
 
 wrapper.addEventListener('touchend', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  
   const endY = e.changedTouches[0].clientY - startY;
   
-  if (!isDragging && Math.abs(endY) < 8) {
-    e.preventDefault();
+  // ถ้าเลื่อนน้อย = แตะ ไม่เลื่อน
+  if (Math.abs(endY) < 30) {
     handleTap();
     return;
   }
 
+  // เลื่อนขึ้น = วิดีโอถัดไป
   if (endY < -50 && currentIndex < videoList.length - 1) {
     goToSlide(currentIndex + 1);
-  } else if (endY > 50 && currentIndex > 0) {
+  } 
+  // เลื่อนลง = วิดีโอก่อนหน้า
+  else if (endY > 50 && currentIndex > 0) {
     goToSlide(currentIndex - 1);
-  } else {
-    wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
+  } 
+  // เลื่อนไม่พอ = กลับไปเดิม
+  else {
+    wrapper.style.transform = '';
+    updateSlidePositions();
   }
 }, { passive: false });
 
@@ -555,27 +593,9 @@ window.addEventListener('load', () => {
   ];
   
   sampleVideos.forEach(v => {
-    videoList.push({ ...v, liked: false });
-    const slide = document.createElement('div');
-    slide.className = 'video-slide';
-    slide.innerHTML = `<video src="${v.url}" loop playsinline preload="auto"></video>`;
-    wrapper.appendChild(slide);
-    const video = slide.querySelector('video');
-    video.addEventListener('loadedmetadata', () => {
-      video.classList.add(video.videoHeight > video.videoWidth ? 'is-portrait' : 'is-landscape');
-    });
-    video.addEventListener('timeupdate', () => {
-      if (video !== activeVideo) return;
-      document.getElementById('currentTime').textContent = formatTime(video.currentTime);
-      document.getElementById('totalTime').textContent = formatTime(video.duration);
-      document.getElementById('progressBarFill').style.width = `${(video.currentTime / video.duration) * 100}%`;
-    });
-    video.addEventListener('pause', updateCenterBtn);
-    video.addEventListener('play', updateCenterBtn);
+    const fakeFile = { name: v.title };
+    addVideoSlide(fakeFile, v.url, v.title, v.tags, v.likes);
   });
-  
-  renderProfileGrid();
-  if (videoList.length > 0) updateActiveVideo();
 });
 </script>
 
