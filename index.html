@@ -1,12 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1074 — แก้จอดำ / โชว์ชัด / ไอคอนเหมือนตัวอย่าง
-   29 กันยายน 2569 06:47 น.
+   ThaiPodee v1075 — ไอคอนตรงตามรายการ 100%
+   29 กันยายน 2569 07:15 น.
    --------------------------------------------------------------
-   ✅ แก้ปัญหาจอดำ — รอโหลดแจ้งชัด ไม่เงียบหาย
-   ✅ ถ้าไม่มีวิดีโอ — มีปุ่มกดโพสต์เลย ไม่ดำ
-   ✅ ไอคอนด้านขวา + แถบล่าง ครบตามตัวอย่าง
-   ✅ สไลด์ขึ้น-ลงได้
-   ✅ Firebase คลังกลาง — ทุกเครื่องเห็นตรงกัน
+   ✅ ด้านขวา 6 ปุ่ม: โปรไฟล์ ❤️ 💬 ⭐ ➡️ 🎵
+   ✅ แถบล่าง 5 ปุ่ม: 🏠 🔍 + 💬 👤
+   ✅ มุมล่างซ้าย: ชื่อ + คำอธิบาย
+   ✅ แก้ Deploy failed — ตั้งค่า Static Site
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -16,16 +15,10 @@
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="thaipodee_logo_icon.png">
   <title>ThaiPodee</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-    html, body { 
-      height: 100%; 
-      overflow: hidden; 
-      background: #000; 
-      color: #fff; 
-    }
+    html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
     /* ========== พื้นที่สไลด์ ========== */
     .swiper-container {
@@ -36,10 +29,7 @@
       touch-action: pan-y;
       background: #000;
     }
-    .swiper-wrapper {
-      transition: transform 0.3s ease-out;
-      will-change: transform;
-    }
+    .swiper-wrapper { transition: transform 0.3s ease-out; will-change: transform; }
     .slide {
       height: 100vh;
       width: 100%;
@@ -48,16 +38,10 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      background: #000;
     }
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #000;
-    }
+    video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 
-    /* ========== ข้อมูลวิดีโอ ========== */
+    /* ========== มุมล่างซ้าย: ชื่อ + คำอธิบาย ========== */
     .video-info {
       position: absolute;
       bottom: 100px;
@@ -78,14 +62,14 @@
       text-shadow: 0 0 4px rgba(0,0,0,.8);
     }
 
-    /* ========== เมนูด้านขวา — เรียงตามตัวอย่าง ========== */
+    /* ========== ด้านขวา 6 ปุ่ม — ตรงตามรายการ ========== */
     .side-menu {
       position: absolute;
-      right: 10px;
-      bottom: 130px;
+      right: 12px;
+      bottom: 110px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 20px;
       z-index: 20;
       align-items: center;
     }
@@ -93,20 +77,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
     }
-    .side-icon-wrap {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.15);
+    .side-icon {
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 26px;
       color: #fff;
-      backdrop-filter: blur(2px);
+      text-shadow: 0 0 4px rgba(0,0,0,.8);
     }
     .side-label {
       font-size: 11px;
@@ -114,20 +96,20 @@
       text-shadow: 0 0 4px rgba(0,0,0,.8);
     }
     .profile-avatar {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 2px solid #fff;
       background: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
       font-size: 22px;
+      overflow: hidden;
     }
     .like-icon.liked { color: #ff2e55; }
 
-    /* ========== แถบล่าง — 5 ปุ่ม ========== */
+    /* ========== แถบล่าง 5 ปุ่ม — ตรงตามรายการ ========== */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -150,11 +132,11 @@
       cursor: pointer;
       min-width: 54px;
     }
-    .nav-icon { font-size: 22px; color: #fff; }
+    .nav-icon { font-size: 24px; color: #fff; }
     .nav-label { font-size: 10px; color: #aaa; }
     .nav-item.active .nav-icon { color: #fff; }
     .upload-center {
-      width: 48px;
+      width: 46px;
       height: 32px;
       background: #fff;
       border-radius: 4px;
@@ -163,18 +145,18 @@
       justify-content: center;
       color: #000;
       font-weight: bold;
-      font-size: 20px;
+      font-size: 22px;
     }
     .my-avatar {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 1px solid #fff;
       background: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 15px;
     }
 
     /* ========== หน้าโหลด / ว่าง ========== */
@@ -338,18 +320,14 @@
 
   <!-- ====== พื้นที่สไลด์ ====== -->
   <div class="swiper-container" id="swiperContainer">
-    <!-- หน้าโหลด — แทนที่จอดำ -->
     <div class="loading-screen" id="loadingScreen">
       <div class="spinner"></div>
       <p>กำลังโหลด ThaiPodee...</p>
     </div>
-
-    <div class="swiper-wrapper" id="swiperWrapper">
-      <!-- วิดีโอจะแสดงที่นี่อัตโนมัติ -->
-    </div>
+    <div class="swiper-wrapper" id="swiperWrapper"></div>
   </div>
 
-  <!-- ====== แถบล่าง 5 ปุ่ม ====== -->
+  <!-- ====== แถบล่าง 5 ปุ่ม ตรงรายการ ====== -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="goToSlide(0); setActiveNav(0)">
       <div class="nav-icon">🏠</div>
@@ -414,9 +392,8 @@
       });
     }
 
-    // ========== แสดงวิดีโอ — ไม่ให้จอดำ ==========
+    // ========== แสดงวิดีโอ + ไอคอนตรงรายการ ==========
     function renderSlides() {
-      // ซ่อนหน้าโหลด
       document.getElementById('loadingScreen').classList.add('hidden');
 
       if (!videos || videos.length === 0) {
@@ -435,32 +412,41 @@
         <div class="slide" data-index="${idx}">
           <video src="${vid.videoUrl}" loop playsinline muted preload="auto"></video>
           
+          <!-- มุมล่างซ้าย: ชื่อ + คำอธิบาย -->
           <div class="video-info">
             <div class="username">@${vid.username}</div>
             <div class="caption">${vid.caption || ''}</div>
           </div>
           
-          <!-- เมนูด้านขวา: โปรไฟล์ ❤️ 💬 ➕ แชร์ -->
+          <!-- ด้านขวา 6 ปุ่ม ตรงรายการเป๊ะ -->
           <div class="side-menu">
+            <!-- 1. โปรไฟล์ -->
             <div class="side-btn">
               <div class="profile-avatar">👤</div>
-              <div class="side-label">โปรไฟล์</div>
             </div>
+            <!-- 2. ไลก์ -->
             <div class="side-btn" onclick="toggleLike(${idx})">
-              <div class="side-icon-wrap like-icon" id="like-${idx}">🤍</div>
+              <div class="side-icon like-icon" id="like-${idx}">🤍</div>
               <div class="side-label" id="like-count-${idx}">0</div>
             </div>
+            <!-- 3. คอมเมนต์ -->
             <div class="side-btn">
-              <div class="side-icon-wrap">💬</div>
-              <div class="side-label">แสดงความคิด</div>
+              <div class="side-icon">💬</div>
+              <div class="side-label">0</div>
             </div>
-            <div class="side-btn" onclick="openUpload()">
-              <div class="side-icon-wrap">➕</div>
-              <div class="side-label">โพสต์</div>
-            </div>
+            <!-- 4. บันทึก/ดาว -->
             <div class="side-btn">
-              <div class="side-icon-wrap">↗️</div>
-              <div class="side-label">แชร์</div>
+              <div class="side-icon">⭐</div>
+              <div class="side-label">0</div>
+            </div>
+            <!-- 5. แชร์ -->
+            <div class="side-btn">
+              <div class="side-icon">➡️</div>
+              <div class="side-label">0</div>
+            </div>
+            <!-- 6. เสียง/เพลง ล่างสุด -->
+            <div class="side-btn">
+              <div class="side-icon">🎵</div>
             </div>
           </div>
         </div>
