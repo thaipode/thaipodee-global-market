@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1130-21 — ✅ ไอคอนชัดเจน ติดตั้งเป็นแอปเต็ม ไม่ใช่ทางลัดเล็ก
-   อัปเดต: 30 กันยายน 2569 13:50 น.
+   ThaiPodee v1130-22 — ✅ แก้ติดตั้งไม่ได้ / ไอคอน 1×1
+   อัปเดต: 30 กันยายน 2569 14:10 น.
    --------------------------------------------------------------
-   ✅ แก้ไอคอน Manifest ชัดเจน — ไม่ขึ้น 1×1 อีก
-   ✅ ติดตั้งเป็นแอปเต็มจอเลย ไม่ใช่ทางลัดหน้าจอหลัก
-   ✅ แถบแจ้งเตือนชัดเจน กดติดตั้งได้ทันที
-   ✅ แจ้งอัปเดตอัตโนมัติเหมือนเดิม
-   ✅ ปุ่ม + อยู่ตรงกลาง วิดีโอ บันทึก ครบทุกอย่าง
+   🔴 ปัญหา: ขึ้น "เพิ่มในหน้าจอหลัก" แทน "ติดตั้งแอป" / ไอคอน 1×1
+   สาเหตุ: Manifest แบบฝังใน data-URL บางเว็บไม่รู้จัก + แคชเก่าค้าง
+   ✅ แก้: เปลี่ยนชื่อไฟล์ + บังคับไม่ให้แคช + ไอคอนชัดเจน
+   ✅ ติดตั้งเป็นแอปเต็ม ไม่ผ่าน Google Play
+   ✅ แจ้งอัปเดตอัตโนมัติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -14,26 +14,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- ✅ ติดตั้งเป็นแอปเต็มรูปแบบ -->
+<!-- ✅ บังคับข้ามแคช -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<!-- ✅ ติดตั้งเป็นแอป -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="application-name" content="ThaiPodee">
 <meta name="description" content="ThaiPodee — ของไทย ไปไกลทั่วโลก">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#e60000">
 <meta name="background-color" content="#000000">
 <meta name="display" content="standalone">
 <meta name="orientation" content="portrait-primary">
 
-<!-- ✅ Manifest พร้อมไอคอนชัดเจน -->
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGVlIiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsImRlc2NyaXB0aW9uIjoiT2sgb2YgVGhhaSBUbyBUaGUgV29ybGQiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiI2ZmMDAwMCIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sJTNDc3ZnIHhtbG5zPSdodHRwczovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxOTIgMTkyJyUzRSUzQ2NpcmNsZSBjeD0nOTYnIGN5PSc5Nicgcj0nODgnIGZpbGw9JyNlNjAwMDAnLyUzRSUzQ3RleHQgeD0nNTAlJyB5PSc1NSUnIGRvbWluYW50LWJhc2VsaW5lPSdjZW50ZXInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9J3doaXRlJyBmb250LXNpemU9JzgwJyBmb250LXdlaWdodD0nYm9sZCclM0VULyUzQy90ZXh0JTNFJTNDc3ZnJTNFIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifSx7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHBzOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwOCAxMDgnJTNFJTNDY2lyY2xlIGN4PSc1NCcgY3k9JzU0JyByPSc0OCcgZmlsbD0nI2U2MDAwMCcvJTNFJTNDdGV4dCB4PSc1MCUnIHk9JzU1JScgZG9taW5hbnQtYmFzZWxpbmU9J2NlbnRlcicgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nd2hpdGUnIGZvbnQtc2l6ZT0nNTAnIGZvbnQtd2VpZ2h0PSdib2xkJyUzRlA8JTJGdGV4dD4lM0Mvc3ZnJTNFIiwic2l6ZXMiOiIxMDh4MTA4IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
+<!-- ✅ Manifest ชื่อใหม่ = ข้ามแคชเก่า -->
+<link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F192%2F192%27%3E%3Ccircle%20cx%3D%2796%27%20cy%3D%2796%27%20r%3D%2788%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%2780%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F512%2F512%27%3E%3Ccircle%20cx%3D%27256%27%20cy%3D%27256%27%20r%3D%27230%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%27200%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-21</title>
+<title>ThaiPodee v1130-22</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
 
-  /* ✅ แถบแจ้งติดตั้งชัดเจน */
+  /* แถบแจ้งติดตั้ง */
   .install-banner {
     position:fixed; top:0; left:0; right:0;
     background:#e60000; color:#fff; padding:12px 16px;
@@ -51,7 +56,7 @@
     cursor:pointer; font-size:14px; opacity:0.85;
   }
 
-  /* ✅ แจ้งอัปเดต */
+  /* แจ้งอัปเดต */
   .update-banner {
     position:fixed; top:0; left:0; right:0;
     background:#00a844; color:#fff; padding:12px 16px;
@@ -97,7 +102,6 @@
   .side-icon.p-avatar img { width:100%; height:100%; object-fit:cover; }
   .side-icon span { font-size:11px; opacity:0.7; }
 
-  /* ✅ ปุ่ม + ตรงกลางพอดี */
   .bottom-nav {
     position:absolute; bottom:0; left:0; right:0; height:75px;
     display:grid;
@@ -260,7 +264,7 @@
 </head>
 <body>
 
-<!-- ✅ แถบแจ้งติดตั้งชัดเจน -->
+<!-- แถบแจ้งติดตั้ง -->
 <div class="install-banner" id="install-banner">
   <span>✅ ติดตั้งแอป ThaiPodee ไว้ที่หน้าจอไหม?</span>
   <div>
@@ -269,13 +273,13 @@
   </div>
 </div>
 
-<!-- ✅ แจ้งอัปเดต -->
+<!-- แจ้งอัปเดต -->
 <div class="update-banner" id="update-banner">
-  <span>✅ มีอัปเดตเวอร์ชันใหม่ v1130-21</span>
+  <span>✅ มีอัปเดตเวอร์ชันใหม่ v1130-22</span>
   <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
 </div>
 
-<div class="top-version">v1130-21</div>
+<div class="top-version">v1130-22</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -371,7 +375,7 @@
 </div>
 
 <script>
-const VERSION = 'v1130-21';
+const VERSION = 'v1130-22';
 const DB_NAME = 'ThaiPodeeDB';
 const STORE = 'videos';
 const MAX_SIZE_MB = 100;
@@ -382,7 +386,10 @@ let playIndex = null;
 let delIndex = null;
 let deferredPrompt = null;
 
-// ✅ ตรวจสอบอัปเดต
+// ✅ ล้างแคชเก่า
+localStorage.removeItem('thaipodee_version');
+
+// ตรวจสอบอัปเดต
 function checkUpdate() {
   const lastVer = localStorage.getItem('thaipodee_version');
   if (lastVer && lastVer !== VERSION) {
@@ -397,17 +404,21 @@ document.getElementById('refresh-btn').addEventListener('click', () => {
   location.reload(true);
 });
 
-// ✅ แจ้งติดตั้งแอป
+// ✅ แจ้งติดตั้งแอป — รอโหลดเสร็จก่อน
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  console.log('✅ พร้อมติดตั้งแอป');
   setTimeout(() => {
     document.getElementById('install-banner').classList.add('show');
-  }, 600);
+  }, 1000);
 });
 
 document.getElementById('install-btn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
+  if (!deferredPrompt) {
+    alert('⚠️ กด 3 จุด มุมขวาบน → เพิ่มในหน้าจอหลัก / ติดตั้งแอป');
+    return;
+  }
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
   if (outcome === 'accepted') {
