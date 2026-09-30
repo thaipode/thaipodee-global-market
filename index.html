@@ -1,11 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1130-16 — ✅ แก้ล้นจอตั้งแต่ครั้งแรก | แนวนอนพอดีจอ
-   อัปเดต: 30 กันยายน 2569 13:20 น.
+   ThaiPodee v1130-17 — ✅ เห็นภาพเต็ม ไม่ตัด ไม่ล้นจอ
+   อัปเดต: 30 กันยายน 2569 13:22 น.
    --------------------------------------------------------------
-   ✅ แก้: วิดีโอแนวนอนไม่ล้นจอตั้งแต่เปิดหน้าแรก
-   ✅ object-fit:cover ทำงานทันที ไม่รอเข้า-ออก
-   ✅ กรอบคงที่ overflow:hidden กันล้นออกนอก
-   ✅ ทุกฟังก์ชันเหมือนเดิม: บันทึก, กดเล่น, หลายตัว
+   ✅ เปลี่ยน object-fit:contain → เห็นภาพทั้งหมด ไม่ตัดขอบ
+   ✅ กรอบสีดำล้อมรอบอัตโนมัติ ไม่ล้น ไม่ยืด
+   ✅ แนวนอน-แนวตั้ง พอดีจอทันทีตั้งแต่เปิด
+   ✅ ทุกฟังก์ชันเหมือนเดิม บันทึก ครบ ไม่หาย
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -23,20 +23,21 @@
   .tabs span { opacity:0.5; cursor:pointer; }
   .tabs span.active { opacity:1; border-bottom:2px solid #fff; padding-bottom:2px; }
 
-  /* ✅ กรอบคงที่ กันล้นออกนอก */
+  /* กรอบคงที่ กันล้น */
   .video-container {
     position:absolute; top:70px; bottom:80px; left:0; right:0;
     display:flex; align-items:center; justify-content:center;
     cursor:pointer; background:#000;
-    overflow:hidden; /* สำคัญ: ไม่ให้ล้นออกนอกกรอบ */
+    overflow:hidden;
   }
   .play-btn { font-size:60px; opacity:0.8; cursor:pointer; z-index:2; position:absolute; }
 
-  /* ✅ พอดีจอทันที ทั้งแนวนอน-แนวตั้ง */
+  /* ✅ contain = เห็นภาพทั้งหมด ไม่ตัด ไม่ล้น */
   .main-video {
     width:100%; height:100%;
-    object-fit:cover; /* เต็มจอ สัดส่วนถูก ตัดขอบนิดหน่อยแต่พอดี */
-    object-position:center center; /* จุดกึ่งกลางเสมอ */
+    object-fit:contain; /* เห็นเต็มภาพ สีดำเติมช่องว่าง */
+    object-position:center center;
+    background:#000;
     display:none;
   }
 
@@ -131,7 +132,7 @@
   .grid-video {
     position:absolute;
     top:0; left:0; width:100%; height:100%;
-    object-fit:cover; /* ปกพอดีบล็อก */
+    object-fit:cover; /* ปกเต็มบล็อก */
     display:block;
     preload:"metadata";
     muted;
@@ -163,7 +164,7 @@
   .video-popup.show { display:flex; }
   .popup-vid {
     width:100%; max-height:85vh;
-    object-fit:contain; /* เต็มจอไม่ตัดขอบ */
+    object-fit:contain;
     border-radius:8px;
   }
   .popup-close {
@@ -207,7 +208,7 @@
 </head>
 <body>
 
-<div class="top-version">v1130-16</div>
+<div class="top-version">v1130-17</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -390,7 +391,6 @@ async function init() {
   await openDB();
   videoList = await loadAllVideos();
   renderGrid();
-  // โหลดวิดีโอล่าสุดมาที่หน้าแรก
   if (videoList.length > 0) {
     setMainVideo(videoList[0]);
   }
@@ -409,7 +409,7 @@ function setMainVideo(item) {
 
 init();
 
-// ========== อัปโหลด + ตรวจสอบ ==========
+// ========== อัปโหลด ==========
 const upBtn = document.getElementById('up-btn');
 const vidInput = document.getElementById('vid-input');
 
@@ -443,7 +443,7 @@ vidInput.addEventListener('change', async e => {
     await saveVideo(file, file.name, duration);
     videoList = await loadAllVideos();
     renderGrid();
-    setMainVideo(videoList[0]); // ใหม่สุดขึ้นหน้าแรกทันที
+    setMainVideo(videoList[0]);
     alert(`✅ อัปโหลดสำเร็จ!\nรวม ${videoList.length} รายการ`);
   } catch (err) {
     alert('❌ ผิดพลาด: ' + err.message);
@@ -507,7 +507,6 @@ document.getElementById('del-yes').addEventListener('click', async () => {
   await deleteVideo(videoList[delIndex].id);
   videoList = await loadAllVideos();
   renderGrid();
-  // ถ้าลบตัวที่แสดงที่หน้าแรก → อัปเดต
   if (delIndex === 0 && videoList.length > 0) {
     setMainVideo(videoList[0]);
   } else if (videoList.length === 0) {
