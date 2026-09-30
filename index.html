@@ -1,10 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1130-3 — ✅ แก้: เลือกไฟล์แล้วติดแน่นอน + แจ้งเตือน
-   อัปเดต: 30 กันยายน 2569 07:58 น.
+   ThaiPodee v1130-4 — ✅ เต็มพื้นที่ ไม่เหลือสีดำ
+   อัปเดต: 30 กันยายน 2569 08:00 น.
    --------------------------------------------------------------
-   ✅ กดเลือกไฟล์ → อัปโหลดติดทันที
-   ✅ มีข้อความแจ้งเมื่อสำเร็จ/ผิดพลาด
-   ✅ 4 คอลัมน์ ไม่ดำ
+   ✅ วิดีโอ/รูปเต็มการ์ด 4 คอลัมน์ — ไม่เหลือช่องดำ
+   ✅ ปุ่ม + กดได้ อัปโหลดติด
    ✅ ไม่แตะหน้าจอหลัก
    ============================================================== -->
 <!DOCTYPE html>
@@ -50,10 +49,7 @@
     position:relative; z-index:200;
   }
 
-  /* ===== ซ่อน input แต่ให้ทำงานได้ ===== */
-  #video-file-input {
-    position:absolute; opacity:0; pointer-events:none;
-  }
+  #video-file-input { position:absolute; opacity:0; pointer-events:none; }
 
   /* ===== หน้าโปรไฟล์ ===== */
   .profile-page {
@@ -98,21 +94,23 @@
   }
   .profile-tab { text-align:center; font-size:20px; cursor:pointer; }
 
-  /* ===== 4 คอลัมน์ ไม่ดำ ===== */
+  /* ===== ✅ 4 คอลัมน์ — เต็มพื้นที่ ไม่เหลือดำ ===== */
   .video-grid {
     display:grid;
     grid-template-columns:repeat(4, 1fr);
-    gap:6px; padding:6px;
+    gap:4px; padding:4px;
   }
   .grid-item {
     aspect-ratio:9/12;
-    background:linear-gradient(135deg, #2a2a2a, #444);
-    border-radius:4px; overflow:hidden;
+    background:#222; /* สีพื้นหลังเดียว ไม่ไล่สี */
+    border-radius:2px; overflow:hidden;
     position:relative; cursor:pointer;
   }
   .grid-item-video {
-    width:100%; height:100%; object-fit:cover; display:block;
-    background:linear-gradient(135deg, #3a3a5c, #5c5c8a);
+    width:100%; height:100%;
+    object-fit:cover; /* ✅ เต็มพื้นที่ ตัดขอบนิดหน่อย ไม่เหลือช่องว่าง */
+    display:block;
+    background:transparent; /* ✅ ซ่อนพื้นหลังสำรอง */
   }
   .grid-delete-btn {
     position:absolute; top:4px; right:4px; width:26px; height:26px;
@@ -177,7 +175,7 @@
 </head>
 <body>
 
-<div class="top-version">v1130-3</div>
+<div class="top-version">v1130-4</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
@@ -268,19 +266,17 @@
   </div>
 
   <div class="video-grid" id="user-videos-grid">
-    <div class="empty-state">ยังไม่มีวิดีโอที่บันทึกไว้ กด + เพื่ออัปโหลด</div>
+    <div class="empty-state">ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด</div>
   </div>
 </div>
 
-<!-- ป๊อปอัพเล่นวิดีโอ -->
 <div class="video-play-popup" id="video-play-popup">
   <video id="popup-video-player" class="popup-video" controls playsinline loop></video>
   <button class="popup-close" onclick="closeVideoPopup()">ปิด</button>
 </div>
 
-<!-- ป๊อปอัพยืนยันลบ -->
 <div class="confirm-popup" id="confirm-delete-popup">
-  <p>ต้องการลบวิดีโอนี้หรือไม่?</p>
+  <p>ลบวิดีโอนี้หรือไม่?</p>
   <div class="confirm-buttons">
     <button class="confirm-btn confirm-no" onclick="closeConfirmPopup()">ไม่</button>
     <button class="confirm-btn confirm-yes" id="confirm-delete-yes">ใช่ ลบเลย</button>
@@ -289,7 +285,7 @@
 
 <div class="name-edit-popup" id="name-edit-popup">
   <h4>เปลี่ยนชื่อโปรไฟล์</h4>
-  <input type="text" id="new-name-input" placeholder="ใส่ชื่อใหม่ตรงนี้">
+  <input type="text" id="new-name-input" placeholder="ใส่ชื่อใหม่">
   <div class="name-edit-buttons">
     <button class="name-edit-btn btn-cancel" onclick="closeNameEdit()">ยกเลิก</button>
     <button class="name-edit-btn btn-save" onclick="saveNewName()">บันทึก</button>
@@ -303,7 +299,6 @@ let savedAvatar = localStorage.getItem('userAvatar');
 let uploadedVideos = JSON.parse(localStorage.getItem('uploadedVideos') || '[]');
 let deleteTargetIndex = null;
 
-// โหลดข้อมูล
 document.getElementById('profile-fullname').textContent = savedDisplayName;
 document.getElementById('display-name').textContent = savedUsername;
 if (savedAvatar) {
@@ -311,39 +306,29 @@ if (savedAvatar) {
   document.getElementById('profile-avatar').src = savedAvatar;
 }
 
-// === ปุ่ม + สีแดง กดเปิดไฟล์ ===
+// === ปุ่มอัปโหลด ===
 const uploadBtn = document.getElementById('upload-btn');
 const fileInput = document.getElementById('video-file-input');
 
 uploadBtn.addEventListener('click', e => {
   e.preventDefault();
   e.stopPropagation();
-  console.log('กดปุ่มอัปโหลด');
   fileInput.click();
 });
 
-// === รับไฟล์เมื่อเลือกแล้ว — แก้ตรงนี้ให้ชัดเจน ===
+// === รับไฟล์ ===
 fileInput.addEventListener('change', e => {
-  console.log('เปลี่ยนไฟล์');
   const files = e.target.files;
-  if (!files || files.length === 0) {
-    alert('❌ ไม่ได้เลือกไฟล์');
-    return;
-  }
+  if (!files || files.length === 0) return;
 
   const file = files[0];
-  console.log('ไฟล์ที่เลือก:', file.name, file.size, file.type);
-
   if (!file.type.startsWith('video/')) {
-    alert('❌ ไม่ใช่ไฟล์วิดีโอ\nประเภทไฟล์: ' + file.type);
+    alert('ไม่ใช่ไฟล์วิดีโอ');
     return;
   }
 
   try {
     const url = URL.createObjectURL(file);
-    console.log('สร้าง URL สำเร็จ:', url);
-
-    // แสดงหน้าหลัก
     const video = document.getElementById('main-video');
     const playIcon = document.getElementById('play-icon');
     
@@ -351,37 +336,25 @@ fileInput.addEventListener('change', e => {
     video.style.display = 'block';
     playIcon.style.display = 'none';
     video.loop = true;
-    
-    video.play()
-      .then(() => console.log('เล่นสำเร็จ'))
-      .catch(err => {
-        console.warn('เล่นอัตโนมัติไม่ได้:', err);
-        video.muted = true;
-        video.play().catch(e => console.error('เล่นไม่ได้เลย:', e));
-      });
+    video.play().catch(() => { video.muted = true; video.play(); });
 
     document.getElementById('video-desc').textContent = file.name;
 
-    // บันทึกลงรายการ
     uploadedVideos.unshift({ 
       name: file.name, 
       url: url, 
-      type: file.type,
-      size: file.size,
       time: new Date().toLocaleString('th-TH') 
     });
     localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
-    
     renderVideoGrid();
-    alert('✅ อัปโหลดสำเร็จ!\nชื่อ: ' + file.name + '\nดูที่โปรไฟล์ → 4 คอลัมน์แล้วครับ');
+    alert('✅ อัปโหลดสำเร็จ');
     
   } catch (err) {
-    console.error('เกิดข้อผิดพลาด:', err);
-    alert('❌ เกิดข้อผิดพลาด:\n' + err.message);
+    alert('❌ ผิดพลาด: ' + err.message);
   }
 });
 
-// === เปิด-ปิด โปรไฟล์ ===
+// === เปิด-ปิดโปรไฟล์ ===
 let profileOpen = false;
 function toggleProfile() {
   profileOpen = !profileOpen;
@@ -415,35 +388,28 @@ function closeNameEdit() {
   document.getElementById('name-edit-popup').classList.remove('show');
 }
 function saveNewName() {
-  const newName = document.getElementById('new-name-input').value.trim();
-  if (!newName) { alert('กรุณาใส่ชื่อ'); return; }
-  savedDisplayName = newName;
-  document.getElementById('profile-fullname').textContent = newName;
-  localStorage.setItem('displayName', newName);
+  const n = document.getElementById('new-name-input').value.trim();
+  if (!n) { alert('ใส่ชื่อ'); return; }
+  savedDisplayName = n;
+  document.getElementById('profile-fullname').textContent = n;
+  localStorage.setItem('displayName', n);
   closeNameEdit();
-  alert('✅ เปลี่ยนชื่อเป็น:\n' + newName);
 }
 
 // === หยุด/เล่น ===
 function togglePlayPause() {
-  const video = document.getElementById('main-video');
-  const playIcon = document.getElementById('play-icon');
-  if (!video.src) return;
-
-  if (video.paused) {
-    video.play();
-    playIcon.style.display = 'none';
-  } else {
-    video.pause();
-    playIcon.style.display = 'block';
-  }
+  const v = document.getElementById('main-video');
+  const i = document.getElementById('play-icon');
+  if (!v.src) return;
+  if (v.paused) { v.play(); i.style.display = 'none'; }
+  else { v.pause(); i.style.display = 'block'; }
 }
 
-// === แสดงตาราง 4 คอลัมน์ ===
+// === ✅ แสดงตาราง — เต็มพื้นที่ ไม่เหลือดำ ===
 function renderVideoGrid() {
   const grid = document.getElementById('user-videos-grid');
   if (uploadedVideos.length === 0) {
-    grid.innerHTML = '<div class="empty-state">ยังไม่มีวิดีโอที่บันทึกไว้ กด + เพื่ออัปโหลด</div>';
+    grid.innerHTML = '<div class="empty-state">ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด</div>';
     return;
   }
   grid.innerHTML = uploadedVideos.map((v, idx) => `
@@ -460,53 +426,31 @@ function renderVideoGrid() {
 // === เล่นจากตาราง ===
 function playVideoFromGrid(index) {
   const v = uploadedVideos[index];
-  if (!v.url) {
-    alert('❌ ไม่พบไฟล์วิดีโอ\nอาจหมดอายุแล้ว ให้อัปโหลดใหม่ครับ');
-    return;
-  }
-  const player = document.getElementById('popup-video-player');
-  player.src = v.url;
-  player.loop = true;
+  if (!v.url) { alert('ไฟล์หมดอายุ อัปโหลดใหม่'); return; }
+  const p = document.getElementById('popup-video-player');
+  p.src = v.url; p.loop = true;
   document.getElementById('video-play-popup').classList.add('show');
-  player.play().catch(() => {
-    player.muted = true;
-    player.play();
-  });
+  p.play().catch(() => { p.muted = true; p.play(); });
 }
 
-// === ปิดเล่น ===
 function closeVideoPopup() {
-  const player = document.getElementById('popup-video-player');
-  player.pause();
-  player.src = '';
+  const p = document.getElementById('popup-video-player');
+  p.pause(); p.src = '';
   document.getElementById('video-play-popup').classList.remove('show');
 }
 
-// === ลบ ===
-function openDeleteConfirm(index) {
-  deleteTargetIndex = index;
-  document.getElementById('confirm-delete-popup').classList.add('show');
-}
-function closeConfirmPopup() {
-  deleteTargetIndex = null;
-  document.getElementById('confirm-delete-popup').classList.remove('show');
-}
-document.getElementById('confirm-delete-yes').addEventListener('click', () => {
+function openDeleteConfirm(i) { deleteTargetIndex = i; document.getElementById('confirm-delete-popup').classList.add('show'); }
+function closeConfirmPopup() { deleteTargetIndex = null; document.getElementById('confirm-delete-popup').classList.remove('show'); }
+document.getElementById('confirm-delete-yes').onclick = () => {
   if (deleteTargetIndex === null) return;
   uploadedVideos.splice(deleteTargetIndex, 1);
   localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
-  closeConfirmPopup();
-  renderVideoGrid();
-  alert('✅ ลบเรียบร้อยแล้ว');
-});
+  closeConfirmPopup(); renderVideoGrid();
+};
 
-// กดเล่นเมื่อยังไม่มี
-document.getElementById('play-icon').addEventListener('click', e => {
-  const video = document.getElementById('main-video');
-  if (!video.src) {
-    alert('กดปุ่ม + สีแดงด้านล่างเพื่อเลือกวิดีโอจากเครื่องของคุณ');
-  }
-});
+document.getElementById('play-icon').onclick = e => {
+  if (!document.getElementById('main-video').src) alert('กด + สีแดงเพื่อเลือกวิดีโอ');
+};
 </script>
 
 </body>
