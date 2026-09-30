@@ -1,20 +1,65 @@
 <!-- ==============================================================
-   ThaiPodee v1130-18 — ✅ ปุ่มบวกสีส้มอยู่ตรงกลางพอดี
-   อัปเดต: 30 กันยายน 2569 13:24 น.
+   ThaiPodee v1130-20 — ✅ แจ้งติดตั้งเอง + แจ้งอัปเดตอัตโนมัติ
+   อัปเดต: 30 กันยายน 2569 13:38 น.
    --------------------------------------------------------------
-   ✅ แก้ Navbar ให้ปุ่ม + อยู่ตรงกลางอย่างสมดุล
-   ✅ วิดีโอแนวนอนยังเห็นภาพเต็ม ไม่ตัดขอบ
-   ✅ ทุกฟังก์ชันเหมือนเดิม
+   ✅ เปิดปุ๊บ เจอปุ่ม "ติดตั้งแอป" ทันที ไม่ต้องหาเมนู
+   ✅ ตรวจสอบเวอร์ชันอัตโนมัติ แจ้ง "มีอัปเดตใหม่"
+   ✅ ติดตั้งเป็นแอปเต็มจอ ไม่ผ่าน Google Play
+   ✅ แชร์ผ่านไลน์ → เปิดใน Chrome → เจอปุ่มเลย
+   ✅ วิดีโอ ปุ่มกลาง บันทึก ครบเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ThaiPodee</title>
+
+<!-- ✅ ติดตั้งเป็นแอปอัตโนมัติ -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ThaiPodee">
+<meta name="application-name" content="ThaiPodee">
+<meta name="description" content="ThaiPodee — ของไทย ไปไกลทั่วโลก">
+<meta name="theme-color" content="#000000">
+<meta name="background-color" content="#000000">
+<meta name="display" content="standalone">
+<meta name="orientation" content="portrait-primary">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGVlIiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsImRlc2NyaXB0aW9uIjoiT2sgb2YgVGhhaSBUbyBUaGUgV29ybGQiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQifQ==">
+
+<title>ThaiPodee v1130-20</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
+
+  /* ✅ แถบแจ้งเตือนติดตั้ง */
+  .install-banner {
+    position:fixed; top:0; left:0; right:0;
+    background:#f00; color:#fff; padding:10px 16px;
+    display:none; justify-content:space-between; align-items:center;
+    z-index:9999; font-size:14px;
+  }
+  .install-banner.show { display:flex; }
+  .install-btn {
+    background:#fff; color:#f00; border:none; padding:6px 16px;
+    border-radius:4px; font-weight:bold; cursor:pointer; font-size:14px;
+  }
+  .later-btn {
+    background:transparent; color:#fff; border:none; margin-left:10px;
+    cursor:pointer; font-size:13px; opacity:0.8;
+  }
+
+  /* ✅ แจ้งอัปเดต */
+  .update-banner {
+    position:fixed; top:0; left:0; right:0;
+    background:#00c853; color:#fff; padding:10px 16px;
+    display:none; justify-content:space-between; align-items:center;
+    z-index:9998; font-size:14px;
+  }
+  .update-banner.show { display:flex; }
+  .refresh-btn {
+    background:#fff; color:#00c853; border:none; padding:6px 16px;
+    border-radius:4px; font-weight:bold; cursor:pointer; font-size:14px;
+  }
 
   .top-version { position:absolute; top:8px; right:12px; font-size:13px; color:#888; z-index:100; }
   .search-icon { position:absolute; top:36px; right:16px; font-size:20px; cursor:pointer; z-index:100; }
@@ -48,11 +93,10 @@
   .side-icon.p-avatar img { width:100%; height:100%; object-fit:cover; }
   .side-icon span { font-size:11px; opacity:0.7; }
 
-  /* ✅ แก้ Navbar ให้สมดุล ปุ่ม + อยู่ตรงกลางพอดี */
   .bottom-nav {
     position:absolute; bottom:0; left:0; right:0; height:75px;
     display:grid;
-    grid-template-columns:1fr 1fr 1fr 1fr 1fr; /* 5 ช่องเท่าๆ กัน */
+    grid-template-columns:1fr 1fr 1fr 1fr 1fr;
     justify-items:center;
     align-items:center;
     background:#000; border-top:1px solid #222; z-index:5;
@@ -130,14 +174,12 @@
   .grid-item:nth-child(n+9) { display:none !important; }
 
   .grid-clickable {
-    position:absolute;
-    top:0; left:0; right:0; bottom:0;
+    position:absolute; top:0; left:0; right:0; bottom:0;
     z-index:10;
     cursor:pointer;
   }
   .grid-video {
-    position:absolute;
-    top:0; left:0; width:100%; height:100%;
+    position:absolute; top:0; left:0; width:100%; height:100%;
     object-fit:cover;
     display:block;
     preload:"metadata";
@@ -213,7 +255,22 @@
 </head>
 <body>
 
-<div class="top-version">v1130-18</div>
+<!-- ✅ แถบแจ้งติดตั้งอัตโนมัติ -->
+<div class="install-banner" id="install-banner">
+  <span>✅ ติดตั้งแอป ThaiPodee ไว้ที่หน้าจอไหม?</span>
+  <div>
+    <button class="later-btn" id="later-btn">ภายหลัง</button>
+    <button class="install-btn" id="install-btn">ติดตั้ง</button>
+  </div>
+</div>
+
+<!-- ✅ แถบแจ้งอัปเดต -->
+<div class="update-banner" id="update-banner">
+  <span>✅ มีอัปเดตเวอร์ชันใหม่ v1130-20</span>
+  <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
+</div>
+
+<div class="top-version">v1130-20</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -309,6 +366,8 @@
 </div>
 
 <script>
+// ========== ตัวแปรหลัก ==========
+const VERSION = 'v1130-20';
 const DB_NAME = 'ThaiPodeeDB';
 const STORE = 'videos';
 const MAX_SIZE_MB = 100;
@@ -317,7 +376,51 @@ let db = null;
 let videoList = [];
 let playIndex = null;
 let delIndex = null;
+let deferredPrompt = null; // สำหรับติดตั้งแอป
 
+// ========== ✅ ตรวจสอบอัปเดต ==========
+function checkUpdate() {
+  const lastVer = localStorage.getItem('thaipodee_version');
+  if (lastVer && lastVer !== VERSION) {
+    // มีรุ่นใหม่ → แจ้ง
+    document.getElementById('update-banner').classList.add('show');
+  }
+  localStorage.setItem('thaipodee_version', VERSION);
+}
+checkUpdate();
+
+// กดรีเฟรชอัปเดต
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  location.reload(true);
+});
+
+// ========== ✅ แจ้งติดตั้งแอปอัตโนมัติ ==========
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // แสดงแถบแจ้ง
+  setTimeout(() => {
+    document.getElementById('install-banner').classList.add('show');
+  }, 800);
+});
+
+// กดติดตั้ง
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    document.getElementById('install-banner').classList.remove('show');
+  }
+  deferredPrompt = null;
+});
+
+// กดภายหลัง
+document.getElementById('later-btn').addEventListener('click', () => {
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+// ========== ฐานข้อมูล IndexedDB ==========
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1);
@@ -378,6 +481,7 @@ function getVideoDuration(file) {
   });
 }
 
+// ========== ข้อมูลผู้ใช้ ==========
 let userName = localStorage.getItem('displayName') || 'THAIPODEE MASTER - 1';
 let userAvt = localStorage.getItem('userAvatar');
 
@@ -388,6 +492,7 @@ if (userAvt) {
   document.getElementById('prof-avt').src = userAvt;
 }
 
+// ========== เปิดฐานข้อมูล ==========
 async function init() {
   await openDB();
   videoList = await loadAllVideos();
@@ -410,6 +515,7 @@ function setMainVideo(item) {
 
 init();
 
+// ========== อัปโหลด ==========
 const upBtn = document.getElementById('up-btn');
 const vidInput = document.getElementById('vid-input');
 
@@ -450,6 +556,7 @@ vidInput.addEventListener('change', async e => {
   }
 });
 
+// ========== แสดงตาราง ==========
 function renderGrid() {
   const grid = document.getElementById('grid');
   if (!videoList.length) {
@@ -469,6 +576,7 @@ function renderGrid() {
   `).join('') + (more > 0 ? `<div class="more-count">+ อีก ${more} รายการ</div>` : '');
 }
 
+// ========== กดเล่นเต็มจอ ==========
 function playVid(idx) {
   playIndex = idx;
   const item = videoList[idx];
@@ -491,6 +599,7 @@ function closePop() {
   playIndex = null;
 }
 
+// ========== ลบ ==========
 function askDel(idx) {
   delIndex = idx;
   document.getElementById('del-pop').classList.add('show');
@@ -515,6 +624,7 @@ document.getElementById('del-yes').addEventListener('click', async () => {
   closeDel();
 });
 
+// ========== สลับหน้า ==========
 let profOpen = false;
 function toggleProf() {
   profOpen = !profOpen;
@@ -532,6 +642,7 @@ function togglePlay() {
   else { v.pause(); document.getElementById('main-play-icon').style.display = 'block'; }
 }
 
+// ========== เปลี่ยนชื่อ ==========
 function openNameEdit() {
   document.getElementById('new-name').value = userName;
   document.getElementById('name-pop').classList.add('show');
@@ -549,6 +660,7 @@ function saveName() {
   closeNameEdit();
 }
 
+// ========== รูปโปรไฟล์ ==========
 document.getElementById('avatar-input').addEventListener('change', e => {
   const f = e.target.files?.[0];
   if (!f) return;
