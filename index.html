@@ -1,6 +1,6 @@
 // ==============================================================
-// ThaiPodee v1132 — FIX เลือกไฟล์แล้วไม่หาย
-// อัปเดต: 30 กันยายน 2569 20:45 น.
+// ThaiPodee v1132 — FIX เลือกไฟล์แล้วไม่หาย + แสดงค่าถูกต้อง
+// อัปเดต: 30 กันยายน 2569 20:48 น.
 // ==============================================================
 
 const fileInput = document.getElementById('file-input');
@@ -13,7 +13,7 @@ uploadTrigger.addEventListener('click', function(e) {
   fileInput.click();
 });
 
-// เลือกไฟล์แล้ว → ประมวลผลอย่างปลอดภัย
+// เลือกไฟล์แล้ว → ประมวลผล
 fileInput.addEventListener('change', async function(e) {
   try {
     const file = e.target.files[0];
@@ -24,14 +24,12 @@ fileInput.addEventListener('change', async function(e) {
 
     console.log('เลือกไฟล์:', file.name, 'ขนาด:', (file.size / 1024 / 1024).toFixed(2), 'MB');
 
-    // ตรวจสอบประเภทไฟล์
     if (!file.type.startsWith('video/')) {
       alert('กรุณาเลือกไฟล์วิดีโอเท่านั้น');
       fileInput.value = '';
       return;
     }
 
-    // แสดงหน้าจอโหลดอย่างเดียว ไม่ให้ขาว
     showUploadingScreen(file);
 
   } catch (err) {
@@ -41,17 +39,17 @@ fileInput.addEventListener('change', async function(e) {
   }
 });
 
-// แสดงหน้าจออัปโหลด — ไม่ให้ขาว
+// แสดงหน้าจอโหลด — ใช้เครื่องหมายถูก ✅
 function showUploadingScreen(file) {
-  // ล้างหน้าจอเก่า
   const body = document.body;
-  
-  // สร้างหน้าจอแสดงสถานะ
+  const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+  // ✅ ใช้ ` ยกนิ้ว ไม่ใช้ ' อีกต่อไป
   body.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
       <h2 style="margin-bottom:20px;">กำลังเตรียมวิดีโอ...</h2>
       <p style="margin-bottom:10px;">ชื่อไฟล์: ${file.name}</p>
-      <p style="margin-bottom:30px;">ขนาด: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+      <p style="margin-bottom:30px;">ขนาด: ${fileSizeMB} MB</p>
       <div style="width:80%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
         <div id="progress-bar" style="width:0%;height:100%;background:#e50914;transition:width 0.3s;"></div>
       </div>
@@ -59,79 +57,73 @@ function showUploadingScreen(file) {
     </div>
   `;
 
-  // จำลองความคืบหน้า
   let progress = 0;
   const bar = document.getElementById('progress-bar');
   const interval = setInterval(() => {
-    progress += Math.random() * 15;
+    progress += Math.random() * 12;
     if (progress >= 100) {
       progress = 100;
       clearInterval(interval);
-      // เริ่มอัปโหลดจริง
       doUpload(file);
     }
     if (bar) bar.style.width = progress + '%';
   }, 300);
 }
 
-// ย้อนกลับไปหน้าแรก
 function goBack() {
   window.location.reload();
 }
 
-// อัปโหลดไป Firebase Storage
 async function doUpload(file) {
   try {
     console.log('เริ่มอัปโหลด...');
     
-    // สร้างชื่อไฟล์ไม่ซ้ำกัน
+    if (!window.firebase) {
+      showMessage('ไม่พบระบบ Firebase — กลับไปหน้าแรก', false);
+      return;
+    }
+
     const fileName = Date.now() + '_' + file.name;
     const filePath = 'videos/' + fileName;
-    
-    // อ้างอิง Firebase Storage
     const storageRef = firebase.storage().ref(filePath);
     
-    // อัปโหลดไฟล์
     const snapshot = await storageRef.put(file);
-    console.log('อัปโหลดสำเร็จ:', snapshot);
-    
-    // รับลิงก์สาธารณะ
     const downloadURL = await snapshot.ref.getDownloadURL();
-    console.log('ลิงก์วิดีโอ:', downloadURL);
     
-    // บันทึกข้อมูลลง Firestore
-    await saveVideoData(file, downloadURL);
+    await firebase.firestore().collection('videos').add({
+      fileName: file.name,
+      videoURL: downloadURL,
+      fileSize: file.size,
+      fileType: file.type,
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      likes: 0,
+      comments: 0,
+      shares: 0
+    });
     
-    // แจ้งสำเร็จ
-    showSuccessScreen(downloadURL);
+    showSuccessScreen();
     
   } catch (err) {
     console.error('อัปโหลดล้มเหลว:', err);
-    alert('อัปโหลดไม่สำเร็จ: ' + err.message);
-    goBack();
+    showMessage('อัปโหลดไม่สำเร็จ: ' + err.message, false);
   }
 }
 
-// บันทึกข้อมูลวิดีโอลงฐานข้อมูล
-async function saveVideoData(file, videoURL) {
-  await firebase.firestore().collection('videos').add({
-    fileName: file.name,
-    videoURL: videoURL,
-    fileSize: file.size,
-    fileType: file.type,
-    uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    likes: 0,
-    comments: 0,
-    shares: 0
-  });
-}
-
-// แสดงหน้าจอสำเร็จ
-function showSuccessScreen(videoURL) {
+function showSuccessScreen() {
   document.body.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
       <h2 style="color:#4cd137;margin-bottom:20px;">✅ อัปโหลดสำเร็จ!</h2>
-      <p style="margin-bottom:30px;">วิดีโอของคุณจะปรากฏในหน้าแรกเร็ว ๆ นี้</p>
+      <p style="margin-bottom:30px;">วิดีโอจะแสดงในหน้าแรกทันที</p>
+      <button onclick="window.location.reload()" style="padding:12px 30px;background:#e50914;color:#fff;border:none;border-radius:25px;font-size:16px;">กลับไปดูวิดีโอ</button>
+    </div>
+  `;
+}
+
+function showMessage(text, isSuccess) {
+  document.body.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
+      <h2 style="color:${isSuccess ? '#4cd137' : '#e50914'};margin-bottom:20px;">${isSuccess ? '✅ สำเร็จ' : '❌ ผิดพลาด'}</h2>
+      <p style="margin-bottom:30px;text-align:center;">${text}</p>
       <button onclick="window.location.reload()" style="padding:12px 30px;background:#e50914;color:#fff;border:none;border-radius:25px;font-size:16px;">กลับไปหน้าแรก</button>
     </div>
   `;
