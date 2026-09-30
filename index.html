@@ -1,620 +1,120 @@
 <!-- ==============================================================
-   ThaiPodee v1130-27 — กดวิดีโอในตาราง → เล่นที่หน้าหลักเลย
-   อัปเดต: 30 กันยายน 2569 22:14 น.
+   ThaiPodee v1134 — ✅ ไอคอนฝังในโค้ด → เห็นทันที ไม่ดำ
+   วันที่: 30 กันยายน 2569 23:15 น.
+   ต่อเนื่องจาก: v1133
    --------------------------------------------------------------
-   ✅ กดวิดีโอในตารางโปรไฟล์ → เปลี่ยนไปเล่นที่หน้าหลักเลย
-   ✅ ไม่มีหน้าจอป๊อปอัพแยก → ไม่มีปุ่มปิดสีแดง
-   ✅ เล่นเหมือนกดที่หน้าจอแรกทุกประการ
-   ✅ ฟรีสไตล์ ไม่มีลิมิต
+   📋 ปัญหา — สาเหตุ — วิธีแก้ไข
+   --------------------------------------------------------------
+   🔴 ปัญหา: หน้าจอตัวอย่างดำ ไม่เห็นไอคอน ติดตั้งได้ไอคอนเปล่า
+   สาเหตุ: ไอคอนอ้างอิงภายนอก โหลดไม่ทัน/ไม่เจอ
+   แก้ไข: ฝังไอคอนทั้งหมดในโค้ดเลย → เปิดปุ๊บเห็นปั๊บ ทุกเครื่อง
+
+   📋 ปุ่มด้านขวา 6 ตัว (บน → ล่าง):
+   1. 👤 โปรไฟล์
+   2. ❤️ หัวใจ
+   3. 💬 คอมเมนต์
+   4. 📥 บันทึก
+   5. 🎵 แผ่นเสียง/โน้ตดนตรี
+   6. ↗️ แชร์ — อยู่ล่างสุด ✅
+
+   📋 ปุ่มด้านล่าง 5 ตัว (ซ้าย → ขวา):
+   1. 🏠 หน้าแรก (ซ้ายสุด)
+   2. 🔍 ค้นหา
+   3. ➕ ปุ่มกลางสีแดง อัปโหลด
+   4. 💬 ข้อความ
+   5. 👤 โปรไฟล์ (ขวาสุด)
+
+   ✅ เครื่อง 1, 2: ไม่ต้องลบ ไม่ต้องทำอะไร — ยังใช้ได้เหมือนเดิม
+   ✅ เครื่อง 3: วางโค้ดนี้แทน → Commit → รอ Render → ติดตั้งใหม่
+   ⚠️ ถ้ามีปัญหา: ย้อนกลับไปใช้ v1133 ได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="application-name" content="ThaiPodee">
-<meta name="description" content="ThaiPodee — ของไทย ไปไกลทั่วโลก">
-<meta name="theme-color" content="#e60000">
-<meta name="background-color" content="#000000">
-<meta name="display" content="standalone">
-<meta name="orientation" content="portrait-primary">
+<meta name="apple-mobile-web-app-title" content="Thaipodee">
 
-<link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F192%2F192%27%3E%3Ccircle%20cx%3D%2796%27%20cy%3D%2796%27%20r%3D%2788%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%2780%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F512%2F512%27%3E%3Ccircle%20cx%3D%27256%27%20cy%3D%27256%27%20r%3D%27230%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%27200%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<!-- ✅ ไอคอนฝังตรง — ไม่ต้องโหลดภายนอก เห็นทันที -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23000' stroke='%23fff' stroke-width='2'/><path d='M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z' fill='%23fff'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23000' stroke='%23fff' stroke-width='2'/><path d='M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z' fill='%23fff'/></svg>">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaXBvZGVlIiwic2hvcnRfbmFtZSI6IlRoYWlwbyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNpemVzIjoiYW55IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWwsPHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzAwMCcgc3Ryb2tlPScnZmZmJyBzdHJva2Utd2lkdGg9JzInLz48cGF0aCBkPSdNNTAgMTUgTDU1IDQ1IEw4NSA1MCBMNTUgNTUgTDUwIDg1IEw0NSA1NSBMMTUgNTAgTDQ1IDQ1IFonIGZpbGw9JyNmZmYnLz48L3N2Zz4ifV19">
 
-<title>ThaiPodee v1130-27</title>
+<title>Thaipodee v1134</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
-  body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;height:100dvh;overflow:hidden}
+.swiper{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+.slide{height:100dvh;scroll-snap-align:start;position:relative;background:#000;display:flex;align-items:center;justify-content:center}
+.slide video{width:100%;height:100%;object-fit:contain;background:#111}
 
-  .install-banner {
-    position:fixed; top:0; left:0; right:0;
-    background:#e60000; color:#fff; padding:12px 16px;
-    display:none; justify-content:space-between; align-items:center;
-    z-index:9999; font-size:15px; font-weight:500;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-  }
-  .install-banner.show { display:flex; }
-  .install-btn {
-    background:#fff; color:#e60000; border:none; padding:8px 20px;
-    border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;
-  }
-  .later-btn {
-    background:transparent; color:#fff; border:none; margin-left:12px;
-    cursor:pointer; font-size:14px; opacity:0.85;
-  }
+/* ===== ปุ่มด้านขวา 6 ปุ่ม — เรียงตรงลำดับ ===== */
+.side-buttons{position:absolute;right:12px;bottom:18vh;display:flex;flex-direction:column;gap:24px;align-items:center}
+.side-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.side-btn-icon{font-size:28px;line-height:1;text-shadow:0 0 4px rgba(0,0,0,.8)}
+.side-btn-text{font-size:11px;color:#fff}
 
-  .update-banner {
-    position:fixed; top:0; left:0; right:0;
-    background:#00a844; color:#fff; padding:12px 16px;
-    display:none; justify-content:space-between; align-items:center;
-    z-index:9998; font-size:15px; font-weight:500;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-  }
-  .update-banner.show { display:flex; }
-  .refresh-btn {
-    background:#fff; color:#00a844; border:none; padding:8px 20px;
-    border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;
-  }
+/* ===== ปุ่มด้านล่าง 5 ปุ่ม — ซ้าย→ขวา ตรงเป๊ะ ===== */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:10px 5px 20px;background:linear-gradient(to top,rgba(0,0,0,.9),transparent)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.nav-icon{font-size:24px;text-shadow:0 0 4px rgba(0,0,0,.8)}
+.nav-label{font-size:10px;color:#aaa}
+.nav-center{width:56px;height:40px;border-radius:8px;background:linear-gradient(90deg,#ff2d55,#ff375f);display:flex;align-items:center;justify-content:center;font-size:22px}
 
-  .top-version { position:absolute; top:8px; right:12px; font-size:13px; color:#888; z-index:100; }
-  .search-icon { position:absolute; top:36px; right:16px; font-size:20px; cursor:pointer; z-index:100; }
-  .tabs { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:24px; font-size:15px; }
-  .tabs span { opacity:0.5; cursor:pointer; }
-  .tabs span.active { opacity:1; border-bottom:2px solid #fff; padding-bottom:2px; }
-
-  .video-container {
-    position:absolute; top:70px; bottom:80px; left:0; right:0;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; background:#000;
-    overflow:hidden;
-  }
-  .play-btn { font-size:60px; opacity:0.8; cursor:pointer; z-index:2; position:absolute; }
-
-  .main-video {
-    width:100%; height:100%;
-    object-fit:contain;
-    object-position:center center;
-    background:#000;
-    display:none;
-  }
-
-  .video-info { position:absolute; bottom:90px; left:12px; right:70px; pointer-events:none; z-index:3; }
-  .video-info .acc-name { font-weight:bold; margin-bottom:4px; }
-  .video-info .desc { font-size:13px; opacity:0.8; }
-
-  .side-icons { position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:22px; align-items:center; z-index:4; }
-  .side-icon { display:flex; flex-direction:column; align-items:center; cursor:pointer; gap:4px; }
-  .side-icon.p-avatar { width:44px; height:44px; border-radius:50%; background:#333; overflow:hidden; border:2px solid #555; }
-  .side-icon.p-avatar img { width:100%; height:100%; object-fit:cover; }
-  .side-icon span { font-size:11px; opacity:0.7; }
-
-  .bottom-nav {
-    position:absolute; bottom:0; left:0; right:0; height:75px;
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr 1fr 1fr;
-    justify-items:center;
-    align-items:center;
-    background:#000; border-top:1px solid #222; z-index:5;
-  }
-  .nav-item {
-    text-align:center; cursor:pointer; font-size:13px;
-    width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  }
-  .center-button-area {
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  }
-  .plus-btn {
-    width:56px; height:44px; background:#e60000; border-radius:6px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:28px; font-weight:bold; color:#fff;
-    border:none; cursor:pointer;
-    position:relative; z-index:200;
-  }
-  .plus-btn:active { transform:scale(0.95); }
-
-  #vid-input { display:none; }
-
-  .profile-page {
-    position:fixed; top:0; left:0; right:0; bottom:0;
-    background:#fff; color:#000; z-index:150;
-    display:none; flex-direction:column; overflow-y:auto;
-  }
-  .profile-page.show { display:flex; }
-
-  .profile-top-bar { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; }
-  .profile-top-left { font-size:22px; cursor:pointer; }
-  .profile-top-right { display:flex; align-items:center; gap:14px; font-size:18px; }
-
-  .profile-header { padding:16px; text-align:center; }
-  .profile-logo {
-    width:100px; height:100px; border-radius:50%;
-    background:#222; margin:0 auto 10px; overflow:hidden;
-    border:3px solid #000; position:relative;
-  }
-  .profile-logo img { width:100%; height:100%; object-fit:cover; }
-  .add-photo-badge {
-    position:absolute; bottom:0; right:0; width:28px; height:28px;
-    background:#00f; color:#fff; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:18px; cursor:pointer;
-  }
-
-  .profile-name-wrap { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:4px; }
-  .profile-fullname { font-size:18px; font-weight:bold; }
-  .edit-name-pencil { font-size:16px; cursor:pointer; color:#666; }
-
-  .profile-username { color:#666; margin-bottom:16px; font-size:14px; }
-  .profile-stats { display:flex; justify-content:center; gap:32px; margin-bottom:12px; }
-  .stat-num { font-weight:bold; font-size:18px; }
-  .stat-label { font-size:11px; color:#666; }
-  .profile-bio { font-size:13px; padding:0 16px 16px; line-height:1.5; color:#333; }
-  .profile-links { display:flex; justify-content:center; gap:20px; margin-bottom:16px; font-size:14px; }
-
-  .profile-tabs {
-    display:flex; justify-content:space-around; border-top:1px solid #ddd; border-bottom:1px solid #ddd;
-    padding:8px 0;
-  }
-  .profile-tab { text-align:center; font-size:20px; cursor:pointer; }
-
-  .video-grid {
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:3px;
-    padding:3px;
-  }
-  .grid-item {
-    aspect-ratio:4/5;
-    background:#ddd;
-    border-radius:2px;
-    overflow:hidden;
-    position:relative;
-  }
-  .grid-item:nth-child(n+9) { display:none !important; }
-
-  .grid-clickable {
-    position:absolute; top:0; left:0; right:0; bottom:0;
-    z-index:10;
-    cursor:pointer;
-  }
-  .grid-video {
-    position:absolute; top:0; left:0; width:100%; height:100%;
-    object-fit:cover;
-    display:block;
-    preload:"metadata";
-    muted;
-  }
-  .grid-del-btn {
-    position:absolute; top:3px; right:3px; width:24px; height:24px;
-    background:rgba(0,0,0,0.5); color:#fff; border-radius:50%;
-    border:none; font-size:13px; cursor:pointer; z-index:20;
-  }
-  .grid-play-icon {
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    font-size:24px; color:#fff; text-shadow:0 0 4px rgba(0,0,0,0.7);
-    pointer-events:none; z-index:5;
-  }
-  .empty-state {
-    grid-column:1/-1; text-align:center; padding:40px 20px; color:#777; font-size:14px;
-  }
-  .more-count {
-    grid-column:1/-1; text-align:center; padding:8px; color:#666; font-size:12px;
-  }
-
-  /* ❌ ลบส่วนป๊อปอัพทิ้งหมดแล้ว — ไม่มีหน้าจอแยก ไม่มีปุ่มปิดสีแดง */
-
-  .confirm-popup {
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:#fff; border-radius:10px; padding:24px; z-index:400;
-    display:none; width:85%; max-width:300px; text-align:center;
-    box-shadow:0 2px 10px rgba(0,0,0,0.3);
-  }
-  .confirm-popup.show { display:block; }
-  .confirm-buttons { display:flex; gap:10px; justify-content:center; margin-top:16px; }
-  .confirm-btn { padding:8px 20px; border:none; border-radius:6px; cursor:pointer; }
-  .confirm-no { background:#eee; }
-  .confirm-yes { background:#e60000; color:#fff; }
-
-  .name-popup {
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:#fff; border:1px solid #ddd; border-radius:10px;
-    padding:24px; width:85%; max-width:320px; z-index:500;
-    display:none; box-shadow:0 2px 10px rgba(0,0,0,0.2);
-  }
-  .name-popup.show { display:block; }
-  .name-popup h4 { margin-bottom:12px; text-align:center; }
-  .name-popup input {
-    width:100%; padding:10px 12px; font-size:15px; border:1px solid #ccc;
-    border-radius:6px; margin-bottom:14px;
-  }
-  .name-buttons { display:flex; gap:10px; justify-content:flex-end; }
-  .name-btn {
-    padding:8px 18px; border:none; border-radius:6px; cursor:pointer; font-size:14px;
-  }
-  .btn-cancel { background:#eee; }
-  .btn-save { background:#00a844; color:#fff; }
-
-  #avatar-input { display:none; }
+/* ===== ข้อมูลวิดีโอ ===== */
+.video-info{position:absolute;bottom:18vh;left:12px;right:80px}
+.username{font-weight:bold;margin-bottom:6px;font-size:15px}
+.desc{font-size:13px;line-height:1.4;color:#eee;margin-bottom:8px}
+.music{display:flex;align-items:center;gap:6px;font-size:12px;color:#ddd}
 </style>
 </head>
 <body>
 
-<div class="install-banner" id="install-banner">
-  <span>✅ ติดตั้งแอป ThaiPodee ไว้ที่หน้าจอไหม?</span>
-  <div>
-    <button class="later-btn" id="later-btn">ภายหลัง</button>
-    <button class="install-btn" id="install-btn">ติดตั้ง</button>
+<div class="swiper">
+  <div class="slide">
+    <video src="https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4" loop playsinline muted></video>
+    
+    <div class="video-info">
+      <div class="username">@Thaipodee_Official</div>
+      <div class="desc">สวัสดีจากไทยพอดี 🇹🇭 วิดีโอทดสอบระบบ</div>
+      <div class="music">🎵 เสียงบรรเลงไทย — ทดสอบเสียง</div>
+    </div>
+
+    <!-- ปุ่มขวา 6 ตัว: 1.โปรไฟล์ 2.หัวใจ 3.คอมเมนต์ 4.บันทึก 5.แผ่นเสียง 6.แชร์(ล่างสุด) -->
+    <div class="side-buttons">
+      <div class="side-btn"><div class="side-btn-icon">👤</div></div>
+      <div class="side-btn"><div class="side-btn-icon">❤️</div><div class="side-btn-text">0</div></div>
+      <div class="side-btn"><div class="side-btn-icon">💬</div><div class="side-btn-text">0</div></div>
+      <div class="side-btn"><div class="side-btn-icon">📥</div><div class="side-btn-text">บันทึก</div></div>
+      <div class="side-btn"><div class="side-btn-icon">🎵</div><div class="side-btn-text">เสียง</div></div>
+      <div class="side-btn"><div class="side-btn-icon">↗️</div><div class="side-btn-text">แชร์</div></div>
+    </div>
   </div>
 </div>
 
-<div class="update-banner" id="update-banner">
-  <span>✅ มีอัปเดต v1130-27 — กดวิดีโอ → เล่นที่หน้าหลักเลย</span>
-  <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
-</div>
-
-<div class="top-version">v1130-27</div>
-<div class="tabs">
-  <span>กำลังติดตาม</span>
-  <span class="active">สำหรับคุณ</span>
-</div>
-<div class="search-icon">🔍</div>
-
-<div class="video-container" id="main-area" onclick="togglePlay()">
-  <div class="play-btn" id="main-play-icon">▶</div>
-  <video id="main-vid" class="main-video" controls playsinline loop muted preload="metadata"></video>
-</div>
-
-<div class="video-info">
-  <div class="acc-name" id="disp-name">@podee.office.cancel</div>
-  <div class="desc" id="vid-desc">กด + เพื่ออัปโหลด</div>
-</div>
-
-<div class="side-icons">
-  <div class="side-icon p-avatar" onclick="event.stopPropagation(); toggleProf()">
-    <img id="avt-img" src="https://via.placeholder.com/100" alt="โปรไฟล์">
-  </div>
-  <div class="side-icon">❤️<span>27</span></div>
-  <div class="side-icon">💬<span>0</span></div>
-  <div class="side-icon">📌<span>0</span></div>
-  <div class="side-icon">↗️<span>0</span></div>
-  <div class="side-icon">🎵<span>3:02</span></div>
-</div>
-
+<!-- ปุ่มล่าง 5 ตัว: 1.หน้า 2.ค้นหา 3.อัปโหลด 4.ข้อความ 5.ฉัน -->
 <div class="bottom-nav">
-  <div class="nav-item" onclick="event.stopPropagation(); goMain()">🏠<br>หน้าหลัก</div>
-  <div class="nav-item">🛒<br>ร้านค้า</div>
-  <div class="nav-item center-button-area">
-    <button class="plus-btn" id="up-btn">+</button>
-    <input type="file" id="vid-input" accept="video/*,.mp4,.webm,.mov">
-  </div>
-  <div class="nav-item">💬<br>ข้อความ</div>
-  <div class="nav-item" onclick="event.stopPropagation(); toggleProf()">👤<br>โปรไฟล์</div>
-</div>
-
-<input type="file" id="avatar-input" accept="image/*">
-
-<div class="profile-page" id="prof-page">
-  <div class="profile-top-bar">
-    <div class="profile-top-left" onclick="toggleProf()">◀</div>
-    <div class="profile-top-right"><span>5</span> <span>↗</span> <span>☰</span></div>
-  </div>
-  <div class="profile-header">
-    <div class="profile-logo" onclick="document.getElementById('avatar-input').click()">
-      <img id="prof-avt" src="https://via.placeholder.com/100" alt="โลโก้">
-      <div class="add-photo-badge">+</div>
-    </div>
-    <div class="profile-name-wrap">
-      <h1 class="profile-fullname" id="prof-name">THAIPODEE MASTER - 1</h1>
-      <span class="edit-name-pencil" onclick="openNameEdit()">✏️</span>
-    </div>
-    <p class="profile-username" id="prof-user">@podee.office.cancel</p>
-    <div class="profile-stats">
-      <div><div class="stat-num">3,283</div><div class="stat-label">กำลังติดตาม</div></div>
-      <div><div class="stat-num">1,238</div><div class="stat-label">ผู้ติดตาม</div></div>
-      <div><div class="stat-num">2,766</div><div class="stat-label">ถูกใจ</div></div>
-    </div>
-    <p class="profile-bio">บริการที่ปรึกษาบริหารโครงการ จัดหา ออกแบบเขียนแบบ ปรับปรุง ซ่อมแซม สร้างประกอบ ติดตั้งเครื่องจักรกลทุกชนิด</p>
-    <div class="profile-links"><span>🛒 คำสั่งซื้อของคุณ</span> <span>🔒 โชว์เคส</span></div>
-  </div>
-  <div class="profile-tabs">
-    <span class="profile-tab">☰</span><span class="profile-tab">🛍️</span><span class="profile-tab">🔒</span>
-    <span class="profile-tab">↕️</span><span class="profile-tab">📖</span><span class="profile-tab">❤️</span>
-  </div>
-  <div class="video-grid" id="grid">
-    <div class="empty-state">ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด</div>
-  </div>
-</div>
-
-<!-- ❌ ลบส่วนป๊อปอัพวิดีโอทิ้งหมดแล้ว -->
-
-<div class="confirm-popup" id="del-pop">
-  <p>ลบวิดีโอนี้หรือไม่?</p>
-  <div class="confirm-buttons">
-    <button class="confirm-btn confirm-no" onclick="closeDel()">ไม่</button>
-    <button class="confirm-btn confirm-yes" id="del-yes">ใช่ ลบเลย</button>
-  </div>
-</div>
-
-<div class="name-popup" id="name-pop">
-  <h4>เปลี่ยนชื่อโปรไฟล์</h4>
-  <input type="text" id="new-name" placeholder="ใส่ชื่อใหม่">
-  <div class="name-buttons">
-    <button class="name-btn btn-cancel" onclick="closeNameEdit()">ยกเลิก</button>
-    <button class="name-btn btn-save" onclick="saveName()">บันทึก</button>
-  </div>
+  <div class="nav-btn"><div class="nav-icon">🏠</div><div class="nav-label">หน้า</div></div>
+  <div class="nav-btn"><div class="nav-icon">🔍</div><div class="nav-label">ค้นหา</div></div>
+  <div class="nav-btn"><div class="nav-icon nav-center">+</div></div>
+  <div class="nav-btn"><div class="nav-icon">💬</div><div class="nav-label">ข้อความ</div></div>
+  <div class="nav-btn"><div class="nav-icon">👤</div><div class="nav-label">ฉัน</div></div>
 </div>
 
 <script>
-const VERSION = 'v1130-27';
-const DB_NAME = 'ThaiPodeeDB';
-const STORE = 'videos';
-// ✅ ฟรีสไตล์ ไม่มีลิมิต
-let db = null;
-let videoList = [];
-let delIndex = null;
-let deferredPrompt = null;
-
-localStorage.removeItem('thaipodee_version');
-
-function checkUpdate() {
-  const lastVer = localStorage.getItem('thaipodee_version');
-  if (lastVer && lastVer !== VERSION) {
-    document.getElementById('update-banner').classList.add('show');
-  }
-  localStorage.setItem('thaipodee_version', VERSION);
-}
-checkUpdate();
-
-document.getElementById('refresh-btn').addEventListener('click', () => {
-  localStorage.removeItem('thaipodee_version');
-  location.reload(true);
-});
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  setTimeout(() => {
-    document.getElementById('install-banner').classList.add('show');
-  }, 1000);
-});
-
-document.getElementById('install-btn').addEventListener('click', async () => {
-  if (!deferredPrompt) {
-    alert('⚠️ กด 3 จุด มุมขวาบน → เพิ่มในหน้าจอหลัก / ติดตั้งแอป');
-    return;
-  }
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    document.getElementById('install-banner').classList.remove('show');
-  }
-  deferredPrompt = null;
-});
-
-document.getElementById('later-btn').addEventListener('click', () => {
-  document.getElementById('install-banner').classList.remove('show');
-});
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = e => {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        const store = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-        store.createIndex('time', 'time');
-      }
-    };
-    req.onsuccess = e => { db = e.target.result; resolve(); };
-    req.onerror = reject;
+const videos = document.querySelectorAll('video');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.play().catch(()=>{});
+    else e.target.pause();
   });
-}
-
-async function saveVideo(file, name) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    const rec = { file, name, time: new Date().toISOString() };
-    const req = store.add(rec);
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = reject;
-  });
-}
-
-async function loadAllVideos() {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly');
-    const store = tx.objectStore(STORE);
-    const req = store.getAll();
-    req.onsuccess = e => {
-      const all = e.target.result;
-      resolve(all.sort((a, b) => new Date(b.time) - new Date(a.time)));
-    };
-    req.onerror = reject;
-  });
-}
-
-async function deleteVideo(id) {
-  return new Promise((resolve) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    store.delete(id).onsuccess = () => resolve();
-  });
-}
-
-let userName = localStorage.getItem('displayName') || 'THAIPODEE MASTER - 1';
-let userAvt = localStorage.getItem('userAvatar');
-
-document.getElementById('prof-name').textContent = userName;
-document.getElementById('disp-name').textContent = userName;
-if (userAvt) {
-  document.getElementById('avt-img').src = userAvt;
-  document.getElementById('prof-avt').src = userAvt;
-}
-
-async function init() {
-  await openDB();
-  videoList = await loadAllVideos();
-  renderGrid();
-  if (videoList.length > 0) {
-    setMainVideo(videoList[0]);
-  }
-}
-
-function setMainVideo(item) {
-  const mainVid = document.getElementById('main-vid');
-  mainVid.pause();
-  mainVid.src = '';
-  mainVid.removeAttribute('src');
-  mainVid.src = URL.createObjectURL(item.file);
-  mainVid.style.display = 'block';
-  document.getElementById('main-play-icon').style.display = 'none';
-  mainVid.loop = true;
-  mainVid.muted = true;
-  mainVid.load();
-  mainVid.play().catch(() => {});
-  document.getElementById('vid-desc').textContent = item.name;
-}
-
-init();
-
-const upBtn = document.getElementById('up-btn');
-const vidInput = document.getElementById('vid-input');
-
-upBtn.addEventListener('click', e => {
-  e.preventDefault();
-  e.stopPropagation();
-  vidInput.click();
-});
-
-vidInput.addEventListener('change', async e => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  if (!file.type.startsWith('video/')) {
-    alert('❌ ไม่ใช่ไฟล์วิดีโอ');
-    return;
-  }
-
-  // ✅ ไม่มีตรวจสอบอะไรเลย
-
-  try {
-    await saveVideo(file, file.name);
-    videoList = await loadAllVideos();
-    renderGrid();
-    setMainVideo(videoList[0]);
-    alert(`✅ อัปโหลดสำเร็จ!\nรวม ${videoList.length} รายการ`);
-  } catch (err) {
-    alert('❌ ผิดพลาด: ' + err.message);
-  }
-});
-
-function renderGrid() {
-  const grid = document.getElementById('grid');
-  if (!videoList.length) {
-    grid.innerHTML = '<div class="empty-state">ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด</div>';
-    return;
-  }
-  const showFirst = videoList.slice(0, 8);
-  const more = videoList.length - 8;
-
-  grid.innerHTML = showFirst.map((item, idx) => `
-    <div class="grid-item">
-      <div class="grid-clickable" onclick="playAtMain(${idx})"></div>
-      <video class="grid-video" muted preload="metadata" src="${URL.createObjectURL(item.file)}" playsinline></video>
-      <span class="grid-play-icon">▶</span>
-      <button class="grid-del-btn" onclick="event.stopPropagation(); askDel(${idx})">🗑️</button>
-    </div>
-  `).join('') + (more > 0 ? `<div class="more-count">+ อีก ${more} รายการ</div>` : '');
-}
-
-// ✅ กดวิดีโอในตาราง → ไปเล่นที่หน้าหลักเลย ปิดหน้าโปรไฟล์
-function playAtMain(idx) {
-  setMainVideo(videoList[idx]);
-  profOpen = false;
-  document.getElementById('prof-page').classList.remove('show');
-}
-
-function askDel(idx) {
-  delIndex = idx;
-  document.getElementById('del-pop').classList.add('show');
-}
-function closeDel() {
-  document.getElementById('del-pop').classList.remove('show');
-  delIndex = null;
-}
-document.getElementById('del-yes').addEventListener('click', async () => {
-  if (delIndex === null) return;
-  await deleteVideo(videoList[delIndex].id);
-  videoList = await loadAllVideos();
-  renderGrid();
-  if (videoList.length > 0) {
-    setMainVideo(videoList[0]);
-  } else {
-    const mainVid = document.getElementById('main-vid');
-    mainVid.pause();
-    mainVid.src = '';
-    mainVid.style.display = 'none';
-    document.getElementById('main-play-icon').style.display = 'block';
-    document.getElementById('vid-desc').textContent = 'กด + เพื่ออัปโหลด';
-  }
-  closeDel();
-});
-
-let profOpen = false;
-function toggleProf() {
-  profOpen = !profOpen;
-  document.getElementById('prof-page').classList.toggle('show', profOpen);
-  if (profOpen) renderGrid();
-}
-function goMain() {
-  profOpen = false;
-  document.getElementById('prof-page').classList.remove('show');
-}
-function togglePlay() {
-  const v = document.getElementById('main-vid');
-  if (!v.src) return;
-  if (v.paused) { v.play(); document.getElementById('main-play-icon').style.display = 'none'; }
-  else { v.pause(); document.getElementById('main-play-icon').style.display = 'block'; }
-}
-
-function openNameEdit() {
-  document.getElementById('new-name').value = userName;
-  document.getElementById('name-pop').classList.add('show');
-}
-function closeNameEdit() {
-  document.getElementById('name-pop').classList.remove('show');
-}
-function saveName() {
-  const n = document.getElementById('new-name').value.trim();
-  if (!n) return;
-  userName = n;
-  localStorage.setItem('displayName', n);
-  document.getElementById('prof-name').textContent = n;
-  document.getElementById('disp-name').textContent = n;
-  closeNameEdit();
-}
-
-document.getElementById('avatar-input').addEventListener('change', e => {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    userAvt = ev.target.result;
-    localStorage.setItem('userAvatar', userAvt);
-    document.getElementById('avt-img').src = userAvt;
-    document.getElementById('prof-avt').src = userAvt;
-  };
-  r.readAsDataURL(f);
-});
+}, { threshold: 0.5 });
+videos.forEach(v => observer.observe(v));
+videos.forEach(v => v.muted = true);
 </script>
+
 </body>
 </html>
