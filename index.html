@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1130-7 — ✅ 4คอลัมน์×2แถว | ใหม่บน-เก่าล่าง | ซ่อนแถวที่3+
-   อัปเดต: 30 กันยายน 2569 09:40 น.
+   ThaiPodee v1130-8 — ✅ ภาพเต็มบล็อก 100% | 4×2 | ใหม่บน-เก่าล่าง
+   อัปเดต: 30 กันยายน 2569 12:38 น.
    --------------------------------------------------------------
-   ✅ แสดงแค่ 8 ช่องแรก = 4×2 เท่านั้น
-   ✅ ใหม่สุดอยู่บนสุด ซ้าย→ขวา บน→ล่าง
-   ✅ แถวที่ 3 เป็นต้นไป มีอยู่จริงแต่ซ่อน ไม่โผล่
-   ✅ ภาพเต็มช่อง ไม่เหลือสีดำ/เทา
-   ✅ ปุ่ม + กดได้ อัปโหลดติด
+   ✅ ภาพเต็มบล็อกทั้งความกว้าง-สูง ไม่เหลือสีเทา
+   ✅ 4 คอลัมน์ × 2 แถว = 8 ช่อง แสดงแค่นี้
+   ✅ ใหม่สุดอยู่ซ้ายบน เรียงซ้าย→ขวา บน→ล่าง
+   ✅ แถวที่ 3+ มีอยู่จริงแต่ซ่อน
+   ✅ preload ทันที เห็นภาพไว
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -96,26 +96,32 @@
   }
   .profile-tab { text-align:center; font-size:20px; cursor:pointer; }
 
-  /* ===== ✅ 4คอลัมน์ × 2แถว เท่านั้น | ซ่อนแถวที่3+ ===== */
+  /* ===== ✅ 4×2 — ภาพเต็มบล็อก 100% ไม่เหลือที่ว่าง ===== */
   .video-grid {
     display:grid;
-    grid-template-columns:repeat(4, 1fr); /* 4 ช่องต่อแถว */
-    grid-auto-rows:1fr; /* ทุกแถวสูงเท่ากัน */
-    gap:3px; padding:3px;
+    grid-template-columns:repeat(4, 1fr);
+    gap:3px;
+    padding:3px;
   }
   .grid-item {
-    aspect-ratio:4/5; /* สัดส่วนสวย เต็มช่อง */
-    background:#eee; /* สีพื้นอ่อน ไม่ดำ */
-    border-radius:2px; overflow:hidden;
-    position:relative; cursor:pointer;
+    aspect-ratio:4/5;
+    background:#ddd; /* สีพื้นอ่อน */
+    border-radius:2px;
+    overflow:hidden; /* ✅ ตัดที่เกินออก ไม่เหลือขอบ */
+    position:relative;
+    cursor:pointer;
   }
-  .grid-item:nth-child(n+9) { display:none; } /* ✅ ซ่อนตัวที่ 9 เป็นต้นไป = แถวที่3+ */
+  /* ✅ ซ่อนแถวที่ 3 เป็นต้นไป = ตัวที่ 9+ */
+  .grid-item:nth-child(n+9) { display:none !important; }
+
+  /* ✅ ภาพเต็มบล็อก 100% */
   .grid-item-video {
-    width:100%; height:100%;
-    object-fit:cover; /* ✅ เต็มช่อง ไม่เหลือขอบ */
+    width:100%;
+    height:100%;
+    object-fit:cover; /* เต็มพื้นที่ ตัดขอบเล็กน้อย */
     display:block;
     background:transparent;
-    preload:auto; /* โหลดทันที เห็นไว */
+    preload:auto;
   }
   .grid-delete-btn {
     position:absolute; top:3px; right:3px; width:24px; height:24px;
@@ -180,7 +186,7 @@
 </head>
 <body>
 
-<div class="top-version">v1130-7</div>
+<div class="top-version">v1130-8</div>
 
 <div class="tabs">
   <span>กำลังติดตาม</span>
@@ -321,7 +327,7 @@ uploadBtn.addEventListener('click', e => {
   fileInput.click();
 });
 
-// === ✅ ใหม่สุดอยู่บนสุด: unshift = ใส่ข้างบนสุด ===
+// === อัปโหลด → ใหม่อยู่บนสุด ===
 fileInput.addEventListener('change', e => {
   const files = e.target.files;
   if (!files || files.length === 0) return;
@@ -345,7 +351,7 @@ fileInput.addEventListener('change', e => {
 
     document.getElementById('video-desc').textContent = file.name;
 
-    // ✅ ใส่ข้างบนสุดเสมอ — ใหม่ก่อน เหมือน TikTok
+    // ใส่ข้างบนสุดเสมอ
     uploadedVideos.unshift({ 
       name: file.name, 
       url: url, 
@@ -353,7 +359,7 @@ fileInput.addEventListener('change', e => {
     });
     localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
     renderVideoGrid();
-    alert('✅ อัปโหลดสำเร็จ — ใหม่อยู่บนสุด แสดงแค่ 8 ช่องแรก');
+    alert('✅ อัปโหลดสำเร็จ — ภาพเต็มบล็อกแล้ว');
     
   } catch (err) {
     alert('❌ ผิดพลาด: ' + err.message);
@@ -411,14 +417,13 @@ function togglePlayPause() {
   else { v.pause(); i.style.display = 'block'; }
 }
 
-// === ✅ แสดง 8 ช่องแรก เรียงใหม่→เก่า ซ้าย→ขวา บน→ล่าง ===
+// === แสดงรายการ ===
 function renderVideoGrid() {
   const grid = document.getElementById('user-videos-grid');
   if (uploadedVideos.length === 0) {
     grid.innerHTML = '<div class="empty-state">ยังไม่มีวิดีโอ กด + เพื่ออัปโหลด</div>';
     return;
   }
-  // แสดงทั้งหมด แต่ CSS จะซ่อนตัวที่ 9 เป็นต้นไปเอง
   grid.innerHTML = uploadedVideos.map((v, idx) => `
     <div class="grid-item">
       <button class="grid-delete-btn" onclick="event.stopPropagation(); openDeleteConfirm(${idx})">🗑️</button>
