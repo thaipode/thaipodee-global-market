@@ -1,10 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1130-23 — ซ่อนข้อความใต้ปุ่ม + / สะอาดตา
-   อัปเดต: 30 กันยายน 2569 21:52 น.
+   ThaiPodee v1130-24 — สะอาด! ไม่มีข้อความ / ปุ่มตรงกลาง / เปลี่ยนวิดีโอตรง
+   อัปเดต: 30 กันยายน 2569 21:56 น.
    --------------------------------------------------------------
-   ✅ ซ่อนข้อความ "เลือกไฟล์..." ไว้ ไม่โผล่ข้างปุ่ม
-   ✅ กด + → เลือกไฟล์ได้ปกติโดยตรง
-   ✅ หน้าจอสะอาด ไม่มีข้อความรบกวน
+   ✅ ลบคำว่า "เลือกไฟล์" ออกหมด — ไม่มีข้อความเลย
+   ✅ ปุ่ม + สีแดง อยู่ตรงกลางแน่นอน
+   ✅ กด + → เลือกไฟล์ได้เลยโดยตรง
+   ✅ อัปโหลดใหม่ → แสดงทันที ไม่ค้างของเก่า
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -28,7 +29,7 @@
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F192%2F192%27%3E%3Ccircle%20cx%3D%2796%27%20cy%3D%2796%27%20r%3D%2788%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%2780%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F512%2F512%27%3E%3Ccircle%20cx%3D%27256%27%20cy%3D%27256%27%20r%3D%27230%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%27200%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-23</title>
+<title>ThaiPodee v1130-24</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
@@ -106,23 +107,22 @@
   .nav-item {
     text-align:center; cursor:pointer; font-size:13px;
     width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  /* ✅ ปุ่มตรงกลางชัดเจน ไม่มีข้อความ */
+  .center-button-area {
+    display:flex; align-items:center; justify-content:center;
     position:relative;
   }
-  .nav-item .plus-wrap { position:relative; }
-  .nav-item .plus-btn {
-    width:48px; height:36px; background:#e60000; border-radius:6px;
+  .plus-btn {
+    width:56px; height:44px; background:#e60000; border-radius:6px;
     display:flex; align-items:center; justify-content:center;
-    font-size:24px; font-weight:bold; border:none; cursor:pointer;
+    font-size:28px; font-weight:bold; color:#fff;
+    border:none; cursor:pointer;
     position:relative; z-index:200;
   }
-  /* ✅ ซ่อนข้อความไว้ใต้ปุ่ม ไม่ให้โผล่ */
-  .nav-item .file-label {
-    position:absolute; opacity:0; pointer-events:none;
-    top:100%; left:50%; transform:translateX(-50%);
-    font-size:0; color:transparent;
-  }
+  .plus-btn:active { transform:scale(0.95); }
 
-  #video-file-input { position:absolute; opacity:0; pointer-events:none; }
+  #vid-input { display:none; }
 
   .profile-page {
     position:fixed; top:0; left:0; right:0; bottom:0;
@@ -178,8 +178,6 @@
     border-radius:2px;
     overflow:hidden;
     position:relative;
-    padding:0;
-    margin:0;
   }
   .grid-item:nth-child(n+9) { display:none !important; }
 
@@ -274,11 +272,11 @@
 </div>
 
 <div class="update-banner" id="update-banner">
-  <span>✅ มีอัปเดตเวอร์ชันใหม่ v1130-23</span>
+  <span>✅ มีอัปเดตเวอร์ชันใหม่ v1130-24</span>
   <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
 </div>
 
-<div class="top-version">v1130-23</div>
+<div class="top-version">v1130-24</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -292,7 +290,7 @@
 
 <div class="video-info">
   <div class="acc-name" id="disp-name">@podee.office.cancel</div>
-  <div class="desc" id="vid-desc">กด + สีแดงเพื่ออัปโหลด — ไม่เกิน 100MB / 3 นาที</div>
+  <div class="desc" id="vid-desc">กด + เพื่ออัปโหลด — ไม่เกิน 100MB / 3 นาที</div>
 </div>
 
 <div class="side-icons">
@@ -309,13 +307,9 @@
 <div class="bottom-nav">
   <div class="nav-item" onclick="event.stopPropagation(); goMain()">🏠<br>หน้าหลัก</div>
   <div class="nav-item">🛒<br>ร้านค้า</div>
-  <div class="nav-item">
-    <div class="plus-wrap">
-      <button class="plus-btn" id="up-btn">+</button>
-      <!-- ✅ ข้อความซ่อนอยู่ตรงนี้ ไม่โผล่ให้เห็น -->
-      <span class="file-label" id="file-status">เลือกไฟล์</span>
-      <input type="file" id="vid-input" accept="video/*,.mp4,.webm,.mov">
-    </div>
+  <div class="nav-item center-button-area">
+    <button class="plus-btn" id="up-btn">+</button>
+    <input type="file" id="vid-input" accept="video/*,.mp4,.webm,.mov">
   </div>
   <div class="nav-item">💬<br>ข้อความ</div>
   <div class="nav-item" onclick="event.stopPropagation(); toggleProf()">👤<br>โปรไฟล์</div>
@@ -378,7 +372,7 @@
 </div>
 
 <script>
-const VERSION = 'v1130-23';
+const VERSION = 'v1130-24';
 const DB_NAME = 'ThaiPodeeDB';
 const STORE = 'videos';
 const MAX_SIZE_MB = 100;
@@ -511,11 +505,17 @@ async function init() {
 
 function setMainVideo(item) {
   const mainVid = document.getElementById('main-vid');
+  // ✅ ล้างของเก่าก่อนแสดงทันที
+  mainVid.pause();
+  mainVid.src = '';
+  mainVid.removeAttribute('src');
+  // ✅ ตั้งค่าใหม่
   mainVid.src = URL.createObjectURL(item.file);
   mainVid.style.display = 'block';
   document.getElementById('main-play-icon').style.display = 'none';
   mainVid.loop = true;
   mainVid.muted = true;
+  mainVid.load(); // บังคับโหลดใหม่
   mainVid.play().catch(() => {});
   document.getElementById('vid-desc').textContent = item.name;
 }
@@ -524,20 +524,16 @@ init();
 
 const upBtn = document.getElementById('up-btn');
 const vidInput = document.getElementById('vid-input');
-const fileStatus = document.getElementById('file-status');
 
 upBtn.addEventListener('click', e => {
-  e.preventDefault(); e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
   vidInput.click();
 });
 
 vidInput.addEventListener('change', async e => {
   const file = e.target.files?.[0];
-  if (!file) {
-    fileStatus.textContent = 'ไม่ได้เลือกไฟล์ใด';
-    return;
-  }
-  fileStatus.textContent = file.name;
+  if (!file) return;
 
   if (!file.type.startsWith('video/')) {
     alert('❌ ไม่ใช่ไฟล์วิดีโอ');
@@ -560,6 +556,7 @@ vidInput.addEventListener('change', async e => {
     await saveVideo(file, file.name, duration);
     videoList = await loadAllVideos();
     renderGrid();
+    // ✅ แสดงวิดีโอล่าสุดทันที ไม่ค้างของเก่า
     setMainVideo(videoList[0]);
     alert(`✅ อัปโหลดสำเร็จ!\nรวม ${videoList.length} รายการ`);
   } catch (err) {
@@ -591,10 +588,13 @@ function playVid(idx) {
   const item = videoList[idx];
   const pop = document.getElementById('play-popup');
   const player = document.getElementById('pop-vid');
+  player.pause();
+  player.src = '';
   player.src = URL.createObjectURL(item.file);
   player.muted = false;
   player.loop = true;
   pop.classList.add('show');
+  player.load();
   player.play().catch(() => {
     player.muted = true;
     player.play();
@@ -604,7 +604,8 @@ function playVid(idx) {
 function closePop() {
   document.getElementById('play-popup').classList.remove('show');
   const p = document.getElementById('pop-vid');
-  p.pause(); p.src = '';
+  p.pause();
+  p.src = '';
   playIndex = null;
 }
 
@@ -621,13 +622,15 @@ document.getElementById('del-yes').addEventListener('click', async () => {
   await deleteVideo(videoList[delIndex].id);
   videoList = await loadAllVideos();
   renderGrid();
-  if (delIndex === 0 && videoList.length > 0) {
+  if (videoList.length > 0) {
     setMainVideo(videoList[0]);
-  } else if (videoList.length === 0) {
+  } else {
     const mainVid = document.getElementById('main-vid');
+    mainVid.pause();
+    mainVid.src = '';
     mainVid.style.display = 'none';
     document.getElementById('main-play-icon').style.display = 'block';
-    document.getElementById('vid-desc').textContent = 'กด + สีแดงเพื่ออัปโหลด';
+    document.getElementById('vid-desc').textContent = 'กด + เพื่ออัปโหลด';
   }
   closeDel();
 });
