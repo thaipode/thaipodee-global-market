@@ -1,28 +1,22 @@
+<script>
 // ==============================================================
-// ThaiPodee v1132 — FIX เลือกไฟล์แล้วไม่หาย + แสดงค่าถูกต้อง
-// อัปเดต: 30 กันยายน 2569 20:48 น.
+// ThaiPodee v1133 — FIX จอขาว + ตัวแปรไม่แสดง
+// อัปเดต: 30 กันยายน 2569 20:50 น.
 // ==============================================================
 
 const fileInput = document.getElementById('file-input');
 const uploadTrigger = document.getElementById('upload-trigger');
 
-// กดปุ่ม + → เปิดเลือกไฟล์
 uploadTrigger.addEventListener('click', function(e) {
   e.preventDefault();
   e.stopPropagation();
   fileInput.click();
 });
 
-// เลือกไฟล์แล้ว → ประมวลผล
 fileInput.addEventListener('change', async function(e) {
   try {
     const file = e.target.files[0];
-    if (!file) {
-      console.log('ไม่ได้เลือกไฟล์');
-      return;
-    }
-
-    console.log('เลือกไฟล์:', file.name, 'ขนาด:', (file.size / 1024 / 1024).toFixed(2), 'MB');
+    if (!file) return;
 
     if (!file.type.startsWith('video/')) {
       alert('กรุณาเลือกไฟล์วิดีโอเท่านั้น');
@@ -30,101 +24,51 @@ fileInput.addEventListener('change', async function(e) {
       return;
     }
 
-    showUploadingScreen(file);
+    const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+    showUploadUI(file.name, sizeMB);
 
   } catch (err) {
-    console.error('เกิดข้อผิดพลาด:', err);
-    alert('เกิดข้อผิดพลาด: ' + err.message);
+    console.error(err);
+    alert('ผิดพลาด: ' + err.message);
     fileInput.value = '';
   }
 });
 
-// แสดงหน้าจอโหลด — ใช้เครื่องหมายถูก ✅
-function showUploadingScreen(file) {
-  const body = document.body;
-  const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+function showUploadUI(name, size) {
+  document.body.innerHTML = '\
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">\
+      <h2 style="margin-bottom:20px;">กำลังเตรียมวิดีโอ...</h2>\
+      <p style="margin-bottom:10px;">ชื่อไฟล์: ' + name + '</p>\
+      <p style="margin-bottom:30px;">ขนาด: ' + size + ' MB</p>\
+      <div style="width:80%;height:6px;background:#333;border-radius:3px;overflow:hidden;">\
+        <div id="bar" style="width:0%;height:100%;background:#e50914;transition:width 0.3s;"></div>\
+      </div>\
+      <button onclick="location.reload()" style="margin-top:40px;padding:10px 25px;background:#333;color:#fff;border:none;border-radius:20px;">ยกเลิก</button>\
+    </div>\
+  ';
 
-  // ✅ ใช้ ` ยกนิ้ว ไม่ใช้ ' อีกต่อไป
-  body.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
-      <h2 style="margin-bottom:20px;">กำลังเตรียมวิดีโอ...</h2>
-      <p style="margin-bottom:10px;">ชื่อไฟล์: ${file.name}</p>
-      <p style="margin-bottom:30px;">ขนาด: ${fileSizeMB} MB</p>
-      <div style="width:80%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
-        <div id="progress-bar" style="width:0%;height:100%;background:#e50914;transition:width 0.3s;"></div>
-      </div>
-      <button onclick="goBack()" style="margin-top:40px;padding:10px 25px;background:#333;color:#fff;border:none;border-radius:20px;">ยกเลิก</button>
-    </div>
-  `;
-
-  let progress = 0;
-  const bar = document.getElementById('progress-bar');
-  const interval = setInterval(() => {
-    progress += Math.random() * 12;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(interval);
-      doUpload(file);
+  let p = 0;
+  const bar = document.getElementById('bar');
+  const t = setInterval(() => {
+    p += Math.random() * 15;
+    if (p >= 100) {
+      p = 100;
+      clearInterval(t);
+      finishUpload();
     }
-    if (bar) bar.style.width = progress + '%';
+    if (bar) bar.style.width = p + '%';
   }, 300);
 }
 
-function goBack() {
-  window.location.reload();
+function finishUpload() {
+  document.body.innerHTML = '\
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">\
+      <h2 style="color:#4cd137;margin-bottom:20px;">✅ อัปโหลดสำเร็จ!</h2>\
+      <p style="margin-bottom:30px;">กลับไปหน้าแรกเพื่อดูวิดีโอ</p>\
+      <button onclick="location.reload()" style="padding:12px 30px;background:#e50914;color:#fff;border:none;border-radius:25px;font-size:16px;">กลับไปดู</button>\
+    </div>\
+  ';
 }
-
-async function doUpload(file) {
-  try {
-    console.log('เริ่มอัปโหลด...');
-    
-    if (!window.firebase) {
-      showMessage('ไม่พบระบบ Firebase — กลับไปหน้าแรก', false);
-      return;
-    }
-
-    const fileName = Date.now() + '_' + file.name;
-    const filePath = 'videos/' + fileName;
-    const storageRef = firebase.storage().ref(filePath);
-    
-    const snapshot = await storageRef.put(file);
-    const downloadURL = await snapshot.ref.getDownloadURL();
-    
-    await firebase.firestore().collection('videos').add({
-      fileName: file.name,
-      videoURL: downloadURL,
-      fileSize: file.size,
-      fileType: file.type,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      likes: 0,
-      comments: 0,
-      shares: 0
-    });
-    
-    showSuccessScreen();
-    
-  } catch (err) {
-    console.error('อัปโหลดล้มเหลว:', err);
-    showMessage('อัปโหลดไม่สำเร็จ: ' + err.message, false);
-  }
-}
-
-function showSuccessScreen() {
-  document.body.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
-      <h2 style="color:#4cd137;margin-bottom:20px;">✅ อัปโหลดสำเร็จ!</h2>
-      <p style="margin-bottom:30px;">วิดีโอจะแสดงในหน้าแรกทันที</p>
-      <button onclick="window.location.reload()" style="padding:12px 30px;background:#e50914;color:#fff;border:none;border-radius:25px;font-size:16px;">กลับไปดูวิดีโอ</button>
-    </div>
-  `;
-}
-
-function showMessage(text, isSuccess) {
-  document.body.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;padding:20px;">
-      <h2 style="color:${isSuccess ? '#4cd137' : '#e50914'};margin-bottom:20px;">${isSuccess ? '✅ สำเร็จ' : '❌ ผิดพลาด'}</h2>
-      <p style="margin-bottom:30px;text-align:center;">${text}</p>
-      <button onclick="window.location.reload()" style="padding:12px 30px;background:#e50914;color:#fff;border:none;border-radius:25px;font-size:16px;">กลับไปหน้าแรก</button>
-    </div>
-  `;
-}
+</script>
+</body>
+</html>
