@@ -1,10 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130-32 — ✅ ใช้โลโก้จริงจาก GitHub ครบทุกจุด
-   อัปเดต: 1 ตุลาคม 2569 08:08 น.
+   ThaiPodee v1130-33 — ✅ มีแอปแล้ว → อัปเดตเอง ไม่ขอติดตั้ง
+   อัปเดต: 1 ตุลาคม 2569 08:15 น.
    --------------------------------------------------------------
-   ✅ ใช้โลโก้: thaipodee_logo_icon.png จาก GitHub เท่านั้น
-   ✅ ติดตั้งทางเดียว ไม่มีเงื่อนไข
-   ✅ ทุกฟังก์ชันครบถ้วน — ก๊อปไปใช้ได้ทันที
+   ✅ ตรวจพบแอปเดิม → ไม่แสดงแถวขอ, อัปเดตทำงานเอง
+   ✅ ใช้โลโก้จริงจาก GitHub ครบทุกจุด
+   ✅ ก๊อปไปใช้ได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -31,7 +31,7 @@
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22ThaiPodee%20%E2%80%94%20%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B8%A3%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-32</title>
+<title>ThaiPodee v1130-33</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
   html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
@@ -39,10 +39,12 @@
   .install-banner {
     position: fixed; top: 0; left: 0; right: 0;
     background: #e60000; color: #fff; padding: 12px 16px;
-    display: flex; justify-content: space-between; align-items: center;
+    display: none; /* ซ่อนไว้ก่อน เช็คแล้วค่อยแสดง */
+    justify-content: space-between; align-items: center;
     z-index: 9999; font-size: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
+  .install-banner.show { display: flex; }
   .install-btn {
     background: #fff; color: #e60000; border: none; padding: 8px 20px;
     border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;
@@ -142,7 +144,7 @@
   </div>
 </div>
 
-<div class="version-top">v1130-32</div>
+<div class="version-top">v1130-33</div>
 <div class="search-icon">🔍</div>
 
 <div class="tabs">
@@ -227,8 +229,24 @@ let currentIndex = 0;
 let isPlaying = false;
 let deferredPrompt = null;
 
-// ติดตั้งแอป
+// === ตรวจ: มีแอปอยู่แล้วหรือไม่ ===
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                     window.navigator.standalone === true ||
+                     document.referrer.includes('android-app://');
+
+if (!isStandalone) {
+  // ยังไม่ติดตั้ง → แสดงแถวขอ
+  setTimeout(() => {
+    document.getElementById('install-banner').classList.add('show');
+  }, 800);
+} else {
+  // มีแอปอยู่แล้ว → ไม่แสดงอะไร อัปเดตทำงานเอง
+  console.log('✅ ทำงานในโหมดแอป — อัปเดตเรียบร้อย');
+}
+
+// ติดตั้งเมื่อยังไม่มี
 window.addEventListener('beforeinstallprompt', e => {
+  if (isStandalone) return; // มีแล้ว ไม่ขออีก
   e.preventDefault();
   deferredPrompt = e;
 });
@@ -240,10 +258,10 @@ document.getElementById('install-btn').addEventListener('click', async () => {
   } else {
     alert('กดจุด 3 จุด มุมขวาบน ⋮ → เพิ่มในหน้าจอหลัก → ติดตั้ง');
   }
-  document.getElementById('install-banner').style.display = 'none';
+  document.getElementById('install-banner').classList.remove('show');
 });
 document.getElementById('later-btn').addEventListener('click', () => {
-  document.getElementById('install-banner').style.display = 'none';
+  document.getElementById('install-banner').classList.remove('show');
 });
 
 // ฐานข้อมูล IndexedDB
