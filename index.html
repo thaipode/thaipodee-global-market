@@ -1,10 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130-34 — ✅ แสดงไอคอนจริงทุกตัว ไม่เป็นจอขาว
-   อัปเดต: 1 ตุลาคม 2569 09:01 น.
+   ThaiPodee v1130-36 — ✅ วิดีโอเล่นวนซ้ำตลอด ไม่หยุด
+   อัปเดต: 1 ตุลาคม 2569 12:07 น.
    --------------------------------------------------------------
-   ✅ ใช้โลโก้จริงจาก GitHub ทุกจุด
-   ✅ ไม่ใช้ตัวย่อ TP
-   ✅ ไม่มีจอขาว
+   ✅ เพิ่ม loop + ควบคุมให้เล่นวนซ้ำอัตโนมัติ
+   ✅ กดหยุดได้ตามปกติ แต่ถ้าไม่หยุด จะเล่นวนไปเรื่อย ๆ
+   ✅ โลโก้+ชื่อครบถ้วน ไม่มี TP
    ✅ ก๊อปไปใช้ได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
@@ -27,13 +27,13 @@
 <meta name="display" content="standalone">
 <meta name="orientation" content="portrait-primary">
 
-<!-- ✅ ใช้โลโก้จริงเป็นไอคอนเว็บ -->
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22ThaiPodee%20%E2%80%94%20%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B8%A3%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-34</title>
+<title>ThaiPodee</title>
+
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
   html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
@@ -68,7 +68,11 @@
     cursor: pointer; background: #000; overflow: hidden;
   }
   .play-overlay { font-size: 60px; opacity: 0.8; cursor: pointer; position: absolute; z-index: 2; }
-  .main-video { width: 100%; height: 100%; object-fit: contain; display: none; }
+  .main-video {
+    width: 100%; height: 100%;
+    object-fit: contain; display: none;
+    loop: true; /* ✅ เล่นวนซ้ำตลอด */
+  }
 
   .video-info { position: absolute; bottom: 90px; left: 12px; right: 70px; pointer-events: none; z-index: 3; }
   .username { font-weight: bold; margin-bottom: 4px; }
@@ -82,12 +86,7 @@
     cursor: pointer; overflow: hidden;
     border: 2px solid #444;
   }
-  .side-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .side-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .side-icon span { font-size: 20px; }
 
   .bottom-nav {
@@ -97,12 +96,7 @@
     background: #000; border-top: 1px solid #222; z-index: 5;
   }
   .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 13px; }
-  .nav-item img {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    display: block;
-  }
+  .nav-item img { width: 24px; height: 24px; object-fit: contain; display: block; }
   .plus-btn { width: 56px; height: 44px; background: #e60000; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #fff; border: none; cursor: pointer; }
 
   .profile-page {
@@ -115,18 +109,11 @@
   .profile-header { padding: 16px; text-align: center; }
   .profile-logo {
     width: 100px; height: 100px; border-radius: 50%;
-    background: #222;
-    margin: 0 auto 10px;
-    overflow: hidden;
-    border: 3px solid #000;
+    background: #222; margin: 0 auto 10px;
+    overflow: hidden; border: 3px solid #000;
     display: flex; align-items: center; justify-content: center;
   }
-  .profile-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .profile-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .name-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; }
   .profile-name { font-size: 18px; font-weight: bold; }
   .edit-pencil { cursor: pointer; font-size: 16px; }
@@ -172,7 +159,7 @@
   </div>
 </div>
 
-<div class="version-top">v1130-34</div>
+<div class="version-top">v1130-36</div>
 <div class="search-icon">🔍</div>
 
 <div class="tabs">
@@ -182,7 +169,8 @@
 
 <div class="video-container" id="video-container">
   <div class="play-overlay" id="play-overlay">▶</div>
-  <video class="main-video" id="main-video" controls playsinline muted></video>
+  <!-- ✅ เพิ่ม loop ที่ตรงนี้ด้วยเพื่อแน่นอน -->
+  <video class="main-video" id="main-video" loop controls playsinline muted></video>
 </div>
 
 <div class="video-info">
@@ -191,9 +179,8 @@
 </div>
 
 <div class="side-icons">
-  <!-- ✅ ไอคอนโปรไฟล์ด้านขวา ใช้โลโก้จริง -->
   <div class="side-icon" id="profile-icon">
-    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โปรไฟล์" id="avatar-display">
+    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="ThaiPodee">
   </div>
   <div class="side-icon">❤️</div>
   <div class="side-icon">💬</div>
@@ -209,9 +196,8 @@
     <input type="file" id="file-input" accept="video/*">
   </div>
   <div class="nav-item">💬</div>
-  <!-- ✅ ไอคอนเมนูโปรไฟล์ด้านล่าง ใช้โลโก้จริง -->
   <div class="nav-item" id="profile-nav-btn">
-    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โปรไฟล์เมนู">
+    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="ThaiPodee">
   </div>
 </div>
 
@@ -220,9 +206,8 @@
     <span class="back-btn" id="profile-back">◀</span>
   </div>
   <div class="profile-header">
-    <!-- ✅ โลโก้ในหน้าโปรไฟล์ ใช้โลโก้จริง -->
     <div class="profile-logo" id="profile-avatar-box">
-      <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โลโก้" id="profile-avatar-img">
+      <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="ThaiPodee" id="profile-avatar-img">
       <input type="file" id="avatar-input" accept="image/*">
     </div>
     <div class="name-row">
@@ -370,7 +355,7 @@ document.getElementById('avatar-input').addEventListener('change', e => {
   const reader = new FileReader();
   reader.onload = evt => {
     const src = evt.target.result;
-    document.getElementById('avatar-display').src = src;
+    document.getElementById('profile-icon').querySelector('img').src = src;
     document.getElementById('profile-avatar-img').src = src;
   };
   reader.readAsDataURL(file);
@@ -399,6 +384,7 @@ function loadVideo(idx) {
   const v = videoList[idx];
   const video = document.getElementById('main-video');
   video.src = v.url;
+  video.loop = true; // ✅ บังคับเล่นวนซ้ำทุกครั้งที่เปลี่ยนวิดีโอ
   video.style.display = 'block';
   document.getElementById('play-overlay').style.display = 'none';
   document.getElementById('video-desc').textContent = v.name;
@@ -450,7 +436,7 @@ function renderVideoGrid() {
     const thumb = document.createElement('div');
     thumb.className = 'video-thumb';
     thumb.innerHTML = `
-      <video src="${v.url}" muted></video>
+      <video src="${v.url}" loop muted></video>
       <button class="delete-thumb-btn" data-id="${v.id}">×</button>
     `;
     thumb.addEventListener('click', e => {
