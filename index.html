@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130-28 — กดบล็อกวิดีโอ → เล่นที่หน้าหลักเลย
-   อัปเดต: 30 กันยายน 2569 22:18 น.
+   ThaiPodee v1130-27 — กดวิดีโอในตาราง → เล่นที่หน้าหลักเลย
+   อัปเดต: 30 กันยายน 2569 22:14 น.
    --------------------------------------------------------------
-   ✅ กดวิดีโอในตาราง → เปลี่ยนไปเล่นที่หน้าหลักทันที
-   ✅ ปิดหน้าโปรไฟล์เองอัตโนมัติ
-   ✅ เล่นเหมือนหน้าจอแรกทุกประการ
-   ✅ ไม่มีป๊อปอัพ ไม่มีปุ่มปิด — ไม่มีหน้าจอแยก
+   ✅ กดวิดีโอในตารางโปรไฟล์ → เปลี่ยนไปเล่นที่หน้าหลักเลย
+   ✅ ไม่มีหน้าจอป๊อปอัพแยก → ไม่มีปุ่มปิดสีแดง
+   ✅ เล่นเหมือนกดที่หน้าจอแรกทุกประการ
    ✅ ฟรีสไตล์ ไม่มีลิมิต
    ============================================================== -->
 <!DOCTYPE html>
@@ -30,7 +29,7 @@
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F192%2F192%27%3E%3Ccircle%20cx%3D%2796%27%20cy%3D%2796%27%20r%3D%2788%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%2780%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F512%2F512%27%3E%3Ccircle%20cx%3D%27256%27%20cy%3D%27256%27%20r%3D%27230%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%27200%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-28</title>
+<title>ThaiPodee v1130-27</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
@@ -178,13 +177,13 @@
     border-radius:2px;
     overflow:hidden;
     position:relative;
-    cursor:pointer;
   }
   .grid-item:nth-child(n+9) { display:none !important; }
 
   .grid-clickable {
     position:absolute; top:0; left:0; right:0; bottom:0;
     z-index:10;
+    cursor:pointer;
   }
   .grid-video {
     position:absolute; top:0; left:0; width:100%; height:100%;
@@ -209,6 +208,8 @@
   .more-count {
     grid-column:1/-1; text-align:center; padding:8px; color:#666; font-size:12px;
   }
+
+  /* ❌ ลบส่วนป๊อปอัพทิ้งหมดแล้ว — ไม่มีหน้าจอแยก ไม่มีปุ่มปิดสีแดง */
 
   .confirm-popup {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -255,11 +256,11 @@
 </div>
 
 <div class="update-banner" id="update-banner">
-  <span>✅ มีอัปเดต v1130-28 — กดบล็อก → เล่นที่หน้าหลักเลย</span>
+  <span>✅ มีอัปเดต v1130-27 — กดวิดีโอ → เล่นที่หน้าหลักเลย</span>
   <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
 </div>
 
-<div class="top-version">v1130-28</div>
+<div class="top-version">v1130-27</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -332,6 +333,8 @@
   </div>
 </div>
 
+<!-- ❌ ลบส่วนป๊อปอัพวิดีโอทิ้งหมดแล้ว -->
+
 <div class="confirm-popup" id="del-pop">
   <p>ลบวิดีโอนี้หรือไม่?</p>
   <div class="confirm-buttons">
@@ -350,14 +353,13 @@
 </div>
 
 <script>
-const VERSION = 'v1130-28';
+const VERSION = 'v1130-27';
 const DB_NAME = 'ThaiPodeeDB';
 const STORE = 'videos';
 // ✅ ฟรีสไตล์ ไม่มีลิมิต
 let db = null;
 let videoList = [];
 let delIndex = null;
-let profOpen = false;
 let deferredPrompt = null;
 
 localStorage.removeItem('thaipodee_version');
@@ -502,6 +504,8 @@ vidInput.addEventListener('change', async e => {
     return;
   }
 
+  // ✅ ไม่มีตรวจสอบอะไรเลย
+
   try {
     await saveVideo(file, file.name);
     videoList = await loadAllVideos();
@@ -523,8 +527,8 @@ function renderGrid() {
   const more = videoList.length - 8;
 
   grid.innerHTML = showFirst.map((item, idx) => `
-    <div class="grid-item" onclick="playAtMain(${idx})">
-      <div class="grid-clickable"></div>
+    <div class="grid-item">
+      <div class="grid-clickable" onclick="playAtMain(${idx})"></div>
       <video class="grid-video" muted preload="metadata" src="${URL.createObjectURL(item.file)}" playsinline></video>
       <span class="grid-play-icon">▶</span>
       <button class="grid-del-btn" onclick="event.stopPropagation(); askDel(${idx})">🗑️</button>
@@ -532,7 +536,7 @@ function renderGrid() {
   `).join('') + (more > 0 ? `<div class="more-count">+ อีก ${more} รายการ</div>` : '');
 }
 
-// ✅ กดบล็อกวิดีโอ → ไปเล่นที่หน้าหลักเลย ปิดหน้าโปรไฟล์
+// ✅ กดวิดีโอในตาราง → ไปเล่นที่หน้าหลักเลย ปิดหน้าโปรไฟล์
 function playAtMain(idx) {
   setMainVideo(videoList[idx]);
   profOpen = false;
@@ -565,6 +569,7 @@ document.getElementById('del-yes').addEventListener('click', async () => {
   closeDel();
 });
 
+let profOpen = false;
 function toggleProf() {
   profOpen = !profOpen;
   document.getElementById('prof-page').classList.toggle('show', profOpen);
