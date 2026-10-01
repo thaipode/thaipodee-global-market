@@ -1,11 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130-36 — ✅ วิดีโอเล่นวนซ้ำตลอด ไม่หยุด
-   อัปเดต: 1 ตุลาคม 2569 12:07 น.
+   ThaiPodee v1130-37 — ✅ ดึงลิงก์เองอัตโนมัติ ไม่ต้องใส่เอง
+   อัปเดต: 1 ตุลาคม 2569 13:36 น.
    --------------------------------------------------------------
-   ✅ เพิ่ม loop + ควบคุมให้เล่นวนซ้ำอัตโนมัติ
-   ✅ กดหยุดได้ตามปกติ แต่ถ้าไม่หยุด จะเล่นวนไปเรื่อย ๆ
-   ✅ โลโก้+ชื่อครบถ้วน ไม่มี TP
-   ✅ ก๊อปไปใช้ได้ทันที
+   ✅ ไม่ต้องแก้ลิงก์เลย โค้ดหาเองจากที่อยู่จริง
+   ✅ ใช้ได้ทั้งเครื่อง 1, เครื่อง 2, ทุกที่
+   ✅ เล่นวนซ้ำตลอด + โลโก้ครบถ้วน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -27,12 +26,52 @@
 <meta name="display" content="standalone">
 <meta name="orientation" content="portrait-primary">
 
+<!-- ✅ ไอคอนโลโก้จริง -->
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 
-<link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22ThaiPodee%20%E2%80%94%20%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B8%A3%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<!-- ✅ ดึงลิงก์เองอัตโนมัติ ไม่ต้องแก้ -->
+<link rel="canonical" id="auto-canonical" href="">
+
+<link rel="manifest" id="auto-manifest" href="">
 
 <title>ThaiPodee</title>
+
+<script>
+// ✅ ดึงที่อยู่จริงอัตโนมัติ ใช้ได้ทั้ง Render ทุกเครื่อง
+const CURRENT_URL = window.location.href;
+const BASE_URL = window.location.origin + window.location.pathname;
+
+// ตั้งค่าลิงก์อ้างอิงเอง
+document.getElementById('auto-canonical').href = BASE_URL;
+
+// ตั้งค่า manifest ให้ตรงกับที่อยู่จริง
+const manifestData = {
+  name: "ThaiPodee",
+  short_name: "ThaiPodee",
+  description: "ThaiPodee — ของไทย ไปไกลทั่วโลก",
+  start_url: window.location.origin + window.location.pathname,
+  display: "standalone",
+  background_color: "#000000",
+  theme_color: "#e60000",
+  orientation: "portrait-primary",
+  icons: [
+    {
+      src: "https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png",
+      sizes: "192x192",
+      type: "image/png"
+    },
+    {
+      src: "https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png",
+      sizes: "512x512",
+      type: "image/png"
+    }
+  ]
+};
+
+document.getElementById('auto-manifest').href = 
+  'data:application/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(manifestData));
+</script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
@@ -71,7 +110,6 @@
   .main-video {
     width: 100%; height: 100%;
     object-fit: contain; display: none;
-    loop: true; /* ✅ เล่นวนซ้ำตลอด */
   }
 
   .video-info { position: absolute; bottom: 90px; left: 12px; right: 70px; pointer-events: none; z-index: 3; }
@@ -159,7 +197,7 @@
   </div>
 </div>
 
-<div class="version-top">v1130-36</div>
+<div class="version-top">v1130-37</div>
 <div class="search-icon">🔍</div>
 
 <div class="tabs">
@@ -169,7 +207,7 @@
 
 <div class="video-container" id="video-container">
   <div class="play-overlay" id="play-overlay">▶</div>
-  <!-- ✅ เพิ่ม loop ที่ตรงนี้ด้วยเพื่อแน่นอน -->
+  <!-- ✅ เล่นวนซ้ำตลอด -->
   <video class="main-video" id="main-video" loop controls playsinline muted></video>
 </div>
 
@@ -247,6 +285,7 @@ let currentIndex = 0;
 let isPlaying = false;
 let deferredPrompt = null;
 
+// ตรวจว่าเปิดจากแอปหรือไม่
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                      window.navigator.standalone === true ||
                      document.referrer.includes('android-app://');
@@ -255,8 +294,6 @@ if (!isStandalone) {
   setTimeout(() => {
     document.getElementById('install-banner').classList.add('show');
   }, 800);
-} else {
-  console.log('✅ ทำงานในโหมดแอป — อัปเดตเรียบร้อย');
 }
 
 window.addEventListener('beforeinstallprompt', e => {
@@ -384,7 +421,7 @@ function loadVideo(idx) {
   const v = videoList[idx];
   const video = document.getElementById('main-video');
   video.src = v.url;
-  video.loop = true; // ✅ บังคับเล่นวนซ้ำทุกครั้งที่เปลี่ยนวิดีโอ
+  video.loop = true; // บังคับเล่นวนซ้ำ
   video.style.display = 'block';
   document.getElementById('play-overlay').style.display = 'none';
   document.getElementById('video-desc').textContent = v.name;
