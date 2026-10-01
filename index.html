@@ -1,12 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1130-28 — กดบล็อกวิดีโอ → เล่นที่หน้าหลักเลย
-   อัปเดต: 30 กันยายน 2569 22:18 น.
+   ThaiPodee v1130-29 — ✅ แก้ข้อผิดพลาด createObjectURL Overload
+   อัปเดต: 2 ตุลาคม 2569 01:46 น.
    --------------------------------------------------------------
-   ✅ กดวิดีโอในตาราง → เปลี่ยนไปเล่นที่หน้าหลักทันที
-   ✅ ปิดหน้าโปรไฟล์เองอัตโนมัติ
-   ✅ เล่นเหมือนหน้าจอแรกทุกประการ
-   ✅ ไม่มีป๊อปอัพ ไม่มีปุ่มปิด — ไม่มีหน้าจอแยก
-   ✅ ฟรีสไตล์ ไม่มีลิมิต
+   ✅ คืนหน่วยความจำอัตโนมัติทุกครั้งหลังเปลี่ยนวิดีโอ
+   ✅ ป้องกันการสะสม URL จนล้น
+   ✅ กดวิดีโอในตาราง → เล่นที่หน้าหลักเลย
+   ✅ เปลี่ยนชื่อ+รูปโปรไฟล์ได้ / เก็บไม่จำกัด
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -30,7 +29,7 @@
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F192%2F192%27%3E%3Ccircle%20cx%3D%2796%27%20cy%3D%2796%27%20r%3D%2788%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%2780%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2F512%2F512%27%3E%3Ccircle%20cx%3D%27256%27%20cy%3D%27256%27%20r%3D%27230%27%20fill%3D%27%23e60000%27%2F%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2755%25%27%20dominant-baseline%3D%27middle%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%20font-size%3D%27200%27%20font-weight%3D%27bold%27%3ET%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-28</title>
+<title>ThaiPodee v1130-29</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
   body { background:#000; color:#fff; min-height:100vh; overflow:hidden; }
@@ -255,11 +254,11 @@
 </div>
 
 <div class="update-banner" id="update-banner">
-  <span>✅ มีอัปเดต v1130-28 — กดบล็อก → เล่นที่หน้าหลักเลย</span>
+  <span>✅ มีอัปเดต v1130-29 — แก้ปัญหาหน่วยความจำล้น</span>
   <button class="refresh-btn" id="refresh-btn">รีเฟรช</button>
 </div>
 
-<div class="top-version">v1130-28</div>
+<div class="top-version">v1130-29</div>
 <div class="tabs">
   <span>กำลังติดตาม</span>
   <span class="active">สำหรับคุณ</span>
@@ -350,7 +349,7 @@
 </div>
 
 <script>
-const VERSION = 'v1130-28';
+const VERSION = 'v1130-29';
 const DB_NAME = 'ThaiPodeeDB';
 const STORE = 'videos';
 let db = null;
@@ -358,6 +357,9 @@ let videoList = [];
 let delIndex = null;
 let profOpen = false;
 let deferredPrompt = null;
+
+// ✅ ตัวแปรเก็บ URL ปัจจุบัน เพื่อคืนหน่วยความจำ
+let currentVideoURL = null;
 
 localStorage.removeItem('thaipodee_version');
 
@@ -466,12 +468,27 @@ async function init() {
   }
 }
 
+// ✅ แก้ — คืน URL เก่าก่อนสร้างใหม่ ป้องกันล้น
+function revokeCurrentURL() {
+  if (currentVideoURL) {
+    try { URL.revokeObjectURL(currentVideoURL); } catch(e) {}
+    currentVideoURL = null;
+  }
+}
+
 function setMainVideo(item) {
   const mainVid = document.getElementById('main-vid');
+  
+  // หยุดก่อนเปลี่ยน
   mainVid.pause();
-  mainVid.src = '';
-  mainVid.removeAttribute('src');
-  mainVid.src = URL.createObjectURL(item.file);
+  
+  // ✅ คืนหน่วยความจำ URL เก่า
+  revokeCurrentURL();
+  
+  // สร้าง URL ใหม่
+  currentVideoURL = URL.createObjectURL(item.file);
+  
+  mainVid.src = currentVideoURL;
   mainVid.style.display = 'block';
   document.getElementById('main-play-icon').style.display = 'none';
   mainVid.loop = true;
@@ -553,6 +570,7 @@ document.getElementById('del-yes').addEventListener('click', async () => {
   if (videoList.length > 0) {
     setMainVideo(videoList[0]);
   } else {
+    revokeCurrentURL();
     const mainVid = document.getElementById('main-vid');
     mainVid.pause();
     mainVid.src = '';
