@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1130-40 — ✅ ปุ่มบ้านทำงาน + เพิ่มปุ่มแชร์
-   อัปเดต: 1 ตุลาคม 2569 20:18 น.
+   ThaiPodee v1130-41
+   อัปเดต: 1 ตุลาคม 2569 20:38 น.
    --------------------------------------------------------------
-   ✅ ปุ่มบ้าน → กลับหน้าเริ่มต้นทันที
-   ✅ ปุ่มแชร์ → ส่งลิงก์ให้เครื่องอื่นได้เลย
-   ✅ วิดีโอเล่นวนซ้ำตลอด
-   ✅ ดึงลิงก์เองอัตโนมัติ
+   ✅ ไอคอนระบุชัดเจน — ไม่เอาไอคอน Google แทน
+   ✅ ปุ่มบ้าน 🏠 → กลับหน้าเริ่มต้นทันที
+   ✅ ปุ่มแชร์ ↗️ → ส่งลิงก์ให้เครื่องอื่นได้เลย
+   ✅ ดึงที่อยู่เองอัตโนมัติ
+   ✅ ฐานข้อมูลเก็บวิดีโอครบถ้วน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -27,8 +28,11 @@
 <meta name="display" content="standalone">
 <meta name="orientation" content="portrait-primary">
 
-<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
+<!-- ✅ ไอคอนชัดเจนทุกขนาด -->
+<link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 
 <link rel="canonical" id="auto-link" href="">
 
@@ -165,7 +169,7 @@ document.head.appendChild(link);
   </div>
 </div>
 
-<div class="ver">v1130-40</div>
+<div class="ver">v1130-41</div>
 <div class="search">🔍</div>
 
 <div class="tabs">
@@ -189,13 +193,11 @@ document.head.appendChild(link);
   </div>
   <div class="side-btn">❤️</div>
   <div class="side-btn">💬</div>
-  <!-- ✅ ปุ่มแชร์ -->
   <div class="side-btn" id="share-btn">↗️</div>
   <div class="side-btn">⋮</div>
 </div>
 
 <div class="bottom">
-  <!-- ✅ ปุ่มบ้านทำงาน -->
   <div class="bot-btn" id="home-btn">🏠</div>
   <div class="bot-btn">🔍</div>
   <div class="bot-btn">
@@ -262,7 +264,7 @@ const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
 if (!isStandalone) {
   setTimeout(() => {
     document.getElementById('install-bar').classList.add('show');
-  }, 1000);
+  }, 1500);
 }
 
 window.addEventListener('beforeinstallprompt', e => {
@@ -277,7 +279,7 @@ document.getElementById('install-now').addEventListener('click', async () => {
     await promptEvent.userChoice;
     promptEvent = null;
   } else {
-    alert('✅ กดจุด 3 จุด มุมขวาบน ⋮ → เพิ่มในหน้าจอหลัก → ติดตั้ง');
+    alert('✅ กดจุด 3 จุด ⋮ → เพิ่มในหน้าจอหลัก → เพิ่ม');
   }
   document.getElementById('install-bar').classList.remove('show');
 });
@@ -285,7 +287,7 @@ document.getElementById('later').addEventListener('click', () => {
   document.getElementById('install-bar').classList.remove('show');
 });
 
-// ✅ ปุ่มบ้าน — กลับหน้าเริ่มต้น
+// ปุ่มบ้าน
 document.getElementById('home-btn').addEventListener('click', () => {
   idx = 0;
   document.getElementById('prof-page').style.display = 'none';
@@ -293,30 +295,18 @@ document.getElementById('home-btn').addEventListener('click', () => {
   window.scrollTo(0, 0);
 });
 
-// ✅ ปุ่มแชร์ — ส่งลิงก์ได้เลย
+// ปุ่มแชร์
 document.getElementById('share-btn').addEventListener('click', async () => {
-  const shareData = {
-    title: 'ThaiPodee',
-    text: 'แพลตฟอร์มวิดีโอไทย — ของไทย ไปไกลทั่วโลก',
-    url: CURRENT_URL
-  };
-
+  const shareData = { title: 'ThaiPodee', text: 'แพลตฟอร์มวิดีโอไทย — ของไทย ไปไกลทั่วโลก', url: CURRENT_URL };
   if (navigator.share) {
-    try {
-      await navigator.share(shareData);
-    } catch (err) {
-      if (err.name !== 'AbortError') copyLink();
-    }
-  } else {
-    copyLink();
-  }
+    try { await navigator.share(shareData); }
+    catch (err) { if (err.name !== 'AbortError') copyLink(); }
+  } else { copyLink(); }
 });
 
 function copyLink() {
   navigator.clipboard.writeText(CURRENT_URL).then(() => {
-    alert('✅ ก๊อปลิงก์เรียบร้อย! ส่งให้เพื่อนได้เลย:\n' + CURRENT_URL);
-  }).catch(() => {
-    alert('📋 ลิงก์นี้ค่ะ — ก๊อปเองนะ:\n' + CURRENT_URL);
+    alert('✅ ก๊อปลิงก์เรียบร้อย!\nส่งให้เพื่อนได้เลย:\n' + CURRENT_URL);
   });
 }
 
@@ -432,19 +422,12 @@ function showVid(i) {
   playing = true;
 }
 
-// กดหยุด/เล่น
+// เล่น-หยุด
 document.getElementById('vid-wrap').onclick = () => {
   const vid = document.getElementById('vid');
   if (!vid.src) return;
-  if (playing) {
-    vid.pause();
-    document.getElementById('play-sign').style.display = 'flex';
-    playing = false;
-  } else {
-    vid.play();
-    document.getElementById('play-sign').style.display = 'none';
-    playing = true;
-  }
+  if (playing) { vid.pause(); document.getElementById('play-sign').style.display = 'flex'; playing = false; }
+  else { vid.play(); document.getElementById('play-sign').style.display = 'none'; playing = true; }
 };
 document.getElementById('play-sign').onclick = e => {
   e.stopPropagation();
