@@ -1,63 +1,58 @@
 <!-- ==============================================================
-   ThaiPodee v1130-44 — ✅ กดติดตั้ง → หายจริง / ติดตั้งจริง
-   อัปเดต: 1 ตุลาคม 2569 21:05 น.
-   --------------------------------------------------------------
-   ✅ กดปุ่ม → เรียกหน้าต่างติดตั้งของระบบจริง
-   ✅ ติดตั้งสำเร็จ → ซ่อนแถบทันที ไม่ค้าง<!-- ==============================================================
-   ThaiPodee v1156 — ✅ ไม่มีข้อความ! กดปุ่มแดงเข้าเลือกได้เลย
-   วันที่: 1 ตุลาคม 2569 00:30 น.
-   --------------------------------------------------------------
-   ✅ เอาข้อความทั้งหมดออก — ไม่มี "เลือกวิดีโอ..." ไม่มี "แตะที่นี่..."
-   ✅ กดปุ่ม + สีแดงตรงกลางด้านล่าง → เข้าหน้าเลือกไฟล์ทันที
-   ✅ พื้นดำเรียบ ไม่มีอะไรเกะกะ
-   ✅ ทุกอย่างอื่นเหมือนเดิมเป๊ะ
-กมายเหตุ สมบูรณ์ ใช่งานได้ 
+   ThaiPodee v1157
+   ✅ เพิ่มปุ่มติดตั้งแอป → เพิ่มลงหน้าจอหลักมือถือได้เลย
+   ✅ จดจำสถานะ — ถ้าติดตั้งแล้ว ปุ่มจะหายไป ไม่รบกวน
+   ✅ ทุกอย่างอื่นเหมือน v1156 เป๊ะ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#000000"> 
 
-<title>ThaiPodee Global Market</title>
+<title>ThaiPodee Global Market</title> 
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
+html,body{background:#000;color:#fff;height:100dvh;overflow:hidden} 
 
-.version-tag{position:fixed;top:8px;right:10px;background:rgba(0,0,0,.5);padding:3px 7px;border-radius:4px;font-size:11px;color:#888;z-index:999}
+.version-tag{position:fixed;top:8px;right:10px;background:rgba(0,0,0,.5);padding:3px 7px;border-radius:4px;font-size:11px;color:#888;z-index:999} 
+
+/* ✅ ปุ่มติดตั้งแอป — มุมซ้ายบน */
+.install-btn{position:fixed;top:8px;left:12px;z-index:999;background:#ff2b4a;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer}
+.install-btn.hidden{display:none !important}
 
 .app-container{height:100dvh;display:flex;flex-direction:column;padding-bottom:70px}
 .page{display:none;flex:1;overflow:hidden;position:relative}
-.page.active{display:flex;flex-direction:column}
+.page.active{display:flex;flex-direction:column} 
 
 /* ===== หน้าแรก ===== */
 .swiper{flex:1;overflow-y:auto;scroll-snap-type:y mandatory}
 .slide{height:100dvh;scroll-snap-align:start;position:relative;background:#000;display:flex;align-items:center;justify-content:center}
-.slide video{width:100%;height:100%;object-fit:contain;background:#111;cursor:pointer;display:block}
+.slide video{width:100%;height:100%;object-fit:contain;background:#111;cursor:pointer;display:block} 
 
 .side-buttons{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:24px;align-items:center}
 .side-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer}
 .side-btn-icon{font-size:26px}
-.side-btn-text{font-size:10px;color:#aaa;margin-top:2px}
+.side-btn-text{font-size:10px;color:#aaa;margin-top:2px} 
 
 .video-info{position:absolute;bottom:85px;left:12px;right:60px}
 .username{font-weight:bold;font-size:14px;margin-bottom:3px}
 .desc{font-size:12px;color:#ddd;margin-bottom:3px}
-.music{font-size:11px;color:#aaa;display:flex;align-items:center;gap:4px}
+.music{font-size:11px;color:#aaa;display:flex;align-items:center;gap:4px} 
 
 /* ===== เมนูล่าง ===== */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(0,0,0,.8);display:flex;justify-content:space-around;align-items:center;padding:8px 10px;z-index:999;border-top:1px solid #222}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(0,0,0,.8);display:flex;justify-content:space-around;align-items:center;padding:8px 10px;z-index:998;border-top:1px solid #222}
 .nav-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;opacity:.5}
 .nav-btn.active{opacity:1}
 .nav-icon{font-size:22px;line-height:1}
 .nav-label{font-size:10px;color:#aaa;margin-top:2px}
-.nav-center{width:56px;height:56px;border-radius:50%;background:#ff2b4a;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;border:none;cursor:pointer;transform:translateY(-5px)}
+.nav-center{width:56px;height:56px;border-radius:50%;background:#ff2b4a;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;border:none;cursor:pointer;transform:translateY(-5px)} 
 
 /* ===== หน้าอัปโหลด — ไม่มีข้อความเลย! ===== */
 .upload-container{height:100%;display:flex;align-items:center;justify-content:center;background:#000}
@@ -65,7 +60,7 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
 .form-group{margin-bottom:12px}
 .form-label{font-size:12px;color:#aaa;margin-bottom:5px}
 .form-input{width:100%;padding:10px;background:#1a1a1a;border:none;border-radius:6px;color:#fff;font-size:14px}
-.post-btn{width:100%;padding:12px;background:#ff2b4a;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;margin-top:8px}
+.post-btn{width:100%;padding:12px;background:#ff2b4a;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;margin-top:8px} 
 
 /* ===== หน้าอื่น ๆ ===== */
 .market-container,.chat-list,.profile-container{padding:15px;overflow-y:auto;height:100%}
@@ -75,13 +70,13 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
 .product-img{width:100%;aspect-ratio:1;background:#333;display:flex;align-items:center;justify-content:center;font-size:30px}
 .product-info{padding:10px}
 .product-name{font-size:13px;font-weight:bold;margin-bottom:4px}
-.product-price{font-size:14px;color:#ff2b4a}
+.product-price{font-size:14px;color:#ff2b4a} 
 
 .chat-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #222;cursor:pointer}
 .chat-avatar{width:45px;height:45px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:20px}
 .chat-body{flex:1}
 .chat-name{font-weight:bold;font-size:14px;margin-bottom:2px}
-.chat-preview{font-size:12px;color:#aaa}
+.chat-preview{font-size:12px;color:#aaa} 
 
 .profile-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
 .profile-avatar{width:70px;height:70px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:35px}
@@ -97,22 +92,18 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
 .profile-content.active{display:block}
 .profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .profile-item{aspect-ratio:9/12;background:#222;display:flex;align-items:center;justify-content:center;font-size:20px}
-.edit-profile-btn{width:100%;padding:10px;background:transparent;border:1px solid #444;color:#fff;border-radius:6px;cursor:pointer;margin-bottom:20px}
-
-.comment-panel,.sound-panel,.share-panel{position:fixed;bottom:0;left:0;right:0;background:#111;z-index:9997;display:none;flex-direction:column;border-radius:12px 12px 0 0}
-.comment-panel.active,.sound-panel.active,.share-panel.active{display:flex}
-.comment-panel{max-height:70vh}
-.sound-panel{max-height:60vh}
-.share-panel{padding:20px}
+.edit-profile-btn{width:100%;padding:10px;background:transparent;border:1px solid #444;color:#fff;border-radius:6px;cursor:pointer;margin-bottom:20px} 
 
 .hidden{display:none !important}
 </style>
 </head>
 <body>
 
-<div class="version-tag">v1156</div>
+<!-- ✅ ปุ่มติดตั้งแอป มุมซ้ายบน -->
+<button class="install-btn" id="installBtn">ติดตั้งแอป</button>
+<div class="version-tag">v1157</div>
 
-<div class="app-container">
+<div class="app-container"> 
 
   <!-- หน้าแรก -->
   <div class="page active" id="page-home">
@@ -136,7 +127,7 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
         </div>
       </div>
     </div>
-  </div>
+  </div> 
 
   <!-- ตลาด -->
   <div class="page" id="page-market">
@@ -149,9 +140,9 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
         <div class="product-card"><div class="product-img">🎨</div><div class="product-info"><div class="product-name">งานฝีมือไทย</div><div class="product-price">฿350</div></div></div>
       </div>
     </div>
-  </div>
+  </div> 
 
-  <!-- อัปโหลด — ไม่มีข้อความเลย! พื้นดำ กดปุ่มแดงแล้วเลือกไฟล์ได้เลย -->
+  <!-- อัปโหลด — ไม่มีข้อความเลย! -->
   <div class="page" id="page-upload">
     <div class="upload-container">
       <div class="upload-drop" id="uploadDrop"></div>
@@ -161,7 +152,7 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
         <button class="post-btn" id="postBtn">เผยแพร่</button>
       </div>
     </div>
-  </div>
+  </div> 
 
   <!-- ข้อความ -->
   <div class="page" id="page-messages">
@@ -170,7 +161,7 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
       <div class="chat-item"><div class="chat-avatar">👩</div><div class="chat-body"><div class="chat-name">น้ำลาย</div><div class="chat-preview">สวัสดีค่ะ...</div></div></div>
       <div class="chat-item"><div class="chat-avatar">👨</div><div class="chat-body"><div class="chat-name">ชายไทย</div><div class="chat-preview">ได้รับแล้วครับ</div></div></div>
     </div>
-  </div>
+  </div> 
 
   <!-- โปรไฟล์ -->
   <div class="page" id="page-profile">
@@ -195,9 +186,9 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
       <div class="profile-content active" id="tab-posts"><div class="profile-grid"><div class="profile-item">🎬</div></div></div>
       <div class="profile-content" id="tab-saved"><div class="profile-grid"><div style="grid-column:span 3;text-align:center;padding:30px;color:#888">ยังไม่มีรายการที่บันทึก</div></div></div>
     </div>
-  </div>
+  </div> 
 
-</div>
+</div> 
 
 <!-- เมนูล่าง -->
 <nav class="bottom-nav">
@@ -206,36 +197,73 @@ html,body{background:#000;color:#fff;height:100dvh;overflow:hidden}
   <button class="nav-center" data-page="upload">+</button>
   <div class="nav-btn" data-page="messages"><div class="nav-icon">💬</div><div class="nav-label">ข้อความ</div></div>
   <div class="nav-btn" data-page="profile"><div class="nav-icon">👤</div><div class="nav-label">ฉัน</div></div>
-</nav>
+</nav> 
 
-<input type="file" id="uploadInputFile" accept="video/*" class="hidden">
+<input type="file" id="uploadInputFile" accept="video/*" class="hidden"> 
 
 <script>
 let likeCount = 0, commentCount = 0, savedItems = [];
 let selectedVideoFile = null;
+let deferredPrompt = null;
 
+// ✅ ตรวจสอบ — ถ้าติดตั้งแล้ว ซ่อนปุ่มเลย
+function isAppInstalled() {
+  return localStorage.getItem('tpInstalled') === 'yes' ||
+         window.matchMedia('(display-mode: standalone)').matches;
+}
+
+// ✅ จับเหตุการณ์ติดตั้งแอป
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isAppInstalled()) {
+    document.getElementById('installBtn').classList.remove('hidden');
+  }
+});
+
+// ✅ กดปุ่มติดตั้ง → แจอให้เพิ่มลงหน้าจอ
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    alert('✅ เปิดเมนูเบราว์เซอร์ (จุด 3 จุด)\n→ กด "เพิ่มลงหน้าจอหลัก" หรือ "ติดตั้งแอป"');
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    localStorage.setItem('tpInstalled', 'yes');
+    document.getElementById('installBtn').classList.add('hidden');
+    alert('✅ ติดตั้งสำเร็จ!\nไอคอนแอปจะปรากฏบนหน้าจอมือถือ');
+  }
+  deferredPrompt = null;
+});
+
+// ซ่อนปุ่มถ้าติดตั้งไว้แล้วตั้งแต่แรก
+if (isAppInstalled()) {
+  document.getElementById('installBtn').classList.add('hidden');
+}
+
+// ===== วิดีโอ =====
 const video = document.getElementById('mainVideo');
 video.addEventListener('canplay', () => { video.play().catch(()=>{}); });
 video.addEventListener('click', () => video.paused ? video.play() : video.pause());
-document.addEventListener('click', () => { video.muted = false; }, {once:true});
+document.addEventListener('click', () => { video.muted = false; }, {once:true}); 
 
 function switchPage(pageName) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(`page-${pageName}`).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-}
+} 
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     switchPage(btn.dataset.page);
     btn.classList.add('active');
   });
-});
+}); 
 
-// กดปุ่ม + แดง → เข้าหน้าอัปโหลด → กดพื้นที่ดำ → เลือกไฟล์เลย ไม่มีข้อความ
 document.querySelector('.nav-center').addEventListener('click', () => {
   switchPage('upload');
-});
+}); 
 
 document.querySelectorAll('.side-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -249,19 +277,17 @@ document.querySelectorAll('.side-btn').forEach(btn => {
       case 'sound': alert('เสียง'); break;
     }
   });
-});
+}); 
 
-// กดพื้นที่ดำ → เลือกไฟล์โดยตรง ไม่มีข้อความ
 document.getElementById('uploadDrop').onclick = () => {
   document.getElementById('uploadInputFile').click();
-};
+}; 
 
 document.getElementById('uploadInputFile').onchange = e => {
   selectedVideoFile = e.target.files[0];
   if(!selectedVideoFile) return;
-  // เลือกเสร็จ → แสดงฟอร์ม
   document.getElementById('uploadForm').style.display = 'block';
-};
+}; 
 
 document.getElementById('postBtn').onclick = () => {
   if(!selectedVideoFile) return;
@@ -271,553 +297,7 @@ document.getElementById('postBtn').onclick = () => {
   switchPage('home');
   document.querySelector('[data-page="home"]').classList.add('active');
 };
-</script>
-
-</body>
-</html>
-   ✅ ถ้าติดตั้งอยู่แล้ว → ไม่โชว์แถบเลย
-   ✅ ล้างแคช → ไลน์เห็น v1130-44 ทันที
-   ============================================================== -->
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<!-- ล้างของเก่าเด็ดขาด -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
-<title>ThaiPodee v1130-44</title>
-<meta name="description" content="ThaiPodee v1130-44 — แพลตฟอร์มวิดีโอไทย">
-<meta name="theme-color" content="#e60000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="application-name" content="ThaiPodee">
-<meta name="display" content="standalone">
-<meta name="orientation" content="portrait-primary">
-
-<link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044">
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044">
-
-<link rel="canonical" href="https://thaipodee-global-market.onrender.com/?v=1130-44">
-
-<script>
-const HERE_URL = window.location.origin + window.location.pathname + '?v=1130-44';
-
-const MANIFEST = {
-  name: "ThaiPodee",
-  short_name: "ThaiPodee",
-  description: "ThaiPodee v1130-44 — แพลตฟอร์มวิดีโอไทย",
-  start_url: HERE_URL,
-  display: "standalone",
-  background_color: "#000000",
-  theme_color: "#e60000",
-  orientation: "portrait-primary",
-  icons: [
-    { src: "https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-    { src: "https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-  ]
-};
-
-const manifestBlob = new Blob([JSON.stringify(MANIFEST)], { type: 'application/json' });
-const manifestURL = URL.createObjectURL(manifestBlob);
-const link = document.createElement('link');
-link.rel = 'manifest';
-link.href = manifestURL;
-document.head.appendChild(link);
-</script>
-
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-  html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
-
-  /* แถบติดตั้ง — ซ่อนเมื่อไม่ต้องใช้ */
-  .install-bar {
-    position: fixed; top: 0; left: 0; right: 0;
-    background: #e60000; color: #fff; padding: 12px 16px;
-    display: none; justify-content: space-between; align-items: center;
-    z-index: 99999; font-size: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  .install-bar.show { display: flex; }
-  .install-bar.hiding { 
-    opacity: 0; transform: translateY(-100%); pointer-events: none;
-    transition: all 0.3s ease;
-  }
-
-  .install-ok { 
-    background: #fff; color: #e60000; border: none; 
-    padding: 8px 20px; border-radius: 6px; 
-    font-weight: bold; cursor: pointer; font-size: 14px;
-  }
-  .install-later { 
-    background: transparent; color: #fff; border: none; 
-    margin-left: 12px; cursor: pointer; font-size: 13px; opacity: 0.9;
-  }
-
-  .ver { position: absolute; top: 12px; right: 12px; font-size: 13px; color: #888; z-index: 100; }
-  .search { position: absolute; top: 40px; right: 16px; font-size: 20px; z-index: 100; cursor: pointer; }
-  .tabs { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 24px; font-size: 15px; z-index: 100; }
-  .tabs span { opacity: 0.5; cursor: pointer; }
-  .tabs span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
-
-  .vid-wrap {
-    position: absolute; top: 70px; bottom: 80px; left: 0; right: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: #000; cursor: pointer; overflow: hidden;
-  }
-  .play-sign { font-size: 60px; opacity: 0.8; position: absolute; z-index: 2; pointer-events: none; }
-  .vid { width: 100%; height: 100%; object-fit: contain; display: none; }
-
-  .info { position: absolute; bottom: 90px; left: 12px; right: 70px; z-index: 3; pointer-events: none; }
-  .user { font-weight: bold; margin-bottom: 4px; }
-  .desc { font-size: 13px; opacity: 0.8; }
-
-  .side { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; z-index: 4; }
-  .side-btn {
-    width: 44px; height: 44px; border-radius: 50%; background: #222;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid #444; overflow: hidden; cursor: pointer;
-    font-size: 20px;
-  }
-  .side-btn img { width: 100%; height: 100%; object-fit: cover; }
-
-  .bottom {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 75px;
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    background: #000; border-top: 1px solid #222; z-index: 5;
-  }
-  .bot-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 22px; }
-  .plus { width: 56px; height: 44px; background: #e60000; border-radius: 6px; border: none; color: #fff; font-size: 28px; font-weight: bold; cursor: pointer; }
-
-  .profile-page {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: #fff; color: #000; z-index: 150; display: none;
-    flex-direction: column; overflow-y: auto;
-  }
-  .profile-top { display: flex; justify-content: space-between; padding: 12px 16px; }
-  .back { font-size: 22px; cursor: pointer; }
-  .profile-head { padding: 16px; text-align: center; }
-  .prof-pic {
-    width: 100px; height: 100px; border-radius: 50%; background: #ddd;
-    margin: 0 auto 10px; overflow: hidden; border: 3px solid #000;
-    cursor: pointer;
-  }
-  .prof-pic img { width: 100%; height: 100%; object-fit: cover; }
-  .name-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; }
-  .prof-name { font-size: 18px; font-weight: bold; }
-  .edit-pen { cursor: pointer; font-size: 16px; }
-  .prof-user { color: #666; margin-bottom: 12px; }
-  .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 12px; }
-  .stat-num { font-weight: bold; font-size: 18px; }
-  .stat-lab { font-size: 11px; color: #666; }
-  .bio { font-size: 13px; padding: 0 16px 16px; line-height: 1.5; }
-  .prof-tabs { display: flex; justify-content: space-around; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px 0; }
-  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; padding: 3px; }
-  .thumb { aspect-ratio: 4/5; background: #ddd; cursor: pointer; position: relative; overflow: hidden; }
-  .thumb video { width: 100%; height: 100%; object-fit: cover; }
-  .del-btn { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1; }
-
-  .pop {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #fff; border-radius: 10px; padding: 24px; z-index: 500;
-    display: none; width: 85%; max-width: 320px; text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3); color: #000;
-  }
-  .pop input { width: 100%; padding: 10px 12px; margin: 12px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-  .pop-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
-  .pop-btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-  .btn-cancel { background: #eee; }
-  .btn-save { background: #00a844; color: #fff; }
-
-  #file-in, #avatar-in { display: none; }
-</style>
-</head>
-<body>
-
-<!-- แถบติดตั้ง -->
-<div class="install-bar" id="installBar">
-  <span>✅ ติดตั้งแอป ThaiPodee v1130-44 ไว้ที่หน้าจอหลัก</span>
-  <div style="display:flex;align-items:center;">
-    <button class="install-later" id="btnLater">ภายหลัง</button>
-    <button class="install-ok" id="btnInstall">ติดตั้ง</button>
-  </div>
-</div>
-
-<div class="ver">v1130-44</div>
-<div class="search">🔍</div>
-
-<div class="tabs">
-  <span class="active">สำหรับคุณ</span>
-  <span>ติดตาม</span>
-</div>
-
-<div class="vid-wrap" id="vidWrap">
-  <div class="play-sign" id="playSign">▶</div>
-  <video class="vid" id="vid" loop playsinline muted></video>
-</div>
-
-<div class="info">
-  <div class="user" id="dispUser">@thaipodee</div>
-  <div class="desc" id="vidDesc">กดปุ่ม + เพื่ออัปโหลดวิดีโอของคุณ</div>
-</div>
-
-<div class="side" id="sideBar">
-  <div class="side-btn" id="profBtn">
-    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044" alt="ThaiPodee" id="profIconImg">
-  </div>
-  <div class="side-btn">❤️</div>
-  <div class="side-btn">💬</div>
-  <div class="side-btn" id="shareBtn">↗️</div>
-  <div class="side-btn">⋮</div>
-</div>
-
-<div class="bottom">
-  <div class="bot-btn" id="homeBtn">🏠</div>
-  <div class="bot-btn">🔍</div>
-  <div class="bot-btn">
-    <button class="plus" id="uploadBtn">+</button>
-    <input type="file" id="fileIn" accept="video/*">
-  </div>
-  <div class="bot-btn">💬</div>
-  <div class="bot-btn" id="profBottomBtn">👤</div>
-</div>
-
-<div class="profile-page" id="profilePage">
-  <div class="profile-top">
-    <span></span>
-    <span class="back" id="closeProfile">✕</span>
-  </div>
-  <div class="profile-head">
-    <div class="prof-pic" id="profPic">
-      <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png?v=113044" alt="ThaiPodee" id="profilePicImg">
-      <input type="file" id="avatarIn" accept="image/*">
-    </div>
-    <div class="name-row">
-      <span class="prof-name" id="profileName">ThaiPodee</span>
-      <span class="edit-pen" id="editNameBtn">✏️</span>
-    </div>
-    <div class="prof-user" id="profileUser">@thaipodee</div>
-    <div class="stats">
-      <div>
-        <div class="stat-num" id="followingCount">0</div>
-        <div class="stat-lab">กำลังติดตาม</div>
-      </div>
-      <div>
-        <div class="stat-num" id="followerCount">0</div>
-        <div class="stat-lab">ผู้ติดตาม</div>
-      </div>
-      <div>
-        <div class="stat-num" id="likeCount">0</div>
-        <div class="stat-lab">ถูกใจ</div>
-      </div>
-    </div>
-    <div class="bio">แพลตฟอร์มวิดีโอไทย — ของไทย ไปไกลทั่วโลก</div>
-  </div>
-  <div class="prof-tabs">
-    <div>📋</div>
-    <div>❤️</div>
-    <div>📹</div>
-  </div>
-  <div class="grid" id="videoGrid"></div>
-</div>
-
-<div class="pop" id="namePop">
-  <h3>เปลี่ยนชื่อโปรไฟล์</h3>
-  <input type="text" id="newNameInput" placeholder="ใส่ชื่อใหม่...">
-  <div class="pop-btns">
-    <button class="pop-btn btn-cancel" id="cancelName">ยกเลิก</button>
-    <button class="pop-btn btn-save" id="saveName">บันทึก</button>
-  </div>
-</div>
-
-<script>
-const DB_NAME = 'ThaiPodeeDB';
-let videoList = [];
-let currentIndex = 0;
-let deferredPrompt = null; // เก็บคำสั่งติดตั้งไว้
-let isAppInstalled = false; // เช็คว่าติดตั้งแล้วหรือยัง
-
-// เช็คว่าติดตั้งแล้วหรือยัง
-function checkInstalled() {
-  // ถ้าเปิดในโหมดแอปอยู่แล้ว = ติดตั้งแล้ว
-  if (window.matchMedia('(display-mode: standalone)').matches || 
-      window.navigator.standalone === true) {
-    isAppInstalled = true;
-    return true;
-  }
-  return false;
-}
-
-// แสดง/ซ่อนแถบติดตั้ง
-function updateInstallBar() {
-  const bar = document.getElementById('installBar');
-  if (isAppInstalled) {
-    bar.classList.remove('show');
-    bar.classList.add('hiding');
-    // ซ่อนถาวรหลังจากหายไป
-    setTimeout(() => { bar.style.display = 'none'; }, 300);
-  } else if (deferredPrompt) {
-    bar.classList.add('show');
-    bar.classList.remove('hiding');
-  }
-}
-
-// รอคำสั่งติดตั้งจากเบราว์เซอร์
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  isAppInstalled = false;
-  updateInstallBar();
-});
-
-// ตรวจสอบสถานะติดตั้งเมื่อโหลดเสร็จ
-window.addEventListener('appinstalled', () => {
-  isAppInstalled = true;
-  deferredPrompt = null;
-  updateInstallBar();
-});
-
-// กดปุ่มติดตั้ง
-document.getElementById('btnInstall').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  
-  // แสดงหน้าต่างยืนยันการติดตั้ง
-  const choiceResult = await deferredPrompt.prompt();
-  
-  // ผู้ใช้ตอบอะไรก็ตาม → ล้างข้อมูล
-  deferredPrompt = null;
-  
-  // ซ่อนแถบทันที ไม่ให้ค้าง
-  const bar = document.getElementById('installBar');
-  bar.classList.add('hiding');
-  setTimeout(() => { bar.style.display = 'none'; }, 300);
-});
-
-// กด "ภายหลัง" → ซ่อนไว้ชั่วคราว
-document.getElementById('btnLater').addEventListener('click', () => {
-  const bar = document.getElementById('installBar');
-  bar.classList.add('hiding');
-  setTimeout(() => { bar.style.display = 'none'; }, 300);
-});
-
-// เช็คสถานะตอนเริ่ม
-if (checkInstalled()) {
-  isAppInstalled = true;
-  updateInstallBar();
-}
-
-// === ส่วนที่เหลือเหมือนเดิม ===
-let profileName = localStorage.getItem('profileName') || 'ThaiPodee';
-let profileUser = localStorage.getItem('profileUser') || '@thaipodee';
-
-document.getElementById('profileName').textContent = profileName;
-document.getElementById('dispUser').textContent = profileUser;
-document.getElementById('profileUser').textContent = profileUser;
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('videos')) {
-        const store = db.createObjectStore('videos', { autoIncrement: true });
-        store.createIndex('timestamp', 'timestamp');
-      }
-    };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = reject;
-  });
-}
-
-async function loadVideos() {
-  const db = await openDB();
-  const tx = db.transaction('videos', 'readonly');
-  const store = tx.objectStore('videos');
-  const req = store.getAll();
-  return new Promise(resolve => {
-    req.onsuccess = () => {
-      let list = req.result || [];
-      list.sort((a, b) => b.timestamp - a.timestamp);
-      resolve(list);
-    };
-  });
-}
-
-async function saveVideo(file, name) {
-  const db = await openDB();
-  const tx = db.transaction('videos', 'readwrite');
-  const store = tx.objectStore('videos');
-  store.add({ file, name, timestamp: Date.now() });
-  await new Promise(r => tx.oncomplete = r);
-}
-
-async function deleteVideo(id) {
-  const db = await openDB();
-  const tx = db.transaction('videos', 'readwrite');
-  const store = tx.objectStore('videos');
-  store.delete(id);
-  await new Promise(r => tx.oncomplete = r);
-}
-
-function renderVideoList() {
-  const grid = document.getElementById('videoGrid');
-  grid.innerHTML = '';
-  videoList.forEach((vid, idx) => {
-    const div = document.createElement('div');
-    div.className = 'thumb';
-    div.innerHTML = `
-      <video muted loop playsinline src="${URL.createObjectURL(vid.file)}"></video>
-      <button class="del-btn" data-idx="${idx}">✕</button>
-    `;
-    div.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('del-btn')) {
-        playVideo(idx);
-        document.getElementById('profilePage').style.display = 'none';
-      }
-    });
-    grid.appendChild(div);
-  });
-  // ปุ่มลบ
-  document.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx);
-      if (confirm('ลบวิดีโอนี้?')) {
-        await deleteVideo(videoList[idx].id);
-        videoList.splice(idx, 1);
-        renderVideoList();
-      }
-    });
-  });
-}
-
-function playVideo(idx) {
-  if (videoList.length === 0) return;
-  currentIndex = idx;
-  const vid = document.getElementById('vid');
-  const src = URL.createObjectURL(videoList[idx].file);
-  vid.src = src;
-  vid.style.display = 'block';
-  document.getElementById('playSign').style.display = 'none';
-  document.getElementById('vidDesc').textContent = videoList[idx].name;
-  vid.play();
-}
-
-async function init() {
-  videoList = await loadVideos();
-  renderVideoList();
-  if (videoList.length > 0) playVideo(0);
-}
-
-// เล่น/หยุด กดที่หน้าจอ
-let isPlaying = true;
-document.getElementById('vidWrap').addEventListener('click', () => {
-  const vid = document.getElementById('vid');
-  if (vid.style.display === 'none' || !vid.src) return;
-  
-  if (isPlaying) {
-    vid.pause();
-    document.getElementById('playSign').style.display = 'block';
-    document.getElementById('playSign').textContent = '⏸';
-  } else {
-    vid.play();
-    document.getElementById('playSign').style.display = 'none';
-  }
-  isPlaying = !isPlaying;
-});
-
-// อัปโหลด
-document.getElementById('uploadBtn').addEventListener('click', () => {
-  document.getElementById('fileIn').click();
-});
-document.getElementById('fileIn').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  await saveVideo(file, file.name);
-  videoList = await loadVideos();
-  renderVideoList();
-  playVideo(videoList.findIndex(v => v.name === file.name));
-});
-
-// โปรไฟล์
-document.getElementById('profBtn').addEventListener('click', openProfile);
-document.getElementById('profBottomBtn').addEventListener('click', openProfile);
-function openProfile() {
-  document.getElementById('profilePage').style.display = 'flex';
-  renderVideoList();
-}
-document.getElementById('closeProfile').addEventListener('click', () => {
-  document.getElementById('profilePage').style.display = 'none';
-});
-
-// เปลี่ยนชื่อ
-document.getElementById('editNameBtn').addEventListener('click', () => {
-  document.getElementById('newNameInput').value = profileName;
-  document.getElementById('namePop').style.display = 'block';
-});
-document.getElementById('cancelName').addEventListener('click', () => {
-  document.getElementById('namePop').style.display = 'none';
-});
-document.getElementById('saveName').addEventListener('click', () => {
-  const newName = document.getElementById('newNameInput').value.trim();
-  if (newName) {
-    profileName = newName;
-    profileUser = '@' + newName.replace(/\s+/g, '_');
-    localStorage.setItem('profileName', profileName);
-    localStorage.setItem('profileUser', profileUser);
-    document.getElementById('profileName').textContent = profileName;
-    document.getElementById('dispUser').textContent = profileUser;
-    document.getElementById('profileUser').textContent = profileUser;
-  }
-  document.getElementById('namePop').style.display = 'none';
-});
-
-// เปลี่ยนรูปโปรไฟล์
-document.getElementById('profPic').addEventListener('click', () => {
-  document.getElementById('avatarIn').click();
-});
-document.getElementById('avatarIn').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const src = ev.target.result;
-    document.getElementById('profilePicImg').src = src;
-    document.getElementById('profIconImg').src = src;
-    localStorage.setItem('profilePic', src);
-  };
-  reader.readAsDataURL(file);
-});
-// โหลดรูปที่บันทึกไว้
-const savedPic = localStorage.getItem('profilePic');
-if (savedPic) {
-  document.getElementById('profilePicImg').src = savedPic;
-  document.getElementById('profIconImg').src = savedPic;
-}
-
-// แชร์
-document.getElementById('shareBtn').addEventListener('click', async () => {
-  const shareData = {
-    title: 'ThaiPodee v1130-44',
-    text: '✅ ใหม่ล่าสุด — แพลตฟอร์มวิดีโอไทย',
-    url: 'https://thaipodee-global-market.onrender.com/?v=1130-44'
-  };
-  if (navigator.share) {
-    try { await navigator.share(shareData); } catch (e) {}
-  } else {
-    await navigator.clipboard.writeText(shareData.url);
-    alert('✅ คัดลอกลิงก์แล้ว:\n' + shareData.url);
-  }
-});
-
-// เริ่มทำงาน
-init();
-</script>
+</script> 
 
 </body>
 </html>
