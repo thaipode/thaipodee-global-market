@@ -1,9 +1,10 @@
 <!-- ==============================================================
-   ThaiPodee v1130-33 — ✅ มีแอปแล้ว → อัปเดตเอง ไม่ขอติดตั้ง
-   อัปเดต: 1 ตุลาคม 2569 08:15 น.
+   ThaiPodee v1130-34 — ✅ แสดงไอคอนจริงทุกตัว ไม่เป็นจอขาว
+   อัปเดต: 1 ตุลาคม 2569 09:01 น.
    --------------------------------------------------------------
-   ✅ ตรวจพบแอปเดิม → ไม่แสดงแถวขอ, อัปเดตทำงานเอง
-   ✅ ใช้โลโก้จริงจาก GitHub ครบทุกจุด
+   ✅ ใช้โลโก้จริงจาก GitHub ทุกจุด
+   ✅ ไม่ใช้ตัวย่อ TP
+   ✅ ไม่มีจอขาว
    ✅ ก๊อปไปใช้ได้ทันที
    ============================================================== -->
 <!DOCTYPE html>
@@ -26,12 +27,13 @@
 <meta name="display" content="standalone">
 <meta name="orientation" content="portrait-primary">
 
+<!-- ✅ ใช้โลโก้จริงเป็นไอคอนเว็บ -->
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png">
 
 <link rel="manifest" href="data:application/json;charset=UTF-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22ThaiPodee%20%E2%80%94%20%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%84%E0%B8%97%E0%B8%A2%20%E0%B9%84%E0%B8%9B%E0%B9%84%E0%B8%81%E0%B8%A5%E0%B8%97%E0%B8%B1%E0%B8%A7%E0%B8%A7%E0%B8%A3%E0%B9%82%E0%B8%A5%E0%B8%81%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fthaipodee%2Fthaipodee-global-market%2Fmain%2Fthaipodee_logo_icon.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
-<title>ThaiPodee v1130-33</title>
+<title>ThaiPodee v1130-34</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
   html, body { height: 100%; background: #000; color: #fff; overflow: hidden; }
@@ -39,7 +41,7 @@
   .install-banner {
     position: fixed; top: 0; left: 0; right: 0;
     background: #e60000; color: #fff; padding: 12px 16px;
-    display: none; /* ซ่อนไว้ก่อน เช็คแล้วค่อยแสดง */
+    display: none;
     justify-content: space-between; align-items: center;
     z-index: 9999; font-size: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -73,8 +75,19 @@
   .desc { font-size: 13px; opacity: 0.8; }
 
   .side-icons { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 4; }
-  .side-icon { width: 44px; height: 44px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border: 2px solid #444; }
-  .side-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .side-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #222;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden;
+    border: 2px solid #444;
+  }
+  .side-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
   .side-icon span { font-size: 20px; }
 
   .bottom-nav {
@@ -84,6 +97,12 @@
     background: #000; border-top: 1px solid #222; z-index: 5;
   }
   .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 13px; }
+  .nav-item img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+  }
   .plus-btn { width: 56px; height: 44px; background: #e60000; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #fff; border: none; cursor: pointer; }
 
   .profile-page {
@@ -96,9 +115,18 @@
   .profile-header { padding: 16px; text-align: center; }
   .profile-logo {
     width: 100px; height: 100px; border-radius: 50%;
-    background: #222; margin: 0 auto 10px; overflow: hidden; border: 3px solid #000;
+    background: #222;
+    margin: 0 auto 10px;
+    overflow: hidden;
+    border: 3px solid #000;
+    display: flex; align-items: center; justify-content: center;
   }
-  .profile-logo img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
   .name-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; }
   .profile-name { font-size: 18px; font-weight: bold; }
   .edit-pencil { cursor: pointer; font-size: 16px; }
@@ -144,7 +172,7 @@
   </div>
 </div>
 
-<div class="version-top">v1130-33</div>
+<div class="version-top">v1130-34</div>
 <div class="search-icon">🔍</div>
 
 <div class="tabs">
@@ -163,6 +191,7 @@
 </div>
 
 <div class="side-icons">
+  <!-- ✅ ไอคอนโปรไฟล์ด้านขวา ใช้โลโก้จริง -->
   <div class="side-icon" id="profile-icon">
     <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โปรไฟล์" id="avatar-display">
   </div>
@@ -180,7 +209,10 @@
     <input type="file" id="file-input" accept="video/*">
   </div>
   <div class="nav-item">💬</div>
-  <div class="nav-item" id="profile-nav-btn">👤</div>
+  <!-- ✅ ไอคอนเมนูโปรไฟล์ด้านล่าง ใช้โลโก้จริง -->
+  <div class="nav-item" id="profile-nav-btn">
+    <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โปรไฟล์เมนู">
+  </div>
 </div>
 
 <div class="profile-page" id="profile-page">
@@ -188,6 +220,7 @@
     <span class="back-btn" id="profile-back">◀</span>
   </div>
   <div class="profile-header">
+    <!-- ✅ โลโก้ในหน้าโปรไฟล์ ใช้โลโก้จริง -->
     <div class="profile-logo" id="profile-avatar-box">
       <img src="https://raw.githubusercontent.com/thaipodee/thaipodee-global-market/main/thaipodee_logo_icon.png" alt="โลโก้" id="profile-avatar-img">
       <input type="file" id="avatar-input" accept="image/*">
@@ -229,24 +262,20 @@ let currentIndex = 0;
 let isPlaying = false;
 let deferredPrompt = null;
 
-// === ตรวจ: มีแอปอยู่แล้วหรือไม่ ===
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                      window.navigator.standalone === true ||
                      document.referrer.includes('android-app://');
 
 if (!isStandalone) {
-  // ยังไม่ติดตั้ง → แสดงแถวขอ
   setTimeout(() => {
     document.getElementById('install-banner').classList.add('show');
   }, 800);
 } else {
-  // มีแอปอยู่แล้ว → ไม่แสดงอะไร อัปเดตทำงานเอง
   console.log('✅ ทำงานในโหมดแอป — อัปเดตเรียบร้อย');
 }
 
-// ติดตั้งเมื่อยังไม่มี
 window.addEventListener('beforeinstallprompt', e => {
-  if (isStandalone) return; // มีแล้ว ไม่ขออีก
+  if (isStandalone) return;
   e.preventDefault();
   deferredPrompt = e;
 });
@@ -264,7 +293,6 @@ document.getElementById('later-btn').addEventListener('click', () => {
   document.getElementById('install-banner').classList.remove('show');
 });
 
-// ฐานข้อมูล IndexedDB
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1);
@@ -308,7 +336,6 @@ async function deleteVideoFromDB(id) {
   });
 }
 
-// โปรไฟล์
 let profileName = localStorage.getItem('profileName') || 'ThaiPodee';
 let displayName = localStorage.getItem('displayName') || '@thaipodee';
 document.getElementById('profile-name-text').textContent = profileName;
@@ -334,7 +361,6 @@ document.getElementById('save-name-btn').addEventListener('click', () => {
   document.getElementById('name-popup').style.display = 'none';
 });
 
-// เปลี่ยนรูปโปรไฟล์
 document.getElementById('profile-avatar-box').addEventListener('click', () => {
   document.getElementById('avatar-input').click();
 });
@@ -350,7 +376,6 @@ document.getElementById('avatar-input').addEventListener('change', e => {
   reader.readAsDataURL(file);
 });
 
-// อัปโหลดวิดีโอ
 document.getElementById('upload-btn').addEventListener('click', () => {
   document.getElementById('file-input').click();
 });
@@ -369,7 +394,6 @@ document.getElementById('file-input').addEventListener('change', async e => {
   alert(`อัปโหลดสำเร็จ! รวม ${videoList.length} รายการ`);
 });
 
-// แสดงวิดีโอ
 function loadVideo(idx) {
   if (!videoList[idx]) return;
   const v = videoList[idx];
@@ -381,7 +405,6 @@ function loadVideo(idx) {
   isPlaying = true;
 }
 
-// เล่น-หยุด แตะหน้าจอ
 document.getElementById('video-container').addEventListener('click', () => {
   const video = document.getElementById('main-video');
   if (!video.src) return;
@@ -402,7 +425,6 @@ document.getElementById('play-overlay').addEventListener('click', e => {
   isPlaying = true;
 });
 
-// สไลด์เปลี่ยนวิดีโอ
 let touchStartY = 0;
 document.getElementById('video-container').addEventListener('touchstart', e => {
   touchStartY = e.touches[0].clientY;
@@ -421,7 +443,6 @@ document.getElementById('video-container').addEventListener('touchend', e => {
   }
 });
 
-// แสดงตารางวิดีโอในโปรไฟล์
 function renderVideoGrid() {
   const grid = document.getElementById('videos-grid');
   grid.innerHTML = '';
@@ -441,7 +462,6 @@ function renderVideoGrid() {
     });
     grid.appendChild(thumb);
   });
-  // ปุ่มลบ
   document.querySelectorAll('.delete-thumb-btn').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.stopPropagation();
@@ -462,7 +482,6 @@ function renderVideoGrid() {
   document.getElementById('following-count').textContent = videoList.length;
 }
 
-// เปิด-ปิดหน้าโปรไฟล์
 async function openProfile() {
   videoList = await loadAllVideos();
   renderVideoGrid();
@@ -474,7 +493,6 @@ document.getElementById('profile-back').addEventListener('click', () => {
   document.getElementById('profile-page').style.display = 'none';
 });
 
-// โหลดรายการเมื่อพร้อม
 document.addEventListener('DOMContentLoaded', async () => {
   videoList = await loadAllVideos();
   if (videoList.length > 0) loadVideo(0);
