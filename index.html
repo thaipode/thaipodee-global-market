@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-FIX-HORIZONTAL-OVERFLOW
-   แก้ด่วน: วิดีโอแนวนอนล้นจอ
-   อัปเดต: 2 ตุลาคม 2569
+   ThaiPodee v1121-6-PROFILE-FIX
+   แก้: หน้าโปรไฟล์ 4×2 / รูปไม่ขึ้น / กล่องเล็ก
+   อัปเดต: 2 ตุลาคม 2569 15:05 น.
    --------------------------------------------------------------
-   ✅ วิดีโอแนวนอนพอดีจอ ไม่ล้น
-   ✅ วิดีโอแนวตั้งพอดีจอ ไม่ตัด
-   ✅ ปุ่มขวา เมนูล่าง แชร์ โปรไฟล์ ครบเหมือนเดิม
+   ✅ โปรไฟล์ 4 คอลัมน์ × 2 แถว พอดี ไม่บิดเบี้ยว
+   ✅ รูปแสดงเต็มกล่อง ทุกกล่องเท่ากัน
+   ✅ กดรูปเข้าเล่นได้ ปุ่มลบทำงานชัดเจน
+   ✅ วิดีโอหน้าหลักพอดีจอ ไม่ล้น
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -42,7 +43,7 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:sans-serif;col
 .main-screen{position:relative;width:100%;height:100vh;display:block}
 .main-screen.hidden{display:none}
 
-/* ✅ แก้ตรงนี้โดยเฉพาะ: วิดีโอไม่ล้นจอ */
+/* ✅ วิดีโอพอดีจอ ไม่ล้น */
 .video-container{position:absolute;top:0;left:0;right:0;bottom:0;background:#000;overflow:hidden;z-index:1}
 video{
   position:absolute;
@@ -81,16 +82,60 @@ video{
 /* ---- ซ่อนช่องเลือกไฟล์ ---- */
 #fileInput{display:none}
 
-/* ---- หน้าโปรไฟล์ 4×2 ---- */
+/* ✅ หน้าโปรไฟล์ แก้แล้ว — 4×2 ชัดเจน */
 .profile-screen{position:absolute;inset:0;background:#000;z-index:40;display:none;overflow-y:auto}
 .profile-screen.active{display:block}
-.profile-header{padding:20px;text-align:center}
-.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px}
-.profile-item{aspect-ratio:9/12;background:#1a1a1a;position:relative;cursor:pointer;overflow:hidden}
+.back-btn{position:absolute;top:10px;left:10px;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;z-index:10}
+.profile-header{padding:20px;text-align:center;padding-top:60px}
+.profile-header h2{font-size:20px;margin-bottom:4px}
+.profile-header p{font-size:13px;color:#aaa}
+
+/* ตาราง 4 คอลัมน์ × 2 แถว — บังคับขนาดเท่ากันทุกช่อง */
+.profile-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  grid-template-rows:repeat(2, 1fr);
+  gap:6px;
+  padding:6px;
+  width:100%;
+  max-width:100vw;
+}
+.profile-item{
+  aspect-ratio:1/1;
+  background:#1a1a1a;
+  position:relative;
+  cursor:pointer;
+  overflow:hidden;
+  width:100%;
+  min-height:80px;
+}
+/* ซ่อนแถวที่ 3 ขึ้นไป*/
 .profile-item:nth-child(n+9){display:none}
-.profile-thumb{width:100%;height:100%;object-fit:cover}
-.profile-delete{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;z-index:2}
-.back-btn{position:absolute;top:10px;left:10px;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer}
+
+.profile-thumb{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#222;
+}
+.profile-delete{
+  position:absolute;
+  top:4px;
+  right:4px;
+  background:rgba(0,0,0,.8);
+  border:none;
+  color:#fff;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 </style>
 </head>
 <body>
@@ -241,29 +286,36 @@ function saveVideos() {
 
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
-  videoList.forEach((v, i) => {
+  // แสดงแค่ 8 อันแรก = 4×2
+  const showList = videoList.slice(0, 8);
+  showList.forEach((v, i) => {
     const d = document.createElement('div');
     d.className = 'profile-item';
     d.innerHTML = `
       <button class="profile-delete" data-idx="${i}">×</button>
-      <img src="${v.thumbnail}" class="profile-thumb">
+      <img src="${v.thumbnail}" class="profile-thumb" alt="วิดีโอ">
     `;
     d.addEventListener('click', ev => {
       if (!ev.target.classList.contains('profile-delete')) {
-        currentIndex = i;
-        loadVideo(i);
+        // หาตำแหน่งจริงในรายการเต็ม
+        const realIndex = videoList.findIndex(x => x.id === v.id);
+        currentIndex = realIndex;
+        loadVideo(realIndex);
         showPage('main');
       }
     });
     profileGrid.appendChild(d);
   });
 
+  // ปุ่มลบ
   document.querySelectorAll('.profile-delete').forEach(b => {
     b.onclick = e => {
       e.stopPropagation();
-      const i = parseInt(b.dataset.idx);
+      const displayIdx = parseInt(b.dataset.idx);
+      const realId = showList[displayIdx].id;
+      const realIdx = videoList.findIndex(x => x.id === realId);
       if (confirm('ลบวิดีโอนี้?')) {
-        videoList.splice(i, 1);
+        videoList.splice(realIdx, 1);
         saveVideos();
         renderProfileGrid();
         if (currentIndex >= videoList.length) {
