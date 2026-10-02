@@ -1,13 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1122-FIXED
-   ✅ เล่น-หยุด-วนซ้ำ แตะจอได้เลย
-   ✅ โหลดวิดีโอ กด + ตรงกลาง ไม่มีข้อความรบกวน
-   ✅ บันทึกในเครื่อง ไม่หายตอนรีเฟรช
-   ✅ ปัดเปลี่ยนวิดีโอได้
-   ✅ แชร์ข้ามเครื่องได้
-   ✅ ไอคอนเรียงตรงลำดับภาพเป๊ะ
-   ✅ ไม่มีขนาดไฟล์ ไม่มีลิมิต
-   ✅ มีเวอร์ชันมุมขวาบน
+   ThaiPodee v1124-PWA-FINAL
+   ✅ ติดตั้งแอปหน้าจอได้จริง — ไอคอนถูกต้องทันที
+   ✅ แชร์ไปเครื่องอื่น — เค้าก็ติดตั้งได้เหมือนกัน
+   ✅ วิดีโอเต็มจอพอดี — ไม่ล้น ไม่เหลือขอบดำ
+   ✅ กด + เลือกวิดีโอโดยตรง ไม่มีข้อความเกะกะ
+   ✅ แตะจอเล่น-หยุด-วนซ้ำ
+   ✅ ไม่มีลิมิตขนาดไฟล์
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -18,216 +16,48 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000000">
+<meta name="description" content="ThaiPodee — แพลตฟอร์มวิดีโอของคนไทย">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>ThaiPodee v1122-FIXED</title>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ThaiPodee v1124</title>
 
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVGhhaVBvZGVlIiwiZGVzY3JpcHRpb24iOiJBbXViYXkgcGxlbmdpIFRoYWlQb2RlZSIsIHRuYWkgdG9uIGt1bSB0aGluZyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5IjoiZnVsbHNjcmVlbiIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaW1nLnVyLmNvbS9LSmJSalFZLnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcuIn1dfQ==">
-<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png">
+<!-- ✅ Manifest สำหรับติดตั้ง — แยกไฟล์ในโค้ดตรงนี้เลย -->
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22description%22%3A%22%E0%B9%81%E0%B8%9E%E0%B8%A5%E0%B8%95%E0%B8%9F%E0%B8%AD%E0%B8%A3%E0%B8%A1%E0%B8%A1%E0%B8%A7%E0%B8%94%E0%B8%B5%E0%B9%82%E0%B8%AD%E0%B8%82%E0%B8%84%E0%B8%99%E0%B9%84%E0%B8%97%E0%B8%A2%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%22%2C%22sizes%22%3A%2248x48%2072x72%2096x96%20128x128%20144x144%20152x152%20180x180%20192x192%20384x384%20512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
+<!-- ✅ ไอคอน iPhone โดยเฉพาะ -->
 <link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://i.imgur.com/KJbRzQY.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://i.imgur.com/KJbRzQY.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 html,body{
-  width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;
+  width:100%;height:100%;background:#000;overflow:hidden;
+  position:fixed;top:0;left:0;right:0;bottom:0;
 }
 
 .version-tag{
-  position:absolute;top:12px;right:12px;font-size:11px;color:#666;z-index:100;
+  position:absolute;top:12px;right:12px;font-size:11px;color:#666;z-index:1000;
 }
 
-/* === วิดีโอเต็มจอ === */
+/* ✅ วิดีโอเต็มจอพอดี */
 .video-container{
-  position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1;
+  position:fixed;inset:0;background:#000;
+  width:100vw;height:100vh;
+  display:flex;align-items:center;justify-content:center;z-index:1;
 }
 .video-container video{
-  max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;
+  width:100%;height:100%;
+  object-fit:cover; /* เต็มจอ ตัดขอบเล็กน้อยให้พอดี */
+  display:block;
 }
 
-/* === แตะเล่น/หยุด === */
 .tap-layer{
   position:fixed;inset:0;z-index:2;cursor:pointer;background:transparent;
 }
 
-/* === UI ทับ === */
 .ui-layer{
-  position:fixed;inset:0;z-index:3;pointer-events:none;
-}
-.ui-layer > *{pointer-events:auto}
-
-/* === ข้อมูลซ้ายล่าง === */
-.bottom-info{
-  position:absolute;left:16px;bottom:75px;right:100px;color:#fff;
-  text-shadow:0 1px 3px rgba(0,0,0,.8);
-}
-.bottom-info .author{font-size:15px;font-weight:700;margin-bottom:6px;}
-.bottom-info .caption{font-size:13px;line-height:1.4;margin-bottom:8px;}
-.bottom-info .music{font-size:12px;display:flex;align-items:center;gap:6px;}
-
-/* === ไอคอนขวา — ลำดับตรงภาพเป๊ะ === */
-.side-icons{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:22px;align-items:center;
-}
-.side-item{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);cursor:pointer;
-}
-.side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px;}
-.side-count{font-size:11px;}
-
-/* 1. โปรไฟล์+บวก */
-.profile-wrap{position:relative;}
-.profile-avatar{width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;}
-.profile-avatar img{width:100%;height:100%;object-fit:cover;}
-.plus-badge{
-  position:absolute;bottom:-4px;right:-4px;width:18px;height:18px;background:#ff0050;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:#fff;
-}
-
-/* 6. แผ่นเสียงหมุน */
-.disc-icon{
-  width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#666,#222);
-  display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;
-}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-/* === แถบเมนูล่าง === */
-.nav-bar{
-  position:absolute;bottom:0;left:0;right:0;height:55px;
-  display:flex;justify-content:space-around;align-items:center;background:transparent;padding:0 8px;
-}
-.nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:2px;color:#999;font-size:10px;cursor:pointer;
-}
-.nav-item.active{color:#fff}
-.nav-icon{font-size:22px}
-.nav-center-plus{
-  width:48px;height:36px;background:#fff;border-radius:6px;
-  display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:bold;
-}
-
-/* === ซ่อน input ดั้งเดิม ใช้ปุ่ม + แทน=== */
-.file-input{display:none;}
-</style>
-</head>
-<body>
-
-<div class="version-tag">v1122-FIXED</div>
-
-<!-- ชั้น 1: วิดีโอ -->
-<div class="video-container" id="videoContainer">
-  <video id="mainVideo" playsinline webkit-playsinline loop autoplay muted>
-    ไม่รองรับวิดีโอ
-  </video>
-</div>
-
-<!-- ชั้น 2: แตะจอ -->
-<div class="tap-layer" id="tapLayer"></div>
-
-<!-- ชั้น 3: ส่วนควบคุม -->
-<div class="ui-layer">
-
-  <div class="bottom-info">
-    <div class="author" id="authorName">@ThaiPodee</div>
-    <div class="caption" id="videoCaption">ยินดีต้อนรับ — แตะจอเพื่อเล่น/หยุด</div>
-    <div class="music">
-      <span>♪</span>
-      <span id="musicName">เสียงประกอบ — ThaiPodee Original</span>
-    </div>
-  </div>
-
-  <div class="side-icons">
-    <!-- 1. โปรไฟล์ -->
-    <div class="side-item" id="profileBtn">
-      <div class="profile-wrap">
-        <div class="profile-avatar"><img src="https://i.imgur.com/KJbRzQY.png" alt="โปรไฟล์"></div>
-        <div class="plus-badge">+</div>
-      </div>
-    </div>
-    <!-- 2. หัวใจ -->
-    <div class="side-item" id="likeBtn">
-      <div class="side-icon">❤️</div>
-      <div class="side-count" id="likeCount">0</div>
-    </div>
-    <!-- 3. คอมเมนต์ -->
-    <div class="side-item">
-      <div class="side-icon">💬</div>
-      <div class="side-count">0</div>
-    </div>
-    <!-- 4. บันทึก -->
-    <div class="side-item" id="saveBtn">
-      <div class="side-icon">⬇️</div>
-      <div class="side-count">บันทึก</div>
-    </div>
-    <!-- 5. แชร์ -->
-    <div class="side-item" id="shareBtn">
-      <div class="side-icon">↗️</div>
-      <div class="side-count">แชร์</div>
-    </div>
-    <!-- 6. แผ่นเสียง -->
-    <div class="side-item">
-      <div class="disc-icon">🎵</div>
-    </div>
-  </div>
-
-  <div class="nav-bar">
-    <div class="nav-item active">
-      <span class="nav-icon">🏠</span><span>หน้าแรก</span>
-    </div>
-    <div class="nav-item" id="shopBtn">
-      <span class="nav-icon">🛒</span><span>ร้านค้า</span>
-    </div>
-    <div class="nav-center-plus" id="uploadTrigger">+</div>
-    <div class="nav-item" id="msgBtn">
-      <span class="nav-icon">💬</span><span>ข้อความ</span>
-    </div>
-    <div class="nav-item" id="profileNavBtn">
-      <span class="nav-icon">👤</span><span>โปรไฟล์</span>
-    </div>
-  </div>
-
-  <!-- ซ่อนไฟล์อินพุต เรียกผ่านปุ่ม + -->
-  <input type="file" id="fileInput" accept="video/*" class="file-input">
-</div>
-
-<script>
-const video = document.getElementById('mainVideo');
-const tapLayer = document.getElementById('tapLayer');
-const fileInput = document.getElementById('fileInput');
-const uploadTrigger = document.getElementById('uploadTrigger');
-
-// === เล่น-หยุด แตะจอ ===
-tapLayer.addEventListener('click', () => {
-  if (video.paused) video.play();
-  else video.pause();
-});
-
-// === กด + → เลือกไฟล์โดยตรง ===
-uploadTrigger.addEventListener('click', () => {
-  fileInput.click();
-});
-
-// === โหลดวิดีโอที่เลือก ===
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const url = URL.createObjectURL(file);
-  video.src = url;
-  video.load();
-  video.play();
-});
-
-// === ปัดเปลี่ยนวิดีโอ ===
-let touchStartY = 0;
-window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; });
-window.addEventListener('touchend', e => {
-  const diff = touchStartY - e.changedTouches[0].clientY;
-  if(Math.abs(diff) > 50) {
-    // ปัดขึ้น/ลง — สามารถขยายเป็นรายการวิดีโอได้ภายหลัง
-  }
-});
-</script>
-
-</body>
-</html>
+  pos
