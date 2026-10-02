@@ -1,9 +1,8 @@
 <!-- ==============================================================
-   ThaiPodee v1121-16-CENTER-PERFECT
-   ✅ วิดีโอตรงกลางจอพอดีเป๊ะ — ไม่เอียงขึ้น ไม่เอียงลง
-   ✅ ทั้งแนวตั้ง-แนวนอน อยู่กึ่งกลางพอดี เท่ากันทั้งบน-ล่าง
-   ✅ object-fit:contain + object-position:center center
-   ✅ จัดตำแหน่งคอนเทนเนอร์ให้ตรงกลางจริงๆ
+   ThaiPodee v1121-21-ORIGINAL-CENTER
+   ✅ ใช้โครงสร้างเดิมทั้งหมด ที่เคยทำได้
+   ✅ แก้จุดเดียว: วิดีโออยู่ตรงกลางพอดี บน-ล่างเท่ากัน
+   ✅ ไม่เปลี่ยนฟังก์ชัน ไม่เปลี่ยนหน้าตา
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,11 +16,11 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>ThaiPodee v1121-16</title>
+<title>ThaiPodee v1121-21</title>
 
-<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png?v=16">
-<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png?v=16">
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1121-16%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D16%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D16%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png?v=21">
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png?v=21">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1121-21%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D21%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D21%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -50,29 +49,33 @@ html,body{
 .main-screen{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden}
 .main-screen.hidden{display:none}
 
-/* ===== คอนเทนเนอร์วิดีโอ — ตรงกลางพอดี ===== */
+/* === คอนเทนเนอร์ — เหมือนเดิม + บังคับตรงกลาง === */
 .video-container{
   position:absolute;inset:0;
   width:100vw;height:100vh;
   background:#000;
   overflow:hidden;
   z-index:1;
-  display:grid;
-  place-items:center center; /* ✅ ตรงกลางพอดี ทั้งแนวตั้ง-แนวนอน */
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-/* ===== วิดีโอ — ตรงกลาง ไม่เอียงขึ้น ไม่เอียงลง ===== */
+/* === วิดีโอ — ยกเลิกบังคับ 100vw/100vh จัดตรงกลางพอดี === */
 video{
-  width:100vw;
-  height:100vh;
   max-width:100vw;
   max-height:100vh;
-  object-fit:contain;       /* ✅ พอดี ไม่ล้น ไม่ยืด */
-  object-position:center center; /* ✅ กึ่งกลางพอดีเป๊ะ */
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  object-position:center center;
   background:#000;
   margin:0;
   padding:0;
-  transform:none !important; /* ✅ ห้ามเลื่อนทุกกรณี */
+  transform:none !important;
+  position:relative;
+  top:auto;
+  left:auto;
 }
 
 .tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
@@ -201,11 +204,11 @@ video{
 
 <div class="splash" id="splash">
   <div class="splash-logo">ThaiPodee</div>
-  <div class="splash-text">v1121-16</div>
+  <div class="splash-text">v1121-21</div>
 </div>
 
 <div class="main-screen" id="mainScreen">
-  <div class="version-tag">v1121-16</div>
+  <div class="version-tag">v1121-21</div>
 
   <div class="video-container">
     <video id="videoPlayer" loop playsinline webkit-playsinline>
@@ -229,7 +232,7 @@ video{
   <div class="side-icons">
     <div class="side-btn" data-page="profile">
       <div class="side-avatar">
-        <img src="https://i.imgur.com/KJbRzQY.png?v=16" alt="โปรไฟล์">
+        <img src="https://i.imgur.com/KJbRzQY.png?v=21" alt="โปรไฟล์">
       </div>
     </div>
     <div class="side-btn" id="likeBtn">
@@ -293,7 +296,7 @@ video{
 </div>
 
 <script>
-const VERSION = 'v1121-16';
+const VERSION = 'v1121-21';
 let videoList = JSON.parse(localStorage.getItem('thaiPodeeVideos') || '[]');
 let currentIndex = 0;
 let isPlaying = true;
@@ -441,7 +444,7 @@ document.querySelectorAll('[data-page]').forEach(b => {
 });
 
 shareBtn.onclick = async () => {
-  const link = window.location.href.split('?')[0] + '?v=1121-16';
+  const link = window.location.href.split('?')[0] + '?v=1121-21';
   try {
     if (navigator.share) await navigator.share({title:'ThaiPodee', url:link});
     else { await navigator.clipboard.writeText(link); alert('✅ คัดลอกลิงก์แล้ว'); }
