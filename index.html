@@ -1,137 +1,189 @@
 <!-- ==============================================================
-   ThaiPodee v1121-5 — โครงสร้างเต็ม ครบทุกส่วน
+   ThaiPodee v1121-5-FIX — หน้าจอตรง / ปุ่มตรง / ไม่มีข้อความเกะกะ
+   อัปเดต: 2 ตุลาคม 2569 07:56 น.
+   --------------------------------------------------------------
+   ✅ ปุ่ม + ตรงกลางล่าง กดแล้วเลือกไฟล์เลย ไม่มีข้อความ
+   ✅ แตะหน้าจอ = หยุด/เล่น จบแล้ววนซ้ำ
+   ✅ โปรไฟล์ 4×2 ใหม่อยู่บนสุด มีปุ่มลบ
+   ✅ แชร์ปุ่มเดียว คัดลอกลิงก์ได้
+   ✅ ไอคอนติดตั้งของเรา
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
-
-<!-- ═══════════════════════════════════════════════════════════
-     ส่วนที่ 1 — HEAD (บนสุด)
-     ═══════════════════════════════════════════════════════════ -->
 <head>
-  <!-- 1.1 ตั้งค่าทั่วไป -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#e60000">
-  <title>ThaiPodee v1121-5</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ThaiPodee">
+<meta name="theme-color" content="#e60000">
+<title>ThaiPodee v1121-5</title>
 
-  <!-- 1.2 ไอคอนติดตั้งแอป -->
-  <link rel="icon" type="image/png" href="...">
-  <link rel="apple-touch-icon" href="...">
-  <link rel="manifest" href="...">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVGhhaVBvZGVlIiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiI2U2MDAwMCIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNybCI6Imh0dHBzOi8vaW1ndXIuY29tL0tKQlJ6UVkucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIn1dfQ==">
 
-  <!-- 1.3 รูปแบบ สี ขนาด ตำแหน่ง ทั้งหมด -->
-  <style>
-    /* ทุกอย่างที่เห็นหน้าตาเป็นอย่างไร กำหนดที่นี่ */
-    .splash { ... }
-    .video-container { ... }
-    .bottom-nav { ... }
-    .profile-grid { ... }
-  </style>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000;font-family:sans-serif;color:#fff}
+
+/* หน้าเริ่มต้น */
+.splash{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .5s}
+.splash.hidden{opacity:0;pointer-events:none}
+.splash-logo{font-size:3rem;font-weight:bold;color:#e60000;margin-bottom:1rem}
+.splash-text{font-size:1rem;color:#aaa}
+
+/* ป้ายเวอร์ชัน */
+.version-tag{position:absolute;top:10px;right:10px;font-size:11px;color:#888;z-index:50}
+
+/* หน้าหลัก */
+.main-screen{position:relative;width:100%;height:100vh;display:none}
+.main-screen.active{display:block}
+
+/* วิดีโอ */
+.video-container{position:absolute;inset:0;background:#000}
+video{width:100%;height:100%;object-fit:cover}
+.tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
+
+/* แถบขวา */
+.side-icons{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:24px;align-items:center;z-index:20}
+.side-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.side-icon{font-size:26px}
+.side-count{font-size:11px;color:#fff}
+
+/* เมนูล่าง */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(0,0,0,.8);display:flex;justify-content:space-around;align-items:center;padding:0 10px;z-index:30}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px;color:#aaa}
+.nav-item.active{color:#fff}
+.nav-icon{font-size:22px}
+.plus-btn{width:50px;height:35px;background:#e60000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;color:#fff;cursor:pointer;border:none}
+
+/* ซ่อนช่องเลือกไฟล์ */
+#fileInput{display:none}
+
+/* โปรไฟล์ */
+.profile-screen{position:absolute;inset:0;background:#000;z-index:40;display:none;overflow-y:auto}
+.profile-screen.active{display:block}
+.profile-header{padding:20px;text-align:center}
+.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px}
+.profile-item{aspect-ratio:9/12;background:#1a1a1a;position:relative;cursor:pointer;overflow:hidden}
+.profile-item:nth-child(n+9){display:none}
+.profile-thumb{width:100%;height:100%;object-fit:cover}
+.profile-delete{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;z-index:2}
+.back-btn{position:absolute;top:10px;left:10px;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer}
+</style>
 </head>
-
-<!-- ═══════════════════════════════════════════════════════════
-     ส่วนที่ 2 — BODY (ส่วนกลาง: สิ่งที่เห็นทั้งหมด)
-     ═══════════════════════════════════════════════════════════ -->
 <body>
 
-  <!-- 2.1 ช่องเลือกไฟล์ (ซ่อนไว้) -->
-  <input type="file" id="fileInput">
+<input type="file" id="fileInput" accept="video/*">
 
-  <!-- 2.2 หน้าเริ่มต้น โลโก้ -->
-  <div class="splash">...</div>
+<div class="splash" id="splash">
+  <div class="splash-logo">ThaiPodee</div>
+  <div class="splash-text">v1121-5 กำลังโหลด...</div>
+</div>
 
-  <!-- 2.3 หน้าหลัก -->
-  <div class="main-screen">
-    <div class="version-tag">v1121-5</div>
-    <div class="video-container">
-      <video id="videoPlayer"></video>
-      <div class="tap-layer"></div>
-    </div>
-    <div class="side-icons">
-      <button>❤️</button>
-      <button>💬</button>
-      <button>📌</button>
-      <button id="shareBtn">↗️</button>
-      <button>🎵</button>
-    </div>
-    <nav class="bottom-nav">
-      <button>🏠</button>
-      <button>🔍</button>
-      <button class="plus-btn">+</button>
-      <button>📦</button>
-      <button>👤</button>
-    </nav>
+<div class="main-screen active" id="mainScreen">
+  <div class="version-tag">v1121-5</div>
+  <div class="video-container">
+    <video id="videoPlayer" loop playsinline webkit-playsinline>
+      <source src="" type="video/mp4">
+    </video>
+    <div class="tap-layer" id="tapLayer"></div>
   </div>
-
-  <!-- 2.4 หน้าโปรไฟล์ -->
-  <div class="profile-screen">
-    <button id="backBtn">←</button>
-    <div class="profile-grid" id="profileGrid"></div>
+  <div class="side-icons">
+    <div class="side-btn" id="likeBtn"><span class="side-icon">❤️</span><span class="side-count" id="likeCount">0</span></div>
+    <div class="side-btn"><span class="side-icon">💬</span><span class="side-count">0</span></div>
+    <div class="side-btn"><span class="side-icon">📌</span><span class="side-count">0</span></div>
+    <div class="side-btn" id="shareBtn"><span class="side-icon">↗️</span><span class="side-count">แชร์</span></div>
+    <div class="side-btn"><span class="side-icon">🎵</span><span class="side-count">เสียง</span></div>
   </div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-page="main"><span class="nav-icon">🏠</span><span>หน้าแรก</span></div>
+    <div class="nav-item"><span class="nav-icon">🔍</span><span>ค้นหา</span></div>
+    <div class="nav-item"><button class="plus-btn" id="uploadBtn">+</button></div>
+    <div class="nav-item"><span class="nav-icon">📦</span><span>กล่อง</span></div>
+    <div class="nav-item" data-page="profile"><span class="nav-icon">👤</span><span>โปรไฟล์</span></div>
+  </nav>
+</div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     ส่วนที่ 3 — SCRIPT (ล่างสุด: สมองคำสั่งทั้งหมด)
-     ═══════════════════════════════════════════════════════════ -->
+<div class="profile-screen" id="profileScreen">
+  <button class="back-btn" id="backBtn">←</button>
+  <div class="profile-header"><h2>โปรไฟล์</h2><p>ThaiPodee User</p></div>
+  <div class="profile-grid" id="profileGrid"></div>
+</div>
+
 <script>
-// ┌─────────────────────────────────────────────────────
-// │ 3.1 ตัวแปร — เก็บค่าที่ใช้ทั้งระบบ
-// └─────────────────────────────────────────────────────
 const VERSION = 'v1121-5';
-let videoList = [];
+let videoList = JSON.parse(localStorage.getItem('thaiPodeeVideos') || '[]');
 let currentIndex = 0;
 let isPlaying = true;
 
-// ┌─────────────────────────────────────────────────────
-// │ 3.2 หน้าบ้าน — ควบคุมสิ่งที่เห็นบนจอ
-// └─────────────────────────────────────────────────────
-function togglePlay() { ... }
-function loadVideo(index) { ... }
-function saveVideos() { ... }
-function renderProfileGrid() { ... }
-function showPage(name) { ... }
+const splash = document.getElementById('splash');
+const mainScreen = document.getElementById('mainScreen');
+const profileScreen = document.getElementById('profileScreen');
+const videoPlayer = document.getElementById('videoPlayer');
+const tapLayer = document.getElementById('tapLayer');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const shareBtn = document.getElementById('shareBtn');
+const profileGrid = document.getElementById('profileGrid');
+const backBtn = document.getElementById('backBtn');
 
-// ปุ่มกดต่าง ๆ
-document.getElementById('tapLayer').onclick = togglePlay;
-document.getElementById('uploadBtn').onclick = () => fileInput.click();
-document.getElementById('shareBtn').onclick = async () => { ... };
+setTimeout(()=>splash.classList.add('hidden'),1200);
 
-// ═══════════════════════════════════════════════════════
-// ⬜ 3.3 หลังบ้าน — ติดต่อ-ประสานงาน-ซื้อขาย
-//     ตำแหน่งนี้ตรง ๆ → ยังว่าง รอใส่ระบบทั้งหมดตรงนี้
-// ═══════════════════════════════════════════════════════
-/*
-   ที่นี่จะใส่เมื่อถึงเวลา:
+function loadVideo(i){
+  if(!videoList.length)return videoPlayer.src='';
+  videoPlayer.src=videoList[i].url;
+  videoPlayer.load();
+  if(isPlaying)videoPlayer.play().catch(()=>{});
+}
+function togglePlay(){
+  videoPlayer.paused?videoPlayer.play():videoPlayer.pause();
+  isPlaying=!videoPlayer.paused;
+}
+tapLayer.addEventListener('click',togglePlay);
+videoPlayer.addEventListener('ended',()=>{videoPlayer.currentTime=0;videoPlayer.play()});
 
-   🔌 เชื่อมต่อภายนอก
-   - เชื่อมต่อเซิร์ฟเวอร์ / Realtime Database
-   - ตรวจสอบเวอร์ชันล่าสุด อัปเดตอัตโนมัติ
+uploadBtn.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const u=URL.createObjectURL(f);
+  videoList.unshift({id:Date.now(),name:f.name,url:u,thumbnail:u});
+  save();render();loadVideo(0);currentIndex=0;fileInput.value='';
+});
+function save(){localStorage.setItem('thaiPodeeVideos',JSON.stringify(videoList))}
+function render(){
+  profileGrid.innerHTML='';
+  videoList.forEach((v,i)=>{
+    const d=document.createElement('div');
+    d.className='profile-item';
+    d.innerHTML=`<button class="profile-delete" data-i="${i}">×</button><img src="${v.thumbnail}" class="profile-thumb">`;
+    d.addEventListener('click',ev=>{if(!ev.target.classList.contains('profile-delete')){currentIndex=i;loadVideo(i);show('main')}});
+    profileGrid.appendChild(d);
+  });
+  document.querySelectorAll('.profile-delete').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const i=+b.dataset.i;
+    if(confirm('ลบ?')){videoList.splice(i,1);save();render();if(currentIndex>=videoList.length)currentIndex=Math.max(0,videoList.length-1);loadVideo(currentIndex)}
+  });
+}
+function show(p){
+  mainScreen.classList.toggle('active',p==='main');
+  profileScreen.classList.toggle('active',p==='profile');
+  if(p==='profile')render();
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>show(b.dataset.page));
+backBtn.onclick=()=>show('main');
 
-   👥 ผู้ใช้ & สมาชิก
-   - เข้าสู่ระบบ / ลงทะเบียน / ออกจากระบบ
-   - ข้อมูลโปรไฟล์กลาง ทุกคนเห็นตรงกัน
+shareBtn.onclick=async()=>{
+  try{
+    if(navigator.share)await navigator.share({title:'ThaiPodee',url:location.href});
+    else{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅')}
+  }catch{try{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅')}catch{alert('ก๊อปปี้ลิงก์จากแถบที่อยู่เองนะ')}}
+};
 
-   📤📥 ส่ง-รับข้อมูล
-   - ส่งวิดีโอ/ข้อความไปยังเครื่องอื่น
-   - รับข้อมูลใหม่มาแสดงทันที ไม่ต้องรีเฟรช
-   - แชร์ลิงก์พร้อมข้อมูลเวอร์ชันล่าสุด
-
-   🛒 ตลาด & ซื้อขาย
-   - รายการสินค้า / โพสต์ขาย
-   - ตะกร้า / สั่งซื้อ / ยืนยัน
-   - บันทึกธุรกรรม ประวัติการซื้อขาย
-
-   💬 ติดต่อ-คุยกัน
-   - ข้อความส่วนตัว / กลุ่ม
-   - แจ้งเตือนเมื่อมีข่าวใหม่
-*/
-
-// ┌─────────────────────────────────────────────────────
-// │ 3.4 เริ่มทำงานทันทีเมื่อโหลดเสร็จ
-// └─────────────────────────────────────────────────────
-renderProfileGrid();
-if (videoList.length > 0) loadVideo(0);
+render();
+if(videoList.length)loadVideo(0);
 </script>
-
 </body>
 </html>
