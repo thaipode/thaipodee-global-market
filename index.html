@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-THUMBNAIL-FINAL
-   แก้ด่วน: รูปในโปรไฟล์ไม่ขึ้น
-   อัปเดต: 2 ตุลาคม 2569 15:15 น.
+   ThaiPodee v1121-6-PROFILE-PAGE2-LAYOUT
+   แก้: หน้าโปรไฟล์แบบรูปขวามือ 3 คอลัมน์
+   อัปเดต: 2 ตุลาคม 2569 16:30 น.
    --------------------------------------------------------------
-   ✅ สร้างรูปย่อจากวิดีโอโดยตรง
-   ✅ รูปแสดงเต็มบล็อกทันที
-   ✅ 4 คอลัมน์ × 2 แถว
+   ✅ เลย์เอาต์โปรไฟล์คล้ายรูปขวามือ
+   ✅ รูปย่อ 3 คอลัมน์
+   ✅ มีปุ่มแก้ไขโปรไฟล์บนสุด
+   ✅ มีโลโก้+ชื่อแอปด้านบน
    ✅ วิดีโอพอดีจอ ไม่ล้น
    ============================================================== -->
 <!DOCTYPE html>
@@ -82,54 +83,109 @@ video{
 /* ---- ซ่อนช่องเลือกไฟล์ ---- */
 #fileInput{display:none}
 
-/* ✅ หน้าโปรไฟล์ — บังคับรูปเต็มบล็อก */
+/* ✅ หน้าโปรไฟล์แบบรูปขวามือ */
 .profile-screen{position:absolute;inset:0;background:#000;z-index:40;display:none;overflow-y:auto}
 .profile-screen.active{display:block}
-.back-btn{position:absolute;top:10px;left:10px;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;z-index:10}
-.profile-header{padding:20px;text-align:center;padding-top:60px}
-.profile-header h2{font-size:20px;margin-bottom:4px}
-.profile-header p{font-size:13px;color:#aaa}
 
-/* ตาราง 4×2 บังคับขนาดชัดเจน */
+/* ---- แถบบนโปรไฟล์ ---- */
+.profile-top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  padding-top:30px;
+}
+.profile-logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.profile-logo img{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.profile-logo span{
+  font-size:16px;
+  font-weight:bold;
+}
+.profile-edit-btn{
+  border:1px solid #555;
+  border-radius:6px;
+  padding:6px 12px;
+  font-size:13px;
+  color:#fff;
+  background:transparent;
+  cursor:pointer;
+}
+
+/* ---- ข้อมูลโปรไฟล์ ---- */
+.profile-info{
+  padding:0 16px 16px;
+}
+.profile-name{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:4px;
+}
+.profile-stats{
+  display:flex;
+  gap:16px;
+  font-size:13px;
+  color:#aaa;
+  margin-bottom:12px;
+}
+.profile-bio{
+  font-size:13px;
+  color:#ccc;
+  line-height:1.5;
+}
+
+/* ---- ตารางรูปย่อ 3 คอลัมน์ ---- */
 .profile-grid{
   display:grid;
-  grid-template-columns:repeat(4, 1fr);
-  grid-template-rows:repeat(2, 1fr);
-  gap:6px;
-  padding:6px;
+  grid-template-columns:repeat(3, 1fr);
+  gap:2px;
   width:100%;
+  padding:0 2px 80px;
 }
 .profile-item{
-  aspect-ratio:1/1;
+  aspect-ratio:9/12;
   background:#222;
   position:relative;
   cursor:pointer;
   overflow:hidden;
   width:100%;
-  min-height:90px;
-  border-radius:4px;
 }
-/* ซ่อนแถวที่ 3 ขึ้นไป*/
-.profile-item:nth-child(n+9){display:none}
-
-/* ✅ รูปเต็มบล็อก ไม่ย่อ ไม่หาย */
 .profile-thumb{
   width:100% !important;
   height:100% !important;
   object-fit:cover !important;
-  background:#333;
   display:block;
-  border:none;
+}
+.profile-item-meta{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  padding:8px;
+  background:linear-gradient(to top, rgba(0,0,0,.7), transparent);
+  font-size:12px;
+  color:#ddd;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 .profile-delete{
   position:absolute;
-  top:4px;
-  right:4px;
+  top:8px;
+  right:8px;
   background:rgba(0,0,0,.8);
   border:none;
   color:#fff;
-  width:26px;
-  height:26px;
+  width:28px;
+  height:28px;
   border-radius:50%;
   font-size:16px;
   font-weight:bold;
@@ -217,11 +273,24 @@ video{
 </div>
 
 <div class="profile-screen" id="profileScreen">
-  <button class="back-btn" id="backBtn">←</button>
-  <div class="profile-header">
-    <h2>โปรไฟล์</h2>
-    <p>ThaiPodee User</p>
+  <div class="profile-top-bar">
+    <div class="profile-logo">
+      <img src="https://i.imgur.com/KJbRzQY.png?v=6" alt="โลโก้">
+      <span>ThaiPodee</span>
+    </div>
+    <button class="profile-edit-btn">แก้ไขโปรไฟล์</button>
   </div>
+
+  <div class="profile-info">
+    <div class="profile-name">ThaiPodee User</div>
+    <div class="profile-stats">
+      <span id="postCount">0 โพสต์</span>
+      <span>0 ผู้ติดตาม</span>
+      <span>0 ไลค์</span>
+    </div>
+    <div class="profile-bio">แพลตฟอร์มวิดีโอสั้นของไทย — แชร์ไปได้ทุกเครื่อง</div>
+  </div>
+
   <div class="profile-grid" id="profileGrid"></div>
 </div>
 
@@ -241,6 +310,7 @@ const uploadBtn = document.getElementById('uploadBtn');
 const shareBtn = document.getElementById('shareBtn');
 const profileGrid = document.getElementById('profileGrid');
 const backBtn = document.getElementById('backBtn');
+const postCount = document.getElementById('postCount');
 
 setTimeout(() => splash.classList.add('hidden'), 1200);
 
@@ -312,7 +382,9 @@ fileInput.addEventListener('change', e => {
       id: Date.now(),
       name: f.name,
       url: u,
-      thumbnail: thumb || u
+      thumbnail: thumb || u,
+      views: 0,
+      likes: 0
     });
 
     saveVideos();
@@ -327,12 +399,16 @@ function saveVideos() {
   localStorage.setItem('thaiPodeeVideos', JSON.stringify(videoList));
 }
 
-// ✅ โหลดรูปย่อแน่นอน ถ้าไม่มีใช้ fallback
+// ✅ อัปเดตจำนวนโพสต์
+function updateProfileStats() {
+  postCount.textContent = `${videoList.length} โพสต์`;
+}
+
+// ✅ แสดงรูปย่อแบบ 3 คอลัมน์ มีข้อมูลมุมมอง
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
-  const showList = videoList.slice(0, 8);
 
-  showList.forEach((v, displayIndex) => {
+  videoList.forEach((v, realIndex) => {
     const item = document.createElement('div');
     item.className = 'profile-item';
     item.dataset.id = v.id;
@@ -340,18 +416,19 @@ function renderProfileGrid() {
     const thumbSrc = v.thumbnail || 'https://i.imgur.com/KJbRzQY.png?v=6';
 
     item.innerHTML = `
-      <button class="profile-delete" data-idx="${displayIndex}">×</button>
+      <button class="profile-delete" data-idx="${realIndex}">×</button>
       <img src="${thumbSrc}" class="profile-thumb" alt="วิดีโอ" loading="eager" onerror="this.src='https://i.imgur.com/KJbRzQY.png?v=6'">
+      <div class="profile-item-meta">
+        <span>▶ ${v.views || 0}</span>
+        <span>❤️ ${v.likes || 0}</span>
+      </div>
     `;
 
     item.addEventListener('click', ev => {
       if (ev.target.classList.contains('profile-delete')) return;
-      const realIndex = videoList.findIndex(x => x.id === v.id);
-      if (realIndex !== -1) {
-        currentIndex = realIndex;
-        loadVideo(realIndex);
-        showPage('main');
-      }
+      currentIndex = realIndex;
+      loadVideo(realIndex);
+      showPage('main');
     });
 
     profileGrid.appendChild(item);
@@ -360,66 +437,6 @@ function renderProfileGrid() {
   document.querySelectorAll('.profile-delete').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const displayIdx = parseInt(btn.dataset.idx);
-      const targetId = showList[displayIdx]?.id;
-      const realIdx = videoList.findIndex(x => x.id === targetId);
+      const realIdx = parseInt(btn.dataset.idx);
 
-      if (realIdx === -1 || !confirm('ลบวิดีโอนี้?')) return;
-
-      try { URL.revokeObjectURL(videoList[realIdx].url); } catch {}
-      videoList.splice(realIdx, 1);
-      saveVideos();
-      renderProfileGrid();
-
-      if (currentIndex >= videoList.length) {
-        currentIndex = Math.max(0, videoList.length - 1);
-      }
-      if (videoList.length > 0) loadVideo(currentIndex);
-    });
-  });
-}
-
-function showPage(page) {
-  mainScreen.classList.toggle('hidden', page === 'profile');
-  profileScreen.classList.toggle('active', page === 'profile');
-  if (page === 'profile') {
-    setTimeout(renderProfileGrid, 100);
-  }
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-}
-
-document.querySelectorAll('[data-page]').forEach(b => {
-  b.onclick = () => showPage(b.dataset.page);
-});
-backBtn.onclick = () => showPage('main');
-
-shareBtn.onclick = async () => {
-  const shareUrl = window.location.href.split('?')[0] + '?v=1121-6';
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: 'ThaiPodee v1121-6',
-        text: 'แอปวิดีโอสั้นไทย — ติดตั้งได้เลย',
-        url: shareUrl
-      });
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('✅ คัดลอกลิงก์แล้ว!\nส่งทางไลน์ไปเครื่องที่ 2 ได้เลย:\n' + shareUrl);
-    }
-  } catch {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('✅ คัดลอกลิงก์แล้ว!\nส่งไลน์ไปเครื่องที่ 2:\n' + shareUrl);
-    } catch {
-      alert('📋 ก๊อปปี้ลิงก์นี้เองนะ:\n' + shareUrl);
-    }
-  }
-};
-
-renderProfileGrid();
-if (videoList.length) loadVideo(0);
-</script>
-
-</body>
-</html>
+      if (realIdx === -1 || !confirm('ลบวิดีโอ
