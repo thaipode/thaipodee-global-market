@@ -1,13 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-FIX — แก้ภาพวงกลม / ลบกล่องซ้อน / สะอาด
-   อัปเดต: 2 ตุลาคม 2569 08:10 น.
+   ThaiPodee v1121-6-FIX-HORIZONTAL-OVERFLOW
+   แก้ด่วน: วิดีโอแนวนอนล้นจอ
+   อัปเดต: 2 ตุลาคม 2569
    --------------------------------------------------------------
-   ✅ ปุ่มขวา 6 ตัว: บนวงกลมรูปโปรไฟล์ / ที่เหลือธรรมดา
-   ✅ ไม่มีกล่องรูปซ้อนด้านซ้าย
-   ✅ เมนูล่างครบ 5 ปุ่ม ปุ่ม+ตรงกลาง
-   ✅ แตะหน้าจอ = หยุด/เล่น / จบวนซ้ำ
-   ✅ กด+ เลือกวิดีโอได้เลย ไม่มีข้อความ
-   ✅ โปรไฟล์ 4×2 มีปุ่มลบ
+   ✅ วิดีโอแนวนอนพอดีจอ ไม่ล้น
+   ✅ วิดีโอแนวตั้งพอดีจอ ไม่ตัด
+   ✅ ปุ่มขวา เมนูล่าง แชร์ โปรไฟล์ ครบเหมือนเดิม
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -18,11 +16,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#e60000">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>ThaiPodee v1121-6</title>
 
-<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png">
-<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png">
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVGhhaVBvZGVlIiwic2hvcnRfbmFtZSI6IlRoYWlQb2RlZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiI2U2MDAwMCIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwiaWNvbnMiOlt7InNybCI6Imh0dHBzOi8vaW1ndXIuY29tL0tKQlJ6UVkucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIn1dfQ==">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png?v=6">
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png?v=6">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1121-6%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D6%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D6%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -41,9 +42,20 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:sans-serif;col
 .main-screen{position:relative;width:100%;height:100vh;display:block}
 .main-screen.hidden{display:none}
 
-/* ---- พื้นที่วิดีโอ ---- */
-.video-container{position:absolute;inset:0;background:#000}
-video{width:100%;height:100%;object-fit:cover}
+/* ✅ แก้ตรงนี้โดยเฉพาะ: วิดีโอไม่ล้นจอ */
+.video-container{position:absolute;top:0;left:0;right:0;bottom:0;background:#000;overflow:hidden;z-index:1}
+video{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  max-width:100vw;
+  max-height:100vh;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  background:#000;
+}
 .tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
 
 /* ---- ข้อมูลใต้วิดีโอ ---- */
@@ -51,23 +63,15 @@ video{width:100%;height:100%;object-fit:cover}
 .video-title{font-size:15px;font-weight:bold;margin-bottom:4px}
 .video-desc{font-size:12px;color:#ccc;line-height:1.4}
 
-/* ==============================================================
-   ปุ่มด้านขวา — บนสุดวงกลม / ที่เหลือธรรมดา
-   ============================================================== */
+/* ---- ปุ่มด้านขวา 6 ตัว ---- */
 .side-icons{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:20}
 .side-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-
-/* ✅ โปรไฟล์วงกลม — รูปชัดเต็มวง */
 .profile-circle{width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#333}
 .profile-circle img{width:100%;height:100%;object-fit:cover}
-
-/* อื่นๆ ธรรมดา */
 .side-icon{font-size:22px}
 .side-count{font-size:9px;color:#aaa}
 
-/* ==============================================================
-   เมนูล่าง — ครบ 5 ปุ่ม ปุ่ม+ตรงกลาง
-   ============================================================== */
+/* ---- เมนูล่าง ---- */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(0,0,0,.85);display:flex;justify-content:space-around;align-items:center;padding:0 10px;z-index:30;border-top:1px solid #222}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:9px;color:#aaa}
 .nav-item.active{color:#fff}
@@ -93,17 +97,14 @@ video{width:100%;height:100%;object-fit:cover}
 
 <input type="file" id="fileInput" accept="video/*">
 
-<!-- หน้าเริ่มต้น -->
 <div class="splash" id="splash">
   <div class="splash-logo">ThaiPodee</div>
   <div class="splash-text">v1121-6 กำลังโหลด...</div>
 </div>
 
-<!-- หน้าหลัก -->
 <div class="main-screen" id="mainScreen">
   <div class="version-tag">v1121-6</div>
 
-  <!-- วิดีโอ -->
   <div class="video-container">
     <video id="videoPlayer" loop playsinline webkit-playsinline>
       <source src="" type="video/mp4">
@@ -111,48 +112,39 @@ video{width:100%;height:100%;object-fit:cover}
     <div class="tap-layer" id="tapLayer"></div>
   </div>
 
-  <!-- ข้อมูลใต้วิดีโอ -->
   <div class="video-info">
     <div class="video-title">ThaiPodee</div>
-    <div class="video-desc">นี่คือแพลตฟอร์มวิดีโอสั้นของไทย</div>
+    <div class="video-desc">แพลตฟอร์มวิดีโอสั้นของไทย — แชร์ไปได้ทุกเครื่อง</div>
   </div>
 
-  <!-- ปุ่มด้านขวา 6 ตัว -->
   <div class="side-icons">
-    <!-- 1. โปรไฟล์วงกลม -->
     <div class="side-btn" data-page="profile">
       <div class="profile-circle">
-        <img src="https://i.imgur.com/KJbRzQY.png" alt="โปรไฟล์">
+        <img src="https://i.imgur.com/KJbRzQY.png?v=6" alt="โปรไฟล์">
       </div>
     </div>
-    <!-- 2. ถูกใจ -->
     <div class="side-btn">
       <span class="side-icon">❤️</span>
       <span class="side-count" id="likeCount">0</span>
     </div>
-    <!-- 3. ความคิดเห็น -->
     <div class="side-btn">
       <span class="side-icon">💬</span>
       <span class="side-count">0</span>
     </div>
-    <!-- 4. ปักหมุด -->
     <div class="side-btn">
       <span class="side-icon">📌</span>
       <span class="side-count">0</span>
     </div>
-    <!-- 5. แชร์ -->
     <div class="side-btn" id="shareBtn">
       <span class="side-icon">↗️</span>
       <span class="side-count">แชร์</span>
     </div>
-    <!-- 6. เสียง -->
     <div class="side-btn">
       <span class="side-icon">🎵</span>
       <span class="side-count">เสียง</span>
     </div>
   </div>
 
-  <!-- เมนูล่าง -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="main">
       <span class="nav-icon">🏠</span>
@@ -176,7 +168,6 @@ video{width:100%;height:100%;object-fit:cover}
   </nav>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
 <div class="profile-screen" id="profileScreen">
   <button class="back-btn" id="backBtn">←</button>
   <div class="profile-header">
@@ -212,11 +203,15 @@ function loadVideo(i) {
   if (isPlaying) videoPlayer.play().catch(() => {});
 }
 
-function togglePlay() {
-  videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
+tapLayer.addEventListener('click', () => {
+  if (videoPlayer.paused) {
+    videoPlayer.play();
+  } else {
+    videoPlayer.pause();
+  }
   isPlaying = !videoPlayer.paused;
-}
-tapLayer.addEventListener('click', togglePlay);
+});
+
 videoPlayer.addEventListener('ended', () => {
   videoPlayer.currentTime = 0;
   videoPlayer.play();
@@ -224,10 +219,20 @@ videoPlayer.addEventListener('ended', () => {
 
 uploadBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => {
-  const f = e.target.files[0]; if (!f) return;
+  const f = e.target.files[0];
+  if (!f) return;
   const u = URL.createObjectURL(f);
-  videoList.unshift({id:Date.now(),name:f.name,url:u,thumbnail:u});
-  saveVideos(); renderProfileGrid(); loadVideo(0); currentIndex=0; fileInput.value='';
+  videoList.unshift({
+    id: Date.now(),
+    name: f.name,
+    url: u,
+    thumbnail: u
+  });
+  saveVideos();
+  renderProfileGrid();
+  loadVideo(0);
+  currentIndex = 0;
+  fileInput.value = '';
 });
 
 function saveVideos() {
@@ -235,41 +240,80 @@ function saveVideos() {
 }
 
 function renderProfileGrid() {
-  profileGrid.innerHTML='';
-  videoList.forEach((v,i)=>{
-    const d=document.createElement('div');
-    d.className='profile-item';
-    d.innerHTML=`<button class="profile-delete" data-idx="${i}">×</button><img src="${v.thumbnail}" class="profile-thumb">`;
-    d.addEventListener('click',ev=>{if(!ev.target.classList.contains('profile-delete')){currentIndex=i;loadVideo(i);showPage('main')}});
+  profileGrid.innerHTML = '';
+  videoList.forEach((v, i) => {
+    const d = document.createElement('div');
+    d.className = 'profile-item';
+    d.innerHTML = `
+      <button class="profile-delete" data-idx="${i}">×</button>
+      <img src="${v.thumbnail}" class="profile-thumb">
+    `;
+    d.addEventListener('click', ev => {
+      if (!ev.target.classList.contains('profile-delete')) {
+        currentIndex = i;
+        loadVideo(i);
+        showPage('main');
+      }
+    });
     profileGrid.appendChild(d);
   });
-  document.querySelectorAll('.profile-delete').forEach(b=>b.onclick=e=>{
-    e.stopPropagation();
-    const i=+b.dataset.idx;
-    if(confirm('ลบวิดีโอนี้?')){videoList.splice(i,1);saveVideos();renderProfileGrid();if(currentIndex>=videoList.length)currentIndex=Math.max(0,videoList.length-1);loadVideo(currentIndex)}
+
+  document.querySelectorAll('.profile-delete').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      const i = parseInt(b.dataset.idx);
+      if (confirm('ลบวิดีโอนี้?')) {
+        videoList.splice(i, 1);
+        saveVideos();
+        renderProfileGrid();
+        if (currentIndex >= videoList.length) {
+          currentIndex = Math.max(0, videoList.length - 1);
+        }
+        loadVideo(currentIndex);
+      }
+    };
   });
 }
 
 function showPage(page) {
-  mainScreen.classList.toggle('hidden', page==='profile');
-  profileScreen.classList.toggle('active', page==='profile');
-  if(page==='profile') renderProfileGrid();
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  mainScreen.classList.toggle('hidden', page === 'profile');
+  profileScreen.classList.toggle('active', page === 'profile');
+  if (page === 'profile') renderProfileGrid();
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
 }
 
-document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-backBtn.onclick=()=>showPage('main');
+document.querySelectorAll('[data-page]').forEach(b => {
+  b.onclick = () => showPage(b.dataset.page);
+});
+backBtn.onclick = () => showPage('main');
 
-shareBtn.onclick=async()=>{
-  try{
-    if(navigator.share)await navigator.share({title:'ThaiPodee',url:location.href});
-    else{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅')}
-  }catch{try{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅')}catch{alert('ก๊อปปี้ลิงก์จากแถบที่อยู่เองนะ')}}
+shareBtn.onclick = async () => {
+  const shareUrl = window.location.href.split('?')[0] + '?v=1121-6';
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: 'ThaiPodee v1121-6',
+        text: 'แอปวิดีโอสั้นไทย — ติดตั้งได้เลย',
+        url: shareUrl
+      });
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('✅ คัดลอกลิงก์แล้ว!\nส่งทางไลน์ไปเครื่องที่ 2 ได้เลย:\n' + shareUrl);
+    }
+  } catch {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('✅ คัดลอกลิงก์แล้ว!\nส่งไลน์ไปเครื่องที่ 2:\n' + shareUrl);
+    } catch {
+      alert('📋 ก๊อปปี้ลิงก์นี้เองนะ:\n' + shareUrl);
+    }
+  }
 };
 
 renderProfileGrid();
-if(videoList.length)loadVideo(0);
+if (videoList.length) loadVideo(0);
 </script>
+
 </body>
 </html>
