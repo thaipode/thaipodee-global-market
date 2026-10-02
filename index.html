@@ -1,9 +1,8 @@
 <!-- ==============================================================
-   ThaiPodee v1121-7-MOVE-VIDEO-CENTER-ALL-UP
-   ✅ วิดีโออยู่ตรงกลาง
-   ✅ ชื่อผู้ใช้ / ไอคอนขวา / แถบเวลา+ลำโพง ขึ้นไปทั้งหมด
-   ✅ เหลือเฉพาะเมนูแถวล่างอยู่ล่างสุด
-   อัปเดต: 2 ตุลาคม 2569 22:05 น.
+   ThaiPodee v1121-7-FIXED-NO-STUCK-SPLASH
+   ✅ แก้หน้าจอค้างที่ Splash
+   ✅ วิดีโอตรงกลาง / ทุกส่วนขึ้นไป / เหลือเมนูล่างสุด
+   อัปเดต: 2 ต.ค. 2569 21:25 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -40,7 +39,7 @@ html,body{height:100%;background:#000;font-family:sans-serif;color:#fff}
 .main-screen{position:relative;width:100%;height:100vh;display:block}
 .main-screen.hidden{display:none}
 
-/* ✅ วิดีโออยู่ตรงกลางพอดี */
+/* ✅ วิดีโออยู่ตรงกลาง */
 .video-container{position:absolute;top:0;left:0;right:0;bottom:0;background:#000;overflow:hidden;z-index:1}
 video{
   position:absolute;
@@ -56,7 +55,7 @@ video{
 }
 .tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
 
-/* ✅ ชื่อผู้ใช้ขึ้นไปอยู่เหนือแถบเวลา */
+/* ✅ ชื่อผู้ใช้ขึ้นไป */
 .video-info{
   position:absolute;
   left:15px;
@@ -67,7 +66,7 @@ video{
 .video-title{font-size:15px;font-weight:bold;margin-bottom:3px}
 .video-desc{font-size:12px;color:#aaa}
 
-/* ✅ แถบเวลา + ลำโพง ขึ้นไปอยู่เหนือเมนูล่าง */
+/* ✅ แถบเวลา+ลำโพง ขึ้นไปตาม */
 .controls-bar{
   position:absolute;
   left:15px;
@@ -124,7 +123,7 @@ video{
 .nav-icon{font-size:22px;line-height:1}
 .plus-btn{width:48px;height:34px;background:#e60000;border-radius:6px;border:none;color:#fff;font-size:22px;font-weight:bold;cursor:pointer}
 
-/* ซ่อนอินพุตไฟล์*/
+/* ซ่อนอินพุตไฟล์ */
 #fileInput{display:none}
 
 /* หน้าโปรไฟล์ */
@@ -165,20 +164,20 @@ video{
     <div class="tap-layer" id="tapLayer"></div>
   </div>
 
-  <!-- ✅ ชื่อผู้ใช้ / ข้อมูลวิดีโอ -->
+  <!-- ชื่อผู้ใช้ / ข้อมูลวิดีโอ -->
   <div class="video-info">
     <div class="video-title">ThaiPodee</div>
     <div class="video-desc">แตะหน้าจอ = หยุด / เล่น</div>
   </div>
 
-  <!-- ✅ แถบเวลา + ลำโพง -->
+  <!-- แถบเวลา + ลำโพง -->
   <div class="controls-bar">
     <button class="sound-btn" id="soundBtn">🔊</button>
     <span class="time-text" id="timeDisplay">0:00 / 0:00</span>
     <input type="range" class="time-slider" id="timeSlider" min="0" max="100" value="0">
   </div>
 
-  <!-- ✅ ไอคอนด้านขวา -->
+  <!-- ไอคอนด้านขวา -->
   <div class="side-icons">
     <div class="side-btn" data-page="profile">
       <div class="profile-circle">
@@ -207,7 +206,7 @@ video{
     </div>
   </div>
 
-  <!-- ✅ เมนูแถวล่าง อยู่ล่างสุด -->
+  <!-- เมนูแถวล่าง อยู่ล่างสุด -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="main">
       <span class="nav-icon">🏠</span>
@@ -235,7 +234,7 @@ video{
   <div class="profile-top-bar">
     <div class="profile-logo">
       <img src="https://i.imgur.com/KJbRzQY.png?v=7" alt="โลโก้">
-      <span>ThaiPodee</point>
+      <span>ThaiPodee</span>
     </div>
     <button class="profile-edit-btn">แก้ไข</button>
   </div>
@@ -258,12 +257,6 @@ let currentIndex = 0;
 let isPlaying = true;
 let isMuted = false;
 
-const splash = 7;
-let videoList = JSON.parse(localStorage.getItem('thaiPodeeVideos') || '[]');
-let currentIndex = 0;
-let isPlaying = true;
-let isMuted = false;
-
 const splash = document.getElementById('splash');
 const mainScreen = document.getElementById('mainScreen');
 const profileScreen = document.getElementById('profileScreen');
@@ -278,11 +271,16 @@ const timeSlider = document.getElementById('timeSlider');
 const timeDisplay = document.getElementById('timeDisplay');
 const soundBtn = document.getElementById('soundBtn');
 
-setTimeout(() => {
+// ✅ แก้ไม่ให้ค้างที่หน้าจอเริ่มต้น — แสดงเนื้อหาแน่นอน
+function hideSplash() {
   splash.classList.add('hidden');
-  if (videoList.length > 0) { loadVideo(0); renderProfileGrid(); }
+  if (videoList.length > 0) {
+    loadVideo(0);
+    renderProfileGrid();
+  }
   updateProfileStats();
-}, 800);
+}
+setTimeout(hideSplash, 800);
 
 function formatTime(secs) {
   if (!secs || isNaN(secs)) return '0:00';
@@ -320,8 +318,13 @@ function loadVideo(i) {
 }
 
 tapLayer.addEventListener('click', () => {
-  if (videoPlayer.paused) { videoPlayer.play(); isPlaying = true; }
-  else { videoPlayer.pause(); isPlaying = false; }
+  if (videoPlayer.paused) {
+    videoPlayer.play();
+    isPlaying = true;
+  } else {
+    videoPlayer.pause();
+    isPlaying = false;
+  }
 });
 
 videoPlayer.addEventListener('ended', () => {
@@ -335,12 +338,18 @@ function generateThumbnail(file, callback) {
   video.muted = true;
   video.playsInline = true;
   video.preload = 'metadata';
-  video.addEventListener('loadeddata', () => { video.currentTime = Math.min(0.3, video.duration / 5); });
+  video.addEventListener('loadeddata', () => {
+    video.currentTime = Math.min(0.3, video.duration / 5);
+  });
   video.addEventListener('seeked', () => {
     const c = document.createElement('canvas');
     c.width = 320; c.height = 400;
     c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-    try { callback(c.toDataURL('image/jpeg', 0.7)); } catch { callback(null); }
+    try {
+      callback(c.toDataURL('image/jpeg', 0.7));
+    } catch {
+      callback(null);
+    }
     try { URL.revokeObjectURL(video.src); } catch {}
   });
   video.addEventListener('error', () => callback(null));
@@ -352,14 +361,29 @@ fileInput.addEventListener('change', e => {
   if (!f) return;
   const u = URL.createObjectURL(f);
   generateThumbnail(f, thumb => {
-    videoList.unshift({ id: Date.now(), name: f.name, url: u, thumbnail: thumb || u, views: 0, likes: 0 });
-    saveVideos(); renderProfileGrid(); updateProfileStats(); loadVideo(0); currentIndex = 0;
+    videoList.unshift({
+      id: Date.now(),
+      name: f.name,
+      url: u,
+      thumbnail: thumb || u,
+      views: 0,
+      likes: 0
+    });
+    saveVideos();
+    renderProfileGrid();
+    updateProfileStats();
+    loadVideo(0);
+    currentIndex = 0;
     fileInput.value = '';
   });
 });
 
-function saveVideos() { localStorage.setItem('thaiPodeeVideos', JSON.stringify(videoList)); }
-function updateProfileStats() { postCount.textContent = `${videoList.length} โพสต์`; }
+function saveVideos() {
+  localStorage.setItem('thaiPodeeVideos', JSON.stringify(videoList));
+}
+function updateProfileStats() {
+  postCount.textContent = `${videoList.length} โพสต์`;
+}
 
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
@@ -370,11 +394,16 @@ function renderProfileGrid() {
     item.innerHTML = `
       <button class="profile-delete" data-idx="${idx}">×</button>
       <img src="${thumb}" class="profile-thumb" alt="วิดีโอ" loading="lazy">
-      <div class="profile-item-meta"><span>▶ ${v.views || 0}</span><span>❤️ ${v.likes || 0}</span></div>
+      <div class="profile-item-meta">
+        <span>▶ ${v.views || 0}</span>
+        <span>❤️ ${v.likes || 0}</span>
+      </div>
     `;
     item.onclick = ev => {
       if (ev.target.classList.contains('profile-delete')) return;
-      currentIndex = idx; loadVideo(idx); showPage('main');
+      currentIndex = idx;
+      loadVideo(idx);
+      showPage('main');
     };
     profileGrid.appendChild(item);
   });
@@ -384,7 +413,14 @@ function renderProfileGrid() {
       const i = parseInt(btn.dataset.idx);
       if (!confirm('ลบ?')) return;
       try { URL.revokeObjectURL(videoList[i].url); } catch {}
-      videoList.splice(i, 1); saveVideos(); renderProfileGrid(); updateProfileStats();
+      videoList.splice(i, 1);
+      saveVideos();
+      renderProfileGrid();
+      updateProfileStats();
+      if (currentIndex >= videoList.length) {
+        currentIndex = Math.max(0, videoList.length - 1);
+      }
+      if (videoList.length) loadVideo(currentIndex);
     };
   });
 }
@@ -397,13 +433,23 @@ function showPage(page) {
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
 }
 
-document.querySelectorAll('[data-page]').forEach(b => { b.onclick = () => showPage(b.dataset.page); });
+document.querySelectorAll('[data-page]').forEach(b => {
+  b.onclick = () => showPage(b.dataset.page);
+});
 
 shareBtn.onclick = async () => {
   const link = window.location.href.split('?')[0] + '?v=1121-7';
   try {
-    if (navigator.share) await navigator.share({title:'ThaiPodee', url:link});
-    else { await navigator.clipboard.writeText(link); alert('✅ คัดลอกแล้ว'); }
-  } catch { alert(link); }
+    if (navigator.share) {
+      await navigator.share({ title: 'ThaiPodee', url: link });
+    } else {
+      await navigator.clipboard.writeText(link);
+      alert('✅ คัดลอกแล้ว');
+    }
+  } catch {
+    alert(link);
+  }
 };
-</tool_call>
+</script>
+</body>
+</html>
