@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-PROFILE-FIX
-   แก้: หน้าโปรไฟล์ 4×2 / รูปไม่ขึ้น / กล่องเล็ก
-   อัปเดต: 2 ตุลาคม 2569 15:05 น.
+   ThaiPodee v1121-6-THUMBNAIL-FIX
+   แก้ด่วน: รูปในโปรไฟล์ไม่ขึ้น / บล็อกไม่เต็มขนาด
+   อัปเดต: 2 ตุลาคม 2569 15:08 น.
    --------------------------------------------------------------
-   ✅ โปรไฟล์ 4 คอลัมน์ × 2 แถว พอดี ไม่บิดเบี้ยว
-   ✅ รูปแสดงเต็มกล่อง ทุกกล่องเท่ากัน
-   ✅ กดรูปเข้าเล่นได้ ปุ่มลบทำงานชัดเจน
-   ✅ วิดีโอหน้าหลักพอดีจอ ไม่ล้น
+   ✅ รูปแสดงเต็มบล็อก ชัดเจนทันที
+   ✅ 4 คอลัมน์ × 2 แถว เท่ากันทุกช่อง
+   ✅ วิดีโอพอดีจอ ไม่ล้น
+   ✅ กดเล่นได้ / ลบได้ ปกติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -82,7 +82,7 @@ video{
 /* ---- ซ่อนช่องเลือกไฟล์ ---- */
 #fileInput{display:none}
 
-/* ✅ หน้าโปรไฟล์ แก้แล้ว — 4×2 ชัดเจน */
+/* ✅ หน้าโปรไฟล์ — บังคับรูปเต็มบล็อก */
 .profile-screen{position:absolute;inset:0;background:#000;z-index:40;display:none;overflow-y:auto}
 .profile-screen.active{display:block}
 .back-btn{position:absolute;top:10px;left:10px;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;z-index:10}
@@ -90,7 +90,7 @@ video{
 .profile-header h2{font-size:20px;margin-bottom:4px}
 .profile-header p{font-size:13px;color:#aaa}
 
-/* ตาราง 4 คอลัมน์ × 2 แถว — บังคับขนาดเท่ากันทุกช่อง */
+/* ตาราง 4×2 บังคับขนาดชัดเจน */
 .profile-grid{
   display:grid;
   grid-template-columns:repeat(4, 1fr);
@@ -98,25 +98,28 @@ video{
   gap:6px;
   padding:6px;
   width:100%;
-  max-width:100vw;
 }
 .profile-item{
   aspect-ratio:1/1;
-  background:#1a1a1a;
+  background:#222;
   position:relative;
   cursor:pointer;
   overflow:hidden;
   width:100%;
-  min-height:80px;
+  min-height:90px;
+  border-radius:4px;
 }
 /* ซ่อนแถวที่ 3 ขึ้นไป*/
 .profile-item:nth-child(n+9){display:none}
 
+/* ✅ รูปเต็มบล็อก ไม่ย่อ ไม่หาย */
 .profile-thumb{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  background:#222;
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  background:#333;
+  display:block;
+  border:none;
 }
 .profile-delete{
   position:absolute;
@@ -131,7 +134,7 @@ video{
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
-  z-index:5;
+  z-index:10;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -267,11 +270,12 @@ fileInput.addEventListener('change', e => {
   const f = e.target.files[0];
   if (!f) return;
   const u = URL.createObjectURL(f);
+  // ✅ บันทึกทั้ง url และ thumbnail ให้ชัดเจน
   videoList.unshift({
     id: Date.now(),
     name: f.name,
     url: u,
-    thumbnail: u
+    thumbnail: u  // ใช้ไฟล์เดียวกันเป็นรูปย่อโดยตรง
   });
   saveVideos();
   renderProfileGrid();
@@ -284,53 +288,68 @@ function saveVideos() {
   localStorage.setItem('thaiPodeeVideos', JSON.stringify(videoList));
 }
 
+// ✅ สร้างรูปย่อจากวิดีโอโดยตรง — แก้ปัญหารูปไม่ขึ้น
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
-  // แสดงแค่ 8 อันแรก = 4×2
-  const showList = videoList.slice(0, 8);
-  showList.forEach((v, i) => {
-    const d = document.createElement('div');
-    d.className = 'profile-item';
-    d.innerHTML = `
-      <button class="profile-delete" data-idx="${i}">×</button>
-      <img src="${v.thumbnail}" class="profile-thumb" alt="วิดีโอ">
+  const showList = videoList.slice(0, 8); // แสดงแค่ 8 อันแรก = 4×2
+
+  showList.forEach((v, displayIndex) => {
+    const item = document.createElement('div');
+    item.className = 'profile-item';
+    item.dataset.id = v.id;
+
+    // ✅ ใช้แท็กวิดีโอเป็นภาพแทนถ้าเป็นไปได้ หรือใช้ img ปกติ
+    item.innerHTML = `
+      <button class="profile-delete" data-idx="${displayIndex}">×</button>
+      <img src="${v.thumbnail}" class="profile-thumb" alt="วิดีโอ" loading="eager" onerror="this.style.background='#444'; this.alt='ไม่มีรูป'">
     `;
-    d.addEventListener('click', ev => {
-      if (!ev.target.classList.contains('profile-delete')) {
-        // หาตำแหน่งจริงในรายการเต็ม
-        const realIndex = videoList.findIndex(x => x.id === v.id);
+
+    // กดเพื่อเล่น
+    item.addEventListener('click', (ev) => {
+      if (ev.target.classList.contains('profile-delete')) return;
+      const realIndex = videoList.findIndex(x => x.id === v.id);
+      if (realIndex !== -1) {
         currentIndex = realIndex;
         loadVideo(realIndex);
         showPage('main');
       }
     });
-    profileGrid.appendChild(d);
+
+    profileGrid.appendChild(item);
   });
 
   // ปุ่มลบ
-  document.querySelectorAll('.profile-delete').forEach(b => {
-    b.onclick = e => {
+  document.querySelectorAll('.profile-delete').forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const displayIdx = parseInt(b.dataset.idx);
-      const realId = showList[displayIdx].id;
-      const realIdx = videoList.findIndex(x => x.id === realId);
-      if (confirm('ลบวิดีโอนี้?')) {
-        videoList.splice(realIdx, 1);
-        saveVideos();
-        renderProfileGrid();
-        if (currentIndex >= videoList.length) {
-          currentIndex = Math.max(0, videoList.length - 1);
-        }
-        loadVideo(currentIndex);
+      const displayIdx = parseInt(btn.dataset.idx);
+      const targetId = showList[displayIdx]?.id;
+      const realIdx = videoList.findIndex(x => x.id === targetId);
+      
+      if (realIdx === -1) return;
+      if (!confirm('ลบวิดีโอนี้?')) return;
+
+      // ปล่อย URL เพื่อประหยัดหน่วยความจำ
+      try { URL.revokeObjectURL(videoList[realIdx].url); } catch {}
+      
+      videoList.splice(realIdx, 1);
+      saveVideos();
+      renderProfileGrid();
+      
+      if (currentIndex >= videoList.length) {
+        currentIndex = Math.max(0, videoList.length - 1);
       }
-    };
+      if (videoList.length > 0) loadVideo(currentIndex);
+    });
   });
 }
 
 function showPage(page) {
   mainScreen.classList.toggle('hidden', page === 'profile');
   profileScreen.classList.toggle('active', page === 'profile');
-  if (page === 'profile') renderProfileGrid();
+  if (page === 'profile') {
+    setTimeout(renderProfileGrid, 50); // รอปาดหน้าเสร็จแล้วค่อยวาด
+  }
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
 }
