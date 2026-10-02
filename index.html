@@ -1,9 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1121-11-NO-BORDERS-FULL-SCREEN-FLOAT-ICONS
-   ✅ ลบแถบสีดำทุกด้าน เต็มขอบจอ ไม่มีขอบดำ
-   ✅ วิดีโอเต็มจอ center center พอดี ไม่ล้น ไม่ตัด
-   ✅ ไอคอนลอยชัดเจนบนหน้าจอ ไม่มีพื้นหลังบัง
-   อัปเดต: 2 ต.ค. 2569 22:05 น.
+   ThaiPodee v1121-12-FULLSCREEN-SOUND-BUTTONS
+   ✅ เพิ่มปุ่ม ขยายจอ/ย่อจอ + เปิด/ปิดเสียง ชัดเจน
+   ✅ ลบแถบดำ เต็มจอ ไอคอนลอย ตรงกลาง center center
+   ✅ ทุกฟังก์ชันครบ — เล่น/หยุด แตะจอ, วนซ้ำ, อัปโหลด, โปรไฟล์
+   อัปเดต: 2 ต.ค. 2569 22:08 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,16 +17,15 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>ThaiPodee v1121-11</title>
+<title>ThaiPodee v1121-12</title>
 
-<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png?v=11">
-<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png?v=11">
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1121-11%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D11%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D11%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="192x192" href="https://i.imgur.com/KJbRzQY.png?v=12">
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.imgur.com/KJbRzQY.png?v=12">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1121-12%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23e60000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D12%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%2F%2Fi.imgur.com%2FKJbRzQY.png%3Fv%3D12%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
-/* ✅ ลบขอบ/แถบดำทั้งหมด เต็มพื้นที่จอ */
 html,body{
   width:100vw;
   height:100vh;
@@ -37,123 +36,77 @@ html,body{
   color:#fff;
   overflow:hidden;
   position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
+  top:0;left:0;right:0;bottom:0;
 }
 
 .splash{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-  transition:opacity .4s ease;
+  position:fixed;inset:0;background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:999;transition:opacity .4s ease;
 }
 .splash.hidden{opacity:0;pointer-events:none}
 .splash-logo{font-size:2.5rem;font-weight:bold;color:#e60000;margin-bottom:.5rem}
 .splash-text{font-size:.9rem;color:#888}
 
-.version-tag{
-  position:absolute;
-  top:8px;
-  right:10px;
-  font-size:11px;
-  color:#666;
-  z-index:50;
-}
+.version-tag{position:absolute;top:8px;right:10px;font-size:11px;color:#666;z-index:50}
 
-.main-screen{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-}
+.main-screen{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden}
 .main-screen.hidden{display:none}
 
-/* ✅ วิดีโอเต็มจอ ไม่มีขอบดำ ตรงกลาง center center */
 .video-container{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  width:100vw;
-  height:100vh;
-  background:#000;
-  overflow:hidden;
-  z-index:1;
-  display:grid;
-  place-items:center center;
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  width:100vw;height:100vh;
+  background:#000;overflow:hidden;z-index:1;
+  display:grid;place-items:center center;
 }
+.video-container.fullscreen-mode{background:#000}
 
 video{
-  width:100vw;
-  height:100vh;
-  max-width:100vw;
-  max-height:100vh;
+  width:100vw;height:100vh;
+  max-width:100vw;max-height:100vh;
   object-fit:contain;
   object-position:center center;
   background:transparent;
   transform:none;
 }
 
-.tap-layer{
-  position:absolute;
-  inset:0;
-  z-index:10;
-  cursor:pointer;
-}
+.tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
 
-/* ✅ ข้อความลอยชัดเจน ไม่มีพื้นหลังบัง */
-.video-info{
-  position:absolute;
-  left:15px;
-  bottom:130px;
-  right:80px;
-  z-index:20;
-  background:transparent;
-}
-.video-title{font-size:15px;font-weight:bold;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
-.video-desc{font-size:12px;color:#aaa;text-shadow:0 1px 2px rgba(0,0,0,.8)}
-
-/* ✅ แถบควบคุมลอยชัดเจน พื้นจาง */
+/* === แถบควบคุมด้านล่างวิดีโอ === */
 .controls-bar{
-  position:absolute;
-  left:15px;
-  right:15px;
-  bottom:90px;
-  z-index:22;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:6px 12px;
+  position:absolute;left:12px;right:12px;bottom:90px;z-index:22;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
   background:rgba(0,0,0,.4);
-  border-radius:20px;
-  backdrop-filter:blur(4px);
+  border-radius:24px;
+  backdrop-filter:blur(6px);
 }
-.sound-btn{font-size:18px;background:transparent;border:none;color:#fff;cursor:pointer;padding:2px 6px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+.control-btn{
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.15);
+  border:none;border-radius:50%;
+  color:#fff;font-size:16px;cursor:pointer;
+  transition:all .2s;
+}
+.control-btn:hover{background:rgba(255,255,255,.25)}
+.control-btn:active{transform:scale(.95)}
+
 .time-slider{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.25);border-radius:2px;outline:none}
 .time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none;box-shadow:0 0 4px rgba(0,0,0,.5)}
 .time-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none}
-.time-text{font-size:11px;color:#ddd;white-space:nowrap;min-width:70px;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.time-text{font-size:11px;color:#ddd;white-space:nowrap;min-width:70px;text-align:center}
 
-/* ✅ ไอคอนด้านขวาลอยชัดเจน ไม่มีพื้นหลังบัง */
+/* === ข้อมูลวิดีโอ ด้านซ้ายล่าง === */
+.video-info{position:absolute;left:15px;bottom:145px;right:100px;z-index:20}
+.video-title{font-size:15px;font-weight:bold;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.video-desc{font-size:12px;color:#aaa;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+/* === ไอคอนด้านขวา === */
 .side-icons{
-  position:absolute;
-  right:12px;
-  bottom:125px;
-  display:flex;
-  flex-direction:column;
-  gap:22px;
-  align-items:center;
-  z-index:20;
-  background:transparent;
+  position:absolute;right:12px;bottom:145px;
+  display:flex;flex-direction:column;gap:22px;align-items:center;z-index:20;
 }
 .side-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 .profile-circle{width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:rgba(0,0,0,.4);box-shadow:0 0 6px rgba(0,0,0,.5)}
@@ -161,20 +114,12 @@ video{
 .side-icon{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
 .side-count{font-size:9px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
 
-/* ✅ เมนูล่างลอยชัดเจน ไม่มีแถบดำหนา */
+/* === เมนูล่างสุด === */
 .bottom-nav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  height:65px;
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(8px);
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  padding:0 5px;
-  z-index:30;
+  position:fixed;bottom:0;left:0;right:0;height:65px;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(8px);
+  display:flex;justify-content:space-around;align-items:center;
+  padding:0 5px;z-index:30;
   border-top:1px solid rgba(255,255,255,.08);
 }
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:9px;color:#ccc;text-shadow:0 1px 2px rgba(0,0,0,.6)}
@@ -184,16 +129,10 @@ video{
 
 #fileInput{display:none}
 
-/* หน้าโปรไฟล์ */
+/* === หน้าโปรไฟล์ === */
 .profile-screen{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  background:#000;
-  z-index:40;
-  display:none;
-  overflow-y:auto;
+  position:fixed;inset:0;width:100vw;height:100vh;
+  background:#000;z-index:40;display:none;overflow-y:auto;
 }
 .profile-screen.active{display:block}
 .profile-top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;padding-top:40px}
@@ -218,13 +157,13 @@ video{
 
 <div class="splash" id="splash">
   <div class="splash-logo">ThaiPodee</div>
-  <div class="splash-text">v1121-11</div>
+  <div class="splash-text">v1121-12</div>
 </div>
 
 <div class="main-screen" id="mainScreen">
-  <div class="version-tag">v1121-11</div>
+  <div class="version-tag">v1121-12</div>
 
-  <div class="video-container">
+  <div class="video-container" id="videoContainer">
     <video id="videoPlayer" loop playsinline webkit-playsinline>
       <source src="" type="video/mp4">
     </video>
@@ -236,16 +175,18 @@ video{
     <div class="video-desc">แตะหน้าจอ = หยุด / เล่น</div>
   </div>
 
+  <!-- ✅ แถบควบคุม: เสียง + เวลา + ขยายจอ -->
   <div class="controls-bar">
-    <button class="sound-btn" id="soundBtn">🔊</button>
+    <button class="control-btn" id="soundBtn" title="เปิด/ปิดเสียง">🔊</button>
     <span class="time-text" id="timeDisplay">0:00 / 0:00</span>
-    <input type="range" class="time-slider" id="timeSlider" min="0" max="100" value="0">
+    <input type="range" class="time-slider" id="timeSlider" min="0" max="100" value="0" title="เลื่อนเวลา">
+    <button class="control-btn" id="fullscreenBtn" title="ขยาย/ย่อจอ">⛶</button>
   </div>
 
   <div class="side-icons">
     <div class="side-btn" data-page="profile">
       <div class="profile-circle">
-        <img src="https://i.imgur.com/KJbRzQY.png?v=11" alt="โปรไฟล์">
+        <img src="https://i.imgur.com/KJbRzQY.png?v=12" alt="โปรไฟล์">
       </div>
     </div>
     <div class="side-btn">
@@ -296,7 +237,7 @@ video{
 <div class="profile-screen" id="profileScreen">
   <div class="profile-top-bar">
     <div class="profile-logo">
-      <img src="https://i.imgur.com/KJbRzQY.png?v=11" alt="โลโก้">
+      <img src="https://i.imgur.com/KJbRzQY.png?v=12" alt="โลโก้">
       <span>ThaiPodee</span>
     </div>
     <button class="profile-edit-btn">แก้ไข</button>
@@ -314,16 +255,18 @@ video{
 </div>
 
 <script>
-const VERSION = 'v1121-11';
+const VERSION = 'v1121-12';
 let videoList = JSON.parse(localStorage.getItem('thaiPodeeVideos') || '[]');
 let currentIndex = 0;
 let isPlaying = true;
 let isMuted = false;
+let isFullscreen = false;
 
 const splash = document.getElementById('splash');
 const mainScreen = document.getElementById('mainScreen');
 const profileScreen = document.getElementById('profileScreen');
 const videoPlayer = document.getElementById('videoPlayer');
+const videoContainer = document.getElementById('videoContainer');
 const tapLayer = document.getElementById('tapLayer');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
@@ -333,6 +276,7 @@ const postCount = document.getElementById('postCount');
 const timeSlider = document.getElementById('timeSlider');
 const timeDisplay = document.getElementById('timeDisplay');
 const soundBtn = document.getElementById('soundBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
 
 function hideSplash() {
   splash.classList.add('hidden');
@@ -341,7 +285,7 @@ function hideSplash() {
 }
 setTimeout(hideSplash, 800);
 
-// ปรับอัตโนมัติเมื่อเปลี่ยนขนาดจอ / หมุนจอ
+// ปรับอัตโนมัติเมื่อหมุน/เปลี่ยนจอ
 function fitVideoToScreen() {
   videoPlayer.style.width = '100vw';
   videoPlayer.style.height = '100vh';
@@ -349,6 +293,38 @@ function fitVideoToScreen() {
 window.addEventListener('resize', fitVideoToScreen);
 window.addEventListener('orientationchange', fitVideoToScreen);
 videoPlayer.addEventListener('loadedmetadata', fitVideoToScreen);
+
+// ✅ ปุ่มขยายจอ/ย่อจอ
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      isFullscreen = true;
+      fullscreenBtn.textContent = '⛶';
+      videoContainer.classList.add('fullscreen-mode');
+    } else {
+      await document.exitFullscreen();
+      isFullscreen = false;
+      fullscreenBtn.textContent = '⛶';
+      videoContainer.classList.remove('fullscreen-mode');
+    }
+  } catch (e) {
+    // สำหรับเบราว์เซอร์มือถือที่ไม่รองรับ fullscreen มาตรฐาน
+    if (!isFullscreen) {
+      mainScreen.style.position = 'fixed';
+      mainScreen.style.inset = '0';
+      mainScreen.style.zIndex = '999';
+      isFullscreen = true;
+      fullscreenBtn.textContent = '⛶';
+    } else {
+      mainScreen.style.position = '';
+      mainScreen.style.zIndex = '';
+      isFullscreen = false;
+      fullscreenBtn.textContent = '⛶';
+    }
+  }
+}
+fullscreenBtn.addEventListener('click', toggleFullscreen);
 
 function formatTime(secs) {
   if (!secs || isNaN(secs)) return '0:00';
@@ -371,6 +347,7 @@ timeSlider.addEventListener('input', () => {
   }
 });
 
+// ✅ ปุ่มเปิด/ปิดเสียง
 soundBtn.addEventListener('click', e => {
   e.stopPropagation();
   isMuted = !isMuted;
@@ -432,7 +409,7 @@ function renderProfileGrid() {
   videoList.forEach((v, idx) => {
     const item = document.createElement('div');
     item.className = 'profile-item';
-    const thumb = v.thumbnail || 'https://i.imgur.com/KJbRzQY.png?v=11';
+    const thumb = v.thumbnail || 'https://i.imgur.com/KJbRzQY.png?v=12';
     item.innerHTML = `
       <button class="profile-delete" data-idx="${idx}">×</button>
       <img src="${thumb}" class="profile-thumb" alt="วิดีโอ" loading="lazy">
@@ -468,7 +445,7 @@ function showPage(page) {
 document.querySelectorAll('[data-page]').forEach(b => { b.onclick = () => showPage(b.dataset.page); });
 
 shareBtn.onclick = async () => {
-  const link = window.location.href.split('?')[0] + '?v=1121-11';
+  const link = window.location.href.split('?')[0] + '?v=1121-12';
   try {
     if (navigator.share) await navigator.share({title:'ThaiPodee', url:link});
     else { await navigator.clipboard.writeText(link); alert('✅ คัดลอกแล้ว'); }
