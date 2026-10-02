@@ -1,12 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-THUMBNAIL-FIX
-   แก้ด่วน: รูปในโปรไฟล์ไม่ขึ้น / บล็อกไม่เต็มขนาด
-   อัปเดต: 2 ตุลาคม 2569 15:08 น.
+   ThaiPodee v1121-6-THUMBNAIL-FINAL
+   แก้ด่วน: รูปในโปรไฟล์ไม่ขึ้น
+   อัปเดต: 2 ตุลาคม 2569 15:15 น.
    --------------------------------------------------------------
-   ✅ รูปแสดงเต็มบล็อก ชัดเจนทันที
-   ✅ 4 คอลัมน์ × 2 แถว เท่ากันทุกช่อง
+   ✅ สร้างรูปย่อจากวิดีโอโดยตรง
+   ✅ รูปแสดงเต็มบล็อกทันที
+   ✅ 4 คอลัมน์ × 2 แถว
    ✅ วิดีโอพอดีจอ ไม่ล้น
-   ✅ กดเล่นได้ / ลบได้ ปกติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -265,47 +265,86 @@ videoPlayer.addEventListener('ended', () => {
   videoPlayer.play();
 });
 
+// ✅ ฟังก์ชันสร้างรูปย่อจากวิดีโอโดยตรง
+function generateThumbnail(file, callback) {
+  const video = document.createElement('video');
+  video.src = URL.createObjectURL(file);
+  video.muted = true;
+  video.playsInline = true;
+  video.crossOrigin = 'anonymous';
+
+  video.addEventListener('loadeddata', () => {
+    video.currentTime = Math.min(1, video.duration / 4);
+  });
+
+  video.addEventListener('seeked', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 640;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    try {
+      const thumbnail = canvas.toDataURL('image/png');
+      callback(thumbnail);
+    } catch {
+      callback(null);
+    }
+
+    try { URL.revokeObjectURL(video.src); } catch {}
+  });
+
+  video.addEventListener('error', () => {
+    callback(null);
+  });
+}
+
+// ✅ อัปโหลดแล้วสร้างรูปย่อทันที
 uploadBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => {
   const f = e.target.files[0];
   if (!f) return;
+
   const u = URL.createObjectURL(f);
-  // ✅ บันทึกทั้ง url และ thumbnail ให้ชัดเจน
-  videoList.unshift({
-    id: Date.now(),
-    name: f.name,
-    url: u,
-    thumbnail: u  // ใช้ไฟล์เดียวกันเป็นรูปย่อโดยตรง
+
+  generateThumbnail(f, thumb => {
+    videoList.unshift({
+      id: Date.now(),
+      name: f.name,
+      url: u,
+      thumbnail: thumb || u
+    });
+
+    saveVideos();
+    renderProfileGrid();
+    loadVideo(0);
+    currentIndex = 0;
+    fileInput.value = '';
   });
-  saveVideos();
-  renderProfileGrid();
-  loadVideo(0);
-  currentIndex = 0;
-  fileInput.value = '';
 });
 
 function saveVideos() {
   localStorage.setItem('thaiPodeeVideos', JSON.stringify(videoList));
 }
 
-// ✅ สร้างรูปย่อจากวิดีโอโดยตรง — แก้ปัญหารูปไม่ขึ้น
+// ✅ โหลดรูปย่อแน่นอน ถ้าไม่มีใช้ fallback
 function renderProfileGrid() {
   profileGrid.innerHTML = '';
-  const showList = videoList.slice(0, 8); // แสดงแค่ 8 อันแรก = 4×2
+  const showList = videoList.slice(0, 8);
 
   showList.forEach((v, displayIndex) => {
     const item = document.createElement('div');
     item.className = 'profile-item';
     item.dataset.id = v.id;
 
-    // ✅ ใช้แท็กวิดีโอเป็นภาพแทนถ้าเป็นไปได้ หรือใช้ img ปกติ
+    const thumbSrc = v.thumbnail || 'https://i.imgur.com/KJbRzQY.png?v=6';
+
     item.innerHTML = `
       <button class="profile-delete" data-idx="${displayIndex}">×</button>
-      <img src="${v.thumbnail}" class="profile-thumb" alt="วิดีโอ" loading="eager" onerror="this.style.background='#444'; this.alt='ไม่มีรูป'">
+      <img src="${thumbSrc}" class="profile-thumb" alt="วิดีโอ" loading="eager" onerror="this.src='https://i.imgur.com/KJbRzQY.png?v=6'">
     `;
 
-    // กดเพื่อเล่น
-    item.addEventListener('click', (ev) => {
+    item.addEventListener('click', ev => {
       if (ev.target.classList.contains('profile-delete')) return;
       const realIndex = videoList.findIndex(x => x.id === v.id);
       if (realIndex !== -1) {
@@ -318,24 +357,20 @@ function renderProfileGrid() {
     profileGrid.appendChild(item);
   });
 
-  // ปุ่มลบ
   document.querySelectorAll('.profile-delete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', e => {
       e.stopPropagation();
       const displayIdx = parseInt(btn.dataset.idx);
       const targetId = showList[displayIdx]?.id;
       const realIdx = videoList.findIndex(x => x.id === targetId);
-      
-      if (realIdx === -1) return;
-      if (!confirm('ลบวิดีโอนี้?')) return;
 
-      // ปล่อย URL เพื่อประหยัดหน่วยความจำ
+      if (realIdx === -1 || !confirm('ลบวิดีโอนี้?')) return;
+
       try { URL.revokeObjectURL(videoList[realIdx].url); } catch {}
-      
       videoList.splice(realIdx, 1);
       saveVideos();
       renderProfileGrid();
-      
+
       if (currentIndex >= videoList.length) {
         currentIndex = Math.max(0, videoList.length - 1);
       }
@@ -348,7 +383,7 @@ function showPage(page) {
   mainScreen.classList.toggle('hidden', page === 'profile');
   profileScreen.classList.toggle('active', page === 'profile');
   if (page === 'profile') {
-    setTimeout(renderProfileGrid, 50); // รอปาดหน้าเสร็จแล้วค่อยวาด
+    setTimeout(renderProfileGrid, 100);
   }
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
