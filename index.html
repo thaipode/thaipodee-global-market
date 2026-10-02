@@ -1,13 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-NO-HANG
-   แก้ด่วน: ค้างหน้าเริ่มต้น / ไม่เข้าแอป
-   อัปเดต: 2 ตุลาคม 2569 17:25 น.
+   ThaiPodee v1121-6-SOUND-TIMELINE
+   แก้: ไม่มีเสียง / ไม่มีแถบเวลา
+   อัปเดต: 2 ตุลาคม 2569 17:35 น.
    --------------------------------------------------------------
-   ✅ หน้าเริ่มต้นหายเร็ว 800 มิลลิวินาที
-   ✅ ไม่มีอะไรบล็อก — เข้าใช้งานทันที
-   ✅ วิดีโอเล่น-หยุดได้ / วนซ้ำ
-   ✅ โปรไฟล์ 3 คอลัมน์ รูปย่อไม่หาย
-   ✅ กด + อัปโหลดได้เลย
+   ✅ มีเสียงปกติ — ไม่ปิดเสียงอัตโนมัติ
+   ✅ มีแถบเวลา + ปุ่มเปิด/ปิดเสียง
+   ✅ เล่น-หยุด-เล่นต่อได้ / วนซ้ำจบแล้วเล่นใหม่
+   ✅ โหลดวิดีโอได้ / โปรไฟล์ 3 คอลัมน์ ปกติ
+   ✅ รูปย่อไม่หาย
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -17,7 +17,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="theme-color" content="#e60000">
+<meta name="theme-color" content="#000000">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -31,7 +31,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:#000;font-family:sans-serif;color:#fff}
 
-/* ---- หน้าเริ่มต้น — เร็วที่สุด ---- */
+/* ---- หน้าเริ่มต้น ---- */
 .splash{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s ease}
 .splash.hidden{opacity:0;pointer-events:none}
 .splash-logo{font-size:2.5rem;font-weight:bold;color:#e60000;margin-bottom:.5rem}
@@ -45,26 +45,34 @@ html,body{height:100%;background:#000;font-family:sans-serif;color:#fff}
 .main-screen.hidden{display:none}
 
 /* วิดีโอพอดีจอ */
-.video-container{position:absolute;inset:0;background:#000;overflow:hidden;z-index:1}
+.video-container{position:absolute;top:0;left:0;right:0;bottom:80px;background:#000;overflow:hidden;z-index:1}
 video{
   position:absolute;
   top:50%;left:50%;
   transform:translate(-50%,-50%);
   max-width:100vw;
-  max-height:100vh;
+  max-height:calc(100vh - 80px);
   width:auto;height:auto;
   object-fit:contain;
   background:#000;
 }
 .tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
 
+/* ---- แถบควบคุมเวลา + เสียง ---- */
+.controls-bar{position:absolute;bottom:70px;left:0;right:0;z-index:15;padding:8px 12px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);display:flex;align-items:center;gap:10px}
+.time-slider{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:#444;border-radius:2px;outline:none}
+.time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none}
+.time-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none}
+.time-text{font-size:11px;color:#aaa;white-space:nowrap;min-width:70px;text-align:center}
+.sound-btn{font-size:18px;background:transparent;border:none;color:#fff;cursor:pointer;padding:4px 8px}
+
 /* ข้อมูลใต้วิดีโอ */
-.video-info{position:absolute;left:15px;bottom:100px;right:80px;z-index:20}
+.video-info{position:absolute;left:15px;bottom:130px;right:80px;z-index:20}
 .video-title{font-size:15px;font-weight:bold;margin-bottom:4px}
 .video-desc{font-size:12px;color:#aaa}
 
 /* ปุ่มด้านขวา */
-.side-icons{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:20}
+.side-icons{position:absolute;right:12px;bottom:150px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:20}
 .side-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .profile-circle{width:42px;height:42px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#333}
 .profile-circle img{width:100%;height:100%;object-fit:cover}
@@ -78,7 +86,7 @@ video{
 .nav-icon{font-size:22px;line-height:1}
 .plus-btn{width:48px;height:34px;background:#e60000;border-radius:6px;border:none;color:#fff;font-size:22px;font-weight:bold;cursor:pointer}
 
-/* ซ่อนอินพุตไฟล์*/
+/*ซ่อนอินพุตไฟล์*/
 #fileInput{display:none}
 
 /* หน้าโปรไฟล์ 3 คอลัมน์ */
@@ -113,15 +121,23 @@ video{
   <div class="version-tag">v1121-6</div>
 
   <div class="video-container">
-    <video id="videoPlayer" loop playsinline webkit-playsinline muted>
+    <video id="videoPlayer" loop playsinline webkit-playsinline>
+      <!-- ❌ ไม่ใส่ muted — มีเสียงปกติ -->
       <source src="" type="video/mp4">
     </video>
     <div class="tap-layer" id="tapLayer"></div>
   </div>
 
+  <!-- ✅ แถบควบคุมเวลา + เสียง -->
+  <div class="controls-bar">
+    <button class="sound-btn" id="soundBtn">🔊</button>
+    <span class="time-text" id="timeDisplay">0:00 / 0:00</span>
+    <input type="range" class="time-slider" id="timeSlider" min="0" max="100" value="0">
+  </div>
+
   <div class="video-info">
     <div class="video-title">ThaiPodee</div>
-    <div class="video-desc">แตะหน้าจอ = หยุด / เล่น</div>
+    <div class="video-desc">แตะหน้าจอ = หยุด / เล่น — มีเสียง</div>
   </div>
 
   <div class="side-icons">
@@ -200,6 +216,7 @@ const VERSION = 'v1121-6';
 let videoList = JSON.parse(localStorage.getItem('thaiPodeeVideos') || '[]');
 let currentIndex = 0;
 let isPlaying = true;
+let isMuted = false;
 
 const splash = document.getElementById('splash');
 const mainScreen = document.getElementById('mainScreen');
@@ -211,8 +228,11 @@ const uploadBtn = document.getElementById('uploadBtn');
 const shareBtn = document.getElementById('shareBtn');
 const profileGrid = document.getElementById('profileGrid');
 const postCount = document.getElementById('postCount');
+const timeSlider = document.getElementById('timeSlider');
+const timeDisplay = document.getElementById('timeDisplay');
+const soundBtn = document.getElementById('soundBtn');
 
-// ✅ ปิดหน้าเริ่มต้นเร็วที่สุด — ไม่ค้าง
+// ปิดหน้าเริ่มต้น
 setTimeout(() => {
   splash.classList.add('hidden');
   if (videoList.length > 0) {
@@ -222,11 +242,48 @@ setTimeout(() => {
   updateProfileStats();
 }, 800);
 
+// แปลงเวลาเป็น นาที:วินาที
+function formatTime(secs) {
+  if (!secs || isNaN(secs)) return '0:00';
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// อัปเดตแถบเวลา
+videoPlayer.addEventListener('timeupdate', () => {
+  if (videoPlayer.duration) {
+    const pct = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+    timeSlider.value = pct;
+    timeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
+  }
+});
+
+// เลื่อนแถบเวลา
+timeSlider.addEventListener('input', () => {
+  if (videoPlayer.duration) {
+    videoPlayer.currentTime = (timeSlider.value / 100) * videoPlayer.duration;
+  }
+});
+
+// ปิด/เปิดเสียง
+soundBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  isMuted = !isMuted;
+  videoPlayer.muted = isMuted;
+  soundBtn.textContent = isMuted ? '🔇' : '🔊';
+});
+
 function loadVideo(i) {
   if (!videoList.length) return;
   videoPlayer.src = videoList[i].url;
   videoPlayer.load();
-  if (isPlaying) videoPlayer.play().catch(() => {});
+  if (isPlaying) {
+    // พยายามเล่น — ถ้าเบราว์เซอร์บล็อก ให้ผู้ใช้แตะเอง
+    videoPlayer.play().catch(() => {
+      isPlaying = false;
+    });
+  }
 }
 
 tapLayer.addEventListener('click', () => {
