@@ -1,7 +1,7 @@
 <!-- ==============================================================
-   ThaiPodee v1121-6-TIME-UNDER-INFO
-   ย้ายแถบเวลา+ลำโพง → ใต้ชื่อวิดีโอ / เหนือเมนูล่าง
-   อัปเดต: 2 ต.ค. 2569 20:35 น.
+   ThaiPodee v1121-6-FIX-BOTTOM-OVERLAP
+   แก้: ยกชื่อผู้ใช้ / แถบเวลา / เมนูไอคอนขวา ขึ้นเหนือเมนูล่าง
+   อัปเดต: 2 ตุลาคม 2569 21:10 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -38,42 +38,42 @@ html,body{height:100%;background:#000;font-family:sans-serif;color:#fff}
 .main-screen{position:relative;width:100%;height:100vh;display:block}
 .main-screen.hidden{display:none}
 
-/* วิดีโอเต็มพื้นที่ */
-.video-container{position:absolute;top:0;left:0;right:0;bottom:170px;background:#000;overflow:hidden;z-index:1}
+/* ✅ วิดีโอปรับพื้นที่ ไม่ทับเมนูล่าง */
+.video-container{position:absolute;top:0;left:0;right:0;bottom:210px;background:#000;overflow:hidden;z-index:1}
 video{
   position:absolute;
   top:50%;left:50%;
   transform:translate(-50%,-50%);
   max-width:100vw;
-  max-height:calc(100vh - 170px);
+  max-height:calc(100vh - 210px);
   width:auto;height:auto;
   object-fit:contain;
   background:#000;
 }
 .tap-layer{position:absolute;inset:0;z-index:10;cursor:pointer}
 
-/* ข้อมูลวิดีโอ */
-.video-info{position:absolute;left:15px;bottom:115px;right:80px;z-index:20}
+/* ✅ ชื่อผู้ใช้ / ข้อมูลวิดีโอ ยกขึ้น อยู่บนแถบเวลา */
+.video-info{position:absolute;left:15px;bottom:145px;right:80px;z-index:20}
 .video-title{font-size:15px;font-weight:bold;margin-bottom:3px}
 .video-desc{font-size:12px;color:#aaa}
 
-/* ✅ แถบควบคุม — ใต้ชื่อวิดีโอ / เหนือเมนูล่าง */
-.controls-bar{position:absolute;left:15px;right:15px;bottom:80px;z-index:22;display:flex;align-items:center;gap:10px;padding:6px 10px;background:rgba(0,0,0,.5);border-radius:20px}
+/* ✅ แถบเวลา + ลำโพง ยกขึ้น อยู่เหนือเมนูล่าง */
+.controls-bar{position:absolute;left:15px;right:15px;bottom:110px;z-index:22;display:flex;align-items:center;gap:10px;padding:6px 10px;background:rgba(0,0,0,.5);border-radius:20px}
 .sound-btn{font-size:18px;background:transparent;border:none;color:#fff;cursor:pointer;padding:2px 6px}
 .time-slider{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:#444;border-radius:2px;outline:none}
 .time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none}
 .time-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;cursor:pointer;border:none}
 .time-text{font-size:11px;color:#aaa;white-space:nowrap;min-width:70px;text-align:center}
 
-/* ปุ่มด้านขวา */
-.side-icons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:20}
+/* ✅ เมนูไอคอนด้านขวา ยกขึ้น ไม่ทับแถบเวลา */
+.side-icons{position:absolute;right:12px;bottom:190px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:20}
 .side-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .profile-circle{width:42px;height:42px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#333}
 .profile-circle img{width:100%;height:100%;object-fit:cover}
 .side-icon{font-size:22px}
 .side-count{font-size:9px;color:#888}
 
-/* เมนูล่าง — ไม่ถูกบัง */
+/* ✅ เมนูแนวนอนล่าง อยู่นิ่ง ไม่ถูกบัง */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:rgba(0,0,0,.85);display:flex;justify-content:space-around;align-items:center;padding:0 5px;z-index:30;border-top:1px solid #222}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:9px;color:#888}
 .nav-item.active{color:#fff}
@@ -121,19 +121,20 @@ video{
     <div class="tap-layer" id="tapLayer"></div>
   </div>
 
-  <!-- ชื่อ/คำอธิบายวิดีโอ -->
+  <!-- ✅ ชื่อผู้ใช้ / ข้อมูลวิดีโอ -->
   <div class="video-info">
     <div class="video-title">ThaiPodee</div>
     <div class="video-desc">แตะหน้าจอ = หยุด / เล่น</div>
   </div>
 
-  <!-- ✅ แถบเวลา+ลำโพง → ใต้ชื่อวิดีโอ / เหนือเมนูล่าง -->
+  <!-- ✅ แถบเวลา + ลำโพง -->
   <div class="controls-bar">
     <button class="sound-btn" id="soundBtn">🔊</button>
     <span class="time-text" id="timeDisplay">0:00 / 0:00</span>
     <input type="range" class="time-slider" id="timeSlider" min="0" max="100" value="0">
   </div>
 
+  <!-- ✅ เมนูไอคอนด้านขวา -->
   <div class="side-icons">
     <div class="side-btn" data-page="profile">
       <div class="profile-circle">
@@ -162,6 +163,7 @@ video{
     </div>
   </div>
 
+  <!-- ✅ เมนูแนวนอนล่าง -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-page="main">
       <span class="nav-icon">🏠</span>
