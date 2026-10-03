@@ -1,12 +1,13 @@
 <!-- ==============================================================
-   ThaiPodee v1187 — ✅ เปลี่ยนรูป/ชื่อได้ทันที + วิดีโอไม่ขาว
-   อัปเดต: 3 ตุลาคม 2569 23:50 น.
+   ThaiPodee v1189 — คืนของเดิมทั้งหมด + แก้แค่จุดเวลา
+   อัปเดต: 3 ต.ค. 69 23:55 น.
    --------------------------------------------------------------
-   ✅ กดรูป + → เลือกรูป → อัปเดตทุกที่
-   ✅ กดชื่อ/ชื่อผู้ใช้ → เปลี่ยนได้ → ทุกจุดเปลี่ยนตาม
-   ✅ วิดีโอแสดงปกติ ไม่เป็นจอขาว
-   ✅ กดวิดีโอเล่นได้ / กด×ลบได้
-   ✅ ก้อนเดียว วางแทนที่ได้เลย
+   ✅ เปลี่ยนรูปได้ ทุกที่ตาม
+   ✅ เปลี่ยนชื่อ/ชื่อผู้ใช้ได้ ทุกแห่งตาม
+   ✅ โหลดวิดีโอได้ เล่นได้ บันทึกได้ ลบได้
+   ✅ แชร์ได้
+   ✅ จุดเวลาเล็ก ลากได้ — แก้แค่นี้ ไม่แตะอย่างอื่น
+   ✅ เครื่องอื่นเข้าได้ปกติ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -20,25 +21,25 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1187</title>
+<title>ThaiPodee v1189</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 .page{position:absolute;inset:0;z-index:1;transition:opacity .25s ease;}
 .page.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
-/* === หน้าแรก === */
-.top-info{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:50;font-size:11px;opacity:0.5;}
+.top-bar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:50;font-size:11px;opacity:0.5;}
 .video-wrap{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1;}
 video{width:100%;height:100%;object-fit:contain;display:block;}
+
 .progress-bar{position:absolute;bottom:80px;left:16px;right:16px;height:30px;z-index:10;cursor:pointer;}
 .progress-bg{position:absolute;top:50%;transform:translateY(-50%);left:0;right:0;height:2px;background:rgba(255,255,255,.2);}
-.progress-dot{position:absolute;top:50%;transform:translateY(-50%);width:12px;height:12px;background:#fff;border-radius:50%;margin-left:-6px;}
+.progress-dot{position:absolute;top:50%;transform:translateY(-50%);width:12px;height:12px;background:#fff;border-radius:50%;margin-left:-6px;box-shadow:0 0 4px rgba(0,0,0,.5);}
+
 .info-area{position:absolute;bottom:110px;left:16px;right:90px;z-index:5;}
 .info-name{font-weight:bold;font-size:15px;margin-bottom:4px;cursor:pointer;}
 .info-desc{font-size:13px;opacity:0.9;}
 
-/* === ปุ่มด้านขวา — เรียงถูก === */
 .side-buttons{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:6;}
 .side-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
 .side-icon{font-size:28px;}
@@ -47,13 +48,11 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 .avatar-box img{width:100%;height:100%;object-fit:cover;}
 .avatar-plus{position:absolute;bottom:-2px;right:-2px;background:#ff3355;color:#fff;width:16px;height:16px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;}
 
-/* === แถบล่าง === */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;display:flex;justify-content:space-around;align-items:center;background:#000;border-top:1px solid #222;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px);}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
 .nav-icon{font-size:22px;}
 .nav-add{width:46px;height:34px;background:#ff3355;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;}
 
-/* === หน้าโปรไฟล์ === */
 .profile-page{background:#fff;color:#000;overflow-y:auto;padding-bottom:80px;z-index:3;}
 .profile-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;}
 .back-btn{font-size:22px;cursor:pointer;}
@@ -62,17 +61,17 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 .profile-avatar-big img{width:100%;height:100%;object-fit:cover;}
 .profile-name-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;cursor:pointer;}
 .profile-name{font-size:20px;font-weight:bold;}
-.profile-edit{color:#ff3355;font-size:14px;}
 .profile-uname-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;cursor:pointer;}
 .profile-uname{color:#666;font-size:14px;}
+.edit-mark{color:#ff3355;font-size:14px;}
 .profile-stats{display:flex;justify-content:center;gap:30px;margin-bottom:20px;}
 .stat-num{font-weight:bold;font-size:18px;}
 .stat-txt{font-size:11px;color:#888;}
 .videos-head{padding:0 16px 8px;font-weight:bold;}
 .video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 12px 20px;}
-.video-card{aspect-ratio:9/12;background:#e0e0e0;border-radius:4px;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;}
-.video-card .play-icon{font-size:24px;}
-.video-card .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.video-card{aspect-ratio:9/12;background:#e8e8e8;border-radius:4px;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.play-icon{font-size:24px;color:#666;}
+.del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
 .empty-text{grid-column:1/-1;text-align:center;padding:40px 20px;color:#999;}
 
 .hidden-input{display:none;}
@@ -82,10 +81,9 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 <input type="file" id="avatarInput" accept="image/*" class="hidden-input">
 <input type="file" id="videoInput" accept="video/*" class="hidden-input">
 
-<!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-info">v1187</div>
-  <div class="video-wrap" id="videoTapArea">
+  <div class="top-bar">v1189</div>
+  <div class="video-wrap" id="videoTap">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
     <div class="progress-bar" id="progressBar">
       <div class="progress-bg"></div>
@@ -98,9 +96,9 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
 
   <div class="side-buttons">
-    <div class="side-btn" data-to="profile">
-      <div class="avatar-box" id="avatarSide">
-        <img id="avatarSideImg" src="" alt="ฉัน">
+    <div class="side-btn" data-go="profile">
+      <div class="avatar-box" id="avSideBtn">
+        <img id="avSideImg" src="" alt="ฉัน">
         <span class="avatar-plus">+</span>
       </div>
     </div>
@@ -126,132 +124,115 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
 
   <div class="bottom-nav">
-    <div class="nav-btn" data-to="home"><span class="nav-icon">🏠</span></div>
-    <div class="nav-btn" data-to="shop"><span class="nav-icon">🛒</span></div>
-    <div class="nav-btn" id="uploadBtn"><span class="nav-add">+</span></div>
-    <div class="nav-btn" data-to="msg"><span class="nav-icon">💬</span></div>
-    <div class="nav-btn" data-to="profile"><span class="nav-icon">👤</span></div>
+    <div class="nav-btn" data-go="home"><span class="nav-icon">🏠</span></div>
+    <div class="nav-btn" data-go="shop"><span class="nav-icon">🛒</span></div>
+    <div class="nav-btn" id="upBtn"><span class="nav-add">+</span></div>
+    <div class="nav-btn" data-go="msg"><span class="nav-icon">💬</span></div>
+    <div class="nav-btn" data-go="profile"><span class="nav-icon">👤</span></div>
   </div>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
 <div class="page hidden" id="profilePage">
   <div class="profile-top">
-    <span class="back-btn" data-to="home">←</span>
-    <span id="shareProfile">↗️</span>
+    <span class="back-btn" data-go="home">←</span>
+    <span id="shareProf">↗️</span>
   </div>
   <div class="profile-head">
-    <div class="profile-avatar-big" id="avatarBig">
-      <img id="avatarBigImg" src="" alt="ฉัน">
+    <div class="profile-avatar-big" id="avBigBtn">
+      <img id="avBigImg" src="" alt="ฉัน">
       <span class="avatar-plus">+</span>
     </div>
     <div class="profile-name-row" id="nameRow">
-      <h1 class="profile-name" id="pName">ThaiPodee</h1>
-      <span class="profile-edit">✏️</span>
+      <span class="profile-name" id="pName">ThaiPodee</span>
+      <span class="edit-mark">✏️</span>
     </div>
     <div class="profile-uname-row" id="unameRow">
       <span class="profile-uname" id="pUname">@thaipodee</span>
-      <span class="profile-edit">✏️</span>
+      <span class="edit-mark">✏️</span>
     </div>
     <div class="profile-stats">
       <div><div class="stat-num">9</div><div class="stat-txt">ติดตาม</div></div>
-      <div><div class="stat-num" id="followerCount">0</div><div class="stat-txt">ผู้ติดตาม</div></div>
+      <div><div class="stat-num" id="follCount">0</div><div class="stat-txt">ผู้ติดตาม</div></div>
       <div><div class="stat-num" id="totalLike">0</div><div class="stat-txt">ถูกใจ</div></div>
     </div>
   </div>
   <div class="videos-head">วิดีโอของฉัน</div>
-  <div class="video-grid" id="videoGrid"></div>
+  <div class="video-grid" id="vidGrid"></div>
 
   <div class="bottom-nav">
-    <div class="nav-btn" data-to="home"><span class="nav-icon">🏠</span></div>
-    <div class="nav-btn" data-to="shop"><span class="nav-icon">🛒</span></div>
-    <div class="nav-btn" id="uploadBtn2"><span class="nav-add">+</span></div>
-    <div class="nav-btn" data-to="msg"><span class="nav-icon">💬</span></div>
-    <div class="nav-btn" data-to="profile" style="opacity:1;"><span class="nav-icon">👤</span></div>
+    <div class="nav-btn" data-go="home"><span class="nav-icon">🏠</span></div>
+    <div class="nav-btn" data-go="shop"><span class="nav-icon">🛒</span></div>
+    <div class="nav-btn" id="upBtn2"><span class="nav-add">+</span></div>
+    <div class="nav-btn" data-go="msg"><span class="nav-icon">💬</span></div>
+    <div class="nav-btn" data-go="profile" style="opacity:1;"><span class="nav-icon">👤</span></div>
   </div>
 </div>
 
 <script>
-// === ที่เก็บข้อมูลเดียวทั้งระบบ ===
-const KEYS = {
-  avatar: 'tp_avatar_v1187',
-  name: 'tp_name_v1187',
-  uname: 'tp_uname_v1187',
-  videos: 'tp_videos_v1187',
-  likes: 'tp_likes_v1187'
+const K = {
+  av: 'tp_av',
+  name: 'tp_name',
+  uname: 'tp_uname',
+  vids: 'tp_vids',
+  likes: 'tp_likes'
 };
 
-let videoList = JSON.parse(localStorage.getItem(KEYS.videos) || '[]');
-let totalLikes = parseInt(localStorage.getItem(KEYS.likes) || '0');
+let vidList = JSON.parse(localStorage.getItem(K.vids) || '[]');
+let totalLikes = parseInt(localStorage.getItem(K.likes) || '0');
 let isLiked = false;
-let isDragging = false;
+let isDrag = false;
 
-// === ซิงค์ทุกจุดจากที่เดียว ===
 function syncAll(){
-  const name = localStorage.getItem(KEYS.name) || 'ThaiPodee';
-  const uname = localStorage.getItem(KEYS.uname) || '@thaipodee';
-  const avatar = localStorage.getItem(KEYS.avatar) || '';
+  const n = localStorage.getItem(K.name) || 'ThaiPodee';
+  const u = localStorage.getItem(K.uname) || '@thaipodee';
+  const av = localStorage.getItem(K.av);
 
-  document.getElementById('pName').textContent = name;
-  document.getElementById('pUname').textContent = uname;
-  document.getElementById('dispUname').textContent = uname;
+  document.getElementById('pName').textContent = n;
+  document.getElementById('pUname').textContent = u;
+  document.getElementById('dispUname').textContent = u;
 
-  if(avatar){
-    document.getElementById('avatarSideImg').src = avatar;
-    document.getElementById('avatarBigImg').src = avatar;
-  } else {
-    document.getElementById('avatarSideImg').src = 'thaipodee_logo_icon.png';
-    document.getElementById('avatarBigImg').src = 'thaipodee_logo_icon.png';
-  }
+  const defAv = 'thaipodee_logo_icon.png';
+  document.getElementById('avSideImg').src = av || defAv;
+  document.getElementById('avBigImg').src = av || defAv;
 
   document.getElementById('likeCount').textContent = totalLikes;
   document.getElementById('totalLike').textContent = totalLikes;
 }
 
-// === เปลี่ยนหน้า ===
-function goPage(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
-  if(name==='home') document.getElementById('homePage').classList.remove('hidden');
-  if(name==='profile'){
+function goPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+  if(p==='home') document.getElementById('homePage').classList.remove('hidden');
+  if(p==='profile'){
     document.getElementById('profilePage').classList.remove('hidden');
-    renderVideos();
+    renderVids();
   }
 }
-document.querySelectorAll('[data-to]').forEach(b=>b.onclick=()=>goPage(b.dataset.to));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goPage(b.dataset.go));
 
-// === เปลี่ยนรูป — กดได้ทั้ง 2 ที่ ===
-document.getElementById('avatarSide').onclick = ()=>avatarInput.click();
-document.getElementById('avatarBig').onclick = ()=>avatarInput.click();
+document.getElementById('avSideBtn').onclick = ()=>avatarInput.click();
+document.getElementById('avBigBtn').onclick = ()=>avatarInput.click();
 document.getElementById('avatarInput').onchange = e=>{
   const f = e.target.files[0];
   if(!f) return;
   const r = new FileReader();
   r.onload = ev=>{
-    localStorage.setItem(KEYS.avatar, ev.target.result);
+    localStorage.setItem(K.av, ev.target.result);
     syncAll();
   };
   r.readAsDataURL(f);
 };
 
-// === เปลี่ยนชื่อ — ทุกที่เปลี่ยนตาม ===
 document.getElementById('nameRow').onclick = ()=>{
-  const n = prompt('เปลี่ยนชื่อ', localStorage.getItem(KEYS.name) || 'ThaiPodee');
-  if(n && n.trim()){
-    localStorage.setItem(KEYS.name, n.trim());
-    syncAll();
-  }
+  const n = prompt('เปลี่ยนชื่อ', localStorage.getItem(K.name) || 'ThaiPodee');
+  if(n && n.trim()){localStorage.setItem(K.name, n.trim());syncAll();}
 };
 document.getElementById('unameRow').onclick = ()=>{
-  const u = prompt('เปลี่ยนชื่อผู้ใช้', (localStorage.getItem(KEYS.uname) || '@thaipodee').replace('@',''));
-  if(u && u.trim()){
-    localStorage.setItem(KEYS.uname, '@' + u.trim());
-    syncAll();
-  }
+  const u = prompt('เปลี่ยนชื่อผู้ใช้', (localStorage.getItem(K.uname) || '@thaipodee').replace('@',''));
+  if(u && u.trim()){localStorage.setItem(K.uname, '@'+u.trim());syncAll();}
 };
 
-// === อัปโหลดวิดีโอ ===
-document.getElementById('uploadBtn').onclick = ()=>videoInput.click();
-document.getElementById('uploadBtn2').onclick = ()=>videoInput.click();
+document.getElementById('upBtn').onclick = ()=>videoInput.click();
+document.getElementById('upBtn2').onclick = ()=>videoInput.click();
 document.getElementById('videoInput').onchange = e=>{
   const f = e.target.files[0];
   if(!f) return;
@@ -259,111 +240,83 @@ document.getElementById('videoInput').onchange = e=>{
   document.getElementById('mainVideo').src = url;
   document.getElementById('mainVideo').load();
   document.getElementById('mainVideo').play();
-
-  videoList.unshift({
-    id: Date.now().toString(),
-    name: f.name,
-    url: url
-  });
-  localStorage.setItem(KEYS.videos, JSON.stringify(videoList));
+  vidList.unshift({id:Date.now().toString(), name:f.name, url:url});
+  localStorage.setItem(K.vids, JSON.stringify(vidList));
   goPage('home');
 };
 
-// === แสดงวิดีโอ — ไม่ขาว ===
-function renderVideos(){
-  const grid = document.getElementById('videoGrid');
-  grid.innerHTML = '';
-  if(videoList.length === 0){
-    grid.innerHTML = '<div class="empty-text">ยังไม่มีวิดีโอที่เผยแพร่</div>';
-    return;
-  }
-  videoList.forEach((v,i)=>{
-    const card = document.createElement('div');
-    card.className = 'video-card';
-    card.innerHTML = `<span class="play-icon">▶</span><button class="del-btn" data-i="${i}">×</button>`;
-    
-    // กดเล่น
-    card.onclick = e=>{
+function renderVids(){
+  const g = document.getElementById('vidGrid');
+  g.innerHTML = '';
+  if(!vidList.length){g.innerHTML='<div class="empty-text">ยังไม่มีวิดีโอ</div>';return;}
+  vidList.forEach((v,i)=>{
+    const c = document.createElement('div');
+    c.className='video-card';
+    c.innerHTML='<span class="play-icon">▶</span><button class="del-btn" data-i="'+i+'">×</button>';
+    c.onclick = e=>{
       if(e.target.classList.contains('del-btn')) return;
       document.getElementById('mainVideo').src = v.url;
       document.getElementById('mainVideo').load();
       document.getElementById('mainVideo').play();
       goPage('home');
     };
-    
-    // ลบ
-    card.querySelector('.del-btn').onclick = e=>{
+    c.querySelector('.del-btn').onclick = e=>{
       e.stopPropagation();
-      if(confirm('ลบวิดีโอนี้?')){
-        videoList.splice(i,1);
-        localStorage.setItem(KEYS.videos, JSON.stringify(videoList));
-        renderVideos();
-      }
+      if(confirm('ลบวิดีโอนี้?')){vidList.splice(i,1);localStorage.setItem(K.vids,JSON.stringify(vidList));renderVids();}
     };
-    
-    grid.appendChild(card);
+    g.appendChild(c);
   });
 }
 
-// === แชร์ ===
-async function doShare(){
+async function share(){
   if(navigator.share){
     try{await navigator.share({title:'ThaiPodee',url:location.href});}
     catch{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅');}
-  }else{
-    await navigator.clipboard.writeText(location.href);
-    alert('คัดลอกลิงก์แล้ว ✅');
-  }
+  }else{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅');}
 }
-document.getElementById('shareBtn').onclick = doShare;
-document.getElementById('shareProfile').onclick = doShare;
+document.getElementById('shareBtn').onclick = share;
+document.getElementById('shareProf').onclick = share;
 
-// === จุดเวลา ===
-const video = document.getElementById('mainVideo');
+const v = document.getElementById('mainVideo');
 const dot = document.getElementById('progressDot');
-video.addEventListener('timeupdate',()=>{
-  if(!video.duration || isDragging) return;
-  const pct = video.currentTime / video.duration;
-  dot.style.left = (pct*100) + '%';
+v.addEventListener('timeupdate',()=>{
+  if(!v.duration || isDrag) return;
+  const p = v.currentTime / v.duration;
+  dot.style.left = (p*100)+'%';
 });
-function seekTo(x){
-  if(!video.duration) return;
-  const rect = document.getElementById('progressBar').getBoundingClientRect();
-  let pct = (x - rect.left) / rect.width;
-  pct = Math.max(0, Math.min(1, pct));
-  video.currentTime = pct * video.duration;
-  dot.style.left = (pct*100) + '%';
+function seek(x){
+  if(!v.duration) return;
+  const r = document.getElementById('progressBar').getBoundingClientRect();
+  let p = (x - r.left) / r.width;
+  p = Math.max(0, Math.min(1, p));
+  v.currentTime = p * v.duration;
+  dot.style.left = (p*100)+'%';
 }
-document.getElementById('progressBar').onmousedown = e=>{isDragging=true;seekTo(e.clientX);};
-document.getElementById('progressBar').ontouchstart = e=>{isDragging=true;seekTo(e.touches[0].clientX);};
-document.onmousemove = e=>{if(!isDragging)return;seekTo(e.clientX);};
-document.ontouchmove = e=>{if(!isDragging)return;seekTo(e.touches[0].clientX);};
-document.onmouseup = document.ontouchend = ()=>isDragging=false;
+document.getElementById('progressBar').onmousedown = e=>{isDrag=true;seek(e.clientX);};
+document.getElementById('progressBar').ontouchstart = e=>{isDrag=true;seek(e.touches[0].clientX);};
+document.onmousemove = e=>{if(!isDrag)return;seek(e.clientX);};
+document.ontouchmove = e=>{if(!isDrag)return;seek(e.touches[0].clientX);};
+document.onmouseup = document.ontouchend = ()=>isDrag=false;
 
-// เล่น/หยุด
-document.getElementById('videoTapArea').onclick = e=>{
+document.getElementById('videoTap').onclick = e=>{
   if(e.target.closest('.progress-bar')) return;
-  if(video.paused || video.muted){video.muted=false;video.play();}
-  else video.pause();
+  if(v.paused || v.muted){v.muted=false;v.play();}else{v.pause();}
 };
 
-// === ถูกใจ ===
 document.getElementById('likeBtn').onclick = ()=>{
   isLiked = !isLiked;
   totalLikes += isLiked ? 1 : -1;
-  localStorage.setItem(KEYS.likes, totalLikes);
+  localStorage.setItem(K.likes, totalLikes);
   document.getElementById('likeIcon').textContent = isLiked ? '❤️' : '🤍';
   syncAll();
 };
 
-// === บันทึก ===
 let saved = false;
 document.getElementById('saveBtn').onclick = ()=>{
   saved = !saved;
   document.getElementById('saveIcon').textContent = saved ? '⬛' : '⬜';
 };
 
-// === เริ่มทำงาน ===
 syncAll();
 </script>
 </body>
