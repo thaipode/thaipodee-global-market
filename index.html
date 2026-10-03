@@ -1,14 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1167 — ✅ + เปลี่ยนรูป | ✏️ เปลี่ยนชื่อ
-   อัปเดต: 3 ตุลาคม 2569 21:39 น.
+   ThaiPodee v1170 — ✅ เหลือแค่ตัวหนังสือสีแดง ไม่มีแถบกว้าง
+   อัปเดต: 3 ตุลาคม 2569 22:10 น.
    --------------------------------------------------------------
-   ✅ รูปโปรไฟล์ → มี + กดเปลี่ยนรูปได้
-   ✅ ชื่อโปรไฟล์ → มี ✏️ กดเปลี่ยนชื่อได้
-   ✅ ชื่อผู้ใช้ → มี ✏️ กดเปลี่ยนได้
-   ✅ ทุกค่าบันทึกอยู่ ไม่หาย
-   ✅ ไอคอนทุกตัวทำงานครบ
-   ✅ วิดีโอเล่นวนซ้ำ / หยุด / แถบเวลา
-   ✅ ติดตั้งแสดงไอคอนถูกต้อง ไม่มีลูกโลก
+   ✅ ยังไม่มี → แสดง "ติดตั้งแอป" สีแดง กระชับ
+   ✅ มีแล้ว → แสดง "ท่านมีแอปในเครื่องของท่านแล้ว" สีเขียว
+   ✅ ไม่มีแถบสีเต็มจอ เหลือแค่ข้อความ
+   ✅ ป้องกันติดตั้งซ้ำ
+   ✅ รูปโปรไฟล์ + เปลี่ยนรูป | ชื่อ ✏️ เปลี่ยนชื่อ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -26,11 +24,11 @@
 <meta name="application-name" content="ThaiPodee">
 <meta name="theme-color" content="#000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1167</title>
+<title>ThaiPodee v1170</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1167">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1167">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1167%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1167%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1170">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1170">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1170%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1170%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -42,13 +40,24 @@ html,body{
   padding-bottom:env(safe-area-inset-bottom);
 }
 
+/* ===== แจ้งเตือน — เหลือแค่ตัวหนังสือ ===== */
+.install-note{
+  position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;
+  z-index:999;display:flex;align-items:center;gap:10px;
+  transition:all .3s ease;
+}
+.install-note.hidden{opacity:0;transform:translateY(-10px);pointer-events:none}
+.install-text{font-size:14px;font-weight:500;cursor:pointer}
+.install-text.need{color:#ff4466}
+.install-text.done{color:#44dd77}
+.close-note{background:transparent;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+
 .page{position:absolute;inset:0;z-index:1;transition:opacity .25s ease,transform .25s ease;}
 .page.hidden{opacity:0;visibility:hidden;transform:translateX(30px);pointer-events:none;}
 
 .top-nav-home{
-  position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;right:12px;
-  display:flex;align-items:flex-start;justify-content:space-between;z-index:100;
-  color:#fff;
+  position:fixed;top:calc(40px + env(safe-area-inset-top,0px));left:12px;right:12px;
+  display:flex;align-items:flex-start;justify-content:space-between;z-index:100;color:#fff;
 }
 .nav-left{font-size:14px;opacity:0.7}
 .nav-center{display:flex;gap:16px;font-size:14px}
@@ -141,7 +150,6 @@ html,body{
   position:absolute;bottom:4px;right:4px;background:#ff0050;color:#fff;
   width:26px;height:26px;border-radius:50%;font-size:18px;font-weight:bold;
   display:flex;align-items:center;justify-content:center;line-height:1;
-  box-shadow:0 2px 4px rgba(0,0,0,.3);
 }
 
 .name-row{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:4px;}
@@ -200,6 +208,12 @@ html,body{
 </head>
 <body>
 
+<!-- ===== แจ้งเตือน — เหลือแค่ตัวหนังสือ ===== -->
+<div class="install-note" id="installNote">
+  <span class="install-text need" id="installText">ติดตั้งแอป</span>
+  <button class="close-note" id="closeNote">×</button>
+</div>
+
 <input type="file" id="avatarInput" accept="image/*" class="hidden-input">
 <input type="file" id="videoInput" accept="video/*" class="hidden-input">
 
@@ -214,7 +228,7 @@ html,body{
       <span class="nav-tab active">สำหรับคุณ</span>
     </div>
     <div>
-      <div class="version-top">v1167</div>
+      <div class="version-top">v1170</div>
       <div>🔍</div>
     </div>
   </div>
@@ -378,7 +392,8 @@ html,body{
 </div>
 
 <script>
-const VERSION = 'v1167';
+const VERSION = 'v1170';
+const INSTALLED_KEY = 'tp_installed';
 const AVATAR_KEY = 'tp_avatar';
 const NAME_KEY = 'tp_name';
 const USERNAME_KEY = 'tp_username';
@@ -387,6 +402,10 @@ const SAVED_KEY = 'tp_saved';
 const VIDEOS_KEY = 'tp_videos';
 
 // DOM
+const installNote = document.getElementById('installNote');
+const installText = document.getElementById('installText');
+const closeNote = document.getElementById('closeNote');
+
 const pages = {
   home: document.getElementById('homePage'),
   profile: document.getElementById('profilePage'),
@@ -415,11 +434,57 @@ const videosGrid = document.getElementById('videosGrid');
 
 let isLiked = false, isSaved = false, totalLikes = 0;
 let uploadedVideos = [];
+let deferredPrompt = null;
+
+// === ตรวจสอบการติดตั้ง — เหลือแค่ข้อความ ===
+function checkInstallStatus() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone === true;
+  const wasInstalled = localStorage.getItem(INSTALLED_KEY) === 'yes';
+
+  if (isStandalone || wasInstalled) {
+    // มีแล้ว → สีเขียว
+    installText.classList.remove('need');
+    installText.classList.add('done');
+    installText.textContent = '✅ ท่านมีแอปในเครื่องของท่านแล้ว';
+    installText.onclick = null; // ไม่ต้องกดอะไร
+  } else {
+    // ยังไม่มี → สีแดง กดได้
+    installText.classList.remove('done');
+    installText.classList.add('need');
+    installText.textContent = 'ติดตั้งแอป';
+    installText.onclick = doInstall;
+  }
+}
+
+// จับเหตุการณ์ก่อนติดตั้ง
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  checkInstallStatus();
+});
+
+// กดติดตั้ง
+async function doInstall() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    localStorage.setItem(INSTALLED_KEY, 'yes');
+    checkInstallStatus();
+  }
+  deferredPrompt = null;
+}
+
+// ปิดข้อความ
+closeNote.addEventListener('click', () => {
+  installNote.classList.add('hidden');
+});
 
 // === โหลดรูปโปรไฟล์ ===
 function loadAvatar() {
   const saved = localStorage.getItem(AVATAR_KEY);
-  const src = saved || 'thaipodee_logo_icon.png?v=1167';
+  const src = saved || 'thaipodee_logo_icon.png?v=1170';
   avatarSideImg.src = src;
   avatarBigImg.src = src;
 }
@@ -437,7 +502,7 @@ avatarSideBtn.addEventListener('click', () => avatarInput.click());
 avatarBigBtn.addEventListener('click', () => avatarInput.click());
 avatarInput.addEventListener('change', e => changeAvatar(e.target.files[0]));
 
-// === โหลด/เปลี่ยนชื่อ ===
+// === เปลี่ยนชื่อ ===
 function loadNames() {
   const savedName = localStorage.getItem(NAME_KEY);
   const savedUser = localStorage.getItem(USERNAME_KEY);
@@ -590,8 +655,9 @@ function renderVideosGrid() {
   });
 }
 
-// === เริ่มต้น ===
+// === เริ่มทำงาน ===
 function init() {
+  checkInstallStatus();
   loadAvatar();
   loadNames();
   totalLikes = parseInt(localStorage.getItem(LIKES_KEY)||'0',10);
