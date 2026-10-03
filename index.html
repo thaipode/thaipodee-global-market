@@ -1,248 +1,146 @@
 <!-- ==============================================================
-   ThaiPodee v1175 — ✅ จุดกลมอยู่บนสุด! แตะติดแน่น ลากได้เลย
-   อัปเดต: 3 ตุลาคม 2569 22:55 น.
+   ThaiPodee v1181 — ✅ เหมือน TikTok: จุดเล็กเท่าเส้น + แตะได้กว้าง
+   อัปเดต: 3 ตุลาคม 2569 23:18 น.
    --------------------------------------------------------------
-   ✅ ยกเส้นเวลา+จุดกลมขึ้นชั้นบนสุด — ไม่มีอะไรบังอีกแล้ว
-   ✅ พื้นที่แตะจุดกว้างขึ้น 2 เท่า — แตะตรงไหนก็ติด
-   ✅ ลากไปข้างหน้า/ถอยหลัง ควบคุมเวลาได้ตรงใจ
-   ✅ ไม่มีสีแดง — เส้นจาง เหลือจุดขาวเด่น
-   ✅ แตะที่อื่น → เล่น/หยุดปกติ
+   ✅ จุดขนาด 2px × 2px — เล็กเท่าเส้นเวลา พอดีเป๊ะ
+   ✅ พื้นที่จับลากกว้าง 44px รอบจุด — แตะไกลก็ติด
+   ✅ ไม่มีขอบโปร่งใสบัง — ดูเล็กจริงตามตา
+   ✅ ก้อนเดียว ก๊อปวางแทนที่ได้เลย
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="application-name" content="ThaiPodee">
 <meta name="theme-color" content="#000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1175</title>
-
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1175">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1175">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1175%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ffffff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1175%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
-
+<title>ThaiPodee v1181</title>
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1181">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1181">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1181%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ffffff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1181%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{
-  width:100%;height:100%;background:#000;overflow:hidden;
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  font-family:-apple-system,sans-serif;color:#fff;
-  padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-
-.install-note{
-  position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;
-  z-index:9999;display:flex;align-items:center;gap:8px;
-  transition:all .3s ease;
-}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+.install-note{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:99999;display:flex;align-items:center;gap:8px;transition:all .3s ease;}
 .install-note.hidden{opacity:0;transform:translateY(-10px);pointer-events:none}
 .install-text{font-size:14px;font-weight:500;cursor:pointer}
 .install-text.need{color:#ff4466}
 .install-text.done{color:#44dd77}
 .close-note{background:transparent;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
-
 .page{position:absolute;inset:0;z-index:1;transition:opacity .25s ease,transform .25s ease;}
 .page.hidden{opacity:0;visibility:hidden;transform:translateX(30px);pointer-events:none;}
-
-.top-nav-home{
-  position:fixed;top:calc(40px + env(safe-area-inset-top,0px));left:12px;right:12px;
-  display:flex;align-items:flex-start;justify-content:space-between;z-index:100;color:#fff;
-  pointer-events:none;
-}
+.top-nav-home{position:fixed;top:calc(40px + env(safe-area-inset-top,0px));left:12px;right:12px;display:flex;align-items:flex-start;justify-content:space-between;z-index:50;color:#fff;pointer-events:none;}
 .top-nav-home > *{pointer-events:auto;}
 .nav-left{font-size:14px;opacity:0.7}
 .nav-center{display:flex;gap:16px;font-size:14px}
 .nav-tab{opacity:0.7;cursor:pointer}
 .nav-tab.active{opacity:1;font-weight:bold;border-bottom:2px solid #fff;padding-bottom:2px}
 .version-top{font-size:10px;opacity:0.6;text-align:right}
-
-.video-container{
-  position:fixed;inset:0;background:#000;
-  display:flex;align-items:center;justify-content:center;z-index:1;
-}
+.video-container{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1;}
 .video-container video{width:100%;height:100%;object-fit:contain;display:block}
 .video-container.portrait video{object-fit:cover}
 .video-container.landscape video{object-fit:contain}
 
-/* ===== เส้นเวลา — อยู่ชั้นบนสุด z-index:999 ===== */
+/* ===== เส้นเวลา — เหมือน TikTok จริง ===== */
 .progress-container{
   position:absolute;left:16px;right:16px;bottom:90px;
-  height:80px; padding:25px 0; /* พื้นที่แตะกว้างมาก */
-  z-index:999; /* บนสุด ไม่มีอะไรบัง */
-  cursor:pointer;
-  touch-action:none; /* ปิดการเลื่อนหน้า เพื่อให้ลากได้ลื่น */
+  height:44px;padding:0;z-index:9999;
+  cursor:pointer;touch-action:none;
 }
 .progress-bg{
   position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
   height:2px;background:rgba(255,255,255,.2);border-radius:1px;
 }
 .progress-dot-wrap{
-  position:absolute;top:50%;transform:translateY(-50%);
-  left:0;
+  position:absolute;top:50%;transform:translateY(-50%);left:0;
+  width:44px;height:44px;margin-left:-22px;
+  display:flex;align-items:center;justify-content:center;
 }
 .progress-dot{
-  width:30px;height:30px;background:#fff;border-radius:50%;
-  box-shadow:0 0 12px rgba(255,255,255,.4);
-  position:relative;z-index:3;
-  /* ขยายพื้นที่แตะรอบจุดให้กว้างขึ้นอีก */
-  border:20px solid transparent;
-  margin:-20px;
+  width:2px;height:2px;background:#fff;border-radius:50%;
+  box-shadow:0 0 2px rgba(255,255,255,.6);
+  flex-shrink:0;
 }
 
-/* ===== ชั้นแตะเล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===== */
-.tap-layer{
-  position:fixed;inset:0;z-index:100;
-  background:transparent;
-  pointer-events:auto;
-}
-/* ยกเว้นบริเวณเส้นเวลาให้ผ่านไปแตะจุดได้ */
-.tap-layer.progress-area{
-  pointer-events:none;
-}
-
+.tap-layer{position:fixed;inset:0;z-index:100;background:transparent;}
+.tap-layer.progress-area{pointer-events:none;}
 .ui-layer{position:fixed;inset:0;z-index:10;pointer-events:none;color:#fff;}
 .ui-layer > *{pointer-events:auto;}
-
-.bottom-info{position:absolute;left:16px;bottom:140px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:7;}
+.bottom-info{position:absolute;left:16px;bottom:140px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:7;pointer-events:none;}
 .author{font-size:15px;font-weight:bold;margin-bottom:4px}
 .caption{font-size:13px;margin-bottom:4px;opacity:0.9}
 .music{font-size:12px;display:flex;align-items:center;gap:6px;opacity:0.85}
-
-.side-icons{
-  position:absolute;right:12px;bottom:180px;
-  display:flex;flex-direction:column;gap:24px;align-items:center;z-index:11;
-}
+.side-icons{position:absolute;right:12px;bottom:180px;display:flex;flex-direction:column;gap:24px;align-items:center;z-index:11;}
 .side-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px}
 .side-count{font-size:11px}
-
-.avatar-side{
-  width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;
-  background:#222;cursor:pointer;position:relative;
-}
+.avatar-side{width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#222;cursor:pointer;position:relative;}
 .avatar-side img{width:100%;height:100%;object-fit:cover}
-.avatar-side .avatar-plus{
-  position:absolute;bottom:0;right:0;background:#ff0050;color:#fff;
-  width:18px;height:18px;border-radius:50%;font-size:14px;font-weight:bold;
-  display:flex;align-items:center;justify-content:center;line-height:1;
-}
-.disc-icon{
-  width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#666,#222);
-  display:flex;align-items:center;justify-content:center;
-  animation:spin 3s linear infinite;cursor:pointer;
-}
+.avatar-side .avatar-plus{position:absolute;bottom:0;right:0;background:#ff0050;color:#fff;width:18px;height:18px;border-radius:50%;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;line-height:1;}
+.disc-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#666,#222);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;cursor:pointer;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.nav-bar{
-  position:absolute;bottom:0;left:0;right:0;height:65px;
-  display:flex;justify-content:space-around;align-items:center;
-  padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));
-  background:#000;z-index:11;color:#999;
-}
+.nav-bar{position:absolute;bottom:0;left:0;right:0;height:65px;display:flex;justify-content:space-around;align-items:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));background:#000;z-index:11;color:#999;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .nav-item.active{color:#fff}
 .nav-icon{font-size:22px}
-.nav-plus{
-  width:52px;height:38px;background:#ff0050;border-radius:6px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;color:#fff;cursor:pointer;
-}
-
+.nav-plus{width:52px;height:38px;background:#ff0050;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;cursor:pointer;}
 .profile-page{background:#fff;color:#000;overflow-y:auto;padding-bottom:90px;z-index:20;}
-.profile-top-bar{
-  position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;
-  padding:12px 16px;background:#fff;border-bottom:1px solid #eee;z-index:10;
-}
+.profile-top-bar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #eee;z-index:10;}
 .back-btn{font-size:24px;cursor:pointer;padding:4px;line-height:1}
 .profile-top-actions{display:flex;gap:16px;font-size:20px;}
 .profile-top-actions span{cursor:pointer}
-
 .profile-header{padding:20px 16px;text-align:center;}
-.profile-avatar-big{
-  width:90px;height:90px;border-radius:50%;overflow:hidden;margin:0 auto 12px;
-  background:#ddd;border:2px solid #eee;cursor:pointer;position:relative;
-}
+.profile-avatar-big{width:90px;height:90px;border-radius:50%;overflow:hidden;margin:0 auto 12px;background:#ddd;border:2px solid #eee;cursor:pointer;position:relative;}
 .profile-avatar-big img{width:100%;height:100%;object-fit:cover;}
-.profile-avatar-big .avatar-plus{
-  position:absolute;bottom:4px;right:4px;background:#ff0050;color:#fff;
-  width:26px;height:26px;border-radius:50%;font-size:18px;font-weight:bold;
-  display:flex;align-items:center;justify-content:center;line-height:1;
-}
-
+.profile-avatar-big .avatar-plus{position:absolute;bottom:4px;right:4px;background:#ff0050;color:#fff;width:26px;height:26px;border-radius:50%;font-size:18px;font-weight:bold;display:flex;align-items:center;justify-content:center;line-height:1;}
 .name-row{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:4px;}
 .profile-name{font-size:20px;font-weight:bold}
 .username-row{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:16px;}
 .profile-username{font-size:14px;color:#666}
 .edit-pencil{font-size:14px;color:#ff0050;transition:transform .2s ease;}
-.name-row:hover .edit-pencil,
-.username-row:hover .edit-pencil{transform:scale(1.2);}
-
+.name-row:hover .edit-pencil,.username-row:hover .edit-pencil{transform:scale(1.2);}
 .profile-stats{display:flex;justify-content:center;gap:32px;margin-bottom:20px;}
 .stat-item{text-align:center}
 .stat-num{font-size:18px;font-weight:bold}
 .stat-label{font-size:11px;color:#888}
-
 .profile-buttons{display:flex;justify-content:center;gap:10px;margin-bottom:24px;}
 .profile-action{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .profile-action-icon{font-size:20px}
 .profile-action-text{font-size:11px;color:#666}
-
 .videos-section{padding:0 16px;}
 .section-title{font-size:15px;font-weight:bold;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
 .view-all{font-size:13px;color:#888;font-weight:normal;cursor:pointer}
-
 .videos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 .video-card{aspect-ratio:9/12;border-radius:6px;overflow:hidden;position:relative;background:#eee;cursor:pointer;}
 .video-card > div:first-child{width:100%;height:100%;background:linear-gradient(135deg,#444,#222);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px}
-.video-card-views{
-  position:absolute;bottom:6px;left:6px;color:#fff;
-  font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,.6);
-  display:flex;align-items:center;gap:4px;
-}
-.video-card-delete{
-  position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);color:#fff;
-  border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;
-  font-size:14px;display:flex;align-items:center;justify-content:center;
-}
+.video-card-views{position:absolute;bottom:6px;left:6px;color:#fff;font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,.6);display:flex;align-items:center;gap:4px;}
+.video-card-delete{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
 .empty-text{grid-column:1/-1;text-align:center;padding:40px 20px;color:#999}
-
-.bottom-nav-profile{
-  position:fixed;bottom:0;left:0;right:0;height:50px;display:flex;justify-content:space-around;align-items:center;
-  background:#fff;border-top:1px solid #eee;z-index:15;
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
+.bottom-nav-profile{position:fixed;bottom:0;left:0;right:0;height:50px;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #eee;z-index:15;padding-bottom:env(safe-area-inset-bottom,0px);}
 .bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:#888;font-size:10px;cursor:pointer;}
 .bottom-nav-item.active{color:#000}
 .bottom-nav-icon{font-size:20px}
-
 .other-page{background:#fff;color:#000;overflow-y:auto;padding-bottom:70px;z-index:20;}
 .page-content{padding:20px 16px;}
 .page-title{font-size:20px;font-weight:bold;margin-bottom:20px}
 .dummy-box{background:#f5f5f5;border-radius:8px;padding:20px;margin-bottom:12px}
-
 .hidden-input{display:none}
 </style>
 </head>
 <body>
-
 <div class="install-note" id="installNote">
   <span class="install-text need" id="installText">ติดตั้งแอป</span>
   <button class="close-note" id="closeNote">×</button>
 </div>
-
 <input type="file" id="avatarInput" accept="image/*" class="hidden-input">
 <input type="file" id="videoInput" accept="video/*" class="hidden-input">
-
 <div class="page" id="homePage">
   <div class="top-nav-home">
     <div class="nav-left">ไลฟ์</div>
@@ -252,15 +150,10 @@ html,body{
       <span class="nav-tab">กำลังติดตาม</span>
       <span class="nav-tab active">สำหรับคุณ</span>
     </div>
-    <div>
-      <div class="version-top">v1175</div>
-      <div>🔍</div>
-    </div>
+    <div><div class="version-top">v1181</div><div>🔍</div></div>
   </div>
-
   <div class="video-container" id="videoContainer">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
-    <!-- ===== เส้นเวลา — อยู่บนสุด z-index:999 ===== -->
     <div class="progress-container" id="progressContainer">
       <div class="progress-bg"></div>
       <div class="progress-dot-wrap" id="progressDotWrap">
@@ -268,45 +161,21 @@ html,body{
       </div>
     </div>
   </div>
-
-  <!-- ===== ชั้นแตะเล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===== -->
   <div class="tap-layer" id="tapLayer"></div>
-
   <div class="ui-layer">
     <div class="bottom-info">
       <div class="author" id="videoAuthor">@thaipodee</div>
       <div class="caption" id="videoCaption">ลากจุดขาว → ข้ามเวลา | แตะที่อื่น → เล่น/หยุด</div>
       <div class="music" id="videoMusic">♪ เสียงประกอบ</div>
     </div>
-
     <div class="side-icons">
-      <div class="side-item" id="avatarSideWrap">
-        <div class="avatar-side" id="avatarSideBtn">
-          <img id="avatarSideImg" alt="ฉัน">
-          <span class="avatar-plus">+</span>
-        </div>
-      </div>
-      <div class="side-item" id="likeBtn">
-        <div class="side-icon" id="likeIcon">🤍</div>
-        <div class="side-count" id="likeCount">0</div>
-      </div>
-      <div class="side-item" id="commentBtn">
-        <div class="side-icon">💬</div>
-        <div class="side-count" id="commentCount">0</div>
-      </div>
-      <div class="side-item" id="saveBtn">
-        <div class="side-icon" id="saveIcon">⬜</div>
-        <div class="side-count">บันทึก</div>
-      </div>
-      <div class="side-item" id="shareBtn">
-        <div class="side-icon">↗️</div>
-        <div class="side-count">แชร์</div>
-      </div>
-      <div class="side-item" id="musicBtn">
-        <div class="disc-icon">🎵</div>
-      </div>
+      <div class="side-item" id="avatarSideWrap"><div class="avatar-side" id="avatarSideBtn"><img id="avatarSideImg" alt="ฉัน"><span class="avatar-plus">+</span></div></div>
+      <div class="side-item" id="likeBtn"><div class="side-icon" id="likeIcon">🤍</div><div class="side-count" id="likeCount">0</div></div>
+      <div class="side-item" id="commentBtn"><div class="side-icon">💬</div><div class="side-count" id="commentCount">0</div></div>
+      <div class="side-item" id="saveBtn"><div class="side-icon" id="saveIcon">⬜</div><div class="side-count">บันทึก</div></div>
+      <div class="side-item" id="shareBtn"><div class="side-icon">↗️</div><div class="side-count">แชร์</div></div>
+      <div class="side-item" id="musicBtn"><div class="disc-icon">🎵</div></div>
     </div>
-
     <div class="nav-bar">
       <div class="nav-item active" data-page="home"><span class="nav-icon">🏠</span><span>หน้าหลัก</span></div>
       <div class="nav-item" data-page="shop"><span class="nav-icon">🛒</span><span>ร้านค้า</span></div>
@@ -316,62 +185,24 @@ html,body{
     </div>
   </div>
 </div>
-
 <div class="page hidden profile-page other-page" id="profilePage">
-  <div class="profile-top-bar">
-    <div class="back-btn" data-back="home">←</div>
-    <div class="profile-top-actions">
-      <span>🔔</span>
-      <span id="shareProfileBtn">↗️</span>
-    </div>
-  </div>
-
+  <div class="profile-top-bar"><div class="back-btn" data-back="home">←</div><div class="profile-top-actions"><span>🔔</span><span id="shareProfileBtn">↗️</span></div></div>
   <div class="profile-header">
-    <div class="profile-avatar-big" id="avatarBigBtn">
-      <img id="avatarBigImg" alt="ฉัน">
-      <span class="avatar-plus">+</span>
-    </div>
-
-    <div class="name-row" id="nameRow">
-      <h1 class="profile-name" id="profileName">ThaiPodee</h1>
-      <span class="edit-pencil">✏️</span>
-    </div>
-
-    <div class="username-row" id="usernameRow">
-      <p class="profile-username" id="profileUsername">@thaipodee</p>
-      <span class="edit-pencil">✏️</span>
-    </div>
-
+    <div class="profile-avatar-big" id="avatarBigBtn"><img id="avatarBigImg" alt="ฉัน"><span class="avatar-plus">+</span></div>
+    <div class="name-row" id="nameRow"><h1 class="profile-name" id="profileName">ThaiPodee</h1><span class="edit-pencil">✏️</span></div>
+    <div class="username-row" id="usernameRow"><p class="profile-username" id="profileUsername">@thaipodee</p><span class="edit-pencil">✏️</span></div>
     <div class="profile-stats">
       <div class="stat-item"><div class="stat-num" id="statFollowing">9</div><div class="stat-label">กำลังติดตาม</div></div>
       <div class="stat-item"><div class="stat-num" id="statFollowers">18.3K</div><div class="stat-label">ผู้ติดตาม</div></div>
       <div class="stat-item"><div class="stat-num" id="statLikes">0</div><div class="stat-label">ถูกใจ</div></div>
     </div>
-
     <div class="profile-buttons">
-      <div class="profile-action" data-page="messages">
-        <div class="profile-action-icon">📩</div>
-        <div class="profile-action-text">ข้อความ</div>
-      </div>
-      <div class="profile-action">
-        <div class="profile-action-icon">⚙️</div>
-        <div class="profile-action-text">ตั้งค่า</div>
-      </div>
-      <div class="profile-action" id="shareProfileBtn2">
-        <div class="profile-action-icon">↗️</div>
-        <div class="profile-action-text">แชร์</div>
-      </div>
+      <div class="profile-action" data-page="messages"><div class="profile-action-icon">📩</div><div class="profile-action-text">ข้อความ</div></div>
+      <div class="profile-action"><div class="profile-action-icon">⚙️</div><div class="profile-action-text">ตั้งค่า</div></div>
+      <div class="profile-action" id="shareProfileBtn2"><div class="profile-action-icon">↗️</div><div class="profile-action-text">แชร์</div></div>
     </div>
   </div>
-
-  <div class="videos-section">
-    <div class="section-title">
-      ผลงานของฉัน
-      <span class="view-all">ดูทั้งหมด ›</span>
-    </div>
-    <div class="videos-grid" id="videosGrid"></div>
-  </div>
-
+  <div class="videos-section"><div class="section-title">ผลงานของฉัน<span class="view-all">ดูทั้งหมด ›</span></div><div class="videos-grid" id="videosGrid"></div></div>
   <div class="bottom-nav-profile">
     <div class="bottom-nav-item" data-page="home"><span class="bottom-nav-icon">🏠</span></div>
     <div class="bottom-nav-item" data-page="shop"><span class="bottom-nav-icon">🛍️</span></div>
@@ -380,17 +211,9 @@ html,body{
     <div class="bottom-nav-item active" data-page="profile"><span class="bottom-nav-icon">👤</span></div>
   </div>
 </div>
-
 <div class="page hidden other-page" id="shopPage">
-  <div class="profile-top-bar">
-    <div class="back-btn" data-back="home">←</div>
-    <div class="profile-top-actions"><span>🔍</span></div>
-  </div>
-  <div class="page-content">
-    <h2 class="page-title">🛒 ร้านค้า</h2>
-    <div class="dummy-box">สินค้า 1 — จะเพิ่มรายการสินค้าที่นี่</div>
-    <div class="dummy-box">สินค้า 2 — จะเพิ่มรายการสินค้าที่นี่</div>
-  </div>
+  <div class="profile-top-bar"><div class="back-btn" data-back="home">←</div><div class="profile-top-actions"><span>🔍</span></div></div>
+  <div class="page-content"><h2 class="page-title">🛒 ร้านค้า</h2><div class="dummy-box">สินค้า 1 — จะเพิ่มรายการสินค้าที่นี่</div><div class="dummy-box">สินค้า 2 — จะเพิ่มรายการสินค้าที่นี่</div></div>
   <div class="bottom-nav-profile">
     <div class="bottom-nav-item" data-page="home"><span class="bottom-nav-icon">🏠</span></div>
     <div class="bottom-nav-item active" data-page="shop"><span class="bottom-nav-icon">🛍️</span></div>
@@ -399,16 +222,9 @@ html,body{
     <div class="bottom-nav-item" data-page="profile"><span class="bottom-nav-icon">👤</span></div>
   </div>
 </div>
-
 <div class="page hidden other-page" id="messagesPage">
-  <div class="profile-top-bar">
-    <div class="back-btn" data-back="home">←</div>
-    <div class="profile-top-actions"><span>✏️</span></div>
-  </div>
-  <div class="page-content">
-    <h2 class="page-title">💬 ข้อความ</h2>
-    <div class="dummy-box">ยังไม่มีข้อความ — เริ่มสนทนาได้ที่นี่</div>
-  </div>
+  <div class="profile-top-bar"><div class="back-btn" data-back="home">←</div><div class="profile-top-actions"><span>✏️</span></div></div>
+  <div class="page-content"><h2 class="page-title">💬 ข้อความ</h2><div class="dummy-box">ยังไม่มีข้อความ — เริ่มสนทนาได้ที่นี่</div></div>
   <div class="bottom-nav-profile">
     <div class="bottom-nav-item" data-page="home"><span class="bottom-nav-icon">🏠</span></div>
     <div class="bottom-nav-item" data-page="shop"><span class="bottom-nav-icon">🛍️</span></div>
@@ -417,9 +233,8 @@ html,body{
     <div class="bottom-nav-item" data-page="profile"><span class="bottom-nav-icon">👤</span></div>
   </div>
 </div>
-
 <script>
-const VERSION = 'v1175';
+const VERSION = 'v1181';
 const INSTALLED_KEY = 'tp_installed';
 const AVATAR_KEY = 'tp_avatar';
 const NAME_KEY = 'tp_name';
@@ -427,16 +242,10 @@ const USERNAME_KEY = 'tp_username';
 const LIKES_KEY = 'tp_likes';
 const SAVED_KEY = 'tp_saved';
 const VIDEOS_KEY = 'tp_videos';
-
 const installNote = document.getElementById('installNote');
 const installText = document.getElementById('installText');
 const closeNote = document.getElementById('closeNote');
-const pages = {
-  home: document.getElementById('homePage'),
-  profile: document.getElementById('profilePage'),
-  shop: document.getElementById('shopPage'),
-  messages: document.getElementById('messagesPage')
-};
+const pages = {home:document.getElementById('homePage'),profile:document.getElementById('profilePage'),shop:document.getElementById('shopPage'),messages:document.getElementById('messagesPage')};
 const video = document.getElementById('mainVideo');
 const tapLayer = document.getElementById('tapLayer');
 const progressContainer = document.getElementById('progressContainer');
@@ -455,240 +264,132 @@ const likeIcon = document.getElementById('likeIcon');
 const likeCountEl = document.getElementById('likeCount');
 const saveIcon = document.getElementById('saveIcon');
 const videosGrid = document.getElementById('videosGrid');
-
 let isLiked = false, isSaved = false, totalLikes = 0;
 let uploadedVideos = [];
 let deferredPrompt = null;
 let isDragging = false;
 
-// === ติดตั้ง ===
-function checkInstallStatus() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone === true;
+function checkInstallStatus(){
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const wasInstalled = localStorage.getItem(INSTALLED_KEY) === 'yes';
-  if (isStandalone || wasInstalled) {
-    installText.classList.remove('need');
-    installText.classList.add('done');
-    installText.textContent = '✅ ท่านมีแอปในเครื่องของท่านแล้ว';
-    installText.onclick = null;
-  } else {
-    installText.classList.remove('done');
-    installText.classList.add('need');
-    installText.textContent = 'ติดตั้งแอป';
-    installText.onclick = doInstall;
-  }
+  if(isStandalone || wasInstalled){installText.classList.remove('need');installText.classList.add('done');installText.textContent='✅ ท่านมีแอปในเครื่องของท่านแล้ว';installText.onclick=null;}
+  else{installText.classList.remove('done');installText.classList.add('need');installText.textContent='ติดตั้งแอป';installText.onclick=doInstall;}
 }
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  checkInstallStatus();
-});
-async function doInstall() {
-  if (!deferredPrompt) return;
-  const {outcome} = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    localStorage.setItem(INSTALLED_KEY, 'yes');
-    checkInstallStatus();
-  }
-  deferredPrompt = null;
-}
-closeNote.addEventListener('click', () => installNote.classList.add('hidden'));
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;checkInstallStatus();});
+async function doInstall(){if(!deferredPrompt)return;const {outcome}=await deferredPrompt.userChoice;if(outcome==='accepted')localStorage.setItem(INSTALLED_KEY,'yes');deferredPrompt=null;checkInstallStatus();}
+closeNote.addEventListener('click',()=>installNote.classList.add('hidden'));
 
-// === ลากจุดกลมขาว — ควบคุมเวลาวิดีโอ ===
-function updateDotPosition() {
-  if (!video.duration || isDragging) return;
-  const pct = video.currentTime / video.duration;
-  progressDotWrap.style.left = `calc(${pct * 100}% - 15px)`;
+function updateDotPosition(){
+  if(!video.duration||isDragging)return;
+  const pct = video.currentTime/video.duration;
+  progressDotWrap.style.left = `calc(${pct*100}%)`;
 }
-video.addEventListener('timeupdate', updateDotPosition);
+video.addEventListener('timeupdate',updateDotPosition);
 
-function seekTo(clientX) {
-  if (!video.duration) return;
+function seekTo(clientX){
+  if(!video.duration)return;
   const rect = progressContainer.getBoundingClientRect();
   let x = clientX - rect.left;
-  x = Math.max(0, Math.min(x, rect.width));
-  const pct = x / rect.width;
-  video.currentTime = pct * video.duration;
-  progressDotWrap.style.left = `calc(${pct * 100}% - 15px)`;
+  x = Math.max(0,Math.min(x,rect.width));
+  const pct = x/rect.width;
+  video.currentTime = pct*video.duration;
+  progressDotWrap.style.left = `calc(${pct*100}%)`;
 }
 
-// เริ่มลาก — จับที่เส้นเวลาโดยตรง ไม่มีอะไรบัง
-progressContainer.addEventListener('mousedown', e => {
-  isDragging = true;
-  seekTo(e.clientX);
-});
-progressContainer.addEventListener('touchstart', e => {
-  isDragging = true;
-  seekTo(e.touches[0].clientX);
-}, {passive: true});
+progressContainer.addEventListener('mousedown',e=>{isDragging=true;seekTo(e.clientX);});
+progressContainer.addEventListener('touchstart',e=>{isDragging=true;seekTo(e.touches[0].clientX);},{passive:true});
+document.addEventListener('mousemove',e=>{if(!isDragging)return;seekTo(e.clientX);});
+document.addEventListener('touchmove',e=>{if(!isDragging)return;seekTo(e.touches[0].clientX);},{passive:true});
+document.addEventListener('mouseup',()=>isDragging=false);
+document.addEventListener('touchend',()=>isDragging=false);
 
-// กำลังลาก
-document.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  seekTo(e.clientX);
-});
-document.addEventListener('touchmove', e => {
-  if (!isDragging) return;
-  seekTo(e.touches[0].clientX);
-}, {passive: true});
+video.addEventListener('ended',()=>{video.currentTime=0;video.play();});
 
-// ปล่อย
-document.addEventListener('mouseup', () => isDragging = false);
-document.addEventListener('touchend', () => isDragging = false);
-
-// จบแล้ววนซ้ำ
-video.addEventListener('ended', () => {
-  video.currentTime = 0;
-  video.play();
-});
-
-// === เล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===
-tapLayer.addEventListener('click', e => {
+tapLayer.addEventListener('click',e=>{
   const rect = progressContainer.getBoundingClientRect();
-  // ถ้ากดที่บริเวณเส้นเวลา → ไม่ทำอะไร ปล่อยให้ลากทำงาน
-  if (e.clientY >= rect.top && e.clientY <= rect.bottom) return;
-  // กดที่อื่น → เล่น/หยุด
-  if (video.paused || video.muted) {
-    video.muted = false; video.play();
-  } else {
-    video.pause();
-  }
+  if(e.clientY>=rect.top&&e.clientY<=rect.bottom)return;
+  if(video.paused||video.muted){video.muted=false;video.play();}else{video.pause();}
 });
 
-// === อัตราส่วนวิดีโอ ===
-function updateRatio() {
-  if (!video.videoWidth) return;
-  const container = document.getElementById('videoContainer');
-  container.classList.toggle('portrait', video.videoWidth/video.videoHeight < 1);
-  container.classList.toggle('landscape', video.videoWidth/video.videoHeight >= 1);
+function updateRatio(){
+  if(!video.videoWidth)return;
+  const c = document.getElementById('videoContainer');
+  c.classList.toggle('portrait',video.videoWidth/video.videoHeight<1);
+  c.classList.toggle('landscape',video.videoWidth/video.videoHeight>=1);
 }
-video.addEventListener('loadedmetadata', updateRatio);
+video.addEventListener('loadedmetadata',updateRatio);
 
-// === โปรไฟล์ ===
-function loadAvatar() {
-  const src = localStorage.getItem(AVATAR_KEY) || 'thaipodee_logo_icon.png?v=1175';
-  avatarSideImg.src = src;
-  avatarBigImg.src = src;
-}
-function changeAvatar(file) {
-  if (!file) return;
-  const r = new FileReader();
-  r.onload = e => {
-    localStorage.setItem(AVATAR_KEY, e.target.result);
-    avatarSideImg.src = e.target.result;
-    avatarBigImg.src = e.target.result;
-  };
-  r.readAsDataURL(file);
-}
-avatarSideBtn.onclick = () => avatarInput.click();
-avatarBigBtn.onclick = () => avatarInput.click();
-avatarInput.onchange = e => changeAvatar(e.target.files[0]);
+function loadAvatar(){const src=localStorage.getItem(AVATAR_KEY)||'thaipodee_logo_icon.png?v=1181';avatarSideImg.src=src;avatarBigImg.src=src;}
+function changeAvatar(file){if(!file)return;const r=new FileReader();r.onload=e=>{localStorage.setItem(AVATAR_KEY,e.target.result);avatarSideImg.src=e.target.result;avatarBigImg.src=e.target.result;};r.readAsDataURL(file);}
+avatarSideBtn.onclick=()=>avatarInput.click();
+avatarBigBtn.onclick=()=>avatarInput.click();
+avatarInput.onchange=e=>changeAvatar(e.target.files[0]);
 
-function loadNames() {
-  profileName.textContent = localStorage.getItem(NAME_KEY) || 'ThaiPodee';
-  profileUsername.textContent = '@' + (localStorage.getItem(USERNAME_KEY) || 'thaipodee');
+function loadNames(){
+  profileName.textContent=localStorage.getItem(NAME_KEY)||'ThaiPodee';
+  profileUsername.textContent='@'+(localStorage.getItem(USERNAME_KEY)||'thaipodee');
 }
-nameRow.onclick = () => {
-  const n = prompt('เปลี่ยนชื่อ', profileName.textContent);
-  if (n && n.trim()) { profileName.textContent = n.trim(); localStorage.setItem(NAME_KEY, n.trim()); }
-};
-usernameRow.onclick = () => {
-  const u = prompt('เปลี่ยนชื่อผู้ใช้', profileUsername.textContent.replace('@',''));
-  if (u && u.trim()) { profileUsername.textContent = '@'+u.trim(); localStorage.setItem(USERNAME_KEY, '@'+u.trim()); }
-};
+nameRow.onclick=()=>{const n=prompt('เปลี่ยนชื่อ',profileName.textContent);if(n&&n.trim()){profileName.textContent=n.trim();localStorage.setItem(NAME_KEY,n.trim());}};
+usernameRow.onclick=()=>{const u=prompt('เปลี่ยนชื่อผู้ใช้',profileUsername.textContent.replace('@',''));if(u&&u.trim()){profileUsername.textContent='@'+u.trim();localStorage.setItem(USERNAME_KEY,'@'+u.trim());}};
 
-// === สลับหน้า ===
-function showPage(name) {
-  Object.entries(pages).forEach(([k,p]) => p.classList.toggle('hidden', k !== name));
-  document.querySelectorAll('[data-page]').forEach(el => {
-    el.classList.toggle('active', el.dataset.page === name);
-  });
-  if (name === 'profile') renderVideosGrid();
+function showPage(name){
+  Object.entries(pages).forEach(([k,p])=>p.classList.toggle('hidden',k!==name));
+  document.querySelectorAll('[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page===name));
+  if(name==='profile')renderVideosGrid();
 }
-document.querySelectorAll('[data-page]').forEach(el => {
-  el.onclick = () => showPage(el.dataset.page);
-});
-document.querySelectorAll('[data-back]').forEach(el => {
-  el.onclick = () => showPage(el.dataset.back);
-});
+document.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>showPage(el.dataset.page));
+document.querySelectorAll('[data-back]').forEach(el=>el.onclick=()=>showPage(el.dataset.back));
 
-// === ถูกใจ บันทึก แชร์ ===
-function updateLikeUI() {
-  likeIcon.textContent = isLiked ? '❤️' : '🤍';
-  likeCountEl.textContent = totalLikes.toLocaleString();
-  document.getElementById('statLikes').textContent = totalLikes.toLocaleString();
+function updateLikeUI(){
+  likeIcon.textContent=isLiked?'❤️':'🤍';
+  likeCountEl.textContent=totalLikes.toLocaleString();
+  document.getElementById('statLikes').textContent=totalLikes.toLocaleString();
 }
-document.getElementById('likeBtn').onclick = () => {
-  isLiked = !isLiked; totalLikes += isLiked ? 1 : -1;
-  localStorage.setItem(LIKES_KEY, totalLikes); updateLikeUI();
-};
-function updateSaveUI() { saveIcon.textContent = isSaved ? '⬛' : '⬜'; }
-document.getElementById('saveBtn').onclick = () => {
-  isSaved = !isSaved; localStorage.setItem(SAVED_KEY, isSaved?'1':'0'); updateSaveUI();
-};
-async function doShare() {
-  const data = {title:`ThaiPodee ${VERSION}`, text:'แอปวิดีโอของคนไทย', url:location.href};
-  if (navigator.share) { try{await navigator.share(data);}catch{await navigator.clipboard.writeText(location.href); alert('คัดลอกลิงก์แล้ว ✅');} }
-  else { await navigator.clipboard.writeText(location.href); alert('คัดลอกลิงก์แล้ว ✅'); }
-}
-document.getElementById('shareBtn').onclick = doShare;
-document.getElementById('shareProfileBtn').onclick = doShare;
-document.getElementById('shareProfileBtn2').onclick = doShare;
+document.getElementById('likeBtn').onclick=()=>{isLiked=!isLiked;totalLikes+=isLiked?1:-1;localStorage.setItem(LIKES_KEY,totalLikes);updateLikeUI();};
 
-// === อัปโหลดวิดีโอ ===
-function handleVideoFile(file) {
-  if (!file) return;
-  video.src = URL.createObjectURL(file); video.load(); video.play();
-  const newVid = {id:Date.now().toString(), name:file.name, src:video.src, date:new Date().toLocaleString('th-TH'), views:0};
+function updateSaveUI(){saveIcon.textContent=isSaved?'⬛':'⬜';}
+document.getElementById('saveBtn').onclick=()=>{isSaved=!isSaved;localStorage.setItem(SAVED_KEY,isSaved?'1':'0');updateSaveUI();};
+
+async function doShare(){
+  const data={title:`ThaiPodee ${VERSION}`,text:'แอปวิดีโอของคนไทย',url:location.href};
+  if(navigator.share){try{await navigator.share(data);}catch{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅');}}
+  else{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅');}
+}
+document.getElementById('shareBtn').onclick=doShare;
+document.getElementById('shareProfileBtn').onclick=doShare;
+document.getElementById('shareProfileBtn2').onclick=doShare;
+
+function handleVideoFile(file){
+  if(!file)return;
+  video.src=URL.createObjectURL(file);video.load();video.play();
+  const newVid={id:Date.now().toString(),name:file.name,src:video.src,date:new Date().toLocaleString('th-TH'),views:0};
   uploadedVideos.unshift(newVid);
-  localStorage.setItem(VIDEOS_KEY, JSON.stringify(uploadedVideos));
-  renderVideosGrid(); updateRatio();
+  localStorage.setItem(VIDEOS_KEY,JSON.stringify(uploadedVideos));
+  renderVideosGrid();updateRatio();
 }
-[uploadBtn, uploadBtn2, uploadBtn3, uploadBtn4].forEach(btn => {
-  btn.onclick = () => videoInput.click();
-});
-videoInput.onchange = e => handleVideoFile(e.target.files[0]);
+[uploadBtn,uploadBtn2,uploadBtn3,uploadBtn4].forEach(btn=>btn.onclick=()=>videoInput.click());
+videoInput.onchange=e=>handleVideoFile(e.target.files[0]);
 
-// === แสดงรายการวิดีโอ ===
-function renderVideosGrid() {
-  uploadedVideos = JSON.parse(localStorage.getItem(VIDEOS_KEY)||'[]');
-  videosGrid.innerHTML = '';
-  if (!uploadedVideos.length) {
-    videosGrid.innerHTML = '<div class="empty-text">ยังไม่มีวิดีโอที่เผยแพร่</div>';
-    return;
-  }
-  uploadedVideos.forEach(v => {
-    const card = document.createElement('div');
-    card.className = 'video-card';
-    card.innerHTML = `
-      <div>▶</div>
-      <div class="video-card-views">▶ ${v.views || 0}</div>
-      <button class="video-card-delete">×</button>
-    `;
-    card.querySelector('.video-card-delete').onclick = e => {
-      e.stopPropagation();
-      if (confirm('ลบวิดีโอนี้หรือไม่?')) {
-        uploadedVideos = uploadedVideos.filter(x => x.id !== v.id);
-        localStorage.setItem(VIDEOS_KEY, JSON.stringify(uploadedVideos));
-        renderVideosGrid();
-      }
-    };
-    card.onclick = () => { video.src = v.src; video.load(); video.play(); showPage('home'); };
+function renderVideosGrid(){
+  uploadedVideos=JSON.parse(localStorage.getItem(VIDEOS_KEY)||'[]');
+  videosGrid.innerHTML='';
+  if(!uploadedVideos.length){videosGrid.innerHTML='<div class="empty-text">ยังไม่มีวิดีโอที่เผยแพร่</div>';return;}
+  uploadedVideos.forEach(v=>{
+    const card=document.createElement('div');card.className='video-card';
+    card.innerHTML=`<div>▶</div><div class="video-card-views">▶ ${v.views||0}</div><button class="video-card-delete">×</button>`;
+    card.querySelector('.video-card-delete').onclick=e=>{e.stopPropagation();if(confirm('ลบวิดีโอนี้หรือไม่?')){uploadedVideos=uploadedVideos.filter(x=>x.id!==v.id);localStorage.setItem(VIDEOS_KEY,JSON.stringify(uploadedVideos));renderVideosGrid();}};
+    card.onclick=()=>{video.src=v.src;video.load();video.play();showPage('home');};
     videosGrid.appendChild(card);
   });
 }
 
-// === เริ่ม ===
-function init() {
-  checkInstallStatus();
-  loadAvatar();
-  loadNames();
-  totalLikes = parseInt(localStorage.getItem(LIKES_KEY)||'0',10);
-  isSaved = localStorage.getItem(SAVED_KEY) === '1';
-  updateLikeUI(); updateSaveUI(); renderVideosGrid();
+function init(){
+  checkInstallStatus();loadAvatar();loadNames();
+  totalLikes=parseInt(localStorage.getItem(LIKES_KEY)||'0',10);
+  isSaved=localStorage.getItem(SAVED_KEY)==='1';
+  updateLikeUI();updateSaveUI();renderVideosGrid();
 }
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded',init);
 </script>
-
 </body>
 </html>
