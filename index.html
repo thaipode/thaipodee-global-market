@@ -1,12 +1,14 @@
 <!-- ==============================================================
-   ThaiPodee v1170 — ✅ เหลือแค่ตัวหนังสือสีแดง ไม่มีแถบกว้าง
-   อัปเดต: 3 ตุลาคม 2569 22:10 น.
+   ThaiPodee v1171 — ✅ เส้นเวลามีปุ่มกลม ลากข้ามได้ + วนซ้ำเอง
+   อัปเดต: 3 ตุลาคม 2569 22:21 น.
    --------------------------------------------------------------
-   ✅ ยังไม่มี → แสดง "ติดตั้งแอป" สีแดง กระชับ
-   ✅ มีแล้ว → แสดง "ท่านมีแอปในเครื่องของท่านแล้ว" สีเขียว
-   ✅ ไม่มีแถบสีเต็มจอ เหลือแค่ข้อความ
-   ✅ ป้องกันติดตั้งซ้ำ
-   ✅ รูปโปรไฟล์ + เปลี่ยนรูป | ชื่อ ✏️ เปลี่ยนชื่อ
+   ✅ เส้นเวลาสีชมพู + ปุ่มกลมสีขาว ลากเดินหน้า/ย้อนกลับได้
+   ✅ ปล่อยนิ้ว → เล่นต่อทันที
+   ✅ จบแล้ววนกลับเริ่มใหม่อัตโนมัติ
+   ✅ แจ้งเตือนเหลือแค่ตัวหนังสือ "ติดตั้งแอป" สีแดง มุมขวาบน
+   ✅ ติดตั้งแอป / ตรวจสอบว่ามีแล้ว → เปลี่ยนเป็นสีเขียว
+   ✅ รูปโปรไฟล์ + เปลี่ยนชื่อ + อัปโหลดวิดีโอ
+   ✅ ไอคอนครบ 6 ตัว เรียงถูกต้อง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -24,11 +26,11 @@
 <meta name="application-name" content="ThaiPodee">
 <meta name="theme-color" content="#000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1170</title>
+<title>ThaiPodee v1171</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1170">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1170">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1170%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1170%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1171">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1171">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1171%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1171%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -40,17 +42,17 @@ html,body{
   padding-bottom:env(safe-area-inset-bottom);
 }
 
-/* ===== แจ้งเตือน — เหลือแค่ตัวหนังสือ ===== */
+/* ===== แจ้งเตือนติดตั้ง — เหลือแค่ตัวหนังสือ ===== */
 .install-note{
   position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;
-  z-index:999;display:flex;align-items:center;gap:10px;
+  z-index:999;display:flex;align-items:center;gap:8px;
   transition:all .3s ease;
 }
 .install-note.hidden{opacity:0;transform:translateY(-10px);pointer-events:none}
 .install-text{font-size:14px;font-weight:500;cursor:pointer}
 .install-text.need{color:#ff4466}
 .install-text.done{color:#44dd77}
-.close-note{background:transparent;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.close-note{background:transparent;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
 
 .page{position:absolute;inset:0;z-index:1;transition:opacity .25s ease,transform .25s ease;}
 .page.hidden{opacity:0;visibility:hidden;transform:translateX(30px);pointer-events:none;}
@@ -73,25 +75,33 @@ html,body{
 .video-container.portrait video{object-fit:cover}
 .video-container.landscape video{object-fit:contain}
 
-.progress-bar-wrap{
-  position:absolute;bottom:80px;left:16px;right:16px;
-  height:4px;background:rgba(255,255,255,.25);border-radius:2px;cursor:pointer;
-  z-index:5;opacity:0;visibility:hidden;transition:all .3s ease;
+/* ===== เส้นเวลาวิดีโอ มีปุ่มกลมลากได้ ===== */
+.video-progress-wrap{
+  position:absolute;bottom:110px;left:16px;right:16px;
+  height:6px;background:rgba(255,255,255,.35);border-radius:3px;
+  z-index:10;cursor:pointer;user-select:none;
 }
-.video-container.playing .progress-bar-wrap{opacity:1;visibility:visible}
-.progress-bar{height:100%;background:#fff;width:0%;border-radius:2px;transition:width .1s linear}
+.video-progress-bar{
+  height:100%;width:0%;background:#ff0050;border-radius:3px;position:relative;
+  transition:width .05s linear;
+}
+.video-progress-thumb{
+  position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;background:#fff;border-radius:50%;
+  box-shadow:0 0 10px rgba(0,0,0,.4);
+}
 
 .tap-layer{position:fixed;inset:0;z-index:3;cursor:pointer;background:transparent;}
 .ui-layer{position:fixed;inset:0;z-index:4;pointer-events:none;color:#fff;}
 .ui-layer > *{pointer-events:auto;}
 
-.bottom-info{position:absolute;left:16px;bottom:130px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
+.bottom-info{position:absolute;left:16px;bottom:140px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
 .author{font-size:15px;font-weight:bold;margin-bottom:4px}
 .caption{font-size:13px;margin-bottom:4px;opacity:0.9}
 .music{font-size:12px;display:flex;align-items:center;gap:6px;opacity:0.85}
 
 .side-icons{
-  position:absolute;right:12px;bottom:160px;
+  position:absolute;right:12px;bottom:180px;
   display:flex;flex-direction:column;gap:24px;align-items:center;z-index:4;
 }
 .side-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
@@ -208,7 +218,7 @@ html,body{
 </head>
 <body>
 
-<!-- ===== แจ้งเตือน — เหลือแค่ตัวหนังสือ ===== -->
+<!-- ===== แจ้งเตือนติดตั้ง — เหลือแค่ตัวหนังสือ ===== -->
 <div class="install-note" id="installNote">
   <span class="install-text need" id="installText">ติดตั้งแอป</span>
   <button class="close-note" id="closeNote">×</button>
@@ -228,15 +238,18 @@ html,body{
       <span class="nav-tab active">สำหรับคุณ</span>
     </div>
     <div>
-      <div class="version-top">v1170</div>
+      <div class="version-top">v1171</div>
       <div>🔍</div>
     </div>
   </div>
 
   <div class="video-container" id="videoContainer">
-    <video id="mainVideo" playsinline webkit-playsinline loop autoplay muted></video>
-    <div class="progress-bar-wrap" id="progressWrap">
-      <div class="progress-bar" id="progressBar"></div>
+    <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
+    <!-- ===== เส้นเวลาวิดีโอ ===== -->
+    <div class="video-progress-wrap" id="videoProgressWrap">
+      <div class="video-progress-bar" id="videoProgressBar">
+        <div class="video-progress-thumb"></div>
+      </div>
     </div>
   </div>
 
@@ -245,7 +258,7 @@ html,body{
   <div class="ui-layer">
     <div class="bottom-info">
       <div class="author" id="videoAuthor">@thaipodee</div>
-      <div class="caption" id="videoCaption">แตะจอ → เล่น/หยุด</div>
+      <div class="caption" id="videoCaption">แตะจอ → เล่น/หยุด | ลากเส้นเวลา → ข้ามได้</div>
       <div class="music" id="videoMusic">♪ เสียงประกอบ</div>
     </div>
 
@@ -392,7 +405,7 @@ html,body{
 </div>
 
 <script>
-const VERSION = 'v1170';
+const VERSION = 'v1171';
 const INSTALLED_KEY = 'tp_installed';
 const AVATAR_KEY = 'tp_avatar';
 const NAME_KEY = 'tp_name';
@@ -415,8 +428,8 @@ const pages = {
 const video = document.getElementById('mainVideo');
 const videoContainer = document.getElementById('videoContainer');
 const tapLayer = document.getElementById('tapLayer');
-const progressBar = document.getElementById('progressBar');
-const progressWrap = document.getElementById('progressWrap');
+const videoProgressWrap = document.getElementById('videoProgressWrap');
+const videoProgressBar = document.getElementById('videoProgressBar');
 const avatarInput = document.getElementById('avatarInput');
 const videoInput = document.getElementById('videoInput');
 const avatarSideImg = document.getElementById('avatarSideImg');
@@ -435,6 +448,7 @@ const videosGrid = document.getElementById('videosGrid');
 let isLiked = false, isSaved = false, totalLikes = 0;
 let uploadedVideos = [];
 let deferredPrompt = null;
+let isDraggingProgress = false;
 
 // === ตรวจสอบการติดตั้ง — เหลือแค่ข้อความ ===
 function checkInstallStatus() {
@@ -443,13 +457,11 @@ function checkInstallStatus() {
   const wasInstalled = localStorage.getItem(INSTALLED_KEY) === 'yes';
 
   if (isStandalone || wasInstalled) {
-    // มีแล้ว → สีเขียว
     installText.classList.remove('need');
     installText.classList.add('done');
     installText.textContent = '✅ ท่านมีแอปในเครื่องของท่านแล้ว';
-    installText.onclick = null; // ไม่ต้องกดอะไร
+    installText.onclick = null;
   } else {
-    // ยังไม่มี → สีแดง กดได้
     installText.classList.remove('done');
     installText.classList.add('need');
     installText.textContent = 'ติดตั้งแอป';
@@ -457,14 +469,12 @@ function checkInstallStatus() {
   }
 }
 
-// จับเหตุการณ์ก่อนติดตั้ง
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   checkInstallStatus();
 });
 
-// กดติดตั้ง
 async function doInstall() {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
@@ -476,15 +486,66 @@ async function doInstall() {
   deferredPrompt = null;
 }
 
-// ปิดข้อความ
 closeNote.addEventListener('click', () => {
   installNote.classList.add('hidden');
 });
 
+// === เส้นเวลาวิดีโอ ลากข้ามได้ ===
+video.addEventListener('timeupdate', () => {
+  if (!isDraggingProgress && video.duration) {
+    const percent = (video.currentTime / video.duration) * 100;
+    videoProgressBar.style.width = percent + '%';
+  }
+});
+
+function updateProgressDrag(e) {
+  if (!video.duration || !isDraggingProgress) return;
+  const rect = videoProgressWrap.getBoundingClientRect();
+  const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
+  if (clientX === undefined) return;
+  let x = clientX - rect.left;
+  x = Math.max(0, Math.min(x, rect.width));
+  const percent = x / rect.width;
+  video.currentTime = percent * video.duration;
+  videoProgressBar.style.width = (percent * 100) + '%';
+}
+
+videoProgressWrap.addEventListener('mousedown', e => { isDraggingProgress = true; updateProgressDrag(e); });
+document.addEventListener('mousemove', e => updateProgressDrag(e));
+document.addEventListener('mouseup', () => isDraggingProgress = false);
+
+videoProgressWrap.addEventListener('touchstart', e => { isDraggingProgress = true; updateProgressDrag(e); }, { passive: true });
+document.addEventListener('touchmove', e => updateProgressDrag(e), { passive: true });
+document.addEventListener('touchend', () => isDraggingProgress = false);
+
+// วิดีโอจบ → เล่นซ้ำเอง
+video.addEventListener('ended', () => {
+  video.currentTime = 0;
+  video.play();
+});
+
+// === เล่น/หยุดวิดีโอ ===
+function togglePlay() {
+  if (video.paused || video.muted) {
+    video.muted = false; video.play(); videoContainer.classList.add('playing');
+  } else {
+    video.pause();
+  }
+}
+tapLayer.addEventListener('click', togglePlay);
+
+// === อัตราส่วนวิดีโอ ===
+function updateRatio() {
+  if (!video.videoWidth) return;
+  videoContainer.classList.toggle('portrait', video.videoWidth/video.videoHeight < 1);
+  videoContainer.classList.toggle('landscape', video.videoWidth/video.videoHeight >= 1);
+}
+video.addEventListener('loadedmetadata', updateRatio);
+
 // === โหลดรูปโปรไฟล์ ===
 function loadAvatar() {
   const saved = localStorage.getItem(AVATAR_KEY);
-  const src = saved || 'thaipodee_logo_icon.png?v=1170';
+  const src = saved || 'thaipodee_logo_icon.png?v=1171';
   avatarSideImg.src = src;
   avatarBigImg.src = src;
 }
@@ -527,10 +588,8 @@ nameRow.addEventListener('click', editName);
 usernameRow.addEventListener('click', editUsername);
 
 // === สลับหน้า ===
-let currentPage = 'home';
 function showPage(name) {
   Object.entries(pages).forEach(([k,p]) => p.classList.toggle('hidden', k !== name));
-  currentPage = name;
   document.querySelectorAll('.nav-item,.bottom-nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === name);
   });
@@ -542,45 +601,6 @@ document.querySelectorAll('[data-page]').forEach(el => {
 document.querySelectorAll('[data-back]').forEach(el => {
   el.addEventListener('click', () => showPage(el.dataset.back));
 });
-
-// === เล่น/หยุดวิดีโอ ===
-function togglePlay() {
-  if (video.paused || video.muted) {
-    video.muted = false; video.play(); videoContainer.classList.add('playing');
-  } else {
-    video.pause();
-  }
-}
-tapLayer.addEventListener('click', togglePlay);
-video.addEventListener('ended', () => { video.currentTime = 0; video.play(); });
-
-// === แถบเวลา ===
-function updateProgress() {
-  if (!video.duration) return;
-  progressBar.style.width = (video.currentTime/video.duration*100)+'%';
-}
-video.addEventListener('timeupdate', updateProgress);
-let seeking = false;
-function seekVideo(e) {
-  if (!video.duration) return;
-  const rect = progressWrap.getBoundingClientRect();
-  const x = e.clientX ?? e.touches?.[0]?.clientX;
-  video.currentTime = ((x - rect.left)/rect.width) * video.duration;
-}
-progressWrap.addEventListener('mousedown', e=>{seeking=true; seekVideo(e);});
-document.addEventListener('mousemove', e=>{if(seeking) seekVideo(e);});
-document.addEventListener('mouseup', ()=>seeking=false);
-progressWrap.addEventListener('touchstart', e=>{seeking=true; seekVideo(e);});
-document.addEventListener('touchmove', e=>{if(seeking) seekVideo(e);});
-document.addEventListener('touchend', ()=>seeking=false);
-
-// === อัตราส่วนวิดีโอ ===
-function updateRatio() {
-  if (!video.videoWidth) return;
-  videoContainer.classList.toggle('portrait', video.videoWidth/video.videoHeight < 1);
-  videoContainer.classList.toggle('landscape', video.videoWidth/video.videoHeight >= 1);
-}
-video.addEventListener('loadedmetadata', updateRatio);
 
 // === ถูกใจ ===
 function updateLikeUI() {
@@ -606,8 +626,8 @@ async function doShare() {
   else { await navigator.clipboard.writeText(location.href); alert('คัดลอกลิงก์แล้ว ✅'); }
 }
 shareBtn.addEventListener('click', doShare);
-shareProfileBtn.addEventListener('click', doShare);
-shareProfileBtn2.addEventListener('click', doShare);
+document.getElementById('shareProfileBtn').addEventListener('click', doShare);
+document.getElementById('shareProfileBtn2').addEventListener('click', doShare);
 
 // === อัปโหลดวิดีโอ ===
 function handleVideoFile(file) {
