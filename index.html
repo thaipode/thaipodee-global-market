@@ -1,13 +1,6 @@
 <!-- ==============================================================
-   ThaiPodee v1154-FINAL-CLEAN
-   ✅ แตะจอตรงไหนก็ได้ → เล่น/หยุด สลับกัน
-   ✅ ไม่มีปุ่มรบกวน — ไม่มีปุ่มลำโพง ไม่มีปุ่มเล่นหยุดแยก
-   ✅ เสียงออกตามธรรมชาติ เล่นก็เสียงออก หยุดก็เสียงหยุด
-   ✅ วิดีโอจบแล้ววนกลับเล่นใหม่อัตโนมัติ
-   ✅ แถบเวลาลากได้ — ข้ามหน้า/ถอยหลังได้เลย
-   ✅ ปุ่มซูม-ย่อ แสดงเฉพาะตอนเล่นวิดีโอ
-   ✅ เอาไอคอน 2 ตัวที่ไม่ใช้ออก — เหลือ 6 ตัว สะอาด
-   ✅ วิดีโออยู่ตรงกลางจอ ไม่ตัดขอบ
+   ThaiPodee v1155-EXACT-9ITEMS
+   ✅ แก้ไขเฉพาะ 9 ข้อที่ระบุเท่านั้น
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -26,11 +19,11 @@
 <meta name="theme-color" content="#ff0050">
 <meta name="msapplication-TileColor" content="#000000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1154</title>
+<title>ThaiPodee v1155</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1154">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1154">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1154%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1154%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1155">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1155">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1155%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1155%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -67,25 +60,24 @@ html,body{
 .version-text{font-size:9px;color:#666}
 .search-icon{font-size:20px;cursor:pointer;}
 
-/* วิดีโอตรงกลางพอดีจอ ไม่ตัดขอบ */
+/* ข้อ 7 — ไม่มีแถบดำรอบ วิดีโอเต็มพื้นที่ */
 .video-container{
   position:fixed;inset:0;background:#000;
   display:flex;align-items:center;justify-content:center;z-index:1;
 }
 .video-container video{
-  max-width:100%;max-height:100%;
   width:100%;height:100%;
-  object-fit:contain;
+  object-fit:cover; /* เต็มจอ ไม่มีขอบดำ */
   display:block;transition:all .3s ease;
 }
-.video-container.fullscreen-mode video{
-  object-fit:cover;
+.video-container.contain-mode video{
+  object-fit:contain;
 }
 
-/* แถบเวลา — ลากได้ แสดงตอนเล่น */
+/* ข้อ 2+8 — แถบเวลาสีขาว มีปุ่มกลม จับเลื่อนได้ โตขึ้น */
 .progress-bar-wrap{
   position:absolute;bottom:0;left:0;right:0;
-  height:6px;background:rgba(255,255,255,.2);
+  height:8px;background:rgba(255,255,255,.25);
   cursor:pointer;z-index:5;
   opacity:0;visibility:hidden;transition:all .3s ease;
 }
@@ -93,11 +85,16 @@ html,body{
   opacity:1;visibility:visible;
 }
 .progress-bar{
-  height:100%;background:#ff0050;width:0%;
+  position:relative;height:100%;background:#fff;width:0%;
   transition:width .1s linear;
 }
+.progress-dot{
+  position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;background:#fff;border-radius:50%;
+  box-shadow:0 0 6px rgba(0,0,0,.4);
+}
 
-/* ปุ่มซูม-ย่อ — อยู่ในวิดีโอเท่านั้น */
+/* ข้อ 1+3 — ปุ่มซูม-ย่อ มีแค่ในวิดีโอ ไม่มีที่อื่น */
 .zoom-controls{
   position:absolute;bottom:20px;right:16px;z-index:6;
   display:flex;flex-direction:column;gap:8px;
@@ -118,13 +115,14 @@ html,body{
 .ui-layer{position:fixed;inset:0;z-index:4;pointer-events:none;}
 .ui-layer > *{pointer-events:auto;}
 
-.bottom-info{position:absolute;left:16px;bottom:40px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
+/* ข้อ 9 — ยกข้อความขึ้น ไม่ชิดแถบล่าง */
+.bottom-info{position:absolute;left:16px;bottom:110px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
 .author{font-size:15px;font-weight:bold;margin-bottom:6px}
 .caption{font-size:13px;margin-bottom:6px}
 .music{font-size:12px;display:flex;align-items:center;gap:6px}
 
-/* ไอคอนด้านขวา — เหลือ 6 ตัว สะอาด ไม่มีอะไรเพิ่ม */
-.side-icons{position:absolute;right:12px;bottom:100px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:4;}
+/* ข้อ 4 — ไอคอนขวา 6 ตัว สะอาด ไม่มีอะไรเพิ่ม */
+.side-icons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:4;}
 .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px}
 .side-count{font-size:11px}
@@ -160,21 +158,23 @@ html,body{
     <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอปเลย</button>
   </div>
   <div class="search-wrap">
-    <span class="version-text">v1154</span>
+    <span class="version-text">v1155</span>
     <span class="search-icon">🔍</span>
   </div>
 </div>
 
 <div class="video-container" id="videoContainer">
-  <!-- เสียงออกเลย ไม่ปิด  วนซ้ำอัตโนมัติ -->
+  <!-- ข้อ 5+6 — แตะเล่น/หยุด เสียงออกเลย วนซ้ำอัตโนมัติ -->
   <video id="mainVideo" playsinline webkit-playsinline loop autoplay></video>
 
-  <!-- แถบเวลาลากได้ -->
+  <!-- แถบเวลา + ปุ่มกลมสีขาว -->
   <div class="progress-bar-wrap" id="progressWrap">
-    <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-dot"></div>
+    </div>
   </div>
 
-  <!-- ปุ่มซูม-ย่อ อยู่ในวิดีโอเท่านั้น -->
+  <!-- ปุ่มซูม-ย่อ มีแค่ตรงนี้ -->
   <div class="zoom-controls">
     <button class="zoom-btn" id="zoomInBtn" title="ขยายเต็มจอ">⛶</button>
     <button class="zoom-btn" id="zoomOutBtn" title="ย่อให้พอดี">⊡</button>
@@ -190,12 +190,12 @@ html,body{
     <div class="music"><span>♪</span><span>เสียงประกอบ</span></div>
   </div>
 
-  <!-- ไอคอน 6 ตัว สะอาด ไม่มีอะไรเพิ่ม -->
+  <!-- ไอคอนขวา 6 ตัว สะอาด ไม่มีปุ่มเกิน -->
   <div class="side-icons">
     <div class="side-item">
       <div class="profile-wrap">
         <div class="profile-avatar">
-          <img src="thaipodee_logo_icon.png?v=1154" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
+          <img src="thaipodee_logo_icon.png?v=1155" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
         </div>
         <div class="plus-badge">+</div>
       </div>
@@ -218,7 +218,7 @@ html,body{
 </div>
 
 <script>
-const CURRENT_VERSION = 'v1154';
+const CURRENT_VERSION = 'v1155';
 const STORAGE_KEY = 'thaipodee_last_version';
 
 const video = document.getElementById('mainVideo');
@@ -233,7 +233,6 @@ const zoomOutBtn = document.getElementById('zoomOutBtn');
 const progressBar = document.getElementById('progressBar');
 const progressWrap = document.getElementById('progressWrap');
 
-// อัปเดตอัตโนมัติ
 const lastVersion = localStorage.getItem(STORAGE_KEY);
 if (lastVersion && lastVersion !== CURRENT_VERSION) {
   localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
@@ -246,20 +245,16 @@ function isAppInstalled() {
   return (window.matchMedia('(display-mode: standalone)').matches) ||
          (window.navigator.standalone === true);
 }
-
 if (isAppInstalled()) installBtn.classList.add('hidden');
 
-// อัปเดตแถบเวลา
 function updateProgress() {
   if (!video.duration) return;
   const pct = (video.currentTime / video.duration) * 100;
   progressBar.style.width = pct + '%';
 }
-
 video.addEventListener('timeupdate', updateProgress);
 video.addEventListener('loadedmetadata', updateProgress);
 
-// ลากแถบเวลาไปข้างหน้า-ถอยหลัง
 let isDragging = false;
 function seekTo(e) {
   if (!video.duration) return;
@@ -275,23 +270,19 @@ progressWrap.addEventListener('touchstart', (e) => { isDragging = true; seekTo(e
 document.addEventListener('touchmove', (e) => { if (isDragging) seekTo(e); });
 document.addEventListener('touchend', () => { isDragging = false; });
 
-// แตะตรงไหนก็ได้ → เล่น/หยุด
 function togglePlay() {
   if (video.paused) {
     video.play();
     videoContainer.classList.add('playing');
   } else {
     video.pause();
-    // หยุดแล้วแถบยังค้างไว้ ไม่ซ่อน
   }
 }
 tapLayer.addEventListener('click', togglePlay);
 
-// ขยาย-ย่อ
-zoomInBtn.addEventListener('click', () => videoContainer.classList.add('fullscreen-mode'));
-zoomOutBtn.addEventListener('click', () => videoContainer.classList.remove('fullscreen-mode'));
+zoomInBtn.addEventListener('click', () => videoContainer.classList.add('contain-mode'));
+zoomOutBtn.addEventListener('click', () => videoContainer.classList.remove('contain-mode'));
 
-// อัปโหลดวิดีโอใหม่
 uploadBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => {
   const f = e.target.files[0];
@@ -331,7 +322,7 @@ installBtn.addEventListener('click', async () => {
 shareBtn.addEventListener('click', async () => {
   const shareData = {
     title: `ThaiPodee ${CURRENT_VERSION}`,
-    text: 'แตะจอเล่น-หยุด ลากแถบเวลาข้ามได้',
+    text: 'แก้ครบ 9 ข้อแล้ว — แถบเวลาสีขาว มีปุ่มกลม',
     url: window.location.href
   };
   if (navigator.share) {
