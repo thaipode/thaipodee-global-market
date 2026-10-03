@@ -154,4 +154,225 @@ html,body{
 }
 .side-icon{
   width:44px;height:44px;
-  display:flex;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+}
+.side-count{font-size:11px}
+
+.profile-wrap{position:relative}
+.profile-avatar{width:44px;height:44px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#222}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.plus-badge{position:absolute;bottom:-4px;right:-4px;width:18px;height:18px;background:#ff0050;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+.disc-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#666,#222);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ✅ แถบล่างชิดขอบ ไม่มีพื้นที่ดำเกิน */
+.nav-bar{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:65px;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));
+  background:#000;
+  z-index:10;
+  margin:0;
+}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:#999;font-size:10px;cursor:pointer}
+.nav-item.active{color:#fff}
+.nav-icon{font-size:22px}
+.nav-center-plus{width:52px;height:38px;background:#ff0050;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px}
+
+.file-input{display:none}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="live-btn"><span class="live-icon">📺</span><span>ไลฟ์</span></div>
+  <div class="nav-center-group">
+    <div class="nav-tabs">
+      <span class="nav-tab">นครราชสีมา</span>
+      <span class="nav-tab">เพื่อน</span>
+      <span class="nav-tab">กำลังติดตาม</span>
+      <span class="nav-tab active">สำหรับคุณ</span>
+    </div>
+    <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอปเลย</button>
+  </div>
+  <div class="search-wrap">
+    <span class="version-text">v1161</span>
+    <span class="search-icon">🔍</span>
+  </div>
+</div>
+
+<div class="video-container" id="videoContainer">
+  <video id="mainVideo" playsinline webkit-playsinline loop autoplay></video>
+
+  <div class="progress-bar-wrap" id="progressWrap">
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="zoomInBtn" title="ขยายเต็มจอ">⛶</button>
+    <button class="zoom-btn" id="zoomOutBtn" title="ย่อให้พอดี">⊡</button>
+  </div>
+</div>
+
+<div class="tap-layer" id="tapLayer"></div>
+
+<div class="ui-layer">
+  <div class="bottom-info">
+    <div class="author">@ThaiPodee</div>
+    <div class="caption">แตะจอตรงไหนก็ได้ → เล่น/หยุด</div>
+    <div class="music"><span>♪</span><span>เสียงประกอบ</span></div>
+  </div>
+
+  <!-- 6 ไอคอนพอดี ไม่มีปุ่มสี่เหลี่ยมเพิ่ม -->
+  <div class="side-icons">
+    <div class="side-item">
+      <div class="profile-wrap">
+        <div class="profile-avatar">
+          <img src="thaipodee_logo_icon.png?v=1161" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
+        </div>
+        <div class="plus-badge">+</div>
+      </div>
+    </div>
+    <div class="side-item"><div class="side-icon">❤️</div><div class="side-count">0</div></div>
+    <div class="side-item"><div class="side-icon">💬</div><div class="side-count">0</div></div>
+    <div class="side-item"><div class="side-icon">⬜</div><div class="side-count">บันทึก</div></div>
+    <div class="side-item" id="shareBtn"><div class="side-icon">↗️</div><div class="side-count">แชร์</div></div>
+    <div class="side-item"><div class="disc-icon">🎵</div></div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-item active"><span class="nav-icon">🏠</span><span>หน้าหลัก</span></div>
+    <div class="nav-item"><span class="nav-icon">🛒</span><span>ร้านค้า</span></div>
+    <div class="nav-center-plus" id="uploadBtn">+</div>
+    <div class="nav-item"><span class="nav-icon">💬</span><span>ข้อความ</span></div>
+    <div class="nav-item"><span class="nav-icon">👤</span><span>โปรไฟล์</span></div>
+  </div>
+  <input type="file" id="fileInput" accept="video/*" class="file-input">
+</div>
+
+<script>
+const CURRENT_VERSION = 'v1161';
+const STORAGE_KEY = 'thaipodee_last_version';
+
+const video = document.getElementById('mainVideo');
+const videoContainer = document.getElementById('videoContainer');
+const tapLayer = document.getElementById('tapLayer');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const installBtn = document.getElementById('installBtn');
+const shareBtn = document.getElementById('shareBtn');
+const zoomInBtn = document.getElementById('zoomInBtn');
+const zoomOutBtn = document.getElementById('zoomOutBtn');
+const progressBar = document.getElementById('progressBar');
+const progressWrap = document.getElementById('progressWrap');
+
+const lastVersion = localStorage.getItem(STORAGE_KEY);
+if (lastVersion && lastVersion !== CURRENT_VERSION) {
+  localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
+  window.location.reload(true);
+} else {
+  localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
+}
+
+function isAppInstalled() {
+  return (window.matchMedia('(display-mode: standalone)').matches) ||
+         (window.navigator.standalone === true);
+}
+if (isAppInstalled()) installBtn.classList.add('hidden');
+
+function updateProgress() {
+  if (!video.duration) return;
+  const pct = (video.currentTime / video.duration) * 100;
+  progressBar.style.width = pct + '%';
+}
+video.addEventListener('timeupdate', updateProgress);
+video.addEventListener('loadedmetadata', updateProgress);
+
+let isDragging = false;
+function seekTo(e) {
+  if (!video.duration) return;
+  const rect = progressWrap.getBoundingClientRect();
+  const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  video.currentTime = pct * video.duration;
+}
+progressWrap.addEventListener('mousedown', (e) => { isDragging = true; seekTo(e); });
+document.addEventListener('mousemove', (e) => { if (isDragging) seekTo(e); });
+document.addEventListener('mouseup', () => { isDragging = false; });
+progressWrap.addEventListener('touchstart', (e) => { isDragging = true; seekTo(e); });
+document.addEventListener('touchmove', (e) => { if (isDragging) seekTo(e); });
+document.addEventListener('touchend', () => { isDragging = false; });
+
+function togglePlay() {
+  if (video.paused) {
+    video.play();
+    videoContainer.classList.add('playing');
+  } else {
+    video.pause();
+  }
+}
+tapLayer.addEventListener('click', togglePlay);
+
+zoomInBtn.addEventListener('click', () => videoContainer.classList.add('contain-mode'));
+zoomOutBtn.addEventListener('click', () => videoContainer.classList.remove('contain-mode'));
+
+uploadBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  video.src = URL.createObjectURL(f);
+  video.load();
+  video.play();
+  videoContainer.classList.add('playing');
+});
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isAppInstalled()) installBtn.style.display = 'block';
+});
+
+installBtn.addEventListener('click', async () => {
+  if (isAppInstalled()) {
+    installBtn.classList.add('hidden');
+    return;
+  }
+  if (!deferredPrompt) {
+    alert('📱 กดเมนู ⋮ → เพิ่มหน้าจอหลัก → ติดตั้ง');
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    installBtn.textContent = '✅ ติดตั้งแล้ว';
+    installBtn.classList.add('installed');
+    setTimeout(() => installBtn.classList.add('hidden'), 1200);
+  }
+  deferredPrompt = null;
+});
+
+shareBtn.addEventListener('click', async () => {
+  const shareData = {
+    title: `ThaiPodee ${CURRENT_VERSION}`,
+    text: 'v1161 — เต็มจอ ไม่มีแถบดำรอบ ๆ',
+    url: window.location.href
+  };
+  if (navigator.share) {
+    try { await navigator.share(shareData); }
+    catch { await navigator.clipboard.writeText(window.location.href); alert('คัดลอกลิงก์แล้ว ✅'); }
+  } else {
+    await navigator.clipboard.writeText(window.location.href);
+    alert('คัดลอกลิงก์แล้ว ✅');
+  }
+});
+</script>
+
+</body>
+</html>
