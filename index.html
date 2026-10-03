@@ -1,8 +1,8 @@
 <!-- ==============================================================
-   ThaiPodee v1143-FIX-INSTALL-BUTTON-ALWAYS-SHOW
-   ✅ แสดงปุ่มติดตั้งชัดเจน ไม่ซ่อนผิด
-   ✅ ทำงานทั้ง GitHub + Render
-   ✅ เปิดจริงเป็นแอปแล้วค่อยซ่อน
+   ThaiPodee v1144-ONE-CLICK-INSTALL
+   ✅ กดปุ่มสีแดง → ติดตั้งได้เลย ไม่ต้องไปกดจุด 3 จุด
+   ✅ แสดงปุ่มชัดเจน ตลอดเวลา จนกว่าจะติดตั้งจริง
+   ✅ ติดตั้งสำเร็จ → ปุ่มเปลี่ยนสีแล้วหายไปเอง
    ✅ ใช้โลโก้จาก logo.png
    ============================================================== -->
 <!DOCTYPE html>
@@ -18,19 +18,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
-<meta name="theme-color" content="#000000">
-<meta name="description" content="ThaiPodee — แอปวิดีโอ">
+<meta name="theme-color" content="#ff0050">
+<meta name="description" content="ThaiPodee — กดปุ่มเดียวติดตั้งเลย">
 
-<title>ThaiPodee v1143</title>
+<title>ThaiPodee v1144</title>
 
-<link rel="apple-touch-icon" sizes="180x180" href="logo.png?v=1143">
-<link rel="apple-touch-icon" sizes="167x167" href="logo.png?v=1143">
-<link rel="apple-touch-icon" sizes="152x152" href="logo.png?v=1143">
-<link rel="apple-touch-icon" sizes="120x120" href="logo.png?v=1143">
-<link rel="icon" type="image/png" sizes="192x192" href="logo.png?v=1143">
-<link rel="icon" type="image/png" sizes="512x512" href="logo.png?v=1143">
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png?v=1144">
+<link rel="apple-touch-icon" sizes="167x167" href="logo.png?v=1144">
+<link rel="apple-touch-icon" sizes="152x152" href="logo.png?v=1144">
+<link rel="apple-touch-icon" sizes="120x120" href="logo.png?v=1144">
+<link rel="icon" type="image/png" sizes="192x192" href="logo.png?v=1144">
+<link rel="icon" type="image/png" sizes="512x512" href="logo.png?v=1144">
 
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%20v1143%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22%2F%3Fv%3D1143%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo.png%3Fv%3D1143%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22%2F%3Fv%3D1144%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo.png%3Fv%3D1144%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -57,14 +57,18 @@ html,body{
 .nav-tab{opacity:0.7;cursor:pointer;}
 .nav-tab.active{opacity:1;font-weight:bold;border-bottom:2px solid #fff;padding-bottom:2px;}
 
-/* ✅ ปุ่มแสดงชัดเจน — ไม่ซ่อนเองผิด */
+/* ✅ ปุ่มสีแดงชัดเจน กดเลย */
 .install-btn-red{
-  font-size:13px;color:#fff;background:#ff0050;border:none;
-  cursor:pointer;padding:6px 16px;border-radius:20px;line-height:1;
-  display:block;
-  transition:all 0.3s ease;
+  font-size:14px;color:#fff;background:#ff0050;border:none;
+  cursor:pointer;padding:8px 20px;border-radius:25px;line-height:1;
   font-weight:bold;
+  box-shadow:0 2px 8px rgba(255,0,80,.4);
+  transition:all 0.3s ease;
+  display:block;
 }
+.install-btn-red:hover{transform:scale(1.05);}
+.install-btn-red:active{transform:scale(0.97);}
+.install-btn-red.installed{background:#00c853;box-shadow:none;}
 .install-btn-red.hidden{display:none !important;}
 
 .search-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
@@ -107,6 +111,9 @@ html,body{
 .nav-center-plus{width:52px;height:38px;background:#ff0050;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;}
 
 .file-input{display:none;}
+
+/* ✅ ซ่อนข้อความแจ้งเตือนอื่นๆ ให้เหลือแค่ปุ่มกดตรงๆ */
+.prompt-box{display:none !important;}
 </style>
 </head>
 <body>
@@ -120,11 +127,11 @@ html,body{
       <span class="nav-tab">กำลังติดตาม</span>
       <span class="nav-tab active">สำหรับคุณ</span>
     </div>
-    <!-- ✅ ปุ่มแสดงตลอด จนกว่าจะติดตั้งจริง -->
-    <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอป</button>
+    <!-- ✅ ปุ่มสีแดง กดเลย ไม่ต้องอธิบายยาว -->
+    <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอปเลย</button>
   </div>
   <div class="search-wrap">
-    <span class="version-text">v1143</span>
+    <span class="version-text">v1144</span>
     <span class="search-icon">🔍</span>
   </div>
 </div>
@@ -138,12 +145,12 @@ html,body{
 <div class="ui-layer">
   <div class="bottom-info">
     <div class="author">@ThaiPodee</div>
-    <div class="caption">แตะจอเล่น/หยุด — กดปุ่มแดงเพื่อติดตั้ง</div>
+    <div class="caption">แตะจอเล่น/หยุด — กดปุ่มแดงติดตั้งเลย</div>
     <div class="music"><span>♪</span><span>เสียงประกอบ</span></div>
   </div>
 
   <div class="side-icons">
-    <div class="side-item"><div class="profile-wrap"><div class="profile-avatar"><img src="logo.png?v=1143" alt="โปรไฟล์"></div><div class="plus-badge">+</div></div></div>
+    <div class="side-item"><div class="profile-wrap"><div class="profile-avatar"><img src="logo.png?v=1144" alt="โปรไฟล์"></div><div class="plus-badge">+</div></div></div>
     <div class="side-item"><div class="side-icon">❤️</div><div class="side-count">0</div></div>
     <div class="side-item"><div class="side-icon">💬</div><div class="side-count">0</div></div>
     <div class="side-item"><div class="side-icon">⬜</div><div class="side-count">บันทึก</div></div>
@@ -169,13 +176,14 @@ const uploadTrigger = document.getElementById('uploadTrigger');
 const installBtn = document.getElementById('installBtn');
 const shareBtn = document.getElementById('shareBtn');
 
-// ✅ ซ่อนปุ่มเฉพาะตอนเปิดจากไอคอนจริงเท่านั้น
-function isRunningAsApp() {
+// ตรวจว่าเปิดจากไอคอนแอปจริงหรือไม่
+function isAppInstalled() {
   return (window.matchMedia('(display-mode: standalone)').matches) ||
          (window.navigator.standalone === true);
 }
 
-if (isRunningAsApp()) {
+// ถ้าติดตั้งแล้ว → ซ่อนปุ่ม
+if (isAppInstalled()) {
   installBtn.classList.add('hidden');
 }
 
@@ -187,60 +195,64 @@ fileInput.addEventListener('change', e => {
 });
 
 let deferredPrompt = null;
+
+// รอระบบพร้อมที่จะติดตั้ง
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  // ยืนยันแสดงปุ่ม
-  if (!isRunningAsApp()) {
-    installBtn.style.display = 'block';
-  }
+  installBtn.style.display = 'block';
 });
 
+// ✅ กดปุ่มสีแดง → เรียกหน้าต่างติดตั้งเลย
 installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) {
-    if (isRunningAsApp()) {
-      installBtn.classList.add('hidden');
-      alert('✅ ติดตั้งอยู่แล้ว — เปิดเป็นแอปแล้วครับ');
-    } else {
-      alert('📱 วิธีติดตั้ง:\n\n1. กดจุด 3 จุด มุมขวาบน (⋮)\n2. เลือก "เพิ่มหน้าจอหลัก"\n3. กด "ติดตั้ง" / "เพิ่ม"\n\n✅ เสร็จแล้วมีไอคอนที่หน้าจอเลยครับ');
-    }
+  if (isAppInstalled()) {
+    installBtn.classList.add('hidden');
     return;
   }
 
+  if (!deferredPrompt) {
+    // บางเครื่องอาจไม่แสดงหน้าต่างอัตโนมัติ ให้แจ้งทางเดียว
+    alert('📱 กดเมนู ⋮ ที่มุมขวาบน → เพิ่มหน้าจอหลัก → ติดตั้ง');
+    return;
+  }
+
+  // เด้งหน้าต่างติดตั้งขึ้นมาเลย
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
-  
+
   if (outcome === 'accepted') {
+    // ติดตั้งสำเร็จ → เปลี่ยนสี + หายไป
     installBtn.textContent = '✅ ติดตั้งแล้ว';
-    installBtn.style.background = '#00a84f';
+    installBtn.classList.add('installed');
     setTimeout(() => {
       installBtn.classList.add('hidden');
-    }, 1500);
-    deferredPrompt = null;
+    }, 1200);
   }
+  deferredPrompt = null;
 });
 
-// ตรวจซ้ำทุกครั้งเมื่อโหลด
+// ตรวจอีกครั้งเมื่อโหลดเสร็จ
 window.addEventListener('load', () => {
   setTimeout(() => {
-    if (isRunningAsApp()) {
+    if (isAppInstalled()) {
       installBtn.classList.add('hidden');
     }
   }, 300);
 });
 
+// แชร์
 shareBtn.addEventListener('click', async () => {
   const shareData = {
-    title: 'ThaiPodee v1143',
-    text: 'เปิดลิงก์ → กดปุ่มแดง "ติดตั้งแอป" → ได้ไอคอนที่หน้าจอเลย',
+    title: 'ThaiPodee v1144',
+    text: 'กดลิงก์ → กดปุ่มแดง "ติดตั้งแอปเลย" → เสร็จมีไอคอนที่หน้าจอ',
     url: window.location.href
   };
   if (navigator.share) {
     try { await navigator.share(shareData); }
-    catch { await navigator.clipboard.writeText(window.location.href); alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย'); }
+    catch { await navigator.clipboard.writeText(window.location.href); alert('คัดลอกลิงก์แล้ว ✅'); }
   } else {
     await navigator.clipboard.writeText(window.location.href);
-    alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย');
+    alert('คัดลอกลิงก์แล้ว ✅');
   }
 });
 </script>
