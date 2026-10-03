@@ -1,14 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1171 — ✅ เส้นเวลามีปุ่มกลม ลากข้ามได้ + วนซ้ำเอง
-   อัปเดต: 3 ตุลาคม 2569 22:21 น.
+   ThaiPodee v1173 — ✅ เส้นเวลาลอยบนวิดีโอโดยตรง ลากได้แน่นอน
+   อัปเดต: 3 ตุลาคม 2569 22:31 น.
    --------------------------------------------------------------
-   ✅ เส้นเวลาสีชมพู + ปุ่มกลมสีขาว ลากเดินหน้า/ย้อนกลับได้
-   ✅ ปล่อยนิ้ว → เล่นต่อทันที
-   ✅ จบแล้ววนกลับเริ่มใหม่อัตโนมัติ
-   ✅ แจ้งเตือนเหลือแค่ตัวหนังสือ "ติดตั้งแอป" สีแดง มุมขวาบน
-   ✅ ติดตั้งแอป / ตรวจสอบว่ามีแล้ว → เปลี่ยนเป็นสีเขียว
-   ✅ รูปโปรไฟล์ + เปลี่ยนชื่อ + อัปโหลดวิดีโอ
-   ✅ ไอคอนครบ 6 ตัว เรียงถูกต้อง
+   ✅ เส้นเวลาลอยอยู่บนภาพวิดีโอโดยตรง — ไม่ซ้อนกับอะไร
+   ✅ แตะ-ลากตรงปุ่มกลมหรือเส้นเลย → ข้ามได้ทันที
+   ✅ แตะที่อื่นในจอ → เล่น/หยุดปกติ ไม่ขัดกัน
+   ✅ จบแล้ววนซ้ำเองอัตโนมัติ
+   ✅ แจ้งเตือนแค่ตัวหนังสือสีแดง มุมขวาบน
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -26,11 +24,11 @@
 <meta name="application-name" content="ThaiPodee">
 <meta name="theme-color" content="#000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1171</title>
+<title>ThaiPodee v1173</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1171">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1171">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1171%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1171%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1173">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1173">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1173%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1173%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -67,6 +65,7 @@ html,body{
 .nav-tab.active{opacity:1;font-weight:bold;border-bottom:2px solid #fff;padding-bottom:2px}
 .version-top{font-size:10px;opacity:0.6;text-align:right}
 
+/* ===== กล่องวิดีโอ ===== */
 .video-container{
   position:fixed;inset:0;background:#000;
   display:flex;align-items:center;justify-content:center;z-index:1;
@@ -75,34 +74,45 @@ html,body{
 .video-container.portrait video{object-fit:cover}
 .video-container.landscape video{object-fit:contain}
 
-/* ===== เส้นเวลาวิดีโอ มีปุ่มกลมลากได้ ===== */
-.video-progress-wrap{
-  position:absolute;bottom:110px;left:16px;right:16px;
-  height:6px;background:rgba(255,255,255,.35);border-radius:3px;
-  z-index:10;cursor:pointer;user-select:none;
+/* ===== เส้นเวลาลอยบนวิดีโอโดยตรง ===== */
+.progress-container{
+  position:absolute;left:12px;right:12px;bottom:90px;
+  height:44px; padding: 10px 0;
+  z-index:10;
+  cursor:pointer;
 }
-.video-progress-bar{
-  height:100%;width:0%;background:#ff0050;border-radius:3px;position:relative;
-  transition:width .05s linear;
+.progress-bg{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  height:5px;background:rgba(255,255,255,.3);border-radius:3px;
 }
-.video-progress-thumb{
-  position:absolute;right:-10px;top:50%;transform:translateY(-50%);
-  width:20px;height:20px;background:#fff;border-radius:50%;
-  box-shadow:0 0 10px rgba(0,0,0,.4);
+.progress-fill{
+  position:absolute;left:0;top:0;height:100%;width:0%;
+  background:#ff0050;border-radius:3px;
+  transition:width .04s linear;
+}
+.progress-thumb{
+  position:absolute;right:-12px;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;background:#fff;border-radius:50%;
+  box-shadow:0 0 12px rgba(0,0,0,.5);
+  z-index:2;
 }
 
-.tap-layer{position:fixed;inset:0;z-index:3;cursor:pointer;background:transparent;}
-.ui-layer{position:fixed;inset:0;z-index:4;pointer-events:none;color:#fff;}
+/* ===== ชั้นแตะเล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===== */
+.tap-layer{
+  position:fixed;inset:0;z-index:5;
+  background:transparent;
+}
+.ui-layer{position:fixed;inset:0;z-index:6;pointer-events:none;color:#fff;}
 .ui-layer > *{pointer-events:auto;}
 
-.bottom-info{position:absolute;left:16px;bottom:140px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
+.bottom-info{position:absolute;left:16px;bottom:140px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:7;}
 .author{font-size:15px;font-weight:bold;margin-bottom:4px}
 .caption{font-size:13px;margin-bottom:4px;opacity:0.9}
 .music{font-size:12px;display:flex;align-items:center;gap:6px;opacity:0.85}
 
 .side-icons{
   position:absolute;right:12px;bottom:180px;
-  display:flex;flex-direction:column;gap:24px;align-items:center;z-index:4;
+  display:flex;flex-direction:column;gap:24px;align-items:center;z-index:7;
 }
 .side-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px}
@@ -129,7 +139,7 @@ html,body{
   position:absolute;bottom:0;left:0;right:0;height:65px;
   display:flex;justify-content:space-around;align-items:center;
   padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));
-  background:#000;z-index:10;color:#999;
+  background:#000;z-index:7;color:#999;
 }
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .nav-item.active{color:#fff}
@@ -218,7 +228,7 @@ html,body{
 </head>
 <body>
 
-<!-- ===== แจ้งเตือนติดตั้ง — เหลือแค่ตัวหนังสือ ===== -->
+<!-- ===== แจ้งเตือนติดตั้ง ===== -->
 <div class="install-note" id="installNote">
   <span class="install-text need" id="installText">ติดตั้งแอป</span>
   <button class="close-note" id="closeNote">×</button>
@@ -238,27 +248,29 @@ html,body{
       <span class="nav-tab active">สำหรับคุณ</span>
     </div>
     <div>
-      <div class="version-top">v1171</div>
+      <div class="version-top">v1173</div>
       <div>🔍</div>
     </div>
   </div>
 
   <div class="video-container" id="videoContainer">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
-    <!-- ===== เส้นเวลาวิดีโอ ===== -->
-    <div class="video-progress-wrap" id="videoProgressWrap">
-      <div class="video-progress-bar" id="videoProgressBar">
-        <div class="video-progress-thumb"></div>
+    <!-- ===== เส้นเวลาลอยบนวิดีโอ ===== -->
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bg"></div>
+      <div class="progress-fill" id="progressFill">
+        <div class="progress-thumb"></div>
       </div>
     </div>
   </div>
 
+  <!-- ===== ชั้นแตะเล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===== -->
   <div class="tap-layer" id="tapLayer"></div>
 
   <div class="ui-layer">
     <div class="bottom-info">
       <div class="author" id="videoAuthor">@thaipodee</div>
-      <div class="caption" id="videoCaption">แตะจอ → เล่น/หยุด | ลากเส้นเวลา → ข้ามได้</div>
+      <div class="caption" id="videoCaption">ลากจุดขาว → ข้ามเวลา | แตะที่อื่น → เล่น/หยุด</div>
       <div class="music" id="videoMusic">♪ เสียงประกอบ</div>
     </div>
 
@@ -405,7 +417,7 @@ html,body{
 </div>
 
 <script>
-const VERSION = 'v1171';
+const VERSION = 'v1173';
 const INSTALLED_KEY = 'tp_installed';
 const AVATAR_KEY = 'tp_avatar';
 const NAME_KEY = 'tp_name';
@@ -428,8 +440,8 @@ const pages = {
 const video = document.getElementById('mainVideo');
 const videoContainer = document.getElementById('videoContainer');
 const tapLayer = document.getElementById('tapLayer');
-const videoProgressWrap = document.getElementById('videoProgressWrap');
-const videoProgressBar = document.getElementById('videoProgressBar');
+const progressContainer = document.getElementById('progressContainer');
+const progressFill = document.getElementById('progressFill');
 const avatarInput = document.getElementById('avatarInput');
 const videoInput = document.getElementById('videoInput');
 const avatarSideImg = document.getElementById('avatarSideImg');
@@ -448,9 +460,9 @@ const videosGrid = document.getElementById('videosGrid');
 let isLiked = false, isSaved = false, totalLikes = 0;
 let uploadedVideos = [];
 let deferredPrompt = null;
-let isDraggingProgress = false;
+let isDragging = false;
 
-// === ตรวจสอบการติดตั้ง — เหลือแค่ข้อความ ===
+// === ตรวจสอบการติดตั้ง ===
 function checkInstallStatus() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                        window.navigator.standalone === true;
@@ -490,33 +502,47 @@ closeNote.addEventListener('click', () => {
   installNote.classList.add('hidden');
 });
 
-// === เส้นเวลาวิดีโอ ลากข้ามได้ ===
-video.addEventListener('timeupdate', () => {
-  if (!isDraggingProgress && video.duration) {
-    const percent = (video.currentTime / video.duration) * 100;
-    videoProgressBar.style.width = percent + '%';
-  }
-});
+// === เส้นเวลา — ลากได้แน่นอน ===
+function updateProgressUI() {
+  if (!video.duration || isDragging) return;
+  const pct = (video.currentTime / video.duration) * 100;
+  progressFill.style.width = pct + '%';
+}
+video.addEventListener('timeupdate', updateProgressUI);
 
-function updateProgressDrag(e) {
-  if (!video.duration || !isDraggingProgress) return;
-  const rect = videoProgressWrap.getBoundingClientRect();
-  const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
-  if (clientX === undefined) return;
+function seekToPosition(clientX) {
+  if (!video.duration) return;
+  const rect = progressContainer.getBoundingClientRect();
   let x = clientX - rect.left;
   x = Math.max(0, Math.min(x, rect.width));
-  const percent = x / rect.width;
-  video.currentTime = percent * video.duration;
-  videoProgressBar.style.width = (percent * 100) + '%';
+  const pct = x / rect.width;
+  video.currentTime = pct * video.duration;
+  progressFill.style.width = (pct * 100) + '%';
 }
 
-videoProgressWrap.addEventListener('mousedown', e => { isDraggingProgress = true; updateProgressDrag(e); });
-document.addEventListener('mousemove', e => updateProgressDrag(e));
-document.addEventListener('mouseup', () => isDraggingProgress = false);
+// เริ่มลาก
+progressContainer.addEventListener('mousedown', e => {
+  isDragging = true;
+  seekToPosition(e.clientX);
+});
+progressContainer.addEventListener('touchstart', e => {
+  isDragging = true;
+  seekToPosition(e.touches[0].clientX);
+}, { passive: true });
 
-videoProgressWrap.addEventListener('touchstart', e => { isDraggingProgress = true; updateProgressDrag(e); }, { passive: true });
-document.addEventListener('touchmove', e => updateProgressDrag(e), { passive: true });
-document.addEventListener('touchend', () => isDraggingProgress = false);
+// กำลังลาก
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  seekToPosition(e.clientX);
+});
+document.addEventListener('touchmove', e => {
+  if (!isDragging) return;
+  seekToPosition(e.touches[0].clientX);
+}, { passive: true });
+
+// ปล่อย
+document.addEventListener('mouseup', () => isDragging = false);
+document.addEventListener('touchend', () => isDragging = false);
 
 // วิดีโอจบ → เล่นซ้ำเอง
 video.addEventListener('ended', () => {
@@ -524,15 +550,19 @@ video.addEventListener('ended', () => {
   video.play();
 });
 
-// === เล่น/หยุดวิดีโอ ===
-function togglePlay() {
+// === เล่น/หยุด — ยกเว้นบริเวณเส้นเวลา ===
+tapLayer.addEventListener('click', e => {
+  // ไม่ทำงานถ้ากดที่เส้นเวลา
+  const rect = progressContainer.getBoundingClientRect();
+  if (e.clientY >= rect.top && e.clientY <= rect.bottom) return;
+  
   if (video.paused || video.muted) {
-    video.muted = false; video.play(); videoContainer.classList.add('playing');
+    video.muted = false;
+    video.play();
   } else {
     video.pause();
   }
-}
-tapLayer.addEventListener('click', togglePlay);
+});
 
 // === อัตราส่วนวิดีโอ ===
 function updateRatio() {
@@ -545,7 +575,7 @@ video.addEventListener('loadedmetadata', updateRatio);
 // === โหลดรูปโปรไฟล์ ===
 function loadAvatar() {
   const saved = localStorage.getItem(AVATAR_KEY);
-  const src = saved || 'thaipodee_logo_icon.png?v=1171';
+  const src = saved || 'thaipodee_logo_icon.png?v=1173';
   avatarSideImg.src = src;
   avatarBigImg.src = src;
 }
@@ -632,7 +662,7 @@ document.getElementById('shareProfileBtn2').addEventListener('click', doShare);
 // === อัปโหลดวิดีโอ ===
 function handleVideoFile(file) {
   if (!file) return;
-  video.src = URL.createObjectURL(file); video.load(); video.play(); videoContainer.classList.add('playing');
+  video.src = URL.createObjectURL(file); video.load(); video.play();
   const newVid = {id:Date.now().toString(), name:file.name, src:video.src, date:new Date().toLocaleString('th-TH'), views:0};
   uploadedVideos.unshift(newVid);
   localStorage.setItem(VIDEOS_KEY, JSON.stringify(uploadedVideos));
