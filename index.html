@@ -1,9 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1151-ZOOM-ON-VIDEO-ONLY
-   ✅ ปุ่มขยาย/ย่อ — ซ่อนอยู่! จะเห็นเมื่อเปิดวิดีโอเท่านั้น
-   ✅ หน้าหลักไม่มีปุ่มรบกวน สวยงามเหมือนเดิม
-   ✅ พอเปิดวิดีโอ → ปุ่มค่อยโผล่มาในพื้นที่วิดีโอ
-   ✅ กดซูมเต็มจอ / ย่อพอดีจอ ได้ภายในวิดีโอ
+   ThaiPodee v1152-FEATURES
+   ✅ เปิดเสียงตามธรรมชาติ
+   ✅ มีแถบเวลา + ปุ่มควบคุมภายในวิดีโอ
+   ✅ วิดีโอจัดกึ่งกลางพอดีจอ ไม่ตัดขอบ
+   ✅ ปุ่มซูม-ย่อ แสดงเมื่อเล่นวิดีโอเท่านั้น
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -22,11 +22,11 @@
 <meta name="theme-color" content="#ff0050">
 <meta name="msapplication-TileColor" content="#000000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1151</title>
+<title>ThaiPodee v1152</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1151">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1151">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1151%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1151%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1152">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1152">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1152%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1152%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -63,33 +63,63 @@ html,body{
 .version-text{font-size:9px;color:#666}
 .search-icon{font-size:20px;cursor:pointer;}
 
+/* ✅ วิดีโอตรงกลางพอดีจอ */
 .video-container{
   position:fixed;inset:0;background:#000;
   display:flex;align-items:center;justify-content:center;z-index:1;
 }
 .video-container video{
+  max-width:100%;max-height:100%;
   width:100%;height:100%;
-  object-fit:contain; /* พอดีจอ ไม่ตัดขอบ */
+  object-fit:contain; /* ไม่ตัดขอบ อยู่ในจอพอดี */
   display:block;transition:all .3s ease;
 }
 .video-container.fullscreen-mode video{
-  object-fit:cover; /* ขยายเต็มจอ */
+  object-fit:cover; /* ขยายเต็มจอเมื่อกด */
 }
 
-/* ✅ ปุ่มซูม — ซ่อนไว้ก่อน จะโผล่เมื่อเล่นวิดีโอ */
+/* ✅ แถบควบคุมเวลา — ซ่อนก่อน แสดงเมื่อเล่น */
+.video-controls{
+  position:absolute;bottom:0;left:0;right:0;padding:12px 16px;
+  background:linear-gradient(to top,rgba(0,0,0,.8),transparent);
+  z-index:5;opacity:0;visibility:hidden;transition:all .3s ease;
+}
+.video-container.playing .video-controls{
+  opacity:1;visibility:visible;
+}
+
+.progress-bar-wrap{
+  width:100%;height:4px;background:rgba(255,255,255,.2);
+  border-radius:2px;margin-bottom:10px;cursor:pointer;
+}
+.progress-bar{
+  height:100%;background:#ff0050;border-radius:2px;width:0%;
+  transition:width .1s linear;
+}
+
+.controls-row{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.control-btn{
+  width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);
+  color:#fff;border:none;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.time-text{font-size:12px;color:#aaa}
+
+/* ✅ ปุ่มซูม-ย่อ */
 .zoom-controls{
-  position:absolute;bottom:20px;right:20px;z-index:6;
-  display:flex;flex-direction:column;gap:10px;
+  position:absolute;bottom:70px;right:16px;z-index:6;
+  display:flex;flex-direction:column;gap:8px;
   opacity:0;visibility:hidden;transition:all .3s ease;
 }
-/* ✅ เมื่อเล่นวิดีโอ → ปุ่มค่อยปรากฏ */
 .video-container.playing .zoom-controls{
   opacity:1;visibility:visible;
 }
 .zoom-btn{
-  width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.6);
+  width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.6);
   color:#fff;border:1px solid rgba(255,255,255,.3);
-  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
   backdrop-filter:blur(4px);
 }
 .zoom-btn:active{transform:scale(.95)}
@@ -98,12 +128,12 @@ html,body{
 .ui-layer{position:fixed;inset:0;z-index:4;pointer-events:none;}
 .ui-layer > *{pointer-events:auto;}
 
-.bottom-info{position:absolute;left:16px;bottom:85px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);}
+.bottom-info{position:absolute;left:16px;bottom:130px;right:100px;text-shadow:0 1px 3px rgba(0,0,0,.8);z-index:4;}
 .author{font-size:15px;font-weight:bold;margin-bottom:6px}
 .caption{font-size:13px;margin-bottom:6px}
 .music{font-size:12px;display:flex;align-items:center;gap:6px}
 
-.side-icons{position:absolute;right:12px;bottom:100px;display:flex;flex-direction:column;gap:22px;align-items:center;}
+.side-icons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:4;}
 .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px}
 .side-count{font-size:11px}
@@ -116,7 +146,7 @@ html,body{
 .disc-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#666,#222);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.nav-bar{position:absolute;bottom:0;left:0;right:0;height:65px;display:flex;justify-content:space-around;align-items:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));background:#000}
+.nav-bar{position:absolute;bottom:0;left:0;right:0;height:65px;display:flex;justify-content:space-around;align-items:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));background:#000;z-index:10;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:#999;font-size:10px;cursor:pointer}
 .nav-item.active{color:#fff}
 .nav-icon{font-size:22px}
@@ -139,15 +169,28 @@ html,body{
     <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอปเลย</button>
   </div>
   <div class="search-wrap">
-    <span class="version-text">v1151</span>
+    <span class="version-text">v1152</span>
     <span class="search-icon">🔍</span>
   </div>
 </div>
 
 <div class="video-container" id="videoContainer">
-  <video id="mainVideo" playsinline webkit-playsinline loop autoplay muted></video>
-  
-  <!-- ✅ ปุ่มซูม — ซ่อนอยู่ จะเห็นเมื่อเล่นวิดีโอเท่านั้น -->
+  <!-- ✅ เปิดเสียงได้ — ไม่มี muted ตอนโหลด -->
+  <video id="mainVideo" playsinline webkit-playsinline loop autoplay></video>
+
+  <!-- ✅ แถบควบคุมเวลา + ปุ่มเล่นหยุด -->
+  <div class="video-controls">
+    <div class="progress-bar-wrap" id="progressWrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="controls-row">
+      <button class="control-btn" id="playPauseBtn">⏸</button>
+      <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
+      <button class="control-btn" id="soundBtn">🔊</button>
+    </div>
+  </div>
+
+  <!-- ✅ ปุ่มซูม-ย่อ -->
   <div class="zoom-controls">
     <button class="zoom-btn" id="zoomInBtn" title="ขยายเต็มจอ">⛶</button>
     <button class="zoom-btn" id="zoomOutBtn" title="ย่อให้พอดี">⊡</button>
@@ -159,7 +202,7 @@ html,body{
 <div class="ui-layer">
   <div class="bottom-info">
     <div class="author">@ThaiPodee</div>
-    <div class="caption">แตะจอเล่น/หยุด — ปุ่มซูมจะปรากฏเมื่อเล่นวิดีโอ</div>
+    <div class="caption">แตะจอเล่น/หยุด — แถบเวลาจะปรากฏขึ้น</div>
     <div class="music"><span>♪</span><span>เสียงประกอบ</span></div>
   </div>
 
@@ -167,7 +210,7 @@ html,body{
     <div class="side-item">
       <div class="profile-wrap">
         <div class="profile-avatar">
-          <img src="thaipodee_logo_icon.png?v=1151" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
+          <img src="thaipodee_logo_icon.png?v=1152" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
         </div>
         <div class="plus-badge">+</div>
       </div>
@@ -190,7 +233,7 @@ html,body{
 </div>
 
 <script>
-const CURRENT_VERSION = 'v1151';
+const CURRENT_VERSION = 'v1152';
 const STORAGE_KEY = 'thaipodee_last_version';
 
 const video = document.getElementById('mainVideo');
@@ -202,6 +245,11 @@ const installBtn = document.getElementById('installBtn');
 const shareBtn = document.getElementById('shareBtn');
 const zoomInBtn = document.getElementById('zoomInBtn');
 const zoomOutBtn = document.getElementById('zoomOutBtn');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const soundBtn = document.getElementById('soundBtn');
+const progressBar = document.getElementById('progressBar');
+const progressWrap = document.getElementById('progressWrap');
+const timeDisplay = document.getElementById('timeDisplay');
 
 // อัปเดตอัตโนมัติ
 const lastVersion = localStorage.getItem(STORAGE_KEY);
@@ -219,27 +267,56 @@ function isAppInstalled() {
 
 if (isAppInstalled()) installBtn.classList.add('hidden');
 
-// เล่น/หยุด + แสดงปุ่มซูมเมื่อเล่น
-tapLayer.addEventListener('click', () => {
+// แปลงเวลาเป็น นาที:วินาที
+function formatTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+// อัปเดตแถบเวลา
+function updateProgress() {
+  if (!video.duration) return;
+  const pct = (video.currentTime / video.duration) * 100;
+  progressBar.style.width = pct + '%';
+  timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+}
+
+// ข้ามเวลาตามแตะแถบ
+progressWrap.addEventListener('click', (e) => {
+  if (!video.duration) return;
+  const rect = progressWrap.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  video.currentTime = pct * video.duration;
+});
+
+// เล่น/หยุด
+function togglePlay() {
   if (video.paused) {
     video.play();
-    videoContainer.classList.add('playing'); // ✅ แสดงปุ่ม
+    videoContainer.classList.add('playing');
+    playPauseBtn.textContent = '⏸';
   } else {
     video.pause();
-    // หากหยุด → ซ่อนปุ่มได้ตามต้องการ ถ้าอยากให้ค้างไว้ ให้ลบบรรทัดข้างล่างนี้
-    // videoContainer.classList.remove('playing');
+    playPauseBtn.textContent = '▶';
   }
+}
+tapLayer.addEventListener('click', togglePlay);
+playPauseBtn.addEventListener('click', togglePlay);
+
+// เปิด/ปิดเสียง
+soundBtn.addEventListener('click', () => {
+  video.muted = !video.muted;
+  soundBtn.textContent = video.muted ? '🔇' : '🔊';
 });
 
-// ✅ ขยายเต็มจอ
-zoomInBtn.addEventListener('click', () => {
-  videoContainer.classList.add('fullscreen-mode');
-});
+// อัปเดตแถบเวลาตลอด
+video.addEventListener('timeupdate', updateProgress);
+video.addEventListener('loadedmetadata', updateProgress);
 
-// ✅ ย่อให้พอดี
-zoomOutBtn.addEventListener('click', () => {
-  videoContainer.classList.remove('fullscreen-mode');
-});
+// ขยาย-ย่อ
+zoomInBtn.addEventListener('click', () => videoContainer.classList.add('fullscreen-mode'));
+zoomOutBtn.addEventListener('click', () => videoContainer.classList.remove('fullscreen-mode'));
 
 // อัปโหลดวิดีโอ
 uploadBtn.addEventListener('click', () => fileInput.click());
@@ -249,7 +326,8 @@ fileInput.addEventListener('change', e => {
   video.src = URL.createObjectURL(f);
   video.load();
   video.play();
-  videoContainer.classList.add('playing'); // แสดงปุ่มทันทีเมื่อโหลดวิดีโอ
+  videoContainer.classList.add('playing');
+  playPauseBtn.textContent = '⏸';
 });
 
 let deferredPrompt = null;
@@ -281,7 +359,7 @@ installBtn.addEventListener('click', async () => {
 shareBtn.addEventListener('click', async () => {
   const shareData = {
     title: `ThaiPodee ${CURRENT_VERSION}`,
-    text: 'เล่นวิดีโอ → ปุ่มซูมจะปรากฏขึ้น',
+    text: 'วิดีโอตรงกลางจอ — มีเสียง + แถบเวลา + ซูมได้',
     url: window.location.href
   };
   if (navigator.share) {
