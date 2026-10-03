@@ -1,8 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1156 — แก้แค่ 2 จุดเท่านั้น
-   ✅ 1. เอาปุ่มซูม-ย่อที่โผล่ใต้โน้ตดนตรีออกหมด
-   ✅ 2. แถบเวลาแสดงชัดเจนตลอดเวลา — เส้นสีขาว ปุ่มกลมชัด
-   นอกเหนือจากนี้ ปล่อยเหมือนเดิมทุกประการ
+   ThaiPodee v1157 — ปรับตรงตามโค้ดที่ส่งมา
+   ✅ 1. เอาปุ่มสี่เหลี่ยมใต้โน้ตดนตรีออกหมด
+   ✅ 2. ปุ่มขยาย-ย่อ แสดงเฉพาะในวิดีโอ ตอนเล่นเท่านั้น
+   ✅ 3. แถบเวลาแสดงเมื่อเล่นวิดีโอ เห็นเส้นวิ่ง
+   นอกนั้นเหมือนเดิมเป๊ะ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -21,11 +22,11 @@
 <meta name="theme-color" content="#ff0050">
 <meta name="msapplication-TileColor" content="#000000">
 <meta name="description" content="ThaiPodee — แอปวิดีโอของคนไทย">
-<title>ThaiPodee v1156</title>
+<title>ThaiPodee v1157</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1156">
-<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1156">
-<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1156%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1156%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<link rel="icon" type="image/png" sizes="512x512" href="thaipodee_logo_icon.png?v=1157">
+<link rel="apple-touch-icon" href="thaipodee_logo_icon.png?v=1157">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ThaiPodee%22%2C%22short_name%22%3A%22ThaiPodee%22%2C%22start_url%22%3A%22.%2F%3Fv%3D1157%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23ff0050%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22thaipodee_logo_icon.png%3Fv%3D1157%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -76,13 +77,15 @@ html,body{
   object-fit:contain;
 }
 
-/* === แก้ข้อ 2 — แถบเวลาแสดงตลอด เส้นสีขาว ปุ่มกลมชัด === */
+/* แถบเวลา — แสดงเมื่อเล่นวิดีโอ เส้นสีขาว ปุ่มกลมชัด */
 .progress-bar-wrap{
   position:absolute;bottom:0;left:0;right:0;
   height:8px;background:rgba(255,255,255,.35);
   cursor:pointer;z-index:5;
-  opacity:1 !important;visibility:visible !important;
-  transition:none;
+  opacity:0;visibility:hidden;transition:all .3s ease;
+}
+.video-container.playing .progress-bar-wrap{
+  opacity:1;visibility:visible;
 }
 .progress-bar{
   position:relative;height:100%;background:#fff;width:0%;
@@ -94,7 +97,7 @@ html,body{
   box-shadow:0 0 8px rgba(0,0,0,.5);
 }
 
-/* === แก้ข้อ 1 — ปุ่มซูมมีแค่ในวิดีโอ ขวาล่าง ไม่มีที่อื่น === */
+/* ปุ่มขยาย-ย่อ — มีแค่ในวิดีโอ ตอนเล่นเท่านั้น ไม่มีที่อื่น */
 .zoom-controls{
   position:absolute;bottom:20px;right:16px;z-index:6;
   display:flex;flex-direction:column;gap:8px;
@@ -121,7 +124,7 @@ html,body{
 .caption{font-size:13px;margin-bottom:6px}
 .music{font-size:12px;display:flex;align-items:center;gap:6px}
 
-/* ไอคอนขวา 6 ตัว — ไม่มีปุ่มเกินเพิ่ม */
+/* === ไอคอนขวา 6 ตัว — ไม่มีปุ่มเพิ่มใต้โน้ตดนตรี ออกหมดแล้ว === */
 .side-icons{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:4;}
 .side-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .side-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px}
@@ -158,7 +161,7 @@ html,body{
     <button class="install-btn-red" id="installBtn">📲 ติดตั้งแอปเลย</button>
   </div>
   <div class="search-wrap">
-    <span class="version-text">v1156</span>
+    <span class="version-text">v1157</span>
     <span class="search-icon">🔍</span>
   </div>
 </div>
@@ -166,14 +169,14 @@ html,body{
 <div class="video-container" id="videoContainer">
   <video id="mainVideo" playsinline webkit-playsinline loop autoplay></video>
 
-  <!-- แถบเวลา — แสดงตลอดเวลา -->
+  <!-- แถบเวลา — แสดงตอนเล่นวิดีโอ -->
   <div class="progress-bar-wrap" id="progressWrap">
     <div class="progress-bar" id="progressBar">
       <div class="progress-dot"></div>
     </div>
   </div>
 
-  <!-- ปุ่มซูม-ย่อ มีแค่ตรงนี้ในวิดีโอ ไม่มีที่อื่น -->
+  <!-- ปุ่มขยาย-ย่อ — มีแค่ตรงนี้ในวิดีโอ ไม่มีที่อื่น -->
   <div class="zoom-controls">
     <button class="zoom-btn" id="zoomInBtn" title="ขยายเต็มจอ">⛶</button>
     <button class="zoom-btn" id="zoomOutBtn" title="ย่อให้พอดี">⊡</button>
@@ -189,12 +192,12 @@ html,body{
     <div class="music"><span>♪</span><span>เสียงประกอบ</span></div>
   </div>
 
-  <!-- ไอคอนขวา 6 ตัว — ไม่มีปุ่มซูมเพิ่มตรงไหนเลย -->
+  <!-- === ไอคอนขวา 6 ตัว — เอาปุ่มใต้โน้ตดนตรีออกหมดแล้ว === -->
   <div class="side-icons">
     <div class="side-item">
       <div class="profile-wrap">
         <div class="profile-avatar">
-          <img src="thaipodee_logo_icon.png?v=1156" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
+          <img src="thaipodee_logo_icon.png?v=1157" alt="ThaiPodee" onerror="this.parentElement.innerHTML='TP';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontWeight='bold'">
         </div>
         <div class="plus-badge">+</div>
       </div>
@@ -204,6 +207,7 @@ html,body{
     <div class="side-item"><div class="side-icon">⬜</div><div class="side-count">บันทึก</div></div>
     <div class="side-item" id="shareBtn"><div class="side-icon">↗️</div><div class="side-count">แชร์</div></div>
     <div class="side-item"><div class="disc-icon">🎵</div></div>
+    <!-- ไม่มีปุ่มเพิ่มตรงนี้แล้ว — เอาออกหมดแล้ว -->
   </div>
 
   <div class="nav-bar">
@@ -217,7 +221,7 @@ html,body{
 </div>
 
 <script>
-const CURRENT_VERSION = 'v1156';
+const CURRENT_VERSION = 'v1157';
 const STORAGE_KEY = 'thaipodee_last_version';
 
 const video = document.getElementById('mainVideo');
@@ -321,7 +325,7 @@ installBtn.addEventListener('click', async () => {
 shareBtn.addEventListener('click', async () => {
   const shareData = {
     title: `ThaiPodee ${CURRENT_VERSION}`,
-    text: 'v1156 — แก้ 2 จุด: แถบเวลาแสดงตลอด + ไม่มีปุ่มเกิน',
+    text: 'v1157 — เอาปุ่มเกินออก แถบเวลาแสดงตอนเล่น',
     url: window.location.href
   };
   if (navigator.share) {
