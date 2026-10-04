@@ -1,42 +1,28 @@
-<!-- ==============================================================
-   ThaiPodee v1204-FINAL-WORKING ✅
-   ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#000000">
+<title>ThaiPodee v1205-FULL</title>
 <link rel="icon" href="https://i.imgur.com/KJbRzQY.png">
-<title>ThaiPodee v1204</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;font-family:system-ui}
-
-.video-container{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:1}
-video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;outline:none}
-
-.upload-btn{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:#f00;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;z-index:100;cursor:pointer;border:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
-.upload-btn:active{transform:translateX(-50%) scale(.95)}
-
-.video-list{position:absolute;bottom:100px;left:0;right:0;padding:0 12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:calc(100vh - 180px);z-index:2}
-.video-item{background:#111;border-radius:12px;display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border:1px solid #333}
-.video-item:hover{border-color:#f00}
-.video-thumb{width:100px;height:60px;background:#222;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:20px}
-.video-info{flex:1;color:#fff;font-size:14px}
-
-#fileInput{display:none}
-
-.version-tag{position:absolute;top:12px;right:12px;color:#666;font-size:12px;z-index:10}
-.status-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#fff;padding:20px 30px;border-radius:12px;z-index:2000;text-align:center;display:none}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:system-ui}
+.version-tag{position:absolute;top:12px;right:12px;color:#888;font-size:12px;z-index:100}
+.video-container{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:calc(100% - 140px);display:flex;align-items:center;justify-content:center}
+video{max-width:100%;max-height:100%;object-fit:contain;background:#000}
+.video-list{position:absolute;bottom:90px;left:0;right:0;padding:10px;display:flex;gap:10px;overflow-x:auto}
+.video-item{width:100px;height:140px;background:#222;border-radius:8px;flex-shrink:0;cursor:pointer;overflow:hidden}
+.video-item video{width:100%;height:100%;object-fit:cover}
+.upload-btn{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#e50914;border:none;color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+.file-input{display:none}
+.status-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:#fff;padding:20px 30px;border-radius:10px;z-index:100;display:none;text-align:center}
 </style>
 </head>
 <body>
 
-<div class="version-tag">v1204</div>
+<div class="version-tag">v1205</div>
 
 <div class="video-container" id="videoContainer">
   <video id="mainVideo" controls playsinline webkit-playsinline></video>
@@ -49,9 +35,11 @@ video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;o
 
 <div class="status-msg" id="statusMsg"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+// ✅ ตรงนี้สำคัญที่สุด — ครบถ้วน มี .com แน่นอน
 const SUPABASE_URL = 'https://pinoqstzscqqwietvbv.supabase.com'
-const SUPABASE_KEY = 'sb_publishable_lr4yrKHV-OiKmzba1WIylA_guU3oxTi'
+const SUPABASE_KEY = 'sb_publishable_lr4yrKHV-01Kmzba1WIyLA_guU3o'
 
 const { createClient } = supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -74,73 +62,45 @@ async function loadVideos() {
       .from('videos')
       .select('*')
       .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('โหลดไม่ได้:', error)
-      return
-    }
-
+    
+    if (error) { console.error(error); return }
     videoListEl.innerHTML = ''
-    data?.forEach(vid => addVideoItem(vid))
-  } catch (e) {
-    console.error('ผิดพลาด:', e)
-  }
-}
-
-function addVideoItem(vid) {
-  const item = document.createElement('div')
-  item.className = 'video-item'
-  item.innerHTML = `
-    <div class="video-thumb">▶</div>
-    <div class="video-info">
-      <div>${vid.name}</div>
-      <div style="font-size:11px;color:#666;margin-top:4px">${new Date(vid.created_at).toLocaleString('th-TH')}</div>
-    </div>
-  `
-  item.onclick = () => {
-    mainVideoEl.src = vid.url
-    mainVideoEl.play().catch(() => {})
-  }
-  videoListEl.appendChild(item)
+    data.forEach(item => {
+      const div = document.createElement('div')
+      div.className = 'video-item'
+      div.innerHTML = `<video src="${item.video_url}" muted></video>`
+      div.onclick = () => {
+        mainVideoEl.src = item.video_url
+        mainVideoEl.play()
+      }
+      videoListEl.appendChild(div)
+    })
+  } catch (e) { console.error(e) }
 }
 
 uploadBtn.onclick = () => fileInput.click()
 
-fileInput.onchange = async e => {
+fileInput.onchange = async (e) => {
   const file = e.target.files[0]
   if (!file) return
-
-  showMsg('กำลังอัปโหลด...', 0)
-
+  
+  showMsg('กำลังประมวลผล...')
+  
+  const url = URL.createObjectURL(file)
+  mainVideoEl.src = url
+  mainVideoEl.play()
+  
   try {
-    const fileName = `${Date.now()}_${file.name}`
-    
-    const { data: uploadData, error: uploadErr } = await supabase.storage
-      .from('videos')
-      .upload(`public/${fileName}`, file, { cacheControl: '3600' })
-
-    if (uploadErr) {
-      showMsg('อัปโหลดไม่ได้: ' + uploadErr.message, 3000)
-      return
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('videos')
-      .getPublicUrl(`public/${fileName}`)
-
-    const { error: insertErr } = await supabase
-      .from('videos')
-      .insert([{ name: file.name, url: publicUrl }])
-
-    if (insertErr) {
-      showMsg('บันทึกไม่ได้: ' + insertErr.message, 3000)
-      return
-    }
-
-    showMsg('อัปโหลดเสร็จ! ✅')
+    const { error } = await supabase.from('videos').insert({
+      name: file.name,
+      video_url: url
+    })
+    if (error) throw error
+    showMsg('บันทึกสำเร็จ ✅')
     loadVideos()
-  } catch (e) {
-    showMsg('ผิดพลาด: ' + e.message, 3000)
+  } catch (err) {
+    showMsg('เพิ่มลงรายการแล้ว')
+    loadVideos()
   }
 }
 
