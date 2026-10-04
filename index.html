@@ -1,7 +1,7 @@
 <!-- ==============================================================
-   ThaiPodee v1203-FIREBASE-CONNECTED ✅
-   databaseURL ตรงกับของจริงเป๊ะ — asia-southeast1
-   อัปเดต: 4 ต.ค. 69 17:31 น.
+   ThaiPodee v1204-STORAGE — วิดีโอเล่นได้ทุกเครื่อง ✅
+   เพิ่ม Firebase Storage → อัปโหลดไฟล์ขึ้นเซิร์ฟเวอร์จริง
+   อัปเดต: 4 ต.ค. 69 17:50 น.
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -15,11 +15,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1203</title>
+<title>ThaiPodee v1204</title>
 
-<!-- ✅ ใช้ compat ทำงานตรงในเบราว์เซอร์ ไม่ต้อง build -->
+<!-- ✅ เพิ่ม Storage SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -86,7 +87,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
 
 <!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-bar">v1203</div>
+  <div class="top-bar">v1204</div>
   <div class="video-wrap" id="videoSwipeArea">
     <video id="mainVideo" playsinline webkit-playsinline loop muted preload="auto">
       ไม่รองรับวิดีโอ
@@ -98,7 +99,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
   </div>
   <div class="info-area">
     <div class="info-name" id="dispUname">@Thaipodee-Master-No.1</div>
-    <div class="info-desc" id="vidDesc">กด + เพิ่มวิดีโอแรกของคุณ!</div>
+    <div class="info-desc" id="vidDesc">กด + เพิ่มวิดีโอ — ทุกเครื่องเล่นได้!</div>
   </div>
 
   <div class="side-buttons">
@@ -176,7 +177,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
 
 <script>
 // ==============================================================
-// ✅ ข้อมูลตรงจาก Firebase Console — ครบถูกต้องทุกบรรทัด!
+// ✅ ข้อมูล Firebase — ครบถูกต้อง
 // ==============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
@@ -188,9 +189,9 @@ const firebaseConfig = {
   appId: "1:802626775100:web:8b2f2914532d2c9e9c3b39"
 };
 
-// เริ่มเชื่อมต่อ
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const storage = firebase.storage();
 const videosRef = db.ref('thaipodee_videos');
 const statsRef = db.ref('thaipodee_stats');
 
@@ -231,9 +232,7 @@ function syncAll(){
 
 function goPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
-  if(p==='home'){
-    document.getElementById('homePage').classList.remove('hidden');
-  }
+  if(p==='home') document.getElementById('homePage').classList.remove('hidden');
   if(p==='profile'){
     document.getElementById('profilePage').classList.remove('hidden');
     renderVids();
@@ -310,28 +309,42 @@ function getVideoThumbnail(url){
   });
 }
 
+// ✅ อัปโหลดไฟล์ขึ้น Firebase Storage จริง ๆ
 async function uploadVideoFile(file){
-  setSyncStatus('กำลังเตรียมวิดีโอ...');
-  const url = URL.createObjectURL(file);
-  const thumb = await getVideoThumbnail(url);
+  setSyncStatus('กำลังอัปโหลดวิดีโอ...');
+  
   const myName = localStorage.getItem('tp_name') || 'Thaipodee-Master';
   const myUname = localStorage.getItem('tp_uname') || '@Thaipodee-Master-No.1';
+  const fileId = Date.now().toString() + '_' + Math.random().toString(36).slice(2,10);
+  const storagePath = 'videos/' + fileId + '_' + file.name;
   
+  // อัปโหลดไฟล์
+  const uploadRef = storage.ref(storagePath);
+  await uploadRef.put(file);
+  const downloadURL = await uploadRef.getDownloadURL();
+  
+  // ทำรูปปก
+  const tempUrl = URL.createObjectURL(file);
+  const thumb = await getVideoThumbnail(tempUrl);
+  URL.revokeObjectURL(tempUrl); // ลบไฟล์ชั่วคราวทิ้ง
+  
+  // บันทึกลงฐานข้อมูล
   const newVid = {
-    id: Date.now().toString() + '_' + Math.random().toString(36).slice(2,10),
+    id: fileId,
     authorId: MY_ID,
     authorName: myName,
     authorUname: myUname,
     name: file.name,
-    url: url,
+    url: downloadURL,
     thumb: thumb,
+    storagePath: storagePath,
     time: Date.now()
   };
   
-  setSyncStatus('กำลังส่งไปฐานข้อมูล...');
+  setSyncStatus('กำลังบันทึก...');
   await videosRef.push(newVid);
-  setSyncStatus('✅ เผยแพร่แล้ว!');
-  setTimeout(()=>setSyncStatus('เชื่อมต่อแล้ว ✅'), 2500);
+  setSyncStatus('✅ เผยแพร่แล้ว! ทุกเครื่องเล่นได้');
+  setTimeout(()=>setSyncStatus('เชื่อมต่อแล้ว ✅'), 3000);
   
   currentIndex = 0;
   playVideoAt(0);
@@ -349,7 +362,7 @@ document.getElementById('videoInput').addEventListener('change', async e=>{
 // รับข้อมูลเรียลไทม์
 videosRef.on('value', snap=>{
   const data = snap.val();
-  console.log('[Firebase] ข้อมูลที่ได้:', data);
+  console.log('[Firebase] ข้อมูล:', data);
   vidList = data ? Object.values(data).sort((a,b)=>b.time - a.time) : [];
   
   if(!loaded){
@@ -373,7 +386,9 @@ async function renderVids(){
     const v = vidList[i];
     const c = document.createElement('div');
     c.className='video-card';
-    const delBtn = v.authorId === MY_ID ? `<button class="del-btn">×</button>` : '';
+    const delBtn = v.authorId === MY_ID 
+      ? `<button class="del-btn" data-path="${v.storagePath||''}">×</button>` 
+      : '';
     
     c.innerHTML = v.thumb 
       ? `<img class="video-thumb" src="${v.thumb}" alt=""><span class="play-icon">▶</span>${delBtn}`
@@ -389,6 +404,10 @@ async function renderVids(){
       c.querySelector('.del-btn')?.addEventListener('click', async e=>{
         e.stopPropagation();
         if(confirm('ลบวิดีโอของคุณ?')){
+          const path = e.target.dataset.path;
+          if(path){
+            try{ await storage.ref(path).delete(); }catch(err){console.log('ลบไฟล์ไม่ได้:', err);}
+          }
           const snapshot = await videosRef.once('value');
           const all = snapshot.val() || {};
           for(const key in all){
