@@ -1,17 +1,11 @@
 <!-- ==============================================================
-   ThaiPodee v1190 — ✅ ทุกปุ่มทำงานครบตามฟังก์ชัน
-   อัปเดต: 4 ต.ค. 69 07:45 น.
+   ThaiPodee v1191 — ✅ สไลด์ขึ้น-ลงเปลี่ยนวิดีโอได้
+   อัปเดต: 4 ต.ค. 69 08:30 น.
    --------------------------------------------------------------
-   ✅ เปลี่ยนรูปได้ ทุกที่อัปเดตตาม
-   ✅ เปลี่ยนชื่อ/ชื่อผู้ใช้ได้ ทุกแห่งเปลี่ยนพร้อมกัน
-   ✅ กด + → เลือกวิดีโอ → เล่นได้ → บันทึกรายการ
-   ✅ กดการ์ดวิดีโอ → เล่นได้ / กด× → ลบได้
-   ✅ กดแชร์ → แชร์ระบบ/คัดลอกลิงก์ได้
-   ✅ กดถูกใจ → นับเพิ่ม-ลด อัปเดตทุกจุด
-   ✅ กดบันทึก → เปลี่ยนสถานะได้
-   ✅ จุดเวลาลากได้ปกติ
-   ✅ แตะจอ → เล่น/หยุดได้
-   ✅ ปุ่มนำทางทุกอันทำงาน
+   ✅ สไลด์ขึ้น → วิดีโอถัดไป / สไลด์ลง → วิดีโอก่อนหน้า
+   ✅ เล่นต่อเนื่องอัตโนมัติเมื่อเปลี่ยน
+   ✅ ทุกฟังก์ชันเดิมยังทำงานครบเหมือนเดิม
+   ✅ รองรับนิ้วสัมผัสโดยตรง
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -25,7 +19,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1190</title>
+<title>ThaiPodee v1191</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
@@ -33,7 +27,7 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;
 .page.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
 .top-bar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:16px;z-index:50;font-size:11px;opacity:0.5;}
-.video-wrap{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1;}
+.video-wrap{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1;overflow:hidden;}
 video{width:100%;height:100%;object-fit:contain;display:block;}
 
 .progress-bar{position:absolute;bottom:80px;left:16px;right:16px;height:30px;z-index:10;cursor:pointer;}
@@ -88,8 +82,8 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 
 <!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-bar">v1190</div>
-  <div class="video-wrap" id="videoTap">
+  <div class="top-bar">v1191</div>
+  <div class="video-wrap" id="videoSwipeArea">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
     <div class="progress-bar" id="progressBar">
       <div class="progress-bg"></div>
@@ -98,7 +92,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
   <div class="info-area">
     <div class="info-name" id="dispUname">@thaipodee</div>
-    <div class="info-desc">ยินดีต้อนรับสู่ ThaiPodee</div>
+    <div class="info-desc">สไลด์ขึ้น-ลงเพื่อดูวิดีโอถัดไป</div>
   </div>
 
   <div class="side-buttons">
@@ -189,8 +183,9 @@ let totalLikes = parseInt(localStorage.getItem(K.likes) || '0');
 let isLiked = false;
 let isDrag = false;
 let saved = false;
+let currentIndex = 0;
 
-// === ซิงค์ทุกจุดจากแหล่งเดียว===
+// ===ซิงค์ทุกจุด===
 function syncAll(){
   const n = localStorage.getItem(K.name) || 'ThaiPodee';
   const u = localStorage.getItem(K.uname) || '@thaipodee';
@@ -221,7 +216,7 @@ document.querySelectorAll('[data-go]').forEach(b=>{
   b.addEventListener('click', ()=>goPage(b.dataset.go));
 });
 
-// ===เปลี่ยนรูปโปรไฟล์===
+// ===เปลี่ยนรูป===
 document.getElementById('avSideBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avBigBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avatarInput').addEventListener('change', e=>{
@@ -253,6 +248,19 @@ document.getElementById('unameRow').addEventListener('click', ()=>{
   }
 });
 
+// ===เล่นวิดีโอตามลำดับ===
+function playVideoAt(index){
+  if(!vidList.length) return;
+  if(index < 0) index = vidList.length - 1;
+  if(index >= vidList.length) index = 0;
+  currentIndex = index;
+  
+  const video = document.getElementById('mainVideo');
+  video.src = vidList[index].url;
+  video.load();
+  video.play();
+}
+
 // ===อัปโหลดวิดีโอ===
 document.getElementById('upBtn').addEventListener('click', ()=>videoInput.click());
 document.getElementById('upBtn2').addEventListener('click', ()=>videoInput.click());
@@ -260,22 +268,21 @@ document.getElementById('videoInput').addEventListener('change', e=>{
   const f = e.target.files[0];
   if(!f) return;
   const url = URL.createObjectURL(f);
-  const video = document.getElementById('mainVideo');
-  video.src = url;
-  video.load();
-  video.play();
   
   vidList.unshift({id:Date.now().toString(), name:f.name, url:url});
   localStorage.setItem(K.vids, JSON.stringify(vidList));
+  
+  currentIndex = 0;
+  playVideoAt(0);
   goPage('home');
 });
 
-// ===แสดงรายการวิดีโอ===
+// ===แสดงทั้งหมดในรายการ===
 function renderVids(){
   const g = document.getElementById('vidGrid');
   g.innerHTML = '';
   if(!vidList.length){
-    g.innerHTML='<div class="empty-text">ยังไม่มีวิดีโอ</div>';
+    g.innerHTML='<div class="empty-text">ยังไม่มีวิดีโอ กด + เพิ่มได้เลย</div>';
     return;
   }
   vidList.forEach((v,i)=>{
@@ -283,23 +290,20 @@ function renderVids(){
     c.className='video-card';
     c.innerHTML='<span class="play-icon">▶</span><button class="del-btn">×</button>';
     
-    // กดเล่น
     c.addEventListener('click', e=>{
       if(e.target.classList.contains('del-btn')) return;
-      const video = document.getElementById('mainVideo');
-      video.src = v.url;
-      video.load();
-      video.play();
+      playVideoAt(i);
       goPage('home');
     });
     
-    // กดลบ
     c.querySelector('.del-btn').addEventListener('click', e=>{
       e.stopPropagation();
       if(confirm('ลบวิดีโอนี้?')){
         vidList.splice(i,1);
+        if(currentIndex >= vidList.length) currentIndex = Math.max(0, vidList.length - 1);
         localStorage.setItem(K.vids, JSON.stringify(vidList));
         renderVids();
+        if(vidList.length) playVideoAt(currentIndex);
       }
     });
     
@@ -307,25 +311,44 @@ function renderVids(){
   });
 }
 
+// ===สไลด์เปลี่ยนวิดีโอ===
+let touchStartY = 0;
+const SWIPE_THRESHOLD = 50;
+
+document.getElementById('videoSwipeArea').addEventListener('touchstart', e=>{
+  touchStartY = e.touches[0].clientY;
+}, {passive:true});
+
+document.getElementById('videoSwipeArea').addEventListener('touchend', e=>{
+  if(!vidList.length) return;
+  const touchEndY = e.changedTouches[0].clientY;
+  const diff = touchStartY - touchEndY;
+  
+  if(Math.abs(diff) < SWIPE_THRESHOLD) return;
+  
+  if(diff > 0){
+    // สไลด์ขึ้น → วิดีโอถัดไป
+    playVideoAt(currentIndex + 1);
+  }else{
+    // สไลด์ลง → วิดีโอก่อนหน้า
+    playVideoAt(currentIndex - 1);
+  }
+}, {passive:true});
+
 // ===แชร์===
 async function share(){
-  const text = 'มาดูวิดีโอที่ ThaiPodee';
   if(navigator.share){
-    try{
-      await navigator.share({title:'ThaiPodee', text:text, url:location.href});
-    }catch{
-      await navigator.clipboard.writeText(location.href);
-      alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย');
-    }
+    try{await navigator.share({title:'ThaiPodee', url:location.href});}
+    catch{await navigator.clipboard.writeText(location.href);alert('คัดลอกลิงก์แล้ว ✅');}
   }else{
     await navigator.clipboard.writeText(location.href);
-    alert('คัดลอกลิงก์แล้ว ✅ ส่งให้เพื่อนได้เลย');
+    alert('คัดลอกลิงก์แล้ว ✅');
   }
 }
 document.getElementById('shareBtn').addEventListener('click', share);
 document.getElementById('shareProf').addEventListener('click', share);
 
-// ===แถบเวลา ลากได้===
+// ===แถบเวลา===
 const video = document.getElementById('mainVideo');
 const dot = document.getElementById('progressDot');
 
@@ -353,7 +376,7 @@ document.addEventListener('mouseup', ()=>isDrag=false);
 document.addEventListener('touchend', ()=>isDrag=false);
 
 // ===แตะจอ เล่น/หยุด===
-document.getElementById('videoTap').addEventListener('click', e=>{
+document.getElementById('videoSwipeArea').addEventListener('click', e=>{
   if(e.target.closest('.progress-bar')) return;
   if(video.paused || video.muted){
     video.muted = false;
@@ -380,6 +403,7 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
 
 // ===เริ่มทำงาน===
 syncAll();
+if(vidList.length) playVideoAt(0);
 </script>
 </body>
 </html>
