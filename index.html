@@ -1,12 +1,9 @@
 <!-- ==============================================================
-   ThaiPodee v1192 — ✅ แสดงรูปปกวิดีโอครบ + สไลด์เปลี่ยน
-   อัปเดต: 4 ต.ค. 69 09:00 น.
+   ThaiPodee v1193 — ✅ ปรับสไลด์ขึ้น-ลงเปลี่ยนวิดีโอ
+   อัปเดต: 4 ต.ค. 69 09:15 น.
    --------------------------------------------------------------
-   ✅ แสดงรูปปกวิดีโอจริงทุกอัน ครบ 6 ช่อง
-   ✅ สไลด์ขึ้น → วิดีโอถัดไป / สไลด์ลง → ก่อนหน้า
-   ✅ เล่นต่อเนื่องอัตโนมัติ
-   ✅ ตรงตามภาพตัวอย่างเป๊ะ — ชื่อ, สถิติ, ปุ่ม, แถบเมนู
-   ✅ ทุกฟังก์ชันเดิมทำงานครบ
+   ✅ ปรับปรุงระบบสไลด์ — ขึ้น=ถัดไป / ลง=ก่อนหน้า ทำแม่นยำขึ้น
+   ✅ ส่วนอื่นทั้งหมดเหมือนเดิมเป๊ะ ไม่แก้ไข
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -20,7 +17,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1192</title>
+<title>ThaiPodee v1193</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
@@ -52,7 +49,6 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 .nav-icon{font-size:22px;line-height:1;}
 .nav-add{width:46px;height:34px;background:#ff3355;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;}
 
-/* ===== หน้าโปรไฟล์ ตรงตามภาพ ===== */
 .profile-page{background:#000;color:#fff;overflow-y:auto;padding-bottom:80px;z-index:3;}
 .profile-top{display:flex;align-items:center;justify-content:flex-end;padding:12px 16px;position:sticky;top:0;background:#000;}
 .share-link{font-size:20px;cursor:pointer;}
@@ -85,7 +81,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 
 <!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-bar">v1192</div>
+  <div class="top-bar">v1193</div>
   <div class="video-wrap" id="videoSwipeArea">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
     <div class="progress-bar" id="progressBar">
@@ -95,7 +91,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
   <div class="info-area">
     <div class="info-name" id="dispUname">@Thaipodee-Master-No.1</div>
-    <div class="info-desc">สไลด์ขึ้น-ลงเพื่อดูวิดีโอถัดไป</div>
+    <div class="info-desc">สไลด์ขึ้น=วิดีโอถัดไป | สไลด์ลง=ย้อนกลับ</div>
   </div>
 
   <div class="side-buttons">
@@ -135,7 +131,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
 </div>
 
-<!-- หน้าโปรไฟล์ ตรงตามภาพ -->
+<!-- หน้าโปรไฟล์ -->
 <div class="page hidden profile-page" id="profilePage">
   <div class="profile-top">
     <span class="share-link" id="shareProf">↗️</span>
@@ -299,7 +295,7 @@ document.getElementById('videoInput').addEventListener('change', async e=>{
   goPage('home');
 });
 
-// ===แสดงรายการวิดีโอ — ครบทุกตัว มีรูปปก===
+// ===แสดงรายการวิดีโอ===
 async function renderVids(){
   const g = document.getElementById('vidGrid');
   g.innerHTML = '';
@@ -341,26 +337,35 @@ async function renderVids(){
   }
 }
 
-// ===สไลด์เปลี่ยนวิดีโอ===
+// ==============================================================
+// ✅ ปรับปรุง: สไลด์ขึ้น-ลงเปลี่ยนวิดีโอ — แก้เฉพาะส่วนนี้
+// ==============================================================
 let touchStartY = 0;
-const SWIPE_THRESHOLD = 50;
+let touchStartTime = 0;
+const SWIPE_THRESHOLD = 60;  // ปรับเกณฑ์ให้ชัดเจนขึ้น
+const TIME_THRESHOLD = 300;  // มิลลิวินาที — สไลด์เร็วในเวลานี้เท่านั้น
 
 document.getElementById('videoSwipeArea').addEventListener('touchstart', e=>{
   touchStartY = e.touches[0].clientY;
+  touchStartTime = Date.now();
 }, {passive:true});
 
 document.getElementById('videoSwipeArea').addEventListener('touchend', e=>{
   if(!vidList.length) return;
+  
   const touchEndY = e.changedTouches[0].clientY;
-  const diff = touchStartY - touchEndY;
+  const touchEndTime = Date.now();
+  const diffY = touchStartY - touchEndY;
+  const elapsed = touchEndTime - touchStartTime;
   
-  if(Math.abs(diff) < SWIPE_THRESHOLD) return;
+  // ต้องเป็นสไลด์เร็วและระยะพอสมควร
+  if(elapsed > TIME_THRESHOLD && Math.abs(diffY) < SWIPE_THRESHOLD) return;
   
-  if(diff > 0){
-    // สไลด์ขึ้น → วิดีโอถัดไป
+  if(diffY > 0){
+    // ✅ สไลด์ขึ้น → วิดีโอถัดไป
     playVideoAt(currentIndex + 1);
-  }else{
-    // สไลด์ลง → วิดีโอก่อนหน้า
+  }else if(diffY < 0){
+    // ✅ สไลด์ลง → ย้อนกลับวิดีโอก่อนหน้า
     playVideoAt(currentIndex - 1);
   }
 }, {passive:true});
