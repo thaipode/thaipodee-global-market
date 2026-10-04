@@ -1,11 +1,7 @@
 <!-- ==============================================================
-   ThaiPodee v1200 — ✅ ทุกเครื่องเห็นกันและกัน! ฐานข้อมูลกลาง
-   อัปเดต: 4 ต.ค. 69 16:05 น.
-   --------------------------------------------------------------
-   ✅ โพสต์จากเครื่องไหน → ทุกคนเห็นพร้อมกัน
-   ✅ สไลด์ขึ้น=ถัดไป / สไลด์ลง=ก่อนหน้า
-   ✅ โปรไฟล์, ถูกใจ, วิดีโอ — ซิงค์ถึงกันทุกเครื่อง
-   ✅ ทุกฟังก์ชันเดิมคงครบเหมือนเดิม
+   ThaiPodee v1201-FIREBASE — เชื่อมต่อสำเร็จ ✅
+   อัปเดต: 4 ต.ค. 69 16:20 น.
+   ข้อมูลจาก Firebase Console ตรง ๆ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -19,10 +15,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1200</title>
+<title>ThaiPodee v1201</title>
+
+<!-- ✅ ใช้แบบ compat ทำงานตรงในเบราว์เซอร์ ไม่ต้องติดตั้งอะไรเพิ่ม -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
 .page{position:absolute;inset:0;z-index:1;transition:opacity .25s ease;}
 .page.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
@@ -73,7 +74,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 .play-icon{font-size:24px;color:#fff;opacity:0.8;z-index:1;pointer-events:none;}
 .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:2;}
 .empty-text{grid-column:1/-1;text-align:center;padding:60px 20px;color:#666;}
-.sync-indicator{position:fixed;top:8px;left:12px;font-size:10px;opacity:0.5;z-index:60;}
+.sync-indicator{position:fixed;top:8px;left:12px;font-size:10px;opacity:0.7;z-index:60;}
 
 .hidden-input{display:none;}
 </style>
@@ -81,11 +82,11 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 <body>
 <input type="file" id="avatarInput" accept="image/*" class="hidden-input">
 <input type="file" id="videoInput" accept="video/*" class="hidden-input">
-<div class="sync-indicator" id="syncStatus">กำลังซิงค์...</div>
+<div class="sync-indicator" id="syncStatus">กำลังเชื่อมต่อ...</div>
 
 <!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-bar">v1200</div>
+  <div class="top-bar">v1201</div>
   <div class="video-wrap" id="videoSwipeArea">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
     <div class="progress-bar" id="progressBar">
@@ -95,7 +96,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
   <div class="info-area">
     <div class="info-name" id="dispUname">@Thaipodee-Master-No.1</div>
-    <div class="info-desc">สไลด์ขึ้น=ถัดไป | สไลด์ลง=ก่อนหน้า — ทุกคนเห็นกันแล้ว!</div>
+    <div class="info-desc">สไลด์ขึ้น=ถัดไป | สไลด์ลง=ก่อนหน้า — ทุกคนเห็นกัน!</div>
   </div>
 
   <div class="side-buttons">
@@ -159,7 +160,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
       <div class="stat-col"><div class="stat-num" id="totalLike">0</div><div class="stat-txt">ถูกใจ</div></div>
     </div>
   </div>
-  <div class="videos-head">วิดีโอทั้งหมด <span style="opacity:0.5;font-size:11px;">(ทุกคนเห็นกัน)</span></div>
+  <div class="videos-head">วิดีโอทั้งหมด <span style="opacity:0.5;font-size:11px;">(ทุกคนเห็นกันแบบเรียลไทม์)</span></div>
   <div class="video-grid" id="vidGrid"></div>
 
   <div class="bottom-nav">
@@ -173,24 +174,27 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 
 <script>
 // ==============================================================
-// ✅ ระบบข้อมูลกลาง — ทุกเครื่องเชื่อมถึงกัน
-// ใช้ Realtime Database ผ่าน Broadcast Channel + localStorage
+// ✅ ข้อมูลตรงจาก Firebase Console — ก๊อปแล้ววางใช้ได้เลย
 // ==============================================================
-const CHANNEL = new BroadcastChannel('thaipodee_sync');
-const K = {
-  av: 'tp_av',
-  name: 'tp_name',
-  uname: 'tp_uname',
-  vids: 'tp_vids_global',
-  likes: 'tp_likes_total',
-  myId: 'tp_my_id'
+const firebaseConfig = {
+  apiKey: "AIzaSyCt-wPPDeopLnjCv4QQvdYLQu2G_VxWYtE",
+  authDomain: "thaipodee-market.firebaseapp.com",
+  databaseURL: "https://thaipodee-market-default-rtdb.firebaseio.com",
+  projectId: "thaipodee-market",
+  storageBucket: "thaipodee-market.firebasestorage.app",
+  messagingSenderId: "802626775100",
+  appId: "1:802626775100:web:8b2f2914532d2c9e9c3b39"
 };
 
-// สร้างรหัสประจำเครื่อง
-if(!localStorage.getItem(K.myId)){
-  localStorage.setItem(K.myId, 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,9));
-}
-const MY_ID = localStorage.getItem(K.myId);
+// เริ่มเชื่อมต่อ
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const videosRef = db.ref('thaipodee_videos');
+const statsRef = db.ref('thaipodee_stats');
+
+// รหัสประจำเครื่อง
+const MY_ID = localStorage.getItem('tp_my_id') || ('u_' + Date.now() + '_' + Math.random().toString(36).slice(2,9));
+localStorage.setItem('tp_my_id', MY_ID);
 
 let vidList = [];
 let totalLikes = 0;
@@ -198,57 +202,16 @@ let isLiked = false;
 let isDrag = false;
 let saved = false;
 let currentIndex = 0;
-let lastSync = 0;
+let loaded = false;
 
-// === แสดงสถานะซิงค์ ===
 function setSyncStatus(txt){
   document.getElementById('syncStatus').textContent = txt;
 }
 
-// === โหลดข้อมูลกลาง ===
-function loadGlobalData(){
-  try{
-    const stored = localStorage.getItem(K.vids);
-    vidList = stored ? JSON.parse(stored) : [];
-    totalLikes = parseInt(localStorage.getItem(K.likes) || '0');
-    lastSync = Date.now();
-    setSyncStatus('ซิงค์แล้ว ✅');
-    setTimeout(()=>setSyncStatus(''), 2000);
-  }catch(e){
-    vidList = [];
-    totalLikes = 0;
-  }
-}
-
-// === บันทึกข้อมูลกลาง + แจ้งเครื่องอื่น ===
-function saveGlobalData(){
-  localStorage.setItem(K.vids, JSON.stringify(vidList));
-  localStorage.setItem(K.likes, totalLikes.toString());
-  lastSync = Date.now();
-  // ส่งสัญญาณให้เครื่องอื่นรู้ว่ามีข้อมูลใหม่
-  CHANNEL.postMessage({type:'DATA_UPDATED', time:Date.now()});
-}
-
-// === รับสัญญาณจากเครื่องอื่น ===
-CHANNEL.onmessage = (e)=>{
-  if(e.data.type === 'DATA_UPDATED' && e.data.time > lastSync){
-    setSyncStatus('มีข้อมูลใหม่ กำลังอัปเดต...');
-    loadGlobalData();
-    renderVids();
-    if(vidList.length && currentIndex >= vidList.length){
-      currentIndex = Math.max(0, vidList.length - 1);
-    }
-    syncAll();
-    setSyncStatus('อัปเดตแล้ว ✅');
-    setTimeout(()=>setSyncStatus(''), 2000);
-  }
-};
-
-// === ซิงค์ข้อมูลส่วนตัว ===
 function syncAll(){
-  const n = localStorage.getItem(K.name) || 'Thaipodee-Master';
-  const u = localStorage.getItem(K.uname) || '@Thaipodee-Master-No.1';
-  const av = localStorage.getItem(K.av);
+  const n = localStorage.getItem('tp_name') || 'Thaipodee-Master';
+  const u = localStorage.getItem('tp_uname') || '@Thaipodee-Master-No.1';
+  const av = localStorage.getItem('tp_av');
 
   document.getElementById('pName').textContent = n;
   document.getElementById('pUname').textContent = u;
@@ -257,12 +220,10 @@ function syncAll(){
   const defAv = '';
   document.getElementById('avSideImg').src = av || defAv;
   document.getElementById('avBigImg').src = av || defAv;
-
   document.getElementById('likeCount').textContent = totalLikes;
   document.getElementById('totalLike').textContent = totalLikes;
 }
 
-// ===สลับหน้า===
 function goPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
   if(p==='home') document.getElementById('homePage').classList.remove('hidden');
@@ -275,7 +236,6 @@ document.querySelectorAll('[data-go]').forEach(b=>{
   b.addEventListener('click', ()=>goPage(b.dataset.go));
 });
 
-// ===เปลี่ยนรูปโปรไฟล์===
 document.getElementById('avSideBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avBigBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avatarInput').addEventListener('change', e=>{
@@ -283,31 +243,29 @@ document.getElementById('avatarInput').addEventListener('change', e=>{
   if(!f) return;
   const r = new FileReader();
   r.onload = ev=>{
-    localStorage.setItem(K.av, ev.target.result);
+    localStorage.setItem('tp_av', ev.target.result);
     syncAll();
   };
   r.readAsDataURL(f);
 });
 
-// ===เปลี่ยนชื่อ===
 document.getElementById('nameRow').addEventListener('click', ()=>{
-  const curr = localStorage.getItem(K.name) || 'Thaipodee-Master';
+  const curr = localStorage.getItem('tp_name') || 'Thaipodee-Master';
   const n = prompt('เปลี่ยนชื่อ', curr);
   if(n && n.trim()){
-    localStorage.setItem(K.name, n.trim());
+    localStorage.setItem('tp_name', n.trim());
     syncAll();
   }
 });
 document.getElementById('unameRow').addEventListener('click', ()=>{
-  const curr = (localStorage.getItem(K.uname) || '@Thaipodee-Master-No.1').replace('@','');
+  const curr = (localStorage.getItem('tp_uname') || '@Thaipodee-Master-No.1').replace('@','');
   const u = prompt('เปลี่ยนชื่อผู้ใช้', curr);
   if(u && u.trim()){
-    localStorage.setItem(K.uname, '@'+u.trim());
+    localStorage.setItem('tp_uname', '@'+u.trim());
     syncAll();
   }
 });
 
-// ===เล่นวิดีโอตามลำดับ===
 function playVideoAt(index){
   if(!vidList.length) return;
   if(index < 0) index = vidList.length - 1;
@@ -320,7 +278,6 @@ function playVideoAt(index){
   video.play();
 }
 
-// ===สร้างรูปปกวิดีโอ===
 function getVideoThumbnail(url){
   return new Promise(resolve=>{
     const v = document.createElement('video');
@@ -329,8 +286,7 @@ function getVideoThumbnail(url){
     v.currentTime = 1;
     v.addEventListener('loadeddata', ()=>{
       const c = document.createElement('canvas');
-      c.width = 200;
-      c.height = 267;
+      c.width = 200; c.height = 267;
       const ctx = c.getContext('2d');
       ctx.drawImage(v, 0, 0, c.width, c.height);
       resolve(c.toDataURL('image/png'));
@@ -339,7 +295,6 @@ function getVideoThumbnail(url){
   });
 }
 
-// ===อัปโหลดวิดีโอ — แชร์ให้ทุกคนเห็น===
 document.getElementById('upBtn').addEventListener('click', ()=>videoInput.click());
 document.getElementById('upBtn2').addEventListener('click', ()=>videoInput.click());
 document.getElementById('videoInput').addEventListener('change', async e=>{
@@ -347,11 +302,10 @@ document.getElementById('videoInput').addEventListener('change', async e=>{
   if(!f) return;
   const url = URL.createObjectURL(f);
   const thumb = await getVideoThumbnail(url);
-  const myName = localStorage.getItem(K.name) || 'Thaipodee-Master';
-  const myUname = localStorage.getItem(K.uname) || '@Thaipodee-Master-No.1';
+  const myName = localStorage.getItem('tp_name') || 'Thaipodee-Master';
+  const myUname = localStorage.getItem('tp_uname') || '@Thaipodee-Master-No.1';
   
-  // เพิ่มลงรายการกลาง — ทุกคนจะเห็น
-  vidList.unshift({
+  const newVid = {
     id: Date.now().toString() + '_' + Math.random().toString(36).slice(2,10),
     authorId: MY_ID,
     authorName: myName,
@@ -360,9 +314,9 @@ document.getElementById('videoInput').addEventListener('change', async e=>{
     url: url,
     thumb: thumb,
     time: Date.now()
-  });
+  };
   
-  saveGlobalData(); // บันทึก + แจ้งเครื่องอื่น
+  await videosRef.push(newVid);
   setSyncStatus('เผยแพร่แล้ว! ✅');
   setTimeout(()=>setSyncStatus(''), 2000);
   
@@ -371,7 +325,19 @@ document.getElementById('videoInput').addEventListener('change', async e=>{
   goPage('home');
 });
 
-// ===แสดงรายการวิดีโอ — ทั้งหมดจากทุกคน===
+videosRef.on('value', snap=>{
+  const data = snap.val();
+  vidList = data ? Object.values(data).sort((a,b)=>b.time - a.time) : [];
+  if(!loaded){
+    loaded = true;
+    setSyncStatus('เชื่อมต่อแล้ว ✅');
+    setTimeout(()=>setSyncStatus(''), 2000);
+    if(vidList.length) playVideoAt(0);
+  }
+  renderVids();
+  syncAll();
+});
+
 async function renderVids(){
   const g = document.getElementById('vidGrid');
   g.innerHTML = '';
@@ -381,18 +347,12 @@ async function renderVids(){
   }
   for(let i=0; i<vidList.length; i++){
     const v = vidList[i];
-    if(!v.thumb) v.thumb = await getVideoThumbnail(v.url);
-    
     const c = document.createElement('div');
     c.className='video-card';
-    // ปุ่มลบเฉพาะของเจ้าของ
-    const delBtn = v.authorId === MY_ID 
-      ? `<button class="del-btn">×</button>` 
-      : '';
+    const delBtn = v.authorId === MY_ID ? `<button class="del-btn">×</button>` : '';
     
     c.innerHTML = v.thumb 
-      ? `<img class="video-thumb" src="${v.thumb}" alt="">
-         <span class="play-icon">▶</span>${delBtn}`
+      ? `<img class="video-thumb" src="${v.thumb}" alt=""><span class="play-icon">▶</span>${delBtn}`
       : `<span class="play-icon">▶</span>${delBtn}`;
     
     c.addEventListener('click', e=>{
@@ -402,48 +362,37 @@ async function renderVids(){
     });
     
     if(v.authorId === MY_ID){
-      c.querySelector('.del-btn')?.addEventListener('click', e=>{
+      c.querySelector('.del-btn')?.addEventListener('click', async e=>{
         e.stopPropagation();
         if(confirm('ลบวิดีโอของคุณ?')){
-          vidList.splice(i,1);
-          if(currentIndex >= vidList.length) currentIndex = Math.max(0, vidList.length - 1);
-          saveGlobalData();
-          renderVids();
-          if(vidList.length) playVideoAt(currentIndex);
+          const snapshot = await videosRef.once('value');
+          const all = snapshot.val() || {};
+          for(const key in all){
+            if(all[key].id === v.id){
+              await videosRef.child(key).remove();
+              break;
+            }
+          }
         }
       });
     }
-    
     g.appendChild(c);
   }
 }
 
-// ===สไลด์เปลี่ยนวิดีโอ===
 let touchStartY = 0;
 const SWIPE_THRESHOLD = 35;
-
 document.getElementById('videoSwipeArea').addEventListener('touchstart', e=>{
   touchStartY = e.touches[0].clientY;
 }, {passive:true});
-
 document.getElementById('videoSwipeArea').addEventListener('touchend', e=>{
   if(!vidList.length) return;
-  
   const touchEndY = e.changedTouches[0].clientY;
   const diffY = touchStartY - touchEndY;
-  
   if(Math.abs(diffY) < SWIPE_THRESHOLD) return;
-  
-  if(diffY > 0){
-    // สไลด์ขึ้น → ถัดไป
-    playVideoAt(currentIndex + 1);
-  }else{
-    // สไลด์ลง → ก่อนหน้า
-    playVideoAt(currentIndex - 1);
-  }
+  playVideoAt(diffY > 0 ? currentIndex + 1 : currentIndex - 1);
 }, {passive:true});
 
-// ===แชร์===
 async function share(){
   if(navigator.share){
     try{await navigator.share({title:'ThaiPodee', url:location.href});}
@@ -456,26 +405,20 @@ async function share(){
 document.getElementById('shareBtn').addEventListener('click', share);
 document.getElementById('shareProf').addEventListener('click', share);
 
-// ===แถบเวลา===
 const video = document.getElementById('mainVideo');
 const dot = document.getElementById('progressDot');
-
 video.addEventListener('timeupdate', ()=>{
   if(!video.duration || isDrag) return;
-  const p = video.currentTime / video.duration;
-  dot.style.left = (p*100)+'%';
+  dot.style.left = (video.currentTime / video.duration * 100) + '%';
 });
-
 function seekTo(x){
   if(!video.duration) return;
   const bar = document.getElementById('progressBar');
   const r = bar.getBoundingClientRect();
-  let p = (x - r.left) / r.width;
-  p = Math.max(0, Math.min(1, p));
+  const p = Math.max(0, Math.min(1, (x - r.left) / r.width));
   video.currentTime = p * video.duration;
-  dot.style.left = (p*100)+'%';
+  dot.style.left = (p * 100) + '%';
 }
-
 document.getElementById('progressBar').addEventListener('mousedown', e=>{isDrag=true;seekTo(e.clientX);});
 document.getElementById('progressBar').addEventListener('touchstart', e=>{isDrag=true;seekTo(e.touches[0].clientX);}, {passive:true});
 document.addEventListener('mousemove', e=>{if(!isDrag)return;seekTo(e.clientX);});
@@ -483,7 +426,6 @@ document.addEventListener('touchmove', e=>{if(!isDrag)return;seekTo(e.touches[0]
 document.addEventListener('mouseup', ()=>isDrag=false);
 document.addEventListener('touchend', ()=>isDrag=false);
 
-// ===แตะจอ เล่น/หยุด===
 document.getElementById('videoSwipeArea').addEventListener('click', e=>{
   if(e.target.closest('.progress-bar')) return;
   if(video.paused || video.muted){
@@ -494,36 +436,26 @@ document.getElementById('videoSwipeArea').addEventListener('click', e=>{
   }
 });
 
-// ===ถูกใจ===
 document.getElementById('likeBtn').addEventListener('click', ()=>{
   isLiked = !isLiked;
   totalLikes += isLiked ? 1 : -1;
-  saveGlobalData();
+  statsRef.set({totalLikes});
   document.getElementById('likeIcon').textContent = isLiked ? '❤️' : '🤍';
   syncAll();
 });
 
-// ===บันทึก===
 document.getElementById('saveBtn').addEventListener('click', ()=>{
   saved = !saved;
   document.getElementById('saveIcon').textContent = saved ? '⬛' : '⬜';
 });
 
-// ===เริ่มทำงาน===
-loadGlobalData();
-syncAll();
-if(vidList.length) playVideoAt(0);
-
-// ตรวจสอบข้อมูลใหม่เป็นระยะ (สำรอง)
-setInterval(()=>{
-  const currentStored = localStorage.getItem(K.vids);
-  const currentStr = JSON.stringify(vidList);
-  if(currentStored && currentStored !== currentStr){
-    loadGlobalData();
-    renderVids();
+statsRef.on('value', snap=>{
+  const d = snap.val();
+  if(d && d.totalLikes !== undefined){
+    totalLikes = d.totalLikes;
     syncAll();
   }
-}, 3000);
+});
 </script>
 </body>
 </html>
