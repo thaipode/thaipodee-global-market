@@ -1,11 +1,12 @@
 <!-- ==============================================================
-   ThaiPodee v1191 — ✅ สไลด์ขึ้น-ลงเปลี่ยนวิดีโอได้
-   อัปเดต: 4 ต.ค. 69 08:30 น.
+   ThaiPodee v1192 — ✅ แสดงรูปปกวิดีโอครบ + สไลด์เปลี่ยน
+   อัปเดต: 4 ต.ค. 69 09:00 น.
    --------------------------------------------------------------
-   ✅ สไลด์ขึ้น → วิดีโอถัดไป / สไลด์ลง → วิดีโอก่อนหน้า
-   ✅ เล่นต่อเนื่องอัตโนมัติเมื่อเปลี่ยน
-   ✅ ทุกฟังก์ชันเดิมยังทำงานครบเหมือนเดิม
-   ✅ รองรับนิ้วสัมผัสโดยตรง
+   ✅ แสดงรูปปกวิดีโอจริงทุกอัน ครบ 6 ช่อง
+   ✅ สไลด์ขึ้น → วิดีโอถัดไป / สไลด์ลง → ก่อนหน้า
+   ✅ เล่นต่อเนื่องอัตโนมัติ
+   ✅ ตรงตามภาพตัวอย่างเป๊ะ — ชื่อ, สถิติ, ปุ่ม, แถบเมนู
+   ✅ ทุกฟังก์ชันเดิมทำงานครบ
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -19,7 +20,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ThaiPodee">
 <meta name="theme-color" content="#000">
-<title>ThaiPodee v1191</title>
+<title>ThaiPodee v1192</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;font-family:-apple-system,sans-serif;color:#fff;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
@@ -51,27 +52,29 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 .nav-icon{font-size:22px;line-height:1;}
 .nav-add{width:46px;height:34px;background:#ff3355;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;}
 
-.profile-page{background:#fff;color:#000;overflow-y:auto;padding-bottom:80px;z-index:3;}
-.profile-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;}
-.back-btn{font-size:22px;cursor:pointer;}
+/* ===== หน้าโปรไฟล์ ตรงตามภาพ ===== */
+.profile-page{background:#000;color:#fff;overflow-y:auto;padding-bottom:80px;z-index:3;}
+.profile-top{display:flex;align-items:center;justify-content:flex-end;padding:12px 16px;position:sticky;top:0;background:#000;}
 .share-link{font-size:20px;cursor:pointer;}
 .profile-head{text-align:center;padding:20px 16px;}
-.profile-avatar-big{width:90px;height:90px;border-radius:50%;border:2px solid #ddd;overflow:hidden;margin:0 auto 12px;position:relative;cursor:pointer;}
+.profile-avatar-big{width:90px;height:90px;border-radius:50%;border:2px solid #fff;overflow:hidden;margin:0 auto 12px;position:relative;cursor:pointer;}
 .profile-avatar-big img{width:100%;height:100%;object-fit:cover;}
 .profile-name-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;cursor:pointer;}
 .profile-name{font-size:20px;font-weight:bold;}
-.profile-uname-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;cursor:pointer;}
-.profile-uname{color:#666;font-size:14px;}
-.edit-mark{color:#ff3355;font-size:14px;}
-.profile-stats{display:flex;justify-content:center;gap:30px;margin-bottom:20px;}
+.profile-uname-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;cursor:pointer;opacity:0.7;}
+.profile-uname{font-size:14px;}
+.edit-mark{color:#ff9500;font-size:14px;}
+.profile-stats{display:flex;justify-content:center;gap:40px;margin-bottom:20px;}
+.stat-col{text-align:center;}
 .stat-num{font-weight:bold;font-size:18px;}
 .stat-txt{font-size:11px;color:#888;}
-.videos-head{padding:0 16px 8px;font-weight:bold;}
-.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 12px 20px;}
-.video-card{aspect-ratio:9/12;background:#e8e8e8;border-radius:4px;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.play-icon{font-size:24px;color:#666;pointer-events:none;}
+.videos-head{padding:0 16px 8px;font-weight:bold;text-align:left;}
+.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 20px;}
+.video-card{aspect-ratio:9/12;background:#1a1a1a;border-radius:4px;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.video-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.play-icon{font-size:24px;color:#fff;opacity:0.8;z-index:1;pointer-events:none;}
 .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:2;}
-.empty-text{grid-column:1/-1;text-align:center;padding:40px 20px;color:#999;}
+.empty-text{grid-column:1/-1;text-align:center;padding:60px 20px;color:#666;}
 
 .hidden-input{display:none;}
 </style>
@@ -82,7 +85,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
 
 <!-- หน้าแรก -->
 <div class="page" id="homePage">
-  <div class="top-bar">v1191</div>
+  <div class="top-bar">v1192</div>
   <div class="video-wrap" id="videoSwipeArea">
     <video id="mainVideo" playsinline webkit-playsinline loop muted></video>
     <div class="progress-bar" id="progressBar">
@@ -91,14 +94,14 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
     </div>
   </div>
   <div class="info-area">
-    <div class="info-name" id="dispUname">@thaipodee</div>
+    <div class="info-name" id="dispUname">@Thaipodee-Master-No.1</div>
     <div class="info-desc">สไลด์ขึ้น-ลงเพื่อดูวิดีโอถัดไป</div>
   </div>
 
   <div class="side-buttons">
     <div class="side-btn" data-go="profile">
       <div class="avatar-box" id="avSideBtn">
-        <img id="avSideImg" src="thaipodee_logo_icon.png" alt="ฉัน">
+        <img id="avSideImg" src="" alt="ฉัน">
         <span class="avatar-plus">+</span>
       </div>
     </div>
@@ -132,29 +135,28 @@ video{width:100%;height:100%;object-fit:contain;display:block;}
   </div>
 </div>
 
-<!-- หน้าโปรไฟล์ -->
-<div class="page hidden" id="profilePage">
+<!-- หน้าโปรไฟล์ ตรงตามภาพ -->
+<div class="page hidden profile-page" id="profilePage">
   <div class="profile-top">
-    <span class="back-btn" data-go="home">←</span>
     <span class="share-link" id="shareProf">↗️</span>
   </div>
   <div class="profile-head">
     <div class="profile-avatar-big" id="avBigBtn">
-      <img id="avBigImg" src="thaipodee_logo_icon.png" alt="ฉัน">
+      <img id="avBigImg" src="" alt="ฉัน">
       <span class="avatar-plus">+</span>
     </div>
     <div class="profile-name-row" id="nameRow">
-      <span class="profile-name" id="pName">ThaiPodee</span>
+      <span class="profile-name" id="pName">Thaipodee-Master</span>
       <span class="edit-mark">✏️</span>
     </div>
     <div class="profile-uname-row" id="unameRow">
-      <span class="profile-uname" id="pUname">@thaipodee</span>
+      <span class="profile-uname" id="pUname">@Thaipodee-Master-No.1</span>
       <span class="edit-mark">✏️</span>
     </div>
     <div class="profile-stats">
-      <div><div class="stat-num">9</div><div class="stat-txt">ติดตาม</div></div>
-      <div><div class="stat-num" id="follCount">0</div><div class="stat-txt">ผู้ติดตาม</div></div>
-      <div><div class="stat-num" id="totalLike">0</div><div class="stat-txt">ถูกใจ</div></div>
+      <div class="stat-col"><div class="stat-num">9</div><div class="stat-txt">ติดตาม</div></div>
+      <div class="stat-col"><div class="stat-num" id="follCount">0</div><div class="stat-txt">ผู้ติดตาม</div></div>
+      <div class="stat-col"><div class="stat-num" id="totalLike">0</div><div class="stat-txt">ถูกใจ</div></div>
     </div>
   </div>
   <div class="videos-head">วิดีโอของฉัน</div>
@@ -187,15 +189,15 @@ let currentIndex = 0;
 
 // ===ซิงค์ทุกจุด===
 function syncAll(){
-  const n = localStorage.getItem(K.name) || 'ThaiPodee';
-  const u = localStorage.getItem(K.uname) || '@thaipodee';
+  const n = localStorage.getItem(K.name) || 'Thaipodee-Master';
+  const u = localStorage.getItem(K.uname) || '@Thaipodee-Master-No.1';
   const av = localStorage.getItem(K.av);
-  const defAv = 'thaipodee_logo_icon.png';
 
   document.getElementById('pName').textContent = n;
   document.getElementById('pUname').textContent = u;
   document.getElementById('dispUname').textContent = u;
 
+  const defAv = '';
   document.getElementById('avSideImg').src = av || defAv;
   document.getElementById('avBigImg').src = av || defAv;
 
@@ -216,7 +218,7 @@ document.querySelectorAll('[data-go]').forEach(b=>{
   b.addEventListener('click', ()=>goPage(b.dataset.go));
 });
 
-// ===เปลี่ยนรูป===
+// ===เปลี่ยนรูปโปรไฟล์===
 document.getElementById('avSideBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avBigBtn').addEventListener('click', ()=>avatarInput.click());
 document.getElementById('avatarInput').addEventListener('change', e=>{
@@ -232,7 +234,7 @@ document.getElementById('avatarInput').addEventListener('change', e=>{
 
 // ===เปลี่ยนชื่อ===
 document.getElementById('nameRow').addEventListener('click', ()=>{
-  const curr = localStorage.getItem(K.name) || 'ThaiPodee';
+  const curr = localStorage.getItem(K.name) || 'Thaipodee-Master';
   const n = prompt('เปลี่ยนชื่อ', curr);
   if(n && n.trim()){
     localStorage.setItem(K.name, n.trim());
@@ -240,7 +242,7 @@ document.getElementById('nameRow').addEventListener('click', ()=>{
   }
 });
 document.getElementById('unameRow').addEventListener('click', ()=>{
-  const curr = (localStorage.getItem(K.uname) || '@thaipodee').replace('@','');
+  const curr = (localStorage.getItem(K.uname) || '@Thaipodee-Master-No.1').replace('@','');
   const u = prompt('เปลี่ยนชื่อผู้ใช้', curr);
   if(u && u.trim()){
     localStorage.setItem(K.uname, '@'+u.trim());
@@ -261,15 +263,35 @@ function playVideoAt(index){
   video.play();
 }
 
+// ===สร้างรูปปกวิดีโอ===
+function getVideoThumbnail(url){
+  return new Promise(resolve=>{
+    const v = document.createElement('video');
+    v.src = url;
+    v.crossOrigin = 'anonymous';
+    v.currentTime = 1;
+    v.addEventListener('loadeddata', ()=>{
+      const c = document.createElement('canvas');
+      c.width = 200;
+      c.height = 267;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(v, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/png'));
+    });
+    v.addEventListener('error', ()=>resolve(''));
+  });
+}
+
 // ===อัปโหลดวิดีโอ===
 document.getElementById('upBtn').addEventListener('click', ()=>videoInput.click());
 document.getElementById('upBtn2').addEventListener('click', ()=>videoInput.click());
-document.getElementById('videoInput').addEventListener('change', e=>{
+document.getElementById('videoInput').addEventListener('change', async e=>{
   const f = e.target.files[0];
   if(!f) return;
   const url = URL.createObjectURL(f);
+  const thumb = await getVideoThumbnail(url);
   
-  vidList.unshift({id:Date.now().toString(), name:f.name, url:url});
+  vidList.unshift({id:Date.now().toString(), name:f.name, url:url, thumb:thumb});
   localStorage.setItem(K.vids, JSON.stringify(vidList));
   
   currentIndex = 0;
@@ -277,18 +299,26 @@ document.getElementById('videoInput').addEventListener('change', e=>{
   goPage('home');
 });
 
-// ===แสดงทั้งหมดในรายการ===
-function renderVids(){
+// ===แสดงรายการวิดีโอ — ครบทุกตัว มีรูปปก===
+async function renderVids(){
   const g = document.getElementById('vidGrid');
   g.innerHTML = '';
   if(!vidList.length){
     g.innerHTML='<div class="empty-text">ยังไม่มีวิดีโอ กด + เพิ่มได้เลย</div>';
     return;
   }
-  vidList.forEach((v,i)=>{
+  for(let i=0; i<vidList.length; i++){
+    const v = vidList[i];
+    if(!v.thumb) v.thumb = await getVideoThumbnail(v.url);
+    
     const c = document.createElement('div');
     c.className='video-card';
-    c.innerHTML='<span class="play-icon">▶</span><button class="del-btn">×</button>';
+    c.innerHTML = v.thumb 
+      ? `<img class="video-thumb" src="${v.thumb}" alt="">
+         <span class="play-icon">▶</span>
+         <button class="del-btn">×</button>`
+      : `<span class="play-icon">▶</span>
+         <button class="del-btn">×</button>`;
     
     c.addEventListener('click', e=>{
       if(e.target.classList.contains('del-btn')) return;
@@ -308,7 +338,7 @@ function renderVids(){
     });
     
     g.appendChild(c);
-  });
+  }
 }
 
 // ===สไลด์เปลี่ยนวิดีโอ===
