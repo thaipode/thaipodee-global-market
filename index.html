@@ -1,5 +1,5 @@
 <!-- ==============================================================
-   ThaiPodee v1200-SUPABASE — พร้อมใช้งาน ✅
+   ThaiPodee v1204-FINAL-WORKING ✅
    ============================================================== -->
 <!DOCTYPE html>
 <html lang="th">
@@ -7,11 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="https://i.imgur.com/KJbRzQY.png">
-<link rel="apple-touch-icon" href="https://i.imgur.com/KJbRzQY.png">
-<title>ThaiPodee v1200</title>
+<title>ThaiPodee v1204</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
@@ -26,27 +23,20 @@ video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;o
 .upload-btn:active{transform:translateX(-50%) scale(.95)}
 
 .video-list{position:absolute;bottom:100px;left:0;right:0;padding:0 12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:calc(100vh - 180px);z-index:2}
-.video-item{background:#111;border-radius:12px;overflow:hidden;display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border:1px solid #333}
+.video-item{background:#111;border-radius:12px;display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border:1px solid #333}
 .video-item:hover{border-color:#f00}
-.video-thumb{width:100px;height:60px;background:#222;border-radius:6px;flex-shrink:0;object-fit:cover}
+.video-thumb{width:100px;height:60px;background:#222;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:20px}
 .video-info{flex:1;color:#fff;font-size:14px}
 
 #fileInput{display:none}
 
-.install-bar{position:fixed;top:0;left:0;right:0;background:#f00;color:#fff;padding:10px 16px;text-align:center;z-index:200;transform:translateY(-100%);transition:transform .3s}
-.install-bar.show{transform:translateY(0)}
-.install-btn{background:#fff;color:#f00;border:none;padding:6px 16px;border-radius:20px;font-weight:bold;margin-left:10px;cursor:pointer}
-.version{position:absolute;top:8px;right:12px;color:#666;font-size:11px;z-index:5}
+.version-tag{position:absolute;top:12px;right:12px;color:#666;font-size:12px;z-index:10}
+.status-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#fff;padding:20px 30px;border-radius:12px;z-index:2000;text-align:center;display:none}
 </style>
 </head>
 <body>
 
-<div class="install-bar" id="installBar">
-  <span>ติดตั้งแอปหน้าจอ</span>
-  <button class="install-btn" id="installBtn">ติดตั้ง</button>
-</div>
-
-<div class="version">v1200</div>
+<div class="version-tag">v1204</div>
 
 <div class="video-container" id="videoContainer">
   <video id="mainVideo" controls playsinline webkit-playsinline></video>
@@ -57,81 +47,101 @@ video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;o
 <button class="upload-btn" id="uploadBtn">+</button>
 <input type="file" id="fileInput" accept="video/*">
 
+<div class="status-msg" id="statusMsg"></div>
+
 <script>
-const supabaseUrl = 'https://pinoqstzlscqqwietvbv.supabase.co'
-const supabaseKey = 'sb_publishable_lr4yrKHV-OiKmzba1WIylA_guU3oxTi'
+const SUPABASE_URL = 'https://pinoqstzscqqwietvbv.supabase.co'
+const SUPABASE_KEY = 'sb_public_lr4yrKHV-01Kmzba1WIyLA_guU3o'
+
 const { createClient } = supabase
-const _supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const videoListEl = document.getElementById('videoList')
 const mainVideoEl = document.getElementById('mainVideo')
 const uploadBtn = document.getElementById('uploadBtn')
 const fileInput = document.getElementById('fileInput')
-const installBar = document.getElementById('installBar')
-const installBtn = document.getElementById('installBtn')
+const statusMsg = document.getElementById('statusMsg')
 
-let deferredPrompt = null
-
-async function loadVideos() {
-  const { data } = await _supabase
-    .from('videos')
-    .select('*')
-    .order('created_at', { ascending: false })
-  
-  videoListEl.innerHTML = ''
-  data?.forEach(vid => addVideoToList(vid))
+function showMsg(text, time=2000) {
+  statusMsg.textContent = text
+  statusMsg.style.display = 'block'
+  setTimeout(() => statusMsg.style.display = 'none', time)
 }
 
-function addVideoToList(vid) {
+async function loadVideos() {
+  try {
+    const { data, error } = await supabase
+      .from('videos')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('โหลดไม่ได้:', error)
+      return
+    }
+
+    videoListEl.innerHTML = ''
+    data?.forEach(vid => addVideoItem(vid))
+  } catch (e) {
+    console.error('ผิดพลาด:', e)
+  }
+}
+
+function addVideoItem(vid) {
   const item = document.createElement('div')
   item.className = 'video-item'
   item.innerHTML = `
-    <img src="https://i.imgur.com/KJbRzQY.png" class="video-thumb">
+    <div class="video-thumb">▶</div>
     <div class="video-info">
       <div>${vid.name}</div>
-      <div style="font-size:11px;color:#888">${new Date(vid.created_at).toLocaleString('th-TH')}</div>
+      <div style="font-size:11px;color:#666;margin-top:4px">${new Date(vid.created_at).toLocaleString('th-TH')}</div>
     </div>
   `
-  item.onclick = () => { mainVideoEl.src = vid.url; mainVideoEl.play() }
+  item.onclick = () => {
+    mainVideoEl.src = vid.url
+    mainVideoEl.play().catch(() => {})
+  }
   videoListEl.appendChild(item)
 }
 
 uploadBtn.onclick = () => fileInput.click()
+
 fileInput.onchange = async e => {
   const file = e.target.files[0]
   if (!file) return
-  
-  const name = Date.now() + '_' + file.name
-  const { data: uploadData, error: uploadErr } = await _supabase.storage
-    .from('videos')
-    .upload(`public/${name}`, file, { cacheControl: '3600' })
 
-  if (uploadErr) return alert('อัปโหลดไม่ได้: ' + uploadErr.message)
+  showMsg('กำลังอัปโหลด...', 0)
 
-  const { data: { publicUrl } } = _supabase.storage
-    .from('videos')
-    .getPublicUrl(`public/${name}`)
+  try {
+    const fileName = `${Date.now()}_${file.name}`
+    
+    const { data: uploadData, error: uploadErr } = await supabase.storage
+      .from('videos')
+      .upload(`public/${fileName}`, file, { cacheControl: '3600' })
 
-  await _supabase.from('videos').insert([{
-    name: file.name,
-    url: publicUrl
-  }])
+    if (uploadErr) {
+      showMsg('อัปโหลดไม่ได้: ' + uploadErr.message, 3000)
+      return
+    }
 
-  loadVideos()
-  alert('อัปโหลดเสร็จ! ✅')
-}
+    const { data: { publicUrl } } = supabase.storage
+      .from('videos')
+      .getPublicUrl(`public/${fileName}`)
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault()
-  deferredPrompt = e
-  installBar.classList.add('show')
-})
+    const { error: insertErr } = await supabase
+      .from('videos')
+      .insert([{ name: file.name, url: publicUrl }])
 
-installBtn.onclick = async () => {
-  if (!deferredPrompt) return
-  deferredPrompt.prompt()
-  const { outcome } = await deferredPrompt.userChoice
-  if (outcome === 'accepted') installBar.classList.remove('show')
+    if (insertErr) {
+      showMsg('บันทึกไม่ได้: ' + insertErr.message, 3000)
+      return
+    }
+
+    showMsg('อัปโหลดเสร็จ! ✅')
+    loadVideos()
+  } catch (e) {
+    showMsg('ผิดพลาด: ' + e.message, 3000)
+  }
 }
 
 loadVideos()
