@@ -13,26 +13,30 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
 html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
 
-/* จอวิดีโอเต็มจอ */
+/* จอวิดีโอ */
 .video-container { position: relative; width: 100%; height: 100vh; }
 video { width: 100%; height: 100%; object-fit: cover; background: #111; }
 
-/* ข้อมูลด้านล่างวิดีโอ */
-.video-info { position: absolute; bottom: 90px; left: 15px; right: 70px; z-index: 10; }
-.username { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+/* ข้อมูลด้านล่าง */
+.video-info { position: absolute; bottom: 90px; left: 15px; right: 90px; z-index: 10; }
+.username { font-weight: bold; font-size: 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 .description { font-size: 14px; line-height: 1.4; color: #eee; }
 
-/* แถบเมนูด้านล่าง */
-.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; display: flex; justify-content: space-around; align-items: center; background: #000; z-index: 20; padding: 0 10px; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; color: #fff; text-decoration: none; font-size: 12px; }
-.nav-icon { font-size: 24px; margin-bottom: 2px; }
-.nav-add { width: 50px; height: 50px; border-radius: 50%; background: #f00; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; line-height: 1; }
-
-/* แถบไอคอนด้านขวา */
+/* แถบไอคอนด้านขวา — ครบ 5 อัน */
 .side-icons { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 15; }
-.side-icon { font-size: 26px; cursor: pointer; }
+.side-icon { font-size: 28px; cursor: pointer; text-align: center; }
+.side-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; padding: 0; overflow: hidden; }
+.side-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-/* สถานะเชื่อมต่อ */
+/* แถบเมนูล่าง */
+.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; display: flex; justify-content: space-around; align-items: center; background: #000; z-index: 20; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; color: #fff; text-decoration: none; font-size: 11px; }
+.nav-icon { font-size: 24px; margin-bottom: 2px; }
+.nav-add { width: 52px; height: 52px; border-radius: 50%; background: #f00; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; line-height: 1; }
+
+/* สถานะ */
 #syncStatus { position: absolute; top: 10px; left: 10px; font-size: 13px; color: #0f0; z-index: 30; }
 
 /* แถบเวลา */
@@ -50,16 +54,23 @@ video { width: 100%; height: 100%; object-fit: cover; background: #111; }
   
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill">
-      <div class="progress-dot" id="progressDot"></div>
+      <div class="progress-dot"></div>
     </div>
   </div>
   
   <div class="video-info">
-    <div class="username" id="username">@Thaipodee-Master-No.1</div>
+    <div class="username">
+      <div class="avatar" id="infoAvatar">👤</div>
+      <span id="username">@Thaipodee-Master-No.1</span>
+    </div>
     <div class="description" id="vidDesc">กด + เพื่ออัปโหลดวิดีโอ</div>
   </div>
   
+  <!-- ✅ ไอคอนด้านขวาครบ 5 อัน + รูปโปรไฟล์บนสุด -->
   <div class="side-icons">
+    <div class="side-icon side-avatar" id="profileBtn">
+      <span id="sideAvatar">👤</span>
+    </div>
     <div class="side-icon" id="likeBtn">🤍</div>
     <div class="side-icon">💬</div>
     <div class="side-icon">📄</div>
@@ -79,72 +90,84 @@ video { width: 100%; height: 100%; object-fit: cover; background: #111; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 <script>
 // ==============================================================
-// ThaiPodee v1205 — ครบทั้งระบบ เชื่อมต่อ Supabase ตรงเป๊ะ
+// ThaiPodee — ครบทุกอย่าง: ไอคอน+รูปโปรไฟล์+Supabase
 // ==============================================================
 
 const SUPABASE_URL = 'https://pinoqstzlscqqwietvbv.supabase.com'
 const SUPABASE_KEY = 'sb_publishable_lr4yrKHV-OiKmzba1WlyIA_guU3oxTi'
 
-// สร้างการเชื่อมต่อ
 const { createClient } = supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// สร้างรหัสประจำเครื่อง
 const MY_ID = localStorage.getItem('tp_my_id') || ('u_' + Date.now())
 localStorage.setItem('tp_my_id', MY_ID)
 
-// ตัวแปรหลัก
-let vidList = []
-let currentIndex = 0
-let isLiked = false
+let vidList = [], currentIndex = 0, isLiked = false
 
-// อ้างอิงองค์ประกอบ
 const syncStatus = document.getElementById('syncStatus')
 const mainVideo = document.getElementById('mainVideo')
 const vidDesc = document.getElementById('vidDesc')
 const upBtn = document.getElementById('upBtn2')
 const likeBtn = document.getElementById('likeBtn')
-const progressFill = document.getElementById('progressFill')
+const profileBtn = document.getElementById('profileBtn')
+const infoAvatar = document.getElementById('infoAvatar')
+const sideAvatar = document.getElementById('sideAvatar')
+const usernameEl = document.getElementById('username')
 
-// ==============================================================
-// โหลดรายการวิดีโอ
-// ==============================================================
+// โหลดรูปโปรไฟล์จากเครื่อง
+function loadAvatar() {
+  const saved = localStorage.getItem('tp_avatar')
+  if (saved) {
+    infoAvatar.innerHTML = `<img src="${saved}" alt="โปรไฟล์">`
+    sideAvatar.innerHTML = `<img src="${saved}" alt="โปรไฟล์">`
+  }
+  const savedName = localStorage.getItem('tp_name')
+  if (savedName) usernameEl.textContent = '@' + savedName
+}
+
+// เปลี่ยนรูปโปรไฟล์
+profileBtn.addEventListener('click', () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = e => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const base64 = ev.target.result
+      localStorage.setItem('tp_avatar', base64)
+      loadAvatar()
+    }
+    reader.readAsDataURL(file)
+  }
+  input.click()
+})
+
+// โหลดวิดีโอ
 async function loadVideos() {
   try {
     syncStatus.textContent = 'กำลังโหลด...'
-    
     const { data, error } = await supabase
       .from('videos')
       .select('*')
       .order('created_at', { ascending: false })
-    
     if (error) throw error
-    
     vidList = data || []
-    
-    if (vidList.length === 0) {
-      syncStatus.textContent = 'ออนไลน์ ✅ ยังไม่มีวิดีโอ กด + เพิ่ม'
-      vidDesc.textContent = 'กดปุ่ม + ด้านล่างเพื่ออัปโหลดวิดีโอแรก'
-      return
-    }
-    
-    syncStatus.textContent = `ออนไลน์ ✅ ${vidList.length} รายการ`
-    showVideo(0)
-    
+    syncStatus.textContent = vidList.length === 0 
+      ? 'ออนไลน์ ✅ กด + เพิ่มวิดีโอแรก' 
+      : `ออนไลน์ ✅ ${vidList.length} รายการ`
+    if (vidList.length > 0) showVideo(0)
   } catch (err) {
-    console.error('โหลดไม่ได้:', err)
+    console.error(err)
     syncStatus.textContent = 'เชื่อมต่อไม่ได้ ❌'
   }
 }
 
-// ==============================================================
-// แสดงวิดีโอ
-// ==============================================================
 function showVideo(index) {
   if (vidList.length === 0) return
   currentIndex = (index + vidList.length) % vidList.length
   const v = vidList[currentIndex]
-  
   mainVideo.src = v.video_url
   vidDesc.textContent = v.description || 'ไม่มีคำอธิบาย'
   isLiked = false
@@ -152,17 +175,14 @@ function showVideo(index) {
   mainVideo.play()
 }
 
-// อัปเดตแถบเวลา
 mainVideo.addEventListener('timeupdate', () => {
   if (mainVideo.duration) {
-    const pct = (mainVideo.currentTime / mainVideo.duration) * 100
-    progressFill.style.width = pct + '%'
+    document.getElementById('progressFill').style.width = 
+      (mainVideo.currentTime / mainVideo.duration) * 100 + '%'
   }
 })
 
-// ==============================================================
-// อัปโหลดวิดีโอ
-// ==============================================================
+// อัปโหลด
 upBtn.addEventListener('click', () => {
   const input = document.createElement('input')
   input.type = 'file'
@@ -170,39 +190,22 @@ upBtn.addEventListener('click', () => {
   input.onchange = async e => {
     const file = e.target.files[0]
     if (!file) return
-    
-    const desc = prompt('ใส่คำอธิบายวิดีโอ:') || 'วิดีโอใหม่'
+    const desc = prompt('คำอธิบายวิดีโอ:') || 'วิดีโอใหม่'
     syncStatus.textContent = 'กำลังอัปโหลด...'
-    
     try {
-      const fileName = `${MY_ID}_${Date.now()}_${file.name}`
-      
-      // อัปโหลดไฟล์
+      const fn = `${MY_ID}_${Date.now()}_${file.name}`
       const { error: upErr } = await supabase.storage
-        .from('videos')
-        .upload(`${MY_ID}/${fileName}`, file)
-      
+        .from('videos').upload(`${MY_ID}/${fn}`, file)
       if (upErr) throw upErr
-      
-      // ลิงก์สาธารณะ
       const { data: { publicUrl } } = supabase.storage
-        .from('videos')
-        .getPublicUrl(`${MY_ID}/${fileName}`)
-      
-      // บันทึกลงตาราง
+        .from('videos').getPublicUrl(`${MY_ID}/${fn}`)
       const { error: dbErr } = await supabase.from('videos').insert([{
-        user_id: MY_ID,
-        description: desc,
-        video_url: publicUrl
+        user_id: MY_ID, description: desc, video_url: publicUrl
       }])
-      
       if (dbErr) throw dbErr
-      
       syncStatus.textContent = 'อัปโหลดสำเร็จ ✅'
       await loadVideos()
-      
     } catch (err) {
-      console.error(err)
       alert('ล้มเหลว: ' + err.message)
       syncStatus.textContent = 'อัปโหลดไม่ได้ ❌'
     }
@@ -210,25 +213,21 @@ upBtn.addEventListener('click', () => {
   input.click()
 })
 
-// ==============================================================
-// สไลด์เปลี่ยนวิดีโอ
-// ==============================================================
+// สไลด์เปลี่ยวิดีโอ
 let startY = 0
-mainVideo.addEventListener('touchstart', e => { startY = e.touches[0].clientY })
+mainVideo.addEventListener('touchstart', e => startY = e.touches[0].clientY)
 mainVideo.addEventListener('touchend', e => {
   const diff = startY - e.changedTouches[0].clientY
-  if (Math.abs(diff) > 60) {
-    showVideo(currentIndex + (diff > 0 ? 1 : -1))
-  }
+  if (Math.abs(diff) > 60) showVideo(currentIndex + (diff > 0 ? 1 : -1))
 })
 
-// กดไลค์
 likeBtn.addEventListener('click', () => {
   isLiked = !isLiked
   likeBtn.textContent = isLiked ? '❤️' : '🤍'
 })
 
-// เริ่มทำงาน
+// เริ่ม
+loadAvatar()
 loadVideos()
 </script>
 </body>
